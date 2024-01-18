@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Understanding with (nolock) in SQL Server :: sqlpey - Example site for hugo-theme-tailwind</title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta
+  name="description"
+  content="What is &amp;quot;with (nolock)&amp;quot; in SQL Server? What is &amp;ldquo;with (nolock)&amp;rdquo; in SQL Server?
+Can someone explain the implications of using with (nolock) on queries, when you should/shouldn&amp;rsquo;t use it? For example, if you have a banking application with high transaction rates and a lot of data in certain tables, in what types of queries would nolock be okay? Are there cases when you should always use it/never use it?"
+/>
+<meta
+  name="keywords"
+  content="hugo, tailwind, tailwindcss, hugo theme, hugo theme tailwind"
+/>
+<meta name="robots" content="noodp" />
+<meta property="og:title" content="Understanding with (nolock) in SQL Server" />
+<meta property="og:description" content="What is &quot;with (nolock)&quot; in SQL Server? What is &ldquo;with (nolock)&rdquo; in SQL Server?
+Can someone explain the implications of using with (nolock) on queries, when you should/shouldn&rsquo;t use it? For example, if you have a banking application with high transaction rates and a lot of data in certain tables, in what types of queries would nolock be okay? Are there cases when you should always use it/never use it?" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://sqlpey.com/question/understanding-with-nolock-in-sql-server/" /><meta property="article:section" content="question" />
+<meta property="article:published_time" content="2023-03-19T22:54:31+00:00" />
+<meta property="article:modified_time" content="2023-03-19T22:54:31+00:00" />
+
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Understanding with (nolock) in SQL Server"/>
+<meta name="twitter:description" content="What is &quot;with (nolock)&quot; in SQL Server? What is &ldquo;with (nolock)&rdquo; in SQL Server?
+Can someone explain the implications of using with (nolock) on queries, when you should/shouldn&rsquo;t use it? For example, if you have a banking application with high transaction rates and a lot of data in certain tables, in what types of queries would nolock be okay? Are there cases when you should always use it/never use it?"/>
+
+
+<link rel="canonical" href="https://sqlpey.com/question/understanding-with-nolock-in-sql-server/" />
+
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="stylesheet" href="/css/index.min.00daf36bd5ee9fe1c553da346dd7a1d93bc97b5cf1fde7ddd1f4a5bd9b1901db.css">
+
+
+
+
+
+
+
+
+
+</head>
+<body class="w-full bg-slate-50 dark:bg-gray-800">
+  <header class="flex flex-none justify-center z-10">
+    <div class="flex flex-row gap justify-between w-full max-w-4xl lg:max-w-5xl h-12 mt-3">
+  <div class="flex-none ml-2 md:ml-0">
+    <a href="/" class="">
+      <img class="h-12 w-12 rounded-full object-cover bg-gray-100" src="/logo_header.webp" alt="logo">
+    </a>
+  </div>
+  <div class="flex-1"></div>
+  <div class="flex-none">
+    
+
+
+
+<nav class="h-full static">
+  <button id="navbar-menu-toggle" type="button" class="inline-flex items-center p-2 text-sm text-slate-800 dark:text-slate-200 rounded-lg md:hidden" aria-controls="navbar-menu" aria-expanded="false">
+    <span class="sr-only">Open main menu</span>
+    <i class="w-8 h-8">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-menu-2" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 6l16 0" />
+  <path d="M4 12l16 0" />
+  <path d="M4 18l16 0" />
+</svg>
+
+    </i>
+  </button>
+  <div class="absolute md:static top-16 left-0 right-0 z-50 hidden w-full md:block md:w-auto" id="navbar-menu">
+    <ul class="flex flex-col mx-2 md:mx-0 md:flex-row md:border-0 rounded-sm md:rounded-full px-3 text-base font-medium text-slate-800 dark:text-slate-200 shadow-lg bg-white dark:bg-gray-600 shadow-slate-800/5 dark:shadow-slate-200/5 ring-1 ring-slate-900/5 dark:ring-slate-100/5">
+    
+        <li id="questions" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="" title="Questions">Questions</a>
+        </li>
+      
+    
+        <li id="about" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="" title="About">About</a>
+        </li>
+      
+    
+        <li id="" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="/" title="Home">Home</a>
+        </li>
+      
+    
+    </ul>
+  </div>
+</nav>
+
+
+  </div>
+  
+  <div class="flex-none mx-1"></div>
+  
+  <div class="darkmode-toggle flex flex-none mr-2 md:mr-0">
+    <label for="darkmode-toggle" class="flex items-center px-3 cursor-pointer rounded-full bg-gray-100 dark:bg-gray-600" title="Toggle dark mode">
+      <input name="darkmode-toggle" id="darkmode-toggle" type="checkbox" class="sr-only peer" aria-label="Toggle dark mode">
+      <div class="group flex flex-row gap-1 justify-center h-8 px-1 rounded-full bg-white dark:bg-gray-700">
+        <i class="h-6 w-6 flex-none rounded-full bg-yellow-400 place-self-center peer-checked:group-[]:invisible">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brightness-down" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+   <path d="M12 5l0 .01"></path>
+   <path d="M17 7l0 .01"></path>
+   <path d="M19 12l0 .01"></path>
+   <path d="M17 17l0 .01"></path>
+   <path d="M12 19l0 .01"></path>
+   <path d="M7 17l0 .01"></path>
+   <path d="M5 12l0 .01"></path>
+   <path d="M7 7l0 .01"></path>
+</svg>
+
+        </i>
+        <i class="h-6 w-6 flex-none rounded-full place-self-center invisible peer-checked:group-[]:visible">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-moon-stars" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"></path>
+   <path d="M17 4a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2"></path>
+   <path d="M19 11h2m-1 -1v2"></path>
+</svg>
+
+        </i>
+      </div>
+    </label>
+  </div>
+</div>
+
+  </header>
+  <main class="flex flex-auto justify-center">
+    
+<div class="w-full max-w-4xl lg:max-w-5xl">
+  <div class="flex flex-col gap-y-3 p-6 mt-6 mx-2 md:mx-0 rounded-lg shadow-md bg-white dark:bg-gray-700">
+    <h1 class="text-4xl font-semibold text-slate-800 dark:text-slate-100">
+      <a href="/question/understanding-with-nolock-in-sql-server/">Understanding with (nolock) in SQL Server</a>
+    </h1>
+
+    
+    
+  <ul class="flex flex-row flex-wrap text-slate-500 dark:text-slate-300">
+    
+      
+      <li>
+        <a href="/categories/sql-server/"
+          class="text-sm mr-2 px-2 py-1 rounded border border-emerald-800 bg-emerald-800 text-slate-50">
+          SQL SERVER
+        </a>
+      </li>
+      
+    
+    
+      
+      <li>
+        <a href="/tags/sql-server/"
+          class="flex flex-row text-sm mr-2 py-1">
+          <i class="h-5 w-5 flex-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M5 9l14 0"></path>
+   <path d="M5 15l14 0"></path>
+   <path d="M11 4l-4 16"></path>
+   <path d="M17 4l-4 16"></path>
+</svg>
+
+          </i>
+          <span class="ml-0">SQL SERVER</span>
+        </a>
+      </li>
+      
+    
+  </ul>
+
+
+
+    <div class="flex flex-col gap-y-1 md:flex-row md:gap-y-0 md:gap-x-4 text-slate-500 dark:text-slate-300">
+  
+  
+  <div class="flex flex-row text-base gap-x-1">
+    <i class="h-6 w-6 flex-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"></path>
+   <path d="M16 3v4"></path>
+   <path d="M8 3v4"></path>
+   <path d="M4 11h16"></path>
+   <path d="M11 15h1"></path>
+   <path d="M12 15v3"></path>
+</svg>
+
+    </i>
+    <time datetime="2023-03-19T22:54:31&#43;00:00">
+      2023-03-19
+    </time>
+  </div>
+
+  <div class="flex flex-row text-base gap-x-1">
+    <i class="h-6 w-6 flex-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hourglass-high" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M6.5 7h11"></path>
+   <path d="M6 20v-2a6 6 0 1 1 12 0v2a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1z"></path>
+   <path d="M6 4v2a6 6 0 1 0 12 0v-2a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1z"></path>
+</svg>
+
+    </i>
+    <span>
+      4 minutes to read
+    </span>
+  </div>
+</div>
+
+
+    
+      
+      <section class="prose prose-slate dark:prose-invert w-full max-w-4xl lg:max-w-5xl mt-6">
+        <h2>Table of Contents</h2>
+        <aside><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#further-reading">Further Reading</a></li>
+        <li><a href="#when-to-use-with-nolock">When to Use With (Nolock)</a></li>
+        <li><a href="#alternative-methods">Alternative Methods</a></li>
+        <li><a href="#to-summarize">To Summarize</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></aside>
+      </section>
+      
+    
+
+    <article class="mt-6 w-full max-w-4xl lg:max-w-5xl prose prose-slate dark:prose-invert prose-quoteless post-content">
+      <p>What is &quot;with (nolock)&quot; in SQL Server?
+What is &ldquo;with (nolock)&rdquo; in SQL Server?<br>
+Can someone explain the implications of using <code>with (nolock)</code> on queries, when you should/shouldn&rsquo;t use it? For example, if you have a banking application with high transaction rates and a lot of data in certain tables, in what types of queries would nolock be okay? Are there cases when you should always use it/never use it?</p>
+<p>WITH (NOLOCK) is the equivalent of using READ UNCOMMITED as a transaction isolation level. So, you stand the risk of reading an uncommitted row that is subsequently rolled back, i.e. data that never made it into the database. So, while it can prevent reads being deadlocked by other operations, it comes with a risk.</p>
+<p>The question is what is worse:</p>
+<ul>
+<li>a deadlock, or</li>
+<li>a wrong value?</li>
+</ul>
+<p>For financial databases, deadlocks are far worse than wrong values. I know that sounds backwards, but hear me out. The traditional example of DB transactions is you update two rows, subtracting from one and adding to another. That is wrong.</p>
+<p>In a financial database you use business transactions. That means adding one row to each account. It is of utmost importance that these transactions complete and the rows are successfully written.</p>
+<p>Getting the account balance temporarily wrong isn&rsquo;t a big deal, that is what the end of day reconciliation is for. And an overdraft from an account is far more likely to occur because two ATMs are being used at once than because of a uncommitted read from a database.</p>
+<p>That said, SQL Server 2005 fixed most of the bugs that made <code>NOLOCK</code> necessary. So unless you are using SQL Server 2000 or earlier, you shouldn&rsquo;t need it.</p>
+<h3 id="further-reading">Further Reading</h3>
+<p><a href="http://www.sqlservercentral.com/articles/SQL&#43;Server&#43;2005/62464/" target="_blank" rel="noopener">Row-Level Versioning</a>
+</p>
+<p>Unfortunately it&rsquo;s not just about reading uncommitted data. In the background you may end up reading pages twice (in the case of a page split), or you may miss the pages altogether. So your results may be grossly skewed.</p>
+<p>Check out <a href="http://www.itprotoday.com/software-development/quaere-verum-clustered-index-scans-part-iii" target="_blank" rel="noopener">Itzik Ben-Gan&rsquo;s article</a>
+. Here&rsquo;s an excerpt:</p>
+<blockquote>
+<p>&quot; With the NOLOCK hint (or setting the isolation level of the session to READ UNCOMMITTED) you tell SQL Server that you don&rsquo;t expect consistency, so there are no guarantees. Bear in mind though that &ldquo;in</p>
+</blockquote>
+<h3 id="when-to-use-with-nolock">When to Use With (Nolock)</h3>
+<p>To summarize, using <code>WITH (NOLOCK)</code> should only be used when there is an acceptable risk of reading uncommitted data. This should really only happen when there is no other way to read the data without an unacceptable risk of deadlocks or performance issues.</p>
+<p>For example, if there is a report that needs to run every minute, and it requires reading data from a table that has a high degree of contention, then <code>WITH (NOLOCK)</code> might be needed to prevent deadlocks. In this case, the risk of reading uncommitted data is acceptable because the report will be run again in a minute, so any wrong values will be corrected soon.</p>
+<p>On the other hand, if you have an application that needs to read from a table that has a high degree of contention, then <code>WITH (NOLOCK)</code> should not be used. In this case, the risk of reading uncommitted data is too high, as the application will likely continue to use the wrong values until it is stopped and restarted. In this case, it&rsquo;s better to use other techniques to reduce contention, such as using a separate reporting database.</p>
+<h3 id="alternative-methods">Alternative Methods</h3>
+<p>If <code>WITH (NOLOCK)</code> is not an option, there are other techniques that can be used to reduce the chance of deadlocks. These include:</p>
+<ul>
+<li>Using separate databases for read-only and write operations</li>
+<li>Adding indexes to tables that are frequently queried</li>
+<li>Using query hints to force specific transaction isolation levels</li>
+<li>Performing operations in batches instead of one at a time</li>
+</ul>
+<h3 id="to-summarize">To Summarize</h3>
+<p>Using the <code>WITH (NOLOCK)</code> hint should only be done when there is an acceptable risk of reading uncommitted data, and when there is no other way to read the data without an unacceptable risk of deadlocks or performance issues. In other cases, alternative methods should be considered to reduce contention.
+]]&gt;</p>
+
+    </article>
+
+    
+
+
+
+  </div>
+</div>
+
+  </main>
+  <footer class="flex flex-none justify-center">
+    <section class="flex flex-col md:flex-row mx-2 md:mx-0 gap-2 md:gap-0 justify-between w-full max-w-4xl lg:max-w-5xl py-6 text-slate-500 dark:text-slate-300">
+  <div class="flex flex-row">
+    
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+  </div>
+  <div class="grow"></div>
+  <div class="flex flex-row">
+    <i class="h-6 w-6 flex-none"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+   <path d="M14 9.75a3.016 3.016 0 0 0 -4.163 .173a2.993 2.993 0 0 0 0 4.154a3.016 3.016 0 0 0 4.163 .173"></path>
+</svg>
+</i> 2024 abkhan
+    
+  </div>
+  
+  <div class="flex flex-row">
+    <span class="ml-0 pl-0 md:ml-2 md:pl-2 border-l-0 md:border-l border-slate-300 dark:border-slate-400">
+      Powered by <a href="https://gohugo.io" target="_blank" rel="noopener" class="underline">Hugo</a> <span class="text-red-600">&hearts;</span> <a href="https://github.com/tomowang/hugo-theme-tailwind" target="_blank" rel="noopener" class="underline">Tailwind</a>
+    </span>
+  </div>
+  
+</section>
+
+  </footer><script src="/main.min.c6372b6836971865bd94bfde974748aca8415824a2facab6ccd66a87384bfacb.js"></script>
+
+</body>
+</html>

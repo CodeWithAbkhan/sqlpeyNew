@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>GOOGLE BIGQUERY: Recovering Deleted Datasets in BigQuery :: sqlpey - Example site for hugo-theme-tailwind</title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta
+  name="description"
+  content="How to Recover a Deleted Dataset in BigQuery
+Have you accidentally deleted a dataset with all its tables in BigQuery and looking for a way to recover it? Unfortunately, there is no recovery mechanism for datasets in BigQuery. Although, you can schedule backups and restore them later in case of any failure. In this post, we will learn how to backup and restore a lost dataset in BigQuery.
+Backing up a Dataset in BigQuery In order to backup a dataset in BigQuery, you need to use the bq extract command."
+/>
+<meta
+  name="keywords"
+  content="hugo, tailwind, tailwindcss, hugo theme, hugo theme tailwind"
+/>
+<meta name="robots" content="noodp" />
+<meta property="og:title" content="GOOGLE BIGQUERY: Recovering Deleted Datasets in BigQuery" />
+<meta property="og:description" content="How to Recover a Deleted Dataset in BigQuery
+Have you accidentally deleted a dataset with all its tables in BigQuery and looking for a way to recover it? Unfortunately, there is no recovery mechanism for datasets in BigQuery. Although, you can schedule backups and restore them later in case of any failure. In this post, we will learn how to backup and restore a lost dataset in BigQuery.
+Backing up a Dataset in BigQuery In order to backup a dataset in BigQuery, you need to use the bq extract command." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://sqlpey.com/question/google-bigquery-recovering-deleted-datasets-in-bigquery/" /><meta property="article:section" content="question" />
+<meta property="article:published_time" content="2023-05-05T07:07:59+00:00" />
+<meta property="article:modified_time" content="2023-05-05T07:07:59+00:00" />
+
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="GOOGLE BIGQUERY: Recovering Deleted Datasets in BigQuery"/>
+<meta name="twitter:description" content="How to Recover a Deleted Dataset in BigQuery
+Have you accidentally deleted a dataset with all its tables in BigQuery and looking for a way to recover it? Unfortunately, there is no recovery mechanism for datasets in BigQuery. Although, you can schedule backups and restore them later in case of any failure. In this post, we will learn how to backup and restore a lost dataset in BigQuery.
+Backing up a Dataset in BigQuery In order to backup a dataset in BigQuery, you need to use the bq extract command."/>
+
+
+<link rel="canonical" href="https://sqlpey.com/question/google-bigquery-recovering-deleted-datasets-in-bigquery/" />
+
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="stylesheet" href="/css/index.min.00daf36bd5ee9fe1c553da346dd7a1d93bc97b5cf1fde7ddd1f4a5bd9b1901db.css">
+
+
+
+
+
+
+
+
+
+</head>
+<body class="w-full bg-slate-50 dark:bg-gray-800">
+  <header class="flex flex-none justify-center z-10">
+    <div class="flex flex-row gap justify-between w-full max-w-4xl lg:max-w-5xl h-12 mt-3">
+  <div class="flex-none ml-2 md:ml-0">
+    <a href="/" class="">
+      <img class="h-12 w-12 rounded-full object-cover bg-gray-100" src="/logo_header.webp" alt="logo">
+    </a>
+  </div>
+  <div class="flex-1"></div>
+  <div class="flex-none">
+    
+
+
+
+<nav class="h-full static">
+  <button id="navbar-menu-toggle" type="button" class="inline-flex items-center p-2 text-sm text-slate-800 dark:text-slate-200 rounded-lg md:hidden" aria-controls="navbar-menu" aria-expanded="false">
+    <span class="sr-only">Open main menu</span>
+    <i class="w-8 h-8">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-menu-2" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 6l16 0" />
+  <path d="M4 12l16 0" />
+  <path d="M4 18l16 0" />
+</svg>
+
+    </i>
+  </button>
+  <div class="absolute md:static top-16 left-0 right-0 z-50 hidden w-full md:block md:w-auto" id="navbar-menu">
+    <ul class="flex flex-col mx-2 md:mx-0 md:flex-row md:border-0 rounded-sm md:rounded-full px-3 text-base font-medium text-slate-800 dark:text-slate-200 shadow-lg bg-white dark:bg-gray-600 shadow-slate-800/5 dark:shadow-slate-200/5 ring-1 ring-slate-900/5 dark:ring-slate-100/5">
+    
+        <li id="questions" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="" title="Questions">Questions</a>
+        </li>
+      
+    
+        <li id="about" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="" title="About">About</a>
+        </li>
+      
+    
+        <li id="" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="/" title="Home">Home</a>
+        </li>
+      
+    
+    </ul>
+  </div>
+</nav>
+
+
+  </div>
+  
+  <div class="flex-none mx-1"></div>
+  
+  <div class="darkmode-toggle flex flex-none mr-2 md:mr-0">
+    <label for="darkmode-toggle" class="flex items-center px-3 cursor-pointer rounded-full bg-gray-100 dark:bg-gray-600" title="Toggle dark mode">
+      <input name="darkmode-toggle" id="darkmode-toggle" type="checkbox" class="sr-only peer" aria-label="Toggle dark mode">
+      <div class="group flex flex-row gap-1 justify-center h-8 px-1 rounded-full bg-white dark:bg-gray-700">
+        <i class="h-6 w-6 flex-none rounded-full bg-yellow-400 place-self-center peer-checked:group-[]:invisible">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brightness-down" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+   <path d="M12 5l0 .01"></path>
+   <path d="M17 7l0 .01"></path>
+   <path d="M19 12l0 .01"></path>
+   <path d="M17 17l0 .01"></path>
+   <path d="M12 19l0 .01"></path>
+   <path d="M7 17l0 .01"></path>
+   <path d="M5 12l0 .01"></path>
+   <path d="M7 7l0 .01"></path>
+</svg>
+
+        </i>
+        <i class="h-6 w-6 flex-none rounded-full place-self-center invisible peer-checked:group-[]:visible">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-moon-stars" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"></path>
+   <path d="M17 4a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2"></path>
+   <path d="M19 11h2m-1 -1v2"></path>
+</svg>
+
+        </i>
+      </div>
+    </label>
+  </div>
+</div>
+
+  </header>
+  <main class="flex flex-auto justify-center">
+    
+<div class="w-full max-w-4xl lg:max-w-5xl">
+  <div class="flex flex-col gap-y-3 p-6 mt-6 mx-2 md:mx-0 rounded-lg shadow-md bg-white dark:bg-gray-700">
+    <h1 class="text-4xl font-semibold text-slate-800 dark:text-slate-100">
+      <a href="/question/google-bigquery-recovering-deleted-datasets-in-bigquery/">GOOGLE BIGQUERY: Recovering Deleted Datasets in BigQuery</a>
+    </h1>
+
+    
+    
+  <ul class="flex flex-row flex-wrap text-slate-500 dark:text-slate-300">
+    
+      
+      <li>
+        <a href="/categories/google-bigquery/"
+          class="text-sm mr-2 px-2 py-1 rounded border border-emerald-800 bg-emerald-800 text-slate-50">
+          Google BigQuery
+        </a>
+      </li>
+      
+    
+    
+      
+      <li>
+        <a href="/tags/google-bigquery/"
+          class="flex flex-row text-sm mr-2 py-1">
+          <i class="h-5 w-5 flex-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M5 9l14 0"></path>
+   <path d="M5 15l14 0"></path>
+   <path d="M11 4l-4 16"></path>
+   <path d="M17 4l-4 16"></path>
+</svg>
+
+          </i>
+          <span class="ml-0">Google BigQuery</span>
+        </a>
+      </li>
+      
+    
+  </ul>
+
+
+
+    <div class="flex flex-col gap-y-1 md:flex-row md:gap-y-0 md:gap-x-4 text-slate-500 dark:text-slate-300">
+  
+  
+  <div class="flex flex-row text-base gap-x-1">
+    <i class="h-6 w-6 flex-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"></path>
+   <path d="M16 3v4"></path>
+   <path d="M8 3v4"></path>
+   <path d="M4 11h16"></path>
+   <path d="M11 15h1"></path>
+   <path d="M12 15v3"></path>
+</svg>
+
+    </i>
+    <time datetime="2023-05-05T07:07:59&#43;00:00">
+      2023-05-05
+    </time>
+  </div>
+
+  <div class="flex flex-row text-base gap-x-1">
+    <i class="h-6 w-6 flex-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hourglass-high" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M6.5 7h11"></path>
+   <path d="M6 20v-2a6 6 0 1 1 12 0v2a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1z"></path>
+   <path d="M6 4v2a6 6 0 1 0 12 0v-2a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1z"></path>
+</svg>
+
+    </i>
+    <span>
+      3 minutes to read
+    </span>
+  </div>
+</div>
+
+
+    
+      
+      <section class="prose prose-slate dark:prose-invert w-full max-w-4xl lg:max-w-5xl mt-6">
+        <h2>Table of Contents</h2>
+        <aside><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#backing-up-a-dataset-in-bigquery">Backing up a Dataset in BigQuery</a></li>
+        <li><a href="#restoring-a-dataset-in-bigquery">Restoring a Dataset in BigQuery</a></li>
+        <li><a href="#practical-examples">Practical Examples</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></aside>
+      </section>
+      
+    
+
+    <article class="mt-6 w-full max-w-4xl lg:max-w-5xl prose prose-slate dark:prose-invert prose-quoteless post-content">
+      <p>How to Recover a Deleted Dataset in BigQuery<br>
+Have you accidentally deleted a dataset with all its tables in BigQuery and looking for a way to recover it? Unfortunately, there is no recovery mechanism for datasets in BigQuery. Although, you can schedule backups and restore them later in case of any failure. In this post, we will learn how to backup and restore a lost dataset in BigQuery.</p>
+<h3 id="backing-up-a-dataset-in-bigquery">Backing up a Dataset in BigQuery</h3>
+<p>In order to backup a dataset in BigQuery, you need to use the bq extract command. This command allows you to extract data from a BigQuery table and save it to Cloud Storage. Here is an example of the bq extract command:</p>
+<pre><code>bq extract \
+  --destination_format=AVRO \
+  --use_avro_logical_types \
+  --compression=SNAPPY \
+  &quot;my-project:my-dataset.my-table&quot; \
+  &quot;gs://my-bucket/extract.avro&quot;
+</code></pre>
+<p>Let&rsquo;s know each parameter of the bq extract command:</p>
+<ul>
+<li><code>--destination_format=AVRO</code>: The destination format for the extracted data. In this case, we are using the AVRO format.</li>
+<li><code>--use_avro_logical_types</code>: This parameter is used to convert BigQuery logical types to their corresponding AVRO logical types.</li>
+<li><code>--compression=SNAPPY</code>: This parameter is used to compress the extracted data. In this case, we are using the SNAPPY compression algorithm which is faster than other algorithms.</li>
+<li><code>&quot;my-project:my-dataset.my-table&quot;</code>: This is the ID of the BigQuery table that you want to extract. You can get this ID from the BigQuery UI or by using the bq ls command.</li>
+<li><code>&quot;gs://my-bucket/extract.avro&quot;</code>: This is the Cloud Storage URI where you want to save the extracted data. You need to provide the path to a new or existing bucket and file name. Make sure that the bucket is in the same project as the BigQuery table.</li>
+</ul>
+<h3 id="restoring-a-dataset-in-bigquery">Restoring a Dataset in BigQuery</h3>
+<p>If you have lost a dataset in BigQuery, you can restore it using the bq load command. This command allows you to load data from Cloud Storage and create a new table in BigQuery. Here is an example of the bq load command:</p>
+<pre><code>bq load \
+  --source_format=AVRO \
+  &quot;my-project:my-dataset.my-table&quot; \
+  &quot;gs://bucket/extract.avro&quot;
+</code></pre>
+<p>Let&rsquo;s know each parameter of the bq load command:</p>
+<ul>
+<li><code>--source_format=AVRO</code>: The source format for the data being loaded. In this case, we are using the AVRO format.</li>
+<li><code>&quot;my-project:my-dataset.my-table&quot;</code>: This is the ID of the new BigQuery table that will be created. The table is created in the specified dataset. If the dataset does not exist, then the bq load command will fail.</li>
+<li><code>&quot;gs://bucket/extract.avro&quot;</code>: This is the Cloud Storage URI where you saved the extracted data using the bq extract command.</li>
+</ul>
+<h3 id="practical-examples">Practical Examples</h3>
+<p>Let&rsquo;s consider a practical example. Suppose you have a BigQuery table named &ldquo;my_table&rdquo; in a dataset named &ldquo;my_dataset&rdquo; in your project &ldquo;my_project&rdquo;. You want to backup this table to Cloud Storage with the file name &ldquo;backup.avro&rdquo; in the bucket &ldquo;my_bucket&rdquo;. Here is the bq extract command you should use:</p>
+<pre><code>bq extract \
+  --destination_format=AVRO \
+  --use_avro_logical_types \
+  --compression=SNAPPY \
+  &quot;my_project:my_dataset.my_table&quot; \
+  &quot;gs://my_bucket/backup.avro&quot;
+</code></pre>
+<p>After a few days, you accidentally deleted the &ldquo;my_dataset&rdquo; in your project. You want to recover this lost dataset using the backup file]]&gt;</p>
+
+    </article>
+
+    
+
+
+
+  </div>
+</div>
+
+  </main>
+  <footer class="flex flex-none justify-center">
+    <section class="flex flex-col md:flex-row mx-2 md:mx-0 gap-2 md:gap-0 justify-between w-full max-w-4xl lg:max-w-5xl py-6 text-slate-500 dark:text-slate-300">
+  <div class="flex flex-row">
+    
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+  </div>
+  <div class="grow"></div>
+  <div class="flex flex-row">
+    <i class="h-6 w-6 flex-none"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+   <path d="M14 9.75a3.016 3.016 0 0 0 -4.163 .173a2.993 2.993 0 0 0 0 4.154a3.016 3.016 0 0 0 4.163 .173"></path>
+</svg>
+</i> 2024 abkhan
+    
+  </div>
+  
+  <div class="flex flex-row">
+    <span class="ml-0 pl-0 md:ml-2 md:pl-2 border-l-0 md:border-l border-slate-300 dark:border-slate-400">
+      Powered by <a href="https://gohugo.io" target="_blank" rel="noopener" class="underline">Hugo</a> <span class="text-red-600">&hearts;</span> <a href="https://github.com/tomowang/hugo-theme-tailwind" target="_blank" rel="noopener" class="underline">Tailwind</a>
+    </span>
+  </div>
+  
+</section>
+
+  </footer><script src="/main.min.c6372b6836971865bd94bfde974748aca8415824a2facab6ccd66a87384bfacb.js"></script>
+  
+  <div class="hidden top-1 right-1" id="code-copy">
+    <i class="h-6 w-6 block">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" />
+  <path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" />
+</svg>
+
+    </i>
+  </div>
+  <div class="hidden top-1 right-1" id="code-copy-done">
+    <i class="h-6 w-6 block">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M5 12l5 5l10 -10" />
+</svg>
+
+    </i>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+</body>
+</html>

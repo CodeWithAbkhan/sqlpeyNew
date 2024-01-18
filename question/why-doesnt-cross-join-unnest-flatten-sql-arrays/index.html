@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Why Doesn&#39;t CROSS JOIN UNNEST Flatten SQL Arrays? :: sqlpey - Example site for hugo-theme-tailwind</title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta
+  name="description"
+  content="SQL array flattening: Why doesn&#39;t CROSS JOIN UNNEST join every nested value with every row?
+SQL Array Flattening: What Happens Behind the Scenes of CROSS JOIN UNNEST? We often use a common SQL idiom to flatten arrays, but what&amp;rsquo;s actually happening behind the scenes? Let&amp;rsquo;s take a closer look at the CROSS JOIN UNNEST pattern and see what&amp;rsquo;s going on.
+The CROSS JOIN The CROSS JOIN combines rows from two tables by combining each row from the first table with each row from the second table."
+/>
+<meta
+  name="keywords"
+  content="hugo, tailwind, tailwindcss, hugo theme, hugo theme tailwind"
+/>
+<meta name="robots" content="noodp" />
+<meta property="og:title" content="Why Doesn&#39;t CROSS JOIN UNNEST Flatten SQL Arrays?" />
+<meta property="og:description" content="SQL array flattening: Why doesn&#39;t CROSS JOIN UNNEST join every nested value with every row?
+SQL Array Flattening: What Happens Behind the Scenes of CROSS JOIN UNNEST? We often use a common SQL idiom to flatten arrays, but what&rsquo;s actually happening behind the scenes? Let&rsquo;s take a closer look at the CROSS JOIN UNNEST pattern and see what&rsquo;s going on.
+The CROSS JOIN The CROSS JOIN combines rows from two tables by combining each row from the first table with each row from the second table." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://sqlpey.com/question/why-doesnt-cross-join-unnest-flatten-sql-arrays/" /><meta property="article:section" content="question" />
+<meta property="article:published_time" content="2023-03-19T19:47:39+00:00" />
+<meta property="article:modified_time" content="2023-03-19T19:47:39+00:00" />
+
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Why Doesn&#39;t CROSS JOIN UNNEST Flatten SQL Arrays?"/>
+<meta name="twitter:description" content="SQL array flattening: Why doesn&#39;t CROSS JOIN UNNEST join every nested value with every row?
+SQL Array Flattening: What Happens Behind the Scenes of CROSS JOIN UNNEST? We often use a common SQL idiom to flatten arrays, but what&rsquo;s actually happening behind the scenes? Let&rsquo;s take a closer look at the CROSS JOIN UNNEST pattern and see what&rsquo;s going on.
+The CROSS JOIN The CROSS JOIN combines rows from two tables by combining each row from the first table with each row from the second table."/>
+
+
+<link rel="canonical" href="https://sqlpey.com/question/why-doesnt-cross-join-unnest-flatten-sql-arrays/" />
+
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="stylesheet" href="/css/index.min.00daf36bd5ee9fe1c553da346dd7a1d93bc97b5cf1fde7ddd1f4a5bd9b1901db.css">
+
+
+
+
+
+
+
+
+
+</head>
+<body class="w-full bg-slate-50 dark:bg-gray-800">
+  <header class="flex flex-none justify-center z-10">
+    <div class="flex flex-row gap justify-between w-full max-w-4xl lg:max-w-5xl h-12 mt-3">
+  <div class="flex-none ml-2 md:ml-0">
+    <a href="/" class="">
+      <img class="h-12 w-12 rounded-full object-cover bg-gray-100" src="/logo_header.webp" alt="logo">
+    </a>
+  </div>
+  <div class="flex-1"></div>
+  <div class="flex-none">
+    
+
+
+
+<nav class="h-full static">
+  <button id="navbar-menu-toggle" type="button" class="inline-flex items-center p-2 text-sm text-slate-800 dark:text-slate-200 rounded-lg md:hidden" aria-controls="navbar-menu" aria-expanded="false">
+    <span class="sr-only">Open main menu</span>
+    <i class="w-8 h-8">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-menu-2" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 6l16 0" />
+  <path d="M4 12l16 0" />
+  <path d="M4 18l16 0" />
+</svg>
+
+    </i>
+  </button>
+  <div class="absolute md:static top-16 left-0 right-0 z-50 hidden w-full md:block md:w-auto" id="navbar-menu">
+    <ul class="flex flex-col mx-2 md:mx-0 md:flex-row md:border-0 rounded-sm md:rounded-full px-3 text-base font-medium text-slate-800 dark:text-slate-200 shadow-lg bg-white dark:bg-gray-600 shadow-slate-800/5 dark:shadow-slate-200/5 ring-1 ring-slate-900/5 dark:ring-slate-100/5">
+    
+        <li id="questions" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="" title="Questions">Questions</a>
+        </li>
+      
+    
+        <li id="about" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="" title="About">About</a>
+        </li>
+      
+    
+        <li id="" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="/" title="Home">Home</a>
+        </li>
+      
+    
+    </ul>
+  </div>
+</nav>
+
+
+  </div>
+  
+  <div class="flex-none mx-1"></div>
+  
+  <div class="darkmode-toggle flex flex-none mr-2 md:mr-0">
+    <label for="darkmode-toggle" class="flex items-center px-3 cursor-pointer rounded-full bg-gray-100 dark:bg-gray-600" title="Toggle dark mode">
+      <input name="darkmode-toggle" id="darkmode-toggle" type="checkbox" class="sr-only peer" aria-label="Toggle dark mode">
+      <div class="group flex flex-row gap-1 justify-center h-8 px-1 rounded-full bg-white dark:bg-gray-700">
+        <i class="h-6 w-6 flex-none rounded-full bg-yellow-400 place-self-center peer-checked:group-[]:invisible">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brightness-down" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+   <path d="M12 5l0 .01"></path>
+   <path d="M17 7l0 .01"></path>
+   <path d="M19 12l0 .01"></path>
+   <path d="M17 17l0 .01"></path>
+   <path d="M12 19l0 .01"></path>
+   <path d="M7 17l0 .01"></path>
+   <path d="M5 12l0 .01"></path>
+   <path d="M7 7l0 .01"></path>
+</svg>
+
+        </i>
+        <i class="h-6 w-6 flex-none rounded-full place-self-center invisible peer-checked:group-[]:visible">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-moon-stars" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"></path>
+   <path d="M17 4a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2"></path>
+   <path d="M19 11h2m-1 -1v2"></path>
+</svg>
+
+        </i>
+      </div>
+    </label>
+  </div>
+</div>
+
+  </header>
+  <main class="flex flex-auto justify-center">
+    
+<div class="w-full max-w-4xl lg:max-w-5xl">
+  <div class="flex flex-col gap-y-3 p-6 mt-6 mx-2 md:mx-0 rounded-lg shadow-md bg-white dark:bg-gray-700">
+    <h1 class="text-4xl font-semibold text-slate-800 dark:text-slate-100">
+      <a href="/question/why-doesnt-cross-join-unnest-flatten-sql-arrays/">Why Doesn&rsquo;t CROSS JOIN UNNEST Flatten SQL Arrays?</a>
+    </h1>
+
+    
+    
+  <ul class="flex flex-row flex-wrap text-slate-500 dark:text-slate-300">
+    
+      
+      <li>
+        <a href="/categories/google-bigquery/"
+          class="text-sm mr-2 px-2 py-1 rounded border border-emerald-800 bg-emerald-800 text-slate-50">
+          Google BigQuery
+        </a>
+      </li>
+      
+    
+    
+      
+      <li>
+        <a href="/tags/google-bigquery/"
+          class="flex flex-row text-sm mr-2 py-1">
+          <i class="h-5 w-5 flex-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M5 9l14 0"></path>
+   <path d="M5 15l14 0"></path>
+   <path d="M11 4l-4 16"></path>
+   <path d="M17 4l-4 16"></path>
+</svg>
+
+          </i>
+          <span class="ml-0">Google BigQuery</span>
+        </a>
+      </li>
+      
+    
+  </ul>
+
+
+
+    <div class="flex flex-col gap-y-1 md:flex-row md:gap-y-0 md:gap-x-4 text-slate-500 dark:text-slate-300">
+  
+  
+  <div class="flex flex-row text-base gap-x-1">
+    <i class="h-6 w-6 flex-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"></path>
+   <path d="M16 3v4"></path>
+   <path d="M8 3v4"></path>
+   <path d="M4 11h16"></path>
+   <path d="M11 15h1"></path>
+   <path d="M12 15v3"></path>
+</svg>
+
+    </i>
+    <time datetime="2023-03-19T19:47:39&#43;00:00">
+      2023-03-19
+    </time>
+  </div>
+
+  <div class="flex flex-row text-base gap-x-1">
+    <i class="h-6 w-6 flex-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hourglass-high" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M6.5 7h11"></path>
+   <path d="M6 20v-2a6 6 0 1 1 12 0v2a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1z"></path>
+   <path d="M6 4v2a6 6 0 1 0 12 0v-2a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1z"></path>
+</svg>
+
+    </i>
+    <span>
+      3 minutes to read
+    </span>
+  </div>
+</div>
+
+
+    
+      
+      <section class="prose prose-slate dark:prose-invert w-full max-w-4xl lg:max-w-5xl mt-6">
+        <h2>Table of Contents</h2>
+        <aside><nav id="TableOfContents">
+  <ul>
+    <li><a href="#sql-array-flattening-what-happens-behind-the-scenes-of-cross-join-unnest">SQL Array Flattening: What Happens Behind the Scenes of CROSS JOIN UNNEST?</a>
+      <ul>
+        <li><a href="#the-cross-join">The CROSS JOIN</a></li>
+        <li><a href="#the-unnest-function">The UNNEST Function</a></li>
+        <li><a href="#combining-cross-join-and-unnest">Combining CROSS JOIN and UNNEST</a></li>
+        <li><a href="#the-magic-of-cross-join-unnest">The Magic of CROSS JOIN UNNEST</a></li>
+        <li><a href="#to-summarize">To Summarize</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></aside>
+      </section>
+      
+    
+
+    <article class="mt-6 w-full max-w-4xl lg:max-w-5xl prose prose-slate dark:prose-invert prose-quoteless post-content">
+      <p>SQL array flattening: Why doesn't CROSS JOIN UNNEST join every nested value with every row?</p>
+<h2 id="sql-array-flattening-what-happens-behind-the-scenes-of-cross-join-unnest">SQL Array Flattening: What Happens Behind the Scenes of CROSS JOIN UNNEST?</h2>
+<p>We often use a common SQL idiom to flatten arrays, but what&rsquo;s actually happening behind the scenes? Let&rsquo;s take a closer look at the <code>CROSS JOIN UNNEST</code> pattern and see what&rsquo;s going on.</p>
+<h3 id="the-cross-join">The CROSS JOIN</h3>
+<p>The <code>CROSS JOIN</code> combines rows from two tables by combining each row from the first table with each row from the second table. Let&rsquo;s consider a simple example of a table called <code>t1</code> that looks like this:</p>
+<p><a href="https://i.stack.imgur.com/mAouG.png" target="_blank" rel="noopener">https://i.stack.imgur.com/mAouG.png</a>
+</p>
+<p>If we run the query <code>SELECT id, flattened.flattened_numbers from t1 CROSS JOIN flattened</code>, we get the following result:</p>
+<p><a href="https://i.stack.imgur.com/82KBt.png" target="_blank" rel="noopener">https://i.stack.imgur.com/82KBt.png</a>
+</p>
+<p>As you can see, each of the original values of the <code>id</code> column gets mixed with <code>flattened_numbers</code> from each of the original rows in <code>t1</code>. Everything gets mixed up because we don&rsquo;t have a <code>WHERE</code> clause that selects only the rows of the <code>CROSS JOIN</code> that we want.</p>
+<h3 id="the-unnest-function">The UNNEST Function</h3>
+<p>The <code>UNNEST</code> function takes a column of type array and unpacks each of the arrays in that column so that we&rsquo;re left with one row for each value in each array. If we run <code>SELECT FLATTEN(numbers_array) AS flattened_numbers FROM t1</code>, we&rsquo;d expect the following result, which we&rsquo;ll call <code>t2</code>:</p>
+<p><a href="https://i.stack.imgur.com/O59l3.png" target="_blank" rel="noopener">https://i.stack.imgur.com/O59l3.png</a>
+</p>
+<h3 id="combining-cross-join-and-unnest">Combining CROSS JOIN and UNNEST</h3>
+<p>The pattern people actually use to flatten arrays looks like this: <code>SELECT id, flattened_numbers FROM t1 CROSS JOIN UNNEST(sequences.some_numbers) AS flattened_numbers</code>, which produces the following result:</p>
+<p><a href="https://i.stack.imgur.com/ZFkaf.png" target="_blank" rel="noopener">https://i.stack.imgur.com/ZFkaf.png</a>
+</p>
+<p>But why does this work? How does the <code>CROSS JOIN UNNEST</code> pattern ensure that each row is only joined with its own nested values?</p>
+<h3 id="the-magic-of-cross-join-unnest">The Magic of CROSS JOIN UNNEST</h3>
+<p>The secret behind the <code>CROSS JOIN UNNEST</code> pattern is that it relies on a special property of the <code>UNNEST</code> function: each row in the result of <code>UNNEST</code> contains a unique identifier from the original table, which is stored in a column called <code>unnest_id</code>. This column is the key to understanding why <code>CROSS JOIN UNNEST</code> works.</p>
+<p>When we combine <code>CROSS JOIN</code> with <code>UNNEST</code>, this unique identifier ensures that each row in the result of the <code>UNNEST</code> is only joined with its own rows from the original table. This prevents us from getting the same result as we did with our imaginary <code>FLATTEN</code> function, where every unnested value gets combined with every row from <code>t1</code>.</p>
+<h3 id="to-summarize">To Summarize</h3>
+<p>The <code>CROSS JOIN UNNEST</code> pattern is a useful way to flatten arrays in SQL. The secret behind this pattern is that it relies on a special property of the <code>UNNEST</code> function: a unique identifier that ensures each row in the result of the <code>UNNEST</code> is only joined with its own rows from the original table.
+]]&gt;</p>
+
+    </article>
+
+    
+
+
+
+  </div>
+</div>
+
+  </main>
+  <footer class="flex flex-none justify-center">
+    <section class="flex flex-col md:flex-row mx-2 md:mx-0 gap-2 md:gap-0 justify-between w-full max-w-4xl lg:max-w-5xl py-6 text-slate-500 dark:text-slate-300">
+  <div class="flex flex-row">
+    
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+  </div>
+  <div class="grow"></div>
+  <div class="flex flex-row">
+    <i class="h-6 w-6 flex-none"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+   <path d="M14 9.75a3.016 3.016 0 0 0 -4.163 .173a2.993 2.993 0 0 0 0 4.154a3.016 3.016 0 0 0 4.163 .173"></path>
+</svg>
+</i> 2024 abkhan
+    
+  </div>
+  
+  <div class="flex flex-row">
+    <span class="ml-0 pl-0 md:ml-2 md:pl-2 border-l-0 md:border-l border-slate-300 dark:border-slate-400">
+      Powered by <a href="https://gohugo.io" target="_blank" rel="noopener" class="underline">Hugo</a> <span class="text-red-600">&hearts;</span> <a href="https://github.com/tomowang/hugo-theme-tailwind" target="_blank" rel="noopener" class="underline">Tailwind</a>
+    </span>
+  </div>
+  
+</section>
+
+  </footer><script src="/main.min.c6372b6836971865bd94bfde974748aca8415824a2facab6ccd66a87384bfacb.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>NOSQL: Cassandra&#39;s Poor Write Performance: Examining the Issue :: sqlpey - Example site for hugo-theme-tailwind</title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta
+  name="description"
+  content="Improving Write Performance in Cassandra Introduction Cassandra is a popular NoSQL database known for its ability to handle high write volume and high availability. Although, achieving maximum write performance with Cassandra can be challenging. In this blog post, we will discuss how to improve write performance in Cassandra.
+Learning Write Performance in Cassandra Before we dive into improving write performance, it&amp;rsquo;s important to know how Cassandra stores data. Cassandra stores data in a data structure called a &amp;ldquo;partition."
+/>
+<meta
+  name="keywords"
+  content="hugo, tailwind, tailwindcss, hugo theme, hugo theme tailwind"
+/>
+<meta name="robots" content="noodp" />
+<meta property="og:title" content="NOSQL: Cassandra&#39;s Poor Write Performance: Examining the Issue" />
+<meta property="og:description" content="Improving Write Performance in Cassandra Introduction Cassandra is a popular NoSQL database known for its ability to handle high write volume and high availability. Although, achieving maximum write performance with Cassandra can be challenging. In this blog post, we will discuss how to improve write performance in Cassandra.
+Learning Write Performance in Cassandra Before we dive into improving write performance, it&rsquo;s important to know how Cassandra stores data. Cassandra stores data in a data structure called a &ldquo;partition." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://sqlpey.com/question/nosql-cassandras-poor-write-performance-examining-issue/" /><meta property="article:section" content="question" />
+<meta property="article:published_time" content="2023-05-05T17:19:01+00:00" />
+<meta property="article:modified_time" content="2023-05-05T17:19:01+00:00" />
+
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="NOSQL: Cassandra&#39;s Poor Write Performance: Examining the Issue"/>
+<meta name="twitter:description" content="Improving Write Performance in Cassandra Introduction Cassandra is a popular NoSQL database known for its ability to handle high write volume and high availability. Although, achieving maximum write performance with Cassandra can be challenging. In this blog post, we will discuss how to improve write performance in Cassandra.
+Learning Write Performance in Cassandra Before we dive into improving write performance, it&rsquo;s important to know how Cassandra stores data. Cassandra stores data in a data structure called a &ldquo;partition."/>
+
+
+<link rel="canonical" href="https://sqlpey.com/question/nosql-cassandras-poor-write-performance-examining-issue/" />
+
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="stylesheet" href="/css/index.min.00daf36bd5ee9fe1c553da346dd7a1d93bc97b5cf1fde7ddd1f4a5bd9b1901db.css">
+
+
+
+
+
+
+
+
+
+</head>
+<body class="w-full bg-slate-50 dark:bg-gray-800">
+  <header class="flex flex-none justify-center z-10">
+    <div class="flex flex-row gap justify-between w-full max-w-4xl lg:max-w-5xl h-12 mt-3">
+  <div class="flex-none ml-2 md:ml-0">
+    <a href="/" class="">
+      <img class="h-12 w-12 rounded-full object-cover bg-gray-100" src="/logo_header.webp" alt="logo">
+    </a>
+  </div>
+  <div class="flex-1"></div>
+  <div class="flex-none">
+    
+
+
+
+<nav class="h-full static">
+  <button id="navbar-menu-toggle" type="button" class="inline-flex items-center p-2 text-sm text-slate-800 dark:text-slate-200 rounded-lg md:hidden" aria-controls="navbar-menu" aria-expanded="false">
+    <span class="sr-only">Open main menu</span>
+    <i class="w-8 h-8">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-menu-2" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 6l16 0" />
+  <path d="M4 12l16 0" />
+  <path d="M4 18l16 0" />
+</svg>
+
+    </i>
+  </button>
+  <div class="absolute md:static top-16 left-0 right-0 z-50 hidden w-full md:block md:w-auto" id="navbar-menu">
+    <ul class="flex flex-col mx-2 md:mx-0 md:flex-row md:border-0 rounded-sm md:rounded-full px-3 text-base font-medium text-slate-800 dark:text-slate-200 shadow-lg bg-white dark:bg-gray-600 shadow-slate-800/5 dark:shadow-slate-200/5 ring-1 ring-slate-900/5 dark:ring-slate-100/5">
+    
+        <li id="questions" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="" title="Questions">Questions</a>
+        </li>
+      
+    
+        <li id="about" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="" title="About">About</a>
+        </li>
+      
+    
+        <li id="" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="/" title="Home">Home</a>
+        </li>
+      
+    
+    </ul>
+  </div>
+</nav>
+
+
+  </div>
+  
+  <div class="flex-none mx-1"></div>
+  
+  <div class="darkmode-toggle flex flex-none mr-2 md:mr-0">
+    <label for="darkmode-toggle" class="flex items-center px-3 cursor-pointer rounded-full bg-gray-100 dark:bg-gray-600" title="Toggle dark mode">
+      <input name="darkmode-toggle" id="darkmode-toggle" type="checkbox" class="sr-only peer" aria-label="Toggle dark mode">
+      <div class="group flex flex-row gap-1 justify-center h-8 px-1 rounded-full bg-white dark:bg-gray-700">
+        <i class="h-6 w-6 flex-none rounded-full bg-yellow-400 place-self-center peer-checked:group-[]:invisible">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brightness-down" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+   <path d="M12 5l0 .01"></path>
+   <path d="M17 7l0 .01"></path>
+   <path d="M19 12l0 .01"></path>
+   <path d="M17 17l0 .01"></path>
+   <path d="M12 19l0 .01"></path>
+   <path d="M7 17l0 .01"></path>
+   <path d="M5 12l0 .01"></path>
+   <path d="M7 7l0 .01"></path>
+</svg>
+
+        </i>
+        <i class="h-6 w-6 flex-none rounded-full place-self-center invisible peer-checked:group-[]:visible">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-moon-stars" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"></path>
+   <path d="M17 4a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2"></path>
+   <path d="M19 11h2m-1 -1v2"></path>
+</svg>
+
+        </i>
+      </div>
+    </label>
+  </div>
+</div>
+
+  </header>
+  <main class="flex flex-auto justify-center">
+    
+<div class="w-full max-w-4xl lg:max-w-5xl">
+  <div class="flex flex-col gap-y-3 p-6 mt-6 mx-2 md:mx-0 rounded-lg shadow-md bg-white dark:bg-gray-700">
+    <h1 class="text-4xl font-semibold text-slate-800 dark:text-slate-100">
+      <a href="/question/nosql-cassandras-poor-write-performance-examining-issue/">NOSQL: Cassandra&rsquo;s Poor Write Performance: Examining the Issue</a>
+    </h1>
+
+    
+    
+  <ul class="flex flex-row flex-wrap text-slate-500 dark:text-slate-300">
+    
+      
+      <li>
+        <a href="/categories/nosql/"
+          class="text-sm mr-2 px-2 py-1 rounded border border-emerald-800 bg-emerald-800 text-slate-50">
+          NoSQL
+        </a>
+      </li>
+      
+    
+    
+      
+      <li>
+        <a href="/tags/nosql/"
+          class="flex flex-row text-sm mr-2 py-1">
+          <i class="h-5 w-5 flex-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M5 9l14 0"></path>
+   <path d="M5 15l14 0"></path>
+   <path d="M11 4l-4 16"></path>
+   <path d="M17 4l-4 16"></path>
+</svg>
+
+          </i>
+          <span class="ml-0">NoSQL</span>
+        </a>
+      </li>
+      
+    
+  </ul>
+
+
+
+    <div class="flex flex-col gap-y-1 md:flex-row md:gap-y-0 md:gap-x-4 text-slate-500 dark:text-slate-300">
+  
+  
+  <div class="flex flex-row text-base gap-x-1">
+    <i class="h-6 w-6 flex-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"></path>
+   <path d="M16 3v4"></path>
+   <path d="M8 3v4"></path>
+   <path d="M4 11h16"></path>
+   <path d="M11 15h1"></path>
+   <path d="M12 15v3"></path>
+</svg>
+
+    </i>
+    <time datetime="2023-05-05T17:19:01&#43;00:00">
+      2023-05-05
+    </time>
+  </div>
+
+  <div class="flex flex-row text-base gap-x-1">
+    <i class="h-6 w-6 flex-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hourglass-high" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M6.5 7h11"></path>
+   <path d="M6 20v-2a6 6 0 1 1 12 0v2a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1z"></path>
+   <path d="M6 4v2a6 6 0 1 0 12 0v-2a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1z"></path>
+</svg>
+
+    </i>
+    <span>
+      4 minutes to read
+    </span>
+  </div>
+</div>
+
+
+    
+      
+      <section class="prose prose-slate dark:prose-invert w-full max-w-4xl lg:max-w-5xl mt-6">
+        <h2>Table of Contents</h2>
+        <aside><nav id="TableOfContents">
+  <ul>
+    <li><a href="#improving-write-performance-in-cassandra">Improving Write Performance in Cassandra</a>
+      <ul>
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#learning-write-performance-in-cassandra">Learning Write Performance in Cassandra</a></li>
+        <li><a href="#improving-write-performance">Improving Write Performance</a></li>
+        <li><a href="#recap">Recap</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></aside>
+      </section>
+      
+    
+
+    <article class="mt-6 w-full max-w-4xl lg:max-w-5xl prose prose-slate dark:prose-invert prose-quoteless post-content">
+      <h2 id="improving-write-performance-in-cassandra">Improving Write Performance in Cassandra</h2>
+<h3 id="introduction">Introduction</h3>
+<p>Cassandra is a popular NoSQL database known for its ability to handle high write volume and high availability. Although, achieving maximum write performance with Cassandra can be challenging. In this blog post, we will discuss how to improve write performance in Cassandra.</p>
+<h3 id="learning-write-performance-in-cassandra">Learning Write Performance in Cassandra</h3>
+<p>Before we dive into improving write performance, it&rsquo;s important to know how Cassandra stores data. Cassandra stores data in a data structure called a &ldquo;partition.&rdquo; Each partition corresponds to a row in a table and is identified by a partition key. Within a partition, data is further organized into columns. Each partition is assigned to a node in the Cassandra cluster based on its partition key.</p>
+<p>When a write request is received, Cassandra writes the data to a commit log and to a data structure called a &ldquo;memtable,&rdquo; which is an in-memory representation of a partition. Once the memtable reaches a certain size, Cassandra writes it to disk as an SSTable (sorted string table).</p>
+<p>The key to achieving high write performance in Cassandra is to ensure that writes are distributed evenly across the cluster.</p>
+<h3 id="improving-write-performance">Improving Write Performance</h3>
+<ol>
+<li>Use Asynchronous Writes</li>
+</ol>
+<p>By default, Cassandra performs writes synchronously, meaning that each write request must be completed before the next one can begin. This can result in low write performance, especially when executing bulk writes.</p>
+<p>To improve write performance, you can use asynchronous writes. Asynchronous writes allow multiple writes to be sent to the database without waiting for the previous write to complete. This can result in a significant improvement in write performance.</p>
+<p>Here&rsquo;s an example of how to use asynchronous writes in Java using the Cassandra Java driver:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>ResultSetFuture future <span style="color:#f92672">=</span> session.<span style="color:#a6e22e">executeAsync</span>(<span style="color:#e6db74">&#34;INSERT INTO mytable (id, name) VALUES (?, ?)&#34;</span>, id, name);  
+</span></span></code></pre></div><ol start="2">
+<li>Increase Batch Size</li>
+</ol>
+<p>Cassandra supports batch writes, which allow multiple write requests to be combined into a single request. This can result in a significant performance improvement, especially when executing bulk writes.</p>
+<p>To improve write performance with batch writes, you can increase the batch size. The default batch size in Cassandra is 5, but you can increase it to a higher number for better performance. Although, increasing the batch size too much can result in increased memory usage, so it&rsquo;s important to find the right balance.</p>
+<p>Here&rsquo;s an example of how to use batch writes in Java using the Cassandra Java driver:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>BatchStatement batch <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BatchStatement();  
+</span></span><span style="display:flex;"><span>batch.<span style="color:#a6e22e">add</span>(<span style="color:#66d9ef">new</span> SimpleStatement(<span style="color:#e6db74">&#34;INSERT INTO mytable (id, name) VALUES (?, ?)&#34;</span>, id1, name1));  
+</span></span><span style="display:flex;"><span>batch.<span style="color:#a6e22e">add</span>(<span style="color:#66d9ef">new</span> SimpleStatement(<span style="color:#e6db74">&#34;INSERT INTO mytable (id, name) VALUES (?, ?)&#34;</span>, id2, name2));  
+</span></span><span style="display:flex;"><span>ResultSetFuture future <span style="color:#f92672">=</span> session.<span style="color:#a6e22e">executeAsync</span>(batch);  
+</span></span></code></pre></div><ol start="3">
+<li>Use a Load Balancer</li>
+</ol>
+<p>To distribute writes evenly across the cluster, it&rsquo;s important to use a load balancer. A load balancer is a piece of software that distributes requests across multiple nodes in a cluster.</p>
+<p>Cassandra supports several load balancing algorithms, including round-robin, token-aware, and datacenter-aware. The choice of load balancing algorithm depends on the specific requirements of your application.</p>
+<p>Here&rsquo;s an example of how to configure load balancing in the Cassandra Java driver:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Cluster cluster <span style="color:#f92672">=</span> Cluster.<span style="color:#a6e22e">builder</span>()  
+</span></span><span style="display:flex;"><span>.<span style="color:#a6e22e">addContactPoints</span>(<span style="color:#e6db74">&#34;127.0.0.1&#34;</span>)  
+</span></span><span style="display:flex;"><span>.<span style="color:#a6e22e">withLoadBalancingPolicy</span>(<span style="color:#66d9ef">new</span> RoundRobinPolicy())  
+</span></span><span style="display:flex;"><span>.<span style="color:#a6e22e">build</span>();  
+</span></span></code></pre></div><ol start="4">
+<li>Use Multiple Client Threads</li>
+</ol>
+<p>To achieve maximum write performance, you can use multiple client threads to write data to Cassandra. Each thread can perform writes independently, allowing for better distribution of writes across the cluster.</p>
+<p>It&rsquo;s important to note that when using multiple client threads, the load balancer should be configured to distribute requests evenly across all nodes in the cluster.</p>
+<p>Here&rsquo;s an example of how to use multiple client threads in Java using the Cassandra Java driver:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>ExecutorService executor <span style="color:#f92672">=</span> Executors.<span style="color:#a6e22e">newFixedThreadPool</span>(10);  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0; i <span style="color:#f92672">&amp;</span>lt; 100000; i<span style="color:#f92672">++</span>) { executor.<span style="color:#a6e22e">submit</span>(() <span style="color:#f92672">-&amp;</span>gt; {  
+</span></span><span style="display:flex;"><span>session.<span style="color:#a6e22e">execute</span>(<span style="color:#e6db74">&#34;INSERT INTO mytable (id, name) VALUES (?, ?)&#34;</span>, id, name);  
+</span></span><span style="display:flex;"><span>});  
+</span></span><span style="display:flex;"><span>}  
+</span></span><span style="display:flex;"><span>executor.<span style="color:#a6e22e">shutdown</span>();  
+</span></span><span style="display:flex;"><span>executor.<span style="color:#a6e22e">awaitTermination</span>(Long.<span style="color:#a6e22e">MAX</span><span style="color:#960050;background-color:#1e0010">\</span>_VALUE, TimeUnit.<span style="color:#a6e22e">SECONDS</span>);  
+</span></span></code></pre></div><ol start="5">
+<li>Use Compression</li>
+</ol>
+<p>Cassandra supports compression, which can reduce the amount of data that needs to be written to disk. This can result in improved write performance, especially when writing large amounts of data.</p>
+<p>Cassandra supports several compression algorithms, including LZ4, Snappy, and Deflate. The choice of compression algorithm depends on the specific requirements of your application.</p>
+<p>Here&rsquo;s an example of how to enable compression in the Cassandra Java driver:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Cluster cluster <span style="color:#f92672">=</span> Cluster.<span style="color:#a6e22e">builder</span>()  
+</span></span><span style="display:flex;"><span>.<span style="color:#a6e22e">addContactPoints</span>(<span style="color:#e6db74">&#34;127.0.0.1&#34;</span>)  
+</span></span><span style="display:flex;"><span>.<span style="color:#a6e22e">withCompression</span>(ProtocolOptions.<span style="color:#a6e22e">Compression</span>.<span style="color:#a6e22e">LZ4</span>)  
+</span></span><span style="display:flex;"><span>.<span style="color:#a6e22e">build</span>();  
+</span></span></code></pre></div><h3 id="recap">Recap</h3>
+<p>Improving write performance in Cassandra requires careful consideration of the specific requirements of your application. By using asynchronous writes, increasing batch size, using a load balancer, using multiple client threads, and using compression, you can achieve maximum write performance and ensure that writes are distributed evenly across the cluster.
+]]&gt;</p>
+
+    </article>
+
+    
+
+
+
+  </div>
+</div>
+
+  </main>
+  <footer class="flex flex-none justify-center">
+    <section class="flex flex-col md:flex-row mx-2 md:mx-0 gap-2 md:gap-0 justify-between w-full max-w-4xl lg:max-w-5xl py-6 text-slate-500 dark:text-slate-300">
+  <div class="flex flex-row">
+    
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+  </div>
+  <div class="grow"></div>
+  <div class="flex flex-row">
+    <i class="h-6 w-6 flex-none"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+   <path d="M14 9.75a3.016 3.016 0 0 0 -4.163 .173a2.993 2.993 0 0 0 0 4.154a3.016 3.016 0 0 0 4.163 .173"></path>
+</svg>
+</i> 2024 abkhan
+    
+  </div>
+  
+  <div class="flex flex-row">
+    <span class="ml-0 pl-0 md:ml-2 md:pl-2 border-l-0 md:border-l border-slate-300 dark:border-slate-400">
+      Powered by <a href="https://gohugo.io" target="_blank" rel="noopener" class="underline">Hugo</a> <span class="text-red-600">&hearts;</span> <a href="https://github.com/tomowang/hugo-theme-tailwind" target="_blank" rel="noopener" class="underline">Tailwind</a>
+    </span>
+  </div>
+  
+</section>
+
+  </footer><script src="/main.min.c6372b6836971865bd94bfde974748aca8415824a2facab6ccd66a87384bfacb.js"></script>
+  
+  <div class="hidden top-1 right-1" id="code-copy">
+    <i class="h-6 w-6 block">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" />
+  <path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" />
+</svg>
+
+    </i>
+  </div>
+  <div class="hidden top-1 right-1" id="code-copy-done">
+    <i class="h-6 w-6 block">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M5 12l5 5l10 -10" />
+</svg>
+
+    </i>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+</body>
+</html>

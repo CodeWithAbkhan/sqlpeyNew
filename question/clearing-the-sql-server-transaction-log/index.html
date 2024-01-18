@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Clearing the SQL Server Transaction Log :: sqlpey - Example site for hugo-theme-tailwind</title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta
+  name="description"
+  content="How do you clear the SQL Server transaction log? Add images for references
+Making changes to the SQL Server transaction log should only be done in scenarios where it has unexpectedly grown in size and it is not expected to happen again. If the log file will grow to the same size again, then not much will be accomplished by shrinking it. This article explains the steps you need to take to clear out the transaction log and ensure you can restore your database should something go wrong."
+/>
+<meta
+  name="keywords"
+  content="hugo, tailwind, tailwindcss, hugo theme, hugo theme tailwind"
+/>
+<meta name="robots" content="noodp" />
+<meta property="og:title" content="Clearing the SQL Server Transaction Log" />
+<meta property="og:description" content="How do you clear the SQL Server transaction log? Add images for references
+Making changes to the SQL Server transaction log should only be done in scenarios where it has unexpectedly grown in size and it is not expected to happen again. If the log file will grow to the same size again, then not much will be accomplished by shrinking it. This article explains the steps you need to take to clear out the transaction log and ensure you can restore your database should something go wrong." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://sqlpey.com/question/clearing-the-sql-server-transaction-log/" /><meta property="article:section" content="question" />
+<meta property="article:published_time" content="2023-03-19T23:15:32+00:00" />
+<meta property="article:modified_time" content="2023-03-19T23:15:32+00:00" />
+
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Clearing the SQL Server Transaction Log"/>
+<meta name="twitter:description" content="How do you clear the SQL Server transaction log? Add images for references
+Making changes to the SQL Server transaction log should only be done in scenarios where it has unexpectedly grown in size and it is not expected to happen again. If the log file will grow to the same size again, then not much will be accomplished by shrinking it. This article explains the steps you need to take to clear out the transaction log and ensure you can restore your database should something go wrong."/>
+
+
+<link rel="canonical" href="https://sqlpey.com/question/clearing-the-sql-server-transaction-log/" />
+
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="stylesheet" href="/css/index.min.00daf36bd5ee9fe1c553da346dd7a1d93bc97b5cf1fde7ddd1f4a5bd9b1901db.css">
+
+
+
+
+
+
+
+
+
+</head>
+<body class="w-full bg-slate-50 dark:bg-gray-800">
+  <header class="flex flex-none justify-center z-10">
+    <div class="flex flex-row gap justify-between w-full max-w-4xl lg:max-w-5xl h-12 mt-3">
+  <div class="flex-none ml-2 md:ml-0">
+    <a href="/" class="">
+      <img class="h-12 w-12 rounded-full object-cover bg-gray-100" src="/logo_header.webp" alt="logo">
+    </a>
+  </div>
+  <div class="flex-1"></div>
+  <div class="flex-none">
+    
+
+
+
+<nav class="h-full static">
+  <button id="navbar-menu-toggle" type="button" class="inline-flex items-center p-2 text-sm text-slate-800 dark:text-slate-200 rounded-lg md:hidden" aria-controls="navbar-menu" aria-expanded="false">
+    <span class="sr-only">Open main menu</span>
+    <i class="w-8 h-8">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-menu-2" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 6l16 0" />
+  <path d="M4 12l16 0" />
+  <path d="M4 18l16 0" />
+</svg>
+
+    </i>
+  </button>
+  <div class="absolute md:static top-16 left-0 right-0 z-50 hidden w-full md:block md:w-auto" id="navbar-menu">
+    <ul class="flex flex-col mx-2 md:mx-0 md:flex-row md:border-0 rounded-sm md:rounded-full px-3 text-base font-medium text-slate-800 dark:text-slate-200 shadow-lg bg-white dark:bg-gray-600 shadow-slate-800/5 dark:shadow-slate-200/5 ring-1 ring-slate-900/5 dark:ring-slate-100/5">
+    
+        <li id="questions" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="" title="Questions">Questions</a>
+        </li>
+      
+    
+        <li id="about" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="" title="About">About</a>
+        </li>
+      
+    
+        <li id="" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="/" title="Home">Home</a>
+        </li>
+      
+    
+    </ul>
+  </div>
+</nav>
+
+
+  </div>
+  
+  <div class="flex-none mx-1"></div>
+  
+  <div class="darkmode-toggle flex flex-none mr-2 md:mr-0">
+    <label for="darkmode-toggle" class="flex items-center px-3 cursor-pointer rounded-full bg-gray-100 dark:bg-gray-600" title="Toggle dark mode">
+      <input name="darkmode-toggle" id="darkmode-toggle" type="checkbox" class="sr-only peer" aria-label="Toggle dark mode">
+      <div class="group flex flex-row gap-1 justify-center h-8 px-1 rounded-full bg-white dark:bg-gray-700">
+        <i class="h-6 w-6 flex-none rounded-full bg-yellow-400 place-self-center peer-checked:group-[]:invisible">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brightness-down" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+   <path d="M12 5l0 .01"></path>
+   <path d="M17 7l0 .01"></path>
+   <path d="M19 12l0 .01"></path>
+   <path d="M17 17l0 .01"></path>
+   <path d="M12 19l0 .01"></path>
+   <path d="M7 17l0 .01"></path>
+   <path d="M5 12l0 .01"></path>
+   <path d="M7 7l0 .01"></path>
+</svg>
+
+        </i>
+        <i class="h-6 w-6 flex-none rounded-full place-self-center invisible peer-checked:group-[]:visible">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-moon-stars" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"></path>
+   <path d="M17 4a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2"></path>
+   <path d="M19 11h2m-1 -1v2"></path>
+</svg>
+
+        </i>
+      </div>
+    </label>
+  </div>
+</div>
+
+  </header>
+  <main class="flex flex-auto justify-center">
+    
+<div class="w-full max-w-4xl lg:max-w-5xl">
+  <div class="flex flex-col gap-y-3 p-6 mt-6 mx-2 md:mx-0 rounded-lg shadow-md bg-white dark:bg-gray-700">
+    <h1 class="text-4xl font-semibold text-slate-800 dark:text-slate-100">
+      <a href="/question/clearing-the-sql-server-transaction-log/">Clearing the SQL Server Transaction Log</a>
+    </h1>
+
+    
+    
+  <ul class="flex flex-row flex-wrap text-slate-500 dark:text-slate-300">
+    
+      
+      <li>
+        <a href="/categories/sql-server/"
+          class="text-sm mr-2 px-2 py-1 rounded border border-emerald-800 bg-emerald-800 text-slate-50">
+          SQL SERVER
+        </a>
+      </li>
+      
+    
+    
+      
+      <li>
+        <a href="/tags/sql-server/"
+          class="flex flex-row text-sm mr-2 py-1">
+          <i class="h-5 w-5 flex-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M5 9l14 0"></path>
+   <path d="M5 15l14 0"></path>
+   <path d="M11 4l-4 16"></path>
+   <path d="M17 4l-4 16"></path>
+</svg>
+
+          </i>
+          <span class="ml-0">SQL SERVER</span>
+        </a>
+      </li>
+      
+    
+  </ul>
+
+
+
+    <div class="flex flex-col gap-y-1 md:flex-row md:gap-y-0 md:gap-x-4 text-slate-500 dark:text-slate-300">
+  
+  
+  <div class="flex flex-row text-base gap-x-1">
+    <i class="h-6 w-6 flex-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"></path>
+   <path d="M16 3v4"></path>
+   <path d="M8 3v4"></path>
+   <path d="M4 11h16"></path>
+   <path d="M11 15h1"></path>
+   <path d="M12 15v3"></path>
+</svg>
+
+    </i>
+    <time datetime="2023-03-19T23:15:32&#43;00:00">
+      2023-03-19
+    </time>
+  </div>
+
+  <div class="flex flex-row text-base gap-x-1">
+    <i class="h-6 w-6 flex-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hourglass-high" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M6.5 7h11"></path>
+   <path d="M6 20v-2a6 6 0 1 1 12 0v2a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1z"></path>
+   <path d="M6 4v2a6 6 0 1 0 12 0v-2a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1z"></path>
+</svg>
+
+    </i>
+    <span>
+      4 minutes to read
+    </span>
+  </div>
+</div>
+
+
+    
+      
+      <section class="prose prose-slate dark:prose-invert w-full max-w-4xl lg:max-w-5xl mt-6">
+        <h2>Table of Contents</h2>
+        <aside><nav id="TableOfContents">
+  <ul>
+    <li><a href="#step-one-take-a-full-backup">Step One: Take a Full Backup</a></li>
+    <li><a href="#step-two-set-the-database-to-full-recovery-mode">Step Two: Set the Database to Full Recovery Mode</a></li>
+    <li><a href="#step-three-perform-a-log-backup">Step Three: Perform a Log Backup</a></li>
+    <li><a href="#step-four-shrink-the-log-file">Step Four: Shrink the Log File</a></li>
+    <li><a href="#step-five-monitor-your-log-usage">Step Five: Monitor Your Log Usage</a></li>
+    <li><a href="#summary">Summary</a></li>
+  </ul>
+</nav></aside>
+      </section>
+      
+    
+
+    <article class="mt-6 w-full max-w-4xl lg:max-w-5xl prose prose-slate dark:prose-invert prose-quoteless post-content">
+      <p>How do you clear the SQL Server transaction log?
+Add images for references</p>
+<p>Making changes to the SQL Server transaction log should only be done in scenarios where it has unexpectedly grown in size and it is not expected to happen again. If the log file will grow to the same size again, then not much will be accomplished by shrinking it. This article explains the steps you need to take to clear out the transaction log and ensure you can restore your database should something go wrong.</p>
+<h2 id="step-one-take-a-full-backup">Step One: Take a Full Backup</h2>
+<p>It is important to make sure you can restore your database should something go wrong. Therefore, never make any changes to your database without ensuring you have a full backup.</p>
+<h2 id="step-two-set-the-database-to-full-recovery-mode">Step Two: Set the Database to Full Recovery Mode</h2>
+<p>If your database is not already in <code>FULL</code> recovery mode, then you should set it to this mode:</p>
+<pre><code>ALTER DATABASE testdb SET RECOVERY FULL;
+</code></pre>
+<h2 id="step-three-perform-a-log-backup">Step Three: Perform a Log Backup</h2>
+<p>Even if you are taking regular full backups, the log file will grow and grow until you perform a <em>log</em> backup. This is for your protection, not to needlessly eat away at your disk space. For example, if you have a business rule that states you can afford to lose no more than 15 minutes of data in the event of a disaster, you should have a job that backs up the log every 15 minutes. Here is a script that will generate timestamped file names based on the current time (but you can also do this with maintenance plans etc., just donâ€™t choose any of the shrink options in maintenance plans, theyâ€™re awful):</p>
+<pre><code>DECLARE @path NVARCHAR(255) = N'\\backup_share\log\testdb_' 
+  + CONVERT(CHAR(8), GETDATE(), 112) + '_'
+  + REPLACE(CONVERT(CHAR(8), GETDATE(), 108),':','')
+  + '.trn';
+
+BACKUP LOG foo TO DISK = @path WITH INIT, COMPRESSION;
+</code></pre>
+<p>Note that <code>\\backup_share\</code> should be on a different machine that represents a different underlying storage device. Backing these up to the same machine (or to a different machine that uses the same underlying disks, or a different VM thatâ€™s on the same physical host) does not really help you, since if the machine blows up, youâ€™ve lost your database <em>and</em> its backups. Depending on your network infrastructure it may make more sense to backup locally and then transfer them to a different location behind the scenes; in either case, you want to make sure your backups are stored in a safe and secure location.</p>
+<h2 id="step-four-shrink-the-log-file">Step Four: Shrink the Log File</h2>
+<p>Once you have a log backup, you can shrink the log file to its reasonable size. To do this, you can run the following command:</p>
+<pre><code>DBCC SHRINKFILE (foo_log, 10); 
+</code></pre>
+<p>Where <code>foo_log</code> is the name of the log file and <code>10</code> is the desired size of the file in megabytes. You should ensure the desired size is large enough to handle your regular transaction log activities.</p>
+<h2 id="step-five-monitor-your-log-usage">Step Five: Monitor Your Log Usage</h2>
+<p>You should monitor your log usage regularly and adjust your backup schedule accordingly. You can use the following query to see how much space your transaction log is currently using:</p>
+<pre><code>SELECT name, log_reuse_wait, log_reuse_wait_desc,
+  convert(decimal(10, 2), log_size_mb) AS log_size_mb,
+  convert(decimal(10, 2), log_space_used_mb) AS log_space_used_mb
+FROM sys.databases
+WHERE name = 'foo';
+</code></pre>
+<p>The <code>log_reuse_wait</code> column will tell you whether or not the log file is currently being reused. If it&rsquo;s not being reused, you should consider taking a log backup to make sure you don&rsquo;t run out of disk space. More, you can also monitor the <code>log_space_used_mb</code> column to get an idea of how much space is being used in the log file.</p>
+<h2 id="summary">Summary</h2>
+<p>To summarize, making changes to the SQL Server transaction log should only be done in scenarios where it has unexpectedly grown in size and it is not expected to happen again. Therefore, it is important to take a full backup, set the database to full recovery mode, and perform log backups regularly. Then you can shrink the log file to its reasonable size and monitor your log usage to make sure you do not run out of disk space.
+]]&gt;</p>
+
+    </article>
+
+    
+
+
+
+  </div>
+</div>
+
+  </main>
+  <footer class="flex flex-none justify-center">
+    <section class="flex flex-col md:flex-row mx-2 md:mx-0 gap-2 md:gap-0 justify-between w-full max-w-4xl lg:max-w-5xl py-6 text-slate-500 dark:text-slate-300">
+  <div class="flex flex-row">
+    
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+  </div>
+  <div class="grow"></div>
+  <div class="flex flex-row">
+    <i class="h-6 w-6 flex-none"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+   <path d="M14 9.75a3.016 3.016 0 0 0 -4.163 .173a2.993 2.993 0 0 0 0 4.154a3.016 3.016 0 0 0 4.163 .173"></path>
+</svg>
+</i> 2024 abkhan
+    
+  </div>
+  
+  <div class="flex flex-row">
+    <span class="ml-0 pl-0 md:ml-2 md:pl-2 border-l-0 md:border-l border-slate-300 dark:border-slate-400">
+      Powered by <a href="https://gohugo.io" target="_blank" rel="noopener" class="underline">Hugo</a> <span class="text-red-600">&hearts;</span> <a href="https://github.com/tomowang/hugo-theme-tailwind" target="_blank" rel="noopener" class="underline">Tailwind</a>
+    </span>
+  </div>
+  
+</section>
+
+  </footer><script src="/main.min.c6372b6836971865bd94bfde974748aca8415824a2facab6ccd66a87384bfacb.js"></script>
+  
+  <div class="hidden top-1 right-1" id="code-copy">
+    <i class="h-6 w-6 block">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" />
+  <path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" />
+</svg>
+
+    </i>
+  </div>
+  <div class="hidden top-1 right-1" id="code-copy-done">
+    <i class="h-6 w-6 block">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M5 12l5 5l10 -10" />
+</svg>
+
+    </i>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+</body>
+</html>

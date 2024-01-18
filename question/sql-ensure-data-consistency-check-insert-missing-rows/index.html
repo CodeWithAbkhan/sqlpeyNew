@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>SQL: Ensure Data Consistency: Check and Insert Missing Rows :: sqlpey - Example site for hugo-theme-tailwind</title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta
+  name="description"
+  content="SQL: Ensure Data Consistency: Check and Insert Missing Rows
+In this Q&amp;amp;A style blog post, we will learn how to write a T-SQL stored procedure that updates a row in a table and inserts it if it doesn&amp;rsquo;t exist. This is for a booking system and must be atomic and reliable. We will use @@rowcount and a transaction to ensure data consistency. Let&amp;rsquo;s get started!
+Summary: We will learn how to update a row in a table and insert it if it doesn&amp;rsquo;t exist using T-SQL and a transaction."
+/>
+<meta
+  name="keywords"
+  content="hugo, tailwind, tailwindcss, hugo theme, hugo theme tailwind"
+/>
+<meta name="robots" content="noodp" />
+<meta property="og:title" content="SQL: Ensure Data Consistency: Check and Insert Missing Rows" />
+<meta property="og:description" content="SQL: Ensure Data Consistency: Check and Insert Missing Rows
+In this Q&amp;A style blog post, we will learn how to write a T-SQL stored procedure that updates a row in a table and inserts it if it doesn&rsquo;t exist. This is for a booking system and must be atomic and reliable. We will use @@rowcount and a transaction to ensure data consistency. Let&rsquo;s get started!
+Summary: We will learn how to update a row in a table and insert it if it doesn&rsquo;t exist using T-SQL and a transaction." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://sqlpey.com/question/sql-ensure-data-consistency-check-insert-missing-rows/" /><meta property="article:section" content="question" />
+<meta property="article:published_time" content="2024-01-18T13:12:33+00:00" />
+<meta property="article:modified_time" content="2024-01-18T13:12:33+00:00" />
+
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="SQL: Ensure Data Consistency: Check and Insert Missing Rows"/>
+<meta name="twitter:description" content="SQL: Ensure Data Consistency: Check and Insert Missing Rows
+In this Q&amp;A style blog post, we will learn how to write a T-SQL stored procedure that updates a row in a table and inserts it if it doesn&rsquo;t exist. This is for a booking system and must be atomic and reliable. We will use @@rowcount and a transaction to ensure data consistency. Let&rsquo;s get started!
+Summary: We will learn how to update a row in a table and insert it if it doesn&rsquo;t exist using T-SQL and a transaction."/>
+
+
+<link rel="canonical" href="https://sqlpey.com/question/sql-ensure-data-consistency-check-insert-missing-rows/" />
+
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="stylesheet" href="/css/index.min.00daf36bd5ee9fe1c553da346dd7a1d93bc97b5cf1fde7ddd1f4a5bd9b1901db.css">
+
+
+
+
+
+
+
+
+
+</head>
+<body class="w-full bg-slate-50 dark:bg-gray-800">
+  <header class="flex flex-none justify-center z-10">
+    <div class="flex flex-row gap justify-between w-full max-w-4xl lg:max-w-5xl h-12 mt-3">
+  <div class="flex-none ml-2 md:ml-0">
+    <a href="/" class="">
+      <img class="h-12 w-12 rounded-full object-cover bg-gray-100" src="/logo_header.webp" alt="logo">
+    </a>
+  </div>
+  <div class="flex-1"></div>
+  <div class="flex-none">
+    
+
+
+
+<nav class="h-full static">
+  <button id="navbar-menu-toggle" type="button" class="inline-flex items-center p-2 text-sm text-slate-800 dark:text-slate-200 rounded-lg md:hidden" aria-controls="navbar-menu" aria-expanded="false">
+    <span class="sr-only">Open main menu</span>
+    <i class="w-8 h-8">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-menu-2" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 6l16 0" />
+  <path d="M4 12l16 0" />
+  <path d="M4 18l16 0" />
+</svg>
+
+    </i>
+  </button>
+  <div class="absolute md:static top-16 left-0 right-0 z-50 hidden w-full md:block md:w-auto" id="navbar-menu">
+    <ul class="flex flex-col mx-2 md:mx-0 md:flex-row md:border-0 rounded-sm md:rounded-full px-3 text-base font-medium text-slate-800 dark:text-slate-200 shadow-lg bg-white dark:bg-gray-600 shadow-slate-800/5 dark:shadow-slate-200/5 ring-1 ring-slate-900/5 dark:ring-slate-100/5">
+    
+        <li id="questions" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="" title="Questions">Questions</a>
+        </li>
+      
+    
+        <li id="about" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="" title="About">About</a>
+        </li>
+      
+    
+        <li id="" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="/" title="Home">Home</a>
+        </li>
+      
+    
+    </ul>
+  </div>
+</nav>
+
+
+  </div>
+  
+  <div class="flex-none mx-1"></div>
+  
+  <div class="darkmode-toggle flex flex-none mr-2 md:mr-0">
+    <label for="darkmode-toggle" class="flex items-center px-3 cursor-pointer rounded-full bg-gray-100 dark:bg-gray-600" title="Toggle dark mode">
+      <input name="darkmode-toggle" id="darkmode-toggle" type="checkbox" class="sr-only peer" aria-label="Toggle dark mode">
+      <div class="group flex flex-row gap-1 justify-center h-8 px-1 rounded-full bg-white dark:bg-gray-700">
+        <i class="h-6 w-6 flex-none rounded-full bg-yellow-400 place-self-center peer-checked:group-[]:invisible">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brightness-down" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+   <path d="M12 5l0 .01"></path>
+   <path d="M17 7l0 .01"></path>
+   <path d="M19 12l0 .01"></path>
+   <path d="M17 17l0 .01"></path>
+   <path d="M12 19l0 .01"></path>
+   <path d="M7 17l0 .01"></path>
+   <path d="M5 12l0 .01"></path>
+   <path d="M7 7l0 .01"></path>
+</svg>
+
+        </i>
+        <i class="h-6 w-6 flex-none rounded-full place-self-center invisible peer-checked:group-[]:visible">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-moon-stars" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"></path>
+   <path d="M17 4a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2"></path>
+   <path d="M19 11h2m-1 -1v2"></path>
+</svg>
+
+        </i>
+      </div>
+    </label>
+  </div>
+</div>
+
+  </header>
+  <main class="flex flex-auto justify-center">
+    
+<div class="w-full max-w-4xl lg:max-w-5xl">
+  <div class="flex flex-col gap-y-3 p-6 mt-6 mx-2 md:mx-0 rounded-lg shadow-md bg-white dark:bg-gray-700">
+    <h1 class="text-4xl font-semibold text-slate-800 dark:text-slate-100">
+      <a href="/question/sql-ensure-data-consistency-check-insert-missing-rows/">SQL: Ensure Data Consistency: Check and Insert Missing Rows</a>
+    </h1>
+
+    
+    
+  <ul class="flex flex-row flex-wrap text-slate-500 dark:text-slate-300">
+    
+      
+      <li>
+        <a href="/categories/sql/"
+          class="text-sm mr-2 px-2 py-1 rounded border border-emerald-800 bg-emerald-800 text-slate-50">
+          SQL
+        </a>
+      </li>
+      
+    
+    
+      
+      <li>
+        <a href="/tags/sql/"
+          class="flex flex-row text-sm mr-2 py-1">
+          <i class="h-5 w-5 flex-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M5 9l14 0"></path>
+   <path d="M5 15l14 0"></path>
+   <path d="M11 4l-4 16"></path>
+   <path d="M17 4l-4 16"></path>
+</svg>
+
+          </i>
+          <span class="ml-0">SQL</span>
+        </a>
+      </li>
+      
+    
+  </ul>
+
+
+
+    <div class="flex flex-col gap-y-1 md:flex-row md:gap-y-0 md:gap-x-4 text-slate-500 dark:text-slate-300">
+  
+  
+  <div class="flex flex-row text-base gap-x-1">
+    <i class="h-6 w-6 flex-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"></path>
+   <path d="M16 3v4"></path>
+   <path d="M8 3v4"></path>
+   <path d="M4 11h16"></path>
+   <path d="M11 15h1"></path>
+   <path d="M12 15v3"></path>
+</svg>
+
+    </i>
+    <time datetime="2024-01-18T13:12:33&#43;00:00">
+      2024-01-18
+    </time>
+  </div>
+
+  <div class="flex flex-row text-base gap-x-1">
+    <i class="h-6 w-6 flex-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hourglass-high" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M6.5 7h11"></path>
+   <path d="M6 20v-2a6 6 0 1 1 12 0v2a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1z"></path>
+   <path d="M6 4v2a6 6 0 1 0 12 0v-2a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1z"></path>
+</svg>
+
+    </i>
+    <span>
+      4 minutes to read
+    </span>
+  </div>
+</div>
+
+
+    
+      
+      <section class="prose prose-slate dark:prose-invert w-full max-w-4xl lg:max-w-5xl mt-6">
+        <h2>Table of Contents</h2>
+        <aside><nav id="TableOfContents">
+  <ul>
+    <li><a href="#step-by-step-guide">Step-by-Step Guide:</a>
+      <ul>
+        <li><a href="#step-1-check-if-a-row-exists">Step 1: Check if a row exists</a></li>
+        <li><a href="#step-2-write-the-update-query">Step 2: Write the UPDATE query</a></li>
+        <li><a href="#step-3-write-the-insert-query">Step 3: Write the INSERT query</a></li>
+        <li><a href="#step-4-use-rowcount">Step 4: Use @@rowcount</a></li>
+        <li><a href="#step-5-use-transactions">Step 5: Use transactions</a></li>
+        <li><a href="#step-6-return-true-or-false">Step 6: Return true or false</a></li>
+      </ul>
+    </li>
+    <li><a href="#alternative-ways">Alternative ways</a></li>
+  </ul>
+</nav></aside>
+      </section>
+      
+    
+
+    <article class="mt-6 w-full max-w-4xl lg:max-w-5xl prose prose-slate dark:prose-invert prose-quoteless post-content">
+      <p>SQL: Ensure Data Consistency: Check and Insert Missing Rows<br>
+In this Q&amp;A style blog post, we will learn how to write a T-SQL stored procedure that updates a row in a table and inserts it if it doesn&rsquo;t exist. This is for a booking system and must be atomic and reliable. We will use @@rowcount and a transaction to ensure data consistency. Let&rsquo;s get started!</p>
+<p><strong>Summary:</strong> We will learn how to update a row in a table and insert it if it doesn&rsquo;t exist using T-SQL and a transaction. We will also use @@rowcount to ensure data consistency.</p>
+<h2 id="step-by-step-guide">Step-by-Step Guide:</h2>
+<h3 id="step-1-check-if-a-row-exists">Step 1: Check if a row exists</h3>
+<p>We will start by checking if a row exists in the table. If it does, we will update the row, else we will insert a new row. Here&rsquo;s how we can do this:</p>
+<pre><code>IF EXISTS (SELECT * FROM Bookings WHERE FlightID = @Id)
+BEGIN
+    -- UPDATE HERE
+END
+ELSE
+BEGIN
+   -- INSERT HERE
+END
+</code></pre>
+<p>We are selecting all rows from the Bookings table where the FlightID column matches the @Id variable value. If a row exists, we will execute the UPDATE query, else we will execute the INSERT query.</p>
+<h3 id="step-2-write-the-update-query">Step 2: Write the UPDATE query</h3>
+<p>If a row exists, we will update the row. Here&rsquo;s how we can do this:</p>
+<pre><code>UPDATE Bookings
+SET TicketsBooked = TicketsBooked + @TicketsToBook
+WHERE FlightId = @Id AND TicketsMax &lt; (TicketsBooked + @TicketsToBook)
+</code></pre>
+<p>We are updating the TicketsBooked column by adding the value of @TicketsToBook to it. We are also checking if the sum of the current value of TicketsBooked and @TicketsToBook is less than the value of TicketsMax. If it&rsquo;s greater, it means the flight is fully booked, and we should not allow more bookings.</p>
+<h3 id="step-3-write-the-insert-query">Step 3: Write the INSERT query</h3>
+<p>If a row doesn&rsquo;t exist, we will insert a new row. Here&rsquo;s how we can do this:</p>
+<pre><code>INSERT INTO Bookings (FlightId, TicketsMax, TicketsBooked)
+VALUES (@Id, @TicketsMax, @TicketsToBook);
+</code></pre>
+<p>We are inserting a new row into the Bookings table with the values of @Id, @TicketsMax, and @TicketsToBook.</p>
+<h3 id="step-4-use-rowcount">Step 4: Use @@rowcount</h3>
+<p>We will use @@rowcount to ensure data consistency. It returns the number of rows affected by the last executed command. If it&rsquo;s 0, it means no rows were affected, which indicates that the condition in the UPDATE or INSERT query was not met. Here&rsquo;s how we can use it:</p>
+<pre><code>IF @@ROWCOUNT = 0
+BEGIN
+   -- INSERT HERE
+END
+</code></pre>
+<p>If @@ROWCOUNT is 0, it means the UPDATE query did not affect any rows, so we should execute the INSERT query to insert a new row.</p>
+<h3 id="step-5-use-transactions">Step 5: Use transactions</h3>
+<p>We will use transactions to ensure atomicity and reliability. A transaction is a sequence of SQL statements that are treated as a single unit of work. We will use BEGIN TRANSACTION and COMMIT TRANSACTION, as shown below:</p>
+<pre><code>BEGIN TRANSACTION;
+
+IF EXISTS (SELECT * FROM Bookings WHERE FlightID = @Id)
+BEGIN
+    UPDATE Bookings
+    SET TicketsBooked = TicketsBooked + @TicketsToBook
+    WHERE FlightId = @Id AND TicketsMax &lt; (TicketsBooked + @TicketsToBook)
+END
+ELSE
+BEGIN
+    INSERT INTO Bookings (FlightId, TicketsMax, TicketsBooked)
+    VALUES (@Id, @TicketsMax, @TicketsToBook);
+END
+
+IF @@ROWCOUNT = 0
+BEGIN
+    INSERT INTO Bookings (FlightId, TicketsMax, TicketsBooked)
+    VALUES (@Id, @TicketsMax, @TicketsToBook);
+END
+
+COMMIT TRANSACTION;
+</code></pre>
+<p>We are using the BEGIN TRANSACTION and COMMIT TRANSACTION statements to wrap the entire block of code. If an error occurs during the execution of the transaction, we can roll back the entire transaction to prevent any data inconsistencies.</p>
+<h3 id="step-6-return-true-or-false">Step 6: Return true or false</h3>
+<p>Lastly, we need to return true or false, depending on whether the transaction was successful or not. We can use the @@error variable to check if an error occurred during the transaction. If @@error is 0, it means the transaction was successful, so we can return true, else we can return false.</p>
+<p>Here&rsquo;s the final code:</p>
+<pre><code>CREATE PROCEDURE BookFlight
+    @Id INT,
+    @TicketsMax INT,
+    @TicketsToBook INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRANSACTION;
+
+    IF EXISTS (SELECT * FROM Bookings WHERE FlightID = @Id)
+    BEGIN
+        UPDATE Bookings
+        SET TicketsBooked = TicketsBooked + @TicketsToBook
+        WHERE FlightId = @Id AND TicketsMax &lt; (TicketsBooked + @TicketsToBook)
+    END
+    ELSE
+    BEGIN
+        INSERT INTO Bookings (FlightId, TicketsMax, TicketsBooked)
+        VALUES (@Id, @TicketsMax, @TicketsToBook);
+    END
+
+    IF @@ROWCOUNT = 0
+    BEGIN
+        INSERT INTO Bookings (FlightId, TicketsMax, TicketsBooked)
+        VALUES (@Id, @TicketsMax, @TicketsToBook);
+    END
+
+    IF @@error = 0
+    BEGIN
+        COMMIT TRANSACTION;
+        SELECT 'true' AS Transaction_Committed; -- Return true
+    END
+    ELSE
+    BEGIN
+        ROLLBACK TRANSACTION;
+        SELECT 'false' AS Transaction_Committed; -- Return false
+    END
+END
+</code></pre>
+<h2 id="alternative-ways">Alternative ways</h2>
+<p>An alternative way to update a row and insert it if it doesn&rsquo;t exist is to use the MERGE command. The MERGE command can perform INSERT, UPDATE, and DELETE operations on a target table based on the results of a join with a source table.</p>
+<p>Here&rsquo;s an example:</p>
+<pre><code>CREATE PROCEDURE BookFlight
+    @Id INT,
+    @TicketsMax INT,
+    @TicketsToBook INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+</code></pre>
+<p>BEGIN TRANSACTION;</p>
+<p>MERGE INTO Bookings AS T<br>
+USING (SELECT @Id AS FlightID, @TicketsToBook AS TicketsToBook) AS S<br>
+ON T.FlightID = S.FlightID<br>
+WHEN MATCHED AND T.TicketsMax &gt; (T.TicketsBooked + S.TicketsToBook) THEN<br>
+UPDATE SET T.TicketsBooked = T.TicketsBooked + S.Tickets</p>
+<p>]]&gt;</p>
+
+    </article>
+
+    
+
+
+
+  </div>
+</div>
+
+  </main>
+  <footer class="flex flex-none justify-center">
+    <section class="flex flex-col md:flex-row mx-2 md:mx-0 gap-2 md:gap-0 justify-between w-full max-w-4xl lg:max-w-5xl py-6 text-slate-500 dark:text-slate-300">
+  <div class="flex flex-row">
+    
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+  </div>
+  <div class="grow"></div>
+  <div class="flex flex-row">
+    <i class="h-6 w-6 flex-none"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+   <path d="M14 9.75a3.016 3.016 0 0 0 -4.163 .173a2.993 2.993 0 0 0 0 4.154a3.016 3.016 0 0 0 4.163 .173"></path>
+</svg>
+</i> 2024 abkhan
+    
+  </div>
+  
+  <div class="flex flex-row">
+    <span class="ml-0 pl-0 md:ml-2 md:pl-2 border-l-0 md:border-l border-slate-300 dark:border-slate-400">
+      Powered by <a href="https://gohugo.io" target="_blank" rel="noopener" class="underline">Hugo</a> <span class="text-red-600">&hearts;</span> <a href="https://github.com/tomowang/hugo-theme-tailwind" target="_blank" rel="noopener" class="underline">Tailwind</a>
+    </span>
+  </div>
+  
+</section>
+
+  </footer><script src="/main.min.c6372b6836971865bd94bfde974748aca8415824a2facab6ccd66a87384bfacb.js"></script>
+  
+  <div class="hidden top-1 right-1" id="code-copy">
+    <i class="h-6 w-6 block">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" />
+  <path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" />
+</svg>
+
+    </i>
+  </div>
+  <div class="hidden top-1 right-1" id="code-copy-done">
+    <i class="h-6 w-6 block">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M5 12l5 5l10 -10" />
+</svg>
+
+    </i>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+</body>
+</html>
