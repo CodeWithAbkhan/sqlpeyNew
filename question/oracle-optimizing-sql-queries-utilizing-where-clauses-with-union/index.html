@@ -140,7 +140,8 @@ In Oracle databases, combining two or more SELECT statements to form a single re
     
 <div class="flex flex-col w-full max-w-4xl lg:max-w-5xl relative">
   <div class="flex flex-row">
-  <section class="flex flex-col gap-y-3 p-6 mt-6 mx-2 md:mx-0 rounded-lg shadow-md bg-white dark:bg-gray-700">
+  <section class="flex flex-col w-full md:w-2/3 p-6 mt-6 m-2 md:mx-0 rounded-lg shadow-md bg-white dark:bg-gray-700">
+    
     <h1 class="text-4xl font-semibold text-slate-800 dark:text-slate-100">
       <a href="/question/oracle-optimizing-sql-queries-utilizing-where-clauses-with-union/">ORACLE: Optimizing SQL Queries: Utilizing WHERE Clauses with UNION</a>
     </h1>
@@ -230,16 +231,18 @@ In Oracle databases, combining two or more SELECT statements to form a single re
       
     
 
-    <article class="mt-6 w-full max-w-4xl lg:max-w-5xl prose prose-slate dark:prose-invert prose-quoteless post-content">
-      <p>ORACLE: Optimizing SQL Queries: Utilizing WHERE Clauses with UNION
+    
+      <article class="mt-6 w-full max-w-4xl lg:max-w-5xl prose prose-slate dark:prose-invert prose-quoteless post-content" 
+      >
+        <p>ORACLE: Optimizing SQL Queries: Utilizing WHERE Clauses with UNION
 Performance Considerations of UNION with WHERE Clause in Oracle</p>
 <p>In Oracle databases, combining two or more SELECT statements to form a single result set is commonly achieved using the UNION operator. In some scenarios, both queries of the UNION operation may have their own WHERE clause, which can lead to confusion about where to place the WHERE clause for optimal performance. This Q&amp;A Session explores the performance considerations of placing WHERE clauses before or after the UNION operator, with practical examples.</p>
 <p>UNION with WHERE Clause Before UNION Operator
 One option is to apply separate WHERE clauses to each query before the UNION operation, like this:</p>
 <p>SELECT colA, colB FROM tableA WHERE colA &gt; 1 UNION SELECT colA, colB FROM tableB WHERE colA &gt; 1  This approach is simple and intuitive, but Oracle&rsquo;s query optimizer might not optimize it to its full potential. In some cases, it may perform a full table scan on both tables before applying the WHERE clause, which can decrease performance.  UNION with WHERE Clause After UNION Operator An alternative is to place the UNION operation in a subquery and apply the WHERE clause to the outer query. Here&rsquo;s how this query would look:  SELECT *    FROM (SELECT colA, colB FROM tableA         UNION         SELECT colA, colB FROM tableB)   WHERE colA &gt; 1  This approach ensures that the WHERE clause is applied only after the UNION operation, which can improve performance in some cases. Oracle&rsquo;s query optimizer can rearrange the order of operations to produce a more optimal plan, such as applying the WHERE clause to each table before the UNION operation.  Example: Comparing Performance of UNION with WHERE Clauses To illustrate the performance differences between using a WHERE clause before or after the UNION operator, we can create two tables and populate them with random data:  CREATE TABLE tableA (colA NUMBER, colB NUMBER); CREATE TABLE tableB (colA NUMBER, colB NUMBER);  INSERT INTO tableA SELECT LEVEL, LEVEL FROM dual CONNECT BY LEVEL  500000 UNION SELECT colA, colB FROM tableB WHERE colA &gt; 500000;  SELECT * FROM TABLE(dbms_xplan.display(format=&gt;&lsquo;basic&rsquo;));  EXPLAIN PLAN FOR SELECT * FROM (   SELECT colA, colB FROM tableA   UNION   SELECT colA, colB FROM tableB ) WHERE colA &gt; 500000;  SELECT * FROM TABLE(dbms_xplan.display(format=&gt;&lsquo;basic&rsquo;));  The first query applies WHERE clauses to each table separately, resulting in a less optimal full table scan on both tables:  | Id  | Operation            | Name   | Rows  | Bytes | Cost (%CPU)| Time     | |   0 | SELECT STATEMENT     |        |     1 |    26 | 19885   (3)| 00:00:01 | |   1 |  SORT UNIQUE         |        |     1 |    26 | 19885   (3)| 00:00:01 | |*  2 |   UNION-ALL          |        |       |       |            |          | |   3 |    TABLE ACCESS FULL | TABLEA |  1000K|    12M|  9949   (1)| 00:00:01 | |   4 |    TABLE ACCESS FULL | TABLEB |  1000K|    12M|  9949   (1)| 00:00:01 |  The second query places the UNION operation in a subquery and applies the WHERE clause to the outer query, resulting in a more optimal index range scan on each table:  | Id  | Operation           | Name   | Rows  | Bytes | Cost (%CPU)| Time     | |   0 | SELECT STATEMENT    |        |     1 |    26 | 19864   (3)| 00:00:01 | |*  1 |  FILTER             |        |       |       |            |          | |   2 |   VIEW              |        |  2000K|    24M|  1970   (1)| 00:00:01 | |   3 |    UNION-ALL        |        |       |       |            |          | |   4 |     INDEX RANGE SCAN| TABLEA |  1000K|    12M|   984   (1)| 00:00:01 | |   5 |     INDEX RANGE SCAN| TABLEB |  1000K|    12M|   984   (1)| 00:00:01 |  In this example, the second query with the WHERE clause after the UNION operator produces a more optimal execution plan.  Alternate Approach: Use CTE (Common Table Expression) Using a Common Table Expression (CTE) can be another way to separate the WHERE clauses before the UNION operator. Here&rsquo;s an example:  WITH tbl AS (   SELECT colA, colB FROM tableA WHERE colA &gt; 500000   UNION   SELECT colA, colB FROM tableB WHERE colA &gt; 500000 ) SELECT * FROM tbl;  This query produces a similar execution plan to the second query above, with one less level of subquery:  | Id  | Operation           | Name   | Rows  | Bytes | Cost (%CPU)| Time     | |   0 | SELECT STATEMENT    |        |     1 |    26 | 19864   (3)| 00:00:01 | |*  1 |  FILTER             |        |       |       |            |          | |]]&gt;</p>
 
-    </article>
-
+      </article>
+    
     
 
 
@@ -471,13 +474,6 @@ One option is to apply separate WHERE clauses to each query before the UNION ope
     </li>
     
     <li class="mt-2 mr-2">
-      <a href="/tags/sql-server/"
-        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
-        SQL SERVER
-      </a>
-    </li>
-    
-    <li class="mt-2 mr-2">
       <a href="/tags/database/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
         database
@@ -485,9 +481,9 @@ One option is to apply separate WHERE clauses to each query before the UNION ope
     </li>
     
     <li class="mt-2 mr-2">
-      <a href="/tags/postgresql/"
+      <a href="/tags/sql-server/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
-        postgresql
+        SQL SERVER
       </a>
     </li>
     
@@ -495,6 +491,13 @@ One option is to apply separate WHERE clauses to each query before the UNION ope
       <a href="/tags/azure-sql-database-2/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
         azure-sql-database-2
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/tags/postgresql/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        postgresql
       </a>
     </li>
     
