@@ -16,7 +16,11 @@
 />
 <meta
   name="keywords"
-  content="SQL, Databases, Big-Query, Oracle, MS SQL SErver, MySQL, PostgreSQL"
+  content="
+            
+              SQL, Databases, Big-Query, Oracle, MS SQL SErver, MySQL, PostgreSQL
+            
+           "
 />
 <meta name="robots" content="noodp" />
 <meta property="og:title" content="Nosql Optimizing Social Network Schema Design" />
@@ -142,21 +146,17 @@
     
 <div class="flex flex-col w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl relative">
   <div class="flex flex-row">
-  <section class="flex flex-col w-full md:w-2/3 mt-6 m-2 md:mx-0 
+    <section class="flex flex-col w-full md:w-2/3 mt-6 m-2 md:mx-0 
   rounded-lg shadow-md bg-white dark:bg-gray-700
   ">
       
-    <div class="p-6">
-    <h1 class="text-4xl font-semibold text-slate-800 dark:text-slate-100">
-      <a href="/question/nosql-optimizing-social-network-schema-design/">Nosql Optimizing Social Network Schema Design</a>
-    </h1>
+      <div class="p-6 gap-y-2">
+        <h1 class="text-4xl font-semibold text-slate-800 dark:text-slate-100">
+          <a href="/question/nosql-optimizing-social-network-schema-design/">Nosql Optimizing Social Network Schema Design</a>
+        </h1>
 
-    
-    <h2 class="my-4 text-large text-slate-600 dark:text-slate-300">
-      NOSQL Optimizing Social Network Schema Design or any other online forum as a primary source. As a developer working on a proof of concept app fo&hellip;
-    </h2>
-    
-    
+        <div class="mt-2">
+          
   <ul class="flex flex-row flex-wrap text-slate-500 dark:text-slate-300">
     
       
@@ -216,7 +216,7 @@
 
 
 
-    <div class="flex flex-col gap-y-1 md:flex-row md:gap-y-0 md:gap-x-4 text-slate-500 dark:text-slate-300">
+          <div class="flex flex-col gap-y-1 md:flex-row md:gap-y-0 md:gap-x-4 text-slate-500 dark:text-slate-300">
   
   
   <div class="flex flex-row text-base gap-x-1">
@@ -254,26 +254,26 @@
 </div>
 
 
-    
-      
-      <section class="prose prose-slate dark:prose-invert w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mt-6">
-        <h2>Table of Contents</h2>
-        <aside><nav id="TableOfContents"></nav></aside>
-       
-      </section>
-      
-    
+          
+          
+        </div>
+        <section class="prose prose-slate dark:prose-invert w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mt-6">
+          <h2>Table of Contents</h2>
+          <aside><nav id="TableOfContents"></nav></aside>
 
-    
-      <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
-       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" 
-      >
-        <p>NOSQL: Optimizing Social Network Schema Design
+        </section>
+        
+        
+
+
+        <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
+       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" >
+          <p>NOSQL: Optimizing Social Network Schema Design
 or any other online forum as a primary source.  As a developer working on a proof of concept app for a social network, you may be wondering about how best to design the &lsquo;schema&rsquo; for your app. One of the primary concerns may be whether to embed a user&rsquo;s subscriptions or have a separate &lsquo;subscriptions&rsquo; collection and use db references. Let&rsquo;s explore this in detail.  ### Embedding subscriptions vs having a separate collection  If you choose to embed a user&rsquo;s subscriptions, you will need to perform a query to get all of a user&rsquo;s followers. For example, given the following user:  <code>{  &quot;username&quot; : &quot;alan&quot;,  &quot;photo&quot;: &quot;123.jpg&quot;,  &quot;subscriptions&quot; : [     {&quot;username&quot; : &quot;john&quot;, &quot;status&quot; : &quot;accepted&quot;},     {&quot;username&quot; : &quot;paul&quot;, &quot;status&quot; : &quot;pending&quot;}   ] }</code>  To find all of alan&rsquo;s subscribers, you&rsquo;d have to run something like this:  <code>db.users.find({'subscriptions.username' : 'alan'});</code>  Although, MongoDB can place indexes on elements which are arrays, so that will make things a lot faster if you are looking for how many friendships a user has.  On the other hand, having a separate &lsquo;subscriptions&rsquo; collection and using db references can also be a good way to design your schema. This can help reduce the amount of data stored in a single document, making it easier to manage and scale. It can also help to avoid duplicate data, which can become a problem when storing large amounts of data. Although, it may require more complex queries to fetch data in certain cases.  ### Recommendations for displaying a list of subscriptions/subscribers  When displaying a list of subscriptions/subscribers, you may encounter problems with n+1 because the subscription document only tells you the username of the target user but not other attributes like the profile photo.  One way to solve this issue is to use the <code>$lookup</code> pipeline stage in MongoDB. This stage allows you to perform a join-like operation between documents in different collections, based on a common field. For example, to fetch the profile photos of a user&rsquo;s subscribers, you can run a query like this:  <code>db.users.aggregate([   {     $match: { username: 'alan' }   },   {     $lookup: {       from: 'users',       localField: 'subscriptions.username',       foreignField: 'username',       as: 'subscribers'     }   },   {     $unwind: '$subscribers',   },   {     $project: {       'subscribers.username': 1,       'subscribers.photo': 1     }   } ]);</code>  This query fetches the user document for &lsquo;alan&rsquo;, and then performs a lookup against the &lsquo;users&rsquo; collection, using the &lsquo;subscriptions.username&rsquo; field as the local field, and the &lsquo;username&rsquo; field as the foreign field. It then adds the fetched documents to a new field called &lsquo;subscribers&rsquo;. After that, it unwinds the &lsquo;subscribers&rsquo; array so that each subscriber becomes a separate document. Lastly, it uses the $project stage to only include the &lsquo;username&rsquo; and &lsquo;photo&rsquo; fields of the subscriber documents.  ### Recap  When designing the &lsquo;schema&rsquo; for a social network app, the decision to embed subscriptions or have a separate collection with db references depends largely on the specific requirements and use cases of the app. Both approaches have their pros and cons, and careful consideration should be given to each before making a final decision.  When displaying a list of subscriptions/subscribers, the <code>$lookup</code> pipeline stage in MongoDB can be a amazing tool to include additional information from related documents.]]&gt;</p>
 
-      </article>
-    
-    
+        </article>
+
+        
 
 
   
@@ -332,11 +332,11 @@ or any other online forum as a primary source.  As a developer working on a proo
   
 
 
-    </div>
-  </section>
-  <aside class="hidden md:flex flex-col md:w-1/3 mx-3 top-0 sticky self-start
+      </div>
+    </section>
+    <aside class="hidden md:flex flex-col md:w-1/3 mx-3 top-0 sticky self-start
 ">
-    
+      
   
   
 
@@ -540,8 +540,8 @@ or any other online forum as a primary source.  As a developer working on a proo
   
 
 
-    
-  </aside>
+
+    </aside>
   </div>
 </div>
 
