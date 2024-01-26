@@ -142,6 +142,9 @@ Table data can be updated with values from another table with the same column na
   rounded-lg shadow-md bg-white dark:bg-gray-700
   ">
       
+      <img src="/sql/Updating-employee-salaries-based-on-changes-in-job-titles.png" alt="Updating Table Values With The Same Username" class="p-0 rounded-lg h-96 object-cover object-top" >
+
+    
     <div class="p-6">
     <h1 class="text-4xl font-semibold text-slate-800 dark:text-slate-100">
       <a href="/question/updating-table-values-with-the-same-username/">Updating Table Values With The Same Username</a>
@@ -244,7 +247,7 @@ Table data can be updated with values from another table with the same column na
 
     </i>
     <span>
-      2 minutes to read
+      5 minutes to read
     </span>
   </div>
 </div>
@@ -256,11 +259,16 @@ Table data can be updated with values from another table with the same column na
         <h2>Table of Contents</h2>
         <aside><nav id="TableOfContents">
   <ul>
-    <li>
+    <li><a href="#update-table-values-from-another-table-with-the-same-user-name">Update table values from another table with the same user name</a>
       <ul>
         <li><a href="#using-the-update-statement">Using the UPDATE Statement</a></li>
         <li><a href="#using-a-temporary-table">Using a Temporary Table</a></li>
-        <li><a href="#conclusion">Conclusion</a></li>
+      </ul>
+    </li>
+    <li><a href="#practical-example-updating-employee-salaries-based-on-a-reference-table">Practical Example: Updating Employee Salaries Based on a Reference Table</a></li>
+    <li><a href="#faqs-on-updating-table-values-with-the-same-username">FAQs on Updating Table Values With The Same Username</a>
+      <ul>
+        <li><a href="#recap">Recap</a></li>
       </ul>
     </li>
   </ul>
@@ -273,41 +281,102 @@ Table data can be updated with values from another table with the same column na
     
       <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
        prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" 
-      >
-        <p>Update table values from another table with the same user name
-Updating Table Values From Another Table With the Same User Name<br>
+       itemscope itemtype="https://schema.org/FAQPage" >
+        <h2 id="update-table-values-from-another-table-with-the-same-user-name">Update table values from another table with the same user name</h2>
+<p>Updating Table Values From Another Table With the Same User Name<br>
 Table data can be updated with values from another table with the same column name, such as a <code>user_name</code>, using SQL statements. This article will take a look at how to do this in a few different ways, and provide practical examples of SQL queries that can be used.</p>
 <h3 id="using-the-update-statement">Using the UPDATE Statement</h3>
 <p>The most straightforward way to update table values from another table is to use the SQL <code>UPDATE</code> statement. The syntax for this statement requires that you specify the table you want to update, the columns to update, and the values to update them with. The following example shows how to use the <code>UPDATE</code> statement to copy values from one table to another:</p>
-<pre><code>UPDATE table_a
-SET
-      column_a_1 = (SELECT table_b.column_b_1 
-                            FROM table_b
-                            WHERE table_b.user_name = table_a.user_name )
-    , column_a_2 = (SELECT table_b.column_b_2
-                            FROM table_b
-                            WHERE table_b.user_name = table_a.user_name )
-WHERE
-    EXISTS (
-        SELECT *
-        FROM table_b
-        WHERE table_b.user_name = table_a.user_name
-    )
-</code></pre>
-<p>The <code>UPDATE</code> statement in <a href="http://www.sqlite.org/lang_update.html" target="_blank" rel="noopener">sqlite3</a>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span>    <span style="color:#66d9ef">UPDATE</span> table_a
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SET</span>
+</span></span><span style="display:flex;"><span>          column_a_1 <span style="color:#f92672">=</span> (<span style="color:#66d9ef">SELECT</span> table_b.column_b_1 
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">FROM</span> table_b
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">WHERE</span> table_b.user_name <span style="color:#f92672">=</span> table_a.user_name )
+</span></span><span style="display:flex;"><span>        , column_a_2 <span style="color:#f92672">=</span> (<span style="color:#66d9ef">SELECT</span> table_b.column_b_2
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">FROM</span> table_b
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">WHERE</span> table_b.user_name <span style="color:#f92672">=</span> table_a.user_name )
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">WHERE</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">EXISTS</span> (
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">FROM</span> table_b
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">WHERE</span> table_b.user_name <span style="color:#f92672">=</span> table_a.user_name
+</span></span><span style="display:flex;"><span>        )
+</span></span></code></pre></div><p>The <code>UPDATE</code> statement in <a href="http://www.sqlite.org/lang_update.html" target="_blank" rel="noopener">sqlite3</a>
  did not support a <code>FROM</code> clause for a long time, so the query had to be written in a more complicated way. However, <code>UPDATE</code> from was implemented in SQLite 3.33 (2020-08-14). This means that the query can now be written in a much simpler way, as shown below:</p>
-<pre><code>UPDATE table_a
-SET column_a_1 = table_b.column_b_1
-   ,column_a_2 = table_b.column_b_2
-FROM table_b
-WHERE table_b.user_name = table_a.user_name;
-</code></pre>
-<p>This is a much simpler and faster way of updating the values from one table to another. It is important to note, however, that this syntax only works for sqlite3 version 3.15 and above. For earlier versions, the more complex syntax is still required.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span>    <span style="color:#66d9ef">UPDATE</span> table_a
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SET</span> column_a_1 <span style="color:#f92672">=</span> table_b.column_b_1
+</span></span><span style="display:flex;"><span>       ,column_a_2 <span style="color:#f92672">=</span> table_b.column_b_2
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">FROM</span> table_b
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">WHERE</span> table_b.user_name <span style="color:#f92672">=</span> table_a.user_name;
+</span></span></code></pre></div><p>This is a much simpler and faster way of updating the values from one table to another. It is important to note, however, that this syntax only works for sqlite3 version 3.15 and above. For earlier versions, the more complex syntax is still required.</p>
 <h3 id="using-a-temporary-table">Using a Temporary Table</h3>
 <p>If the performance of the <code>UPDATE</code> statement is not satisfactory, another option is to build up new rows for the destination table using a <code>SELECT</code> and <code>JOIN</code> with the source table into a temporary table. Then, the data from the destination table can be deleted and repopulated from the temporary table.</p>
-<h3 id="conclusion">Conclusion</h3>
-<p>Updating table values from another table with the same user name can be done using the SQL <code>UPDATE</code> statement. This statement requires that you specify the table you want to update, the columns to update, and the values to update them with. More, if the performance of the <code>UPDATE</code> statement is not satisfactory, another option is to build up new rows for the destination table using a <code>SELECT</code> and <code>JOIN</code> with the source table into a temporary table.
-]]&gt;</p>
+<h2 id="practical-example-updating-employee-salaries-based-on-a-reference-table">Practical Example: Updating Employee Salaries Based on a Reference Table</h2>
+<p>Let&rsquo;s see an example with using <a href="https://sqlpey.com/mysql/sample-database-employees-db-mysql-for-vscode/" target="_blank" rel="noopener">Sample database structure</a>
+. To better align with your structure, let&rsquo;s create a hypothetical <code>title_changes</code> table that represents changes in employee job titles and their corresponding new salaries.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- Creating the &#39;title_changes&#39; table to store changes in employee job titles and new salaries
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> title_changes (
+</span></span><span style="display:flex;"><span>    emp_no      INT             <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>,        <span style="color:#75715e">-- Employee number (foreign key referencing &#39;employees&#39; table)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    new_title   VARCHAR(<span style="color:#ae81ff">50</span>)     <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>,        <span style="color:#75715e">-- New job title
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    new_salary  INT             <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>,        <span style="color:#75715e">-- New salary amount
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    change_date DATE            <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>,        <span style="color:#75715e">-- Date of the title and salary change
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">PRIMARY</span> <span style="color:#66d9ef">KEY</span> (emp_no, change_date),            <span style="color:#75715e">-- Composite primary key
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">FOREIGN</span> <span style="color:#66d9ef">KEY</span> (emp_no) <span style="color:#66d9ef">REFERENCES</span> employees (emp_no) <span style="color:#66d9ef">ON</span> <span style="color:#66d9ef">DELETE</span> <span style="color:#66d9ef">CASCADE</span>  <span style="color:#75715e">-- Foreign key constraint
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Inserting data into &#39;title_changes&#39; table
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> title_changes <span style="color:#66d9ef">VALUES</span>
+</span></span><span style="display:flex;"><span>(<span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#39;Lead Developer&#39;</span>, <span style="color:#ae81ff">85000</span>, <span style="color:#e6db74">&#39;2015-08-18&#39;</span>),
+</span></span><span style="display:flex;"><span>(<span style="color:#ae81ff">2</span>, <span style="color:#e6db74">&#39;HR Manager&#39;</span>, <span style="color:#ae81ff">70000</span>, <span style="color:#e6db74">&#39;2017-11-25&#39;</span>),
+</span></span><span style="display:flex;"><span>(<span style="color:#ae81ff">3</span>, <span style="color:#e6db74">&#39;Senior Sales Manager&#39;</span>, <span style="color:#ae81ff">90000</span>, <span style="color:#e6db74">&#39;2020-06-15&#39;</span>),
+</span></span><span style="display:flex;"><span>(<span style="color:#ae81ff">4</span>, <span style="color:#e6db74">&#39;Senior Financial Analyst&#39;</span>, <span style="color:#ae81ff">80000</span>, <span style="color:#e6db74">&#39;2022-01-08&#39;</span>),
+</span></span><span style="display:flex;"><span>(<span style="color:#ae81ff">5</span>, <span style="color:#e6db74">&#39;Senior Marketing Manager&#39;</span>, <span style="color:#ae81ff">75000</span>, <span style="color:#e6db74">&#39;2023-06-25&#39;</span>);
+</span></span></code></pre></div><p>Now, let&rsquo;s consider the scenario where you want to update the salaries in the <code>salaries</code> table based on changes in job titles from the <code>title_changes</code> table. Here&rsquo;s an example SQL query:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- Updating employee salaries based on changes in job titles
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">UPDATE</span> salaries <span style="color:#66d9ef">AS</span> s
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SET</span> s.salary <span style="color:#f92672">=</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span> tc.new_salary 
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">FROM</span> title_changes <span style="color:#66d9ef">AS</span> tc
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">WHERE</span> tc.emp_no <span style="color:#f92672">=</span> s.emp_no
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">AND</span> s.from_date <span style="color:#f92672">&lt;=</span> tc.change_date <span style="color:#75715e">-- You can add More conditions
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>      <span style="color:#66d9ef">AND</span> s.to_date <span style="color:#f92672">&gt;=</span> tc.change_date
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> <span style="color:#66d9ef">EXISTS</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span> <span style="color:#ae81ff">1</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">FROM</span> title_changes <span style="color:#66d9ef">AS</span> tc
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">WHERE</span> tc.emp_no <span style="color:#f92672">=</span> s.emp_no
+</span></span><span style="display:flex;"><span>);
+</span></span></code></pre></div><p><div class="not-prose">
+<figure>
+    <img src="/sql/Updating-employee-salaries-based-on-changes-in-job-titles.png"
+      alt="Updating employee salaries based on changes in job titles" 
+      loading="lazy"
+    >
+  </figure></div>
+
+This query updates the <code>salaries</code> table with the new salary from the <code>title_changes</code> table based on the corresponding employee number and the date range.</p>
+<p>I hope this example better fits your database structure. If you have any specific requirements or adjustments, please let me know.</p>
+<h2 id="faqs-on-updating-table-values-with-the-same-username">FAQs on Updating Table Values With The Same Username</h2>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I use the UPDATE statement to copy values from one table to another based on a common user name?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">Yes, the UPDATE statement allows you to update values in one table based on the values from another table using a common user name. The example query provided demonstrates how to achieve this by updating columns in <code>table_a</code> with values from <code>table_b</code> where the user names match.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is the UPDATE statement the only way to update values from another table?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">No, besides the UPDATE statement, another option is to use a temporary table. If the performance of the UPDATE statement is not satisfactory, you can build up new rows for the destination table using a SELECT and JOIN with the source table into a temporary table. Then, the data from the destination table can be deleted and repopulated from the temporary table.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is there a difference in syntax between different database systems?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">Yes, there can be differences in syntax between different database systems. For example, the UPDATE statement syntax provided is suitable for MySQL. In SQLite, the syntax might be different, and the article notes the implementation of the UPDATE statement with a FROM clause in SQLite version 3.33 and above.</div>
+    </div>
+</div>
+<h3 id="recap">Recap</h3>
+<p>Updating table values from another table with the same user name can be done using the SQL <code>UPDATE</code> statement. This statement requires that you specify the table you want to update, the columns to update, and the values to update them with. More, if the performance of the <code>UPDATE</code> statement is not satisfactory, another option is to build up new rows for the destination table using a <code>SELECT</code> and <code>JOIN</code> with the source table into a temporary table.</p>
 
       </article>
     
