@@ -17,9 +17,7 @@
 <meta
   name="keywords"
   content="
-            
-              SQL, Databases, Big-Query, Oracle, MS SQL SErver, MySQL, PostgreSQL
-            
+            SQLite, delete duplicate rows, rowid column, unique index, temp table, constraint violation while removing rows, distinct, sqlite remove duplicates, iterating through table, duplicates removal methods
            "
 />
 <meta name="robots" content="noodp" />
@@ -183,6 +181,9 @@
   ">
   
       
+      <img src="/sqlite/Removing-Duplicate-Rows-In-Sqlite.png" alt="Removing Duplicate Rows In Sqlite" class="p-0 rounded-lg h-96 object-cover object-top">
+
+      
       <div class="p-6 gap-y-2">
         <h1 class="text-4xl font-semibold text-slate-800 dark:text-slate-100">
           <a href="/question/removing-duplicate-rows-in-sqlite/">Removing Duplicate Rows In Sqlite</a>
@@ -281,7 +282,7 @@
 
     </i>
     <span>
-      3 minutes to read
+      4 minutes to read
     </span>
   </div>
 </div>
@@ -294,13 +295,16 @@
           <h2>Table of Contents</h2>
           <aside><nav id="TableOfContents">
   <ul>
-    <li>
+    <li><a href="#deleting-duplicate-rows-from-a-sqlite-database">Deleting Duplicate Rows from a SQLite Database</a>
       <ul>
         <li><a href="#using-the-special-rowid-column">Using the Special Rowid Column</a></li>
         <li><a href="#using-the-database-itself">Using the Database Itself</a></li>
         <li><a href="#using-a-temp-table">Using a Temp Table</a></li>
-        <li><a href="#to-summarize">To Summarize</a></li>
-        <li><a href="#faqs">FAQs</a></li>
+      </ul>
+    </li>
+    <li><a href="#faqs-on-removing-duplicate-rows---sqlite">FAQs on Removing Duplicate Rows - SQLite</a>
+      <ul>
+        <li><a href="#recape">Recape</a></li>
       </ul>
     </li>
   </ul>
@@ -313,61 +317,97 @@
 
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
        prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" >
-          <p>Deleting duplicate rows from sqlite database
-Deleting Duplicate Rows from a SQLite Database<br>
-Duplicate rows can be a hassle when dealing with large databases. When attempting to delete these duplicate rows, it is important to have a way to distinguish between them. This is especially true when dealing with a very large table in SQLite3 as is the case with this particular problem. The table in question has two columns, <code>hash</code> (text) and <code>d</code> (real). Some of the rows are duplicates, which means that both the <code>hash</code> and <code>d</code> have the same values. However, two identical <code>d</code>&rsquo;s does not necessarily imply two identical <code>hash</code>&lsquo;es.</p>
+          <h2 id="deleting-duplicate-rows-from-a-sqlite-database">Deleting Duplicate Rows from a SQLite Database</h2>
+<p>Duplicate rows can be a hassle when dealing with large databases. When attempting to delete these duplicate rows, it is important to have a way to distinguish between them. This is especially true when dealing with a very large table in SQLite3 as is the case with this particular problem. The table in question has two columns, <code>hash</code> (text) and <code>d</code> (real). Some of the rows are duplicates, which means that both the <code>hash</code> and <code>d</code> have the same values. However, two identical <code>d</code>&rsquo;s does not necessarily imply two identical <code>hash</code>&lsquo;es.</p>
 <p>The goal is to delete the duplicate rows, but the challenge is that there is no primary key column. What&rsquo;s the fastest way to do this?</p>
 <h3 id="using-the-special-rowid-column">Using the Special Rowid Column</h3>
 <p>The best way to solve this problem is to find a way to distinguish the rows. To do this, we can use the special <a href="http://www.sqlite.org/autoinc.html" target="_blank" rel="noopener">rowid column</a>
 .</p>
 <p>To delete duplicates by keeping the lowest <code>rowid</code> per <code>(hash,d)</code>, the following query can be used:</p>
-<pre><code>delete   from YourTable
-where    rowid not in
-         (
-         select  min(rowid)
-         from    YourTable
-         group by
-                 hash
-         ,       d
-         )
-</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">delete</span>   <span style="color:#66d9ef">from</span> YourTable
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">where</span>    rowid <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">in</span>
+</span></span><span style="display:flex;"><span>        (<span style="color:#66d9ef">select</span>  <span style="color:#66d9ef">min</span>(rowid)
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">from</span>    YourTable
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">group</span> <span style="color:#66d9ef">by</span> hash,d)
+</span></span></code></pre></div><h4 id="removing-duplicate-rows-in-sqlite-using-commandline-tool">Removing Duplicate Rows In Sqlite using Commandline Tool</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">delete</span>   <span style="color:#66d9ef">from</span> customers
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">where</span>    rowid <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">in</span>
+</span></span><span style="display:flex;"><span>        (<span style="color:#66d9ef">select</span>  <span style="color:#66d9ef">min</span>(rowid)
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">from</span>    customers);
+</span></span></code></pre></div><p><div class="not-prose">
+<figure>
+    <img src="/sqlite/Removing-Duplicate-Rows-In-Sqlite.png"
+      alt="Removing Duplicate Rows In Sqlite using Commandline Tool" 
+      loading="lazy"
+    >
+  </figure></div>
+</p>
 <h3 id="using-the-database-itself">Using the Database Itself</h3>
 <p>Another way to solve this problem is to use the very database for it. To do this, we can add a new table with the same columns, but with proper constraints (a unique index on hash/real pair?). Then, we can iterate through the original table and try to insert records in the new table, ignoring constraint violation errors (i.e. continue iterating when exceptions are raised).</p>
 <p>Once that is done, we can delete the old table and rename the new to the old one.</p>
 <h3 id="using-a-temp-table">Using a Temp Table</h3>
 <p>If adding a primary key is not an option, then one approach would be to store the duplicates DISTINCT in a temp table, delete all of the duplicated records from the existing table, and then add the records back into the original table from the temp table.</p>
 <p>The following example is written for SQL Server 2008, but the technique is the same for any database:</p>
-<pre><code>DECLARE @original AS TABLE([hash] varchar(20), [d] float)
-INSERT INTO @original VALUES('A', 1)
-INSERT INTO @original VALUES('A', 2)
-INSERT INTO @original VALUES('A', 1)
-INSERT INTO @original VALUES('B', 1)
-INSERT INTO @original VALUES('C', 1)
-INSERT INTO @original VALUES('C', 1)
-
-DECLARE @temp AS TABLE([hash] varchar(20), [d] float)
-INSERT INTO @temp
-SELECT [hash], [d] FROM @original 
-GROUP BY [hash], [d]
-HAVING COUNT(*) &gt; 1
-
-DELETE O
-FROM @original O
-JOIN @temp T ON T.[hash] = O.[hash] AND T.[d] = O.[d]
-
-INSERT INTO @original
-SELECT [hash], [d] FROM @temp
-
-SELECT * FROM @original
-</code></pre>
-<h3 id="to-summarize">To Summarize</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span>    <span style="color:#66d9ef">DECLARE</span> <span style="color:#f92672">@</span>original <span style="color:#66d9ef">AS</span> <span style="color:#66d9ef">TABLE</span>([hash] varchar(<span style="color:#ae81ff">20</span>), [d] float)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> <span style="color:#f92672">@</span>original <span style="color:#66d9ef">VALUES</span>(<span style="color:#e6db74">&#39;A&#39;</span>, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> <span style="color:#f92672">@</span>original <span style="color:#66d9ef">VALUES</span>(<span style="color:#e6db74">&#39;A&#39;</span>, <span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> <span style="color:#f92672">@</span>original <span style="color:#66d9ef">VALUES</span>(<span style="color:#e6db74">&#39;A&#39;</span>, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> <span style="color:#f92672">@</span>original <span style="color:#66d9ef">VALUES</span>(<span style="color:#e6db74">&#39;B&#39;</span>, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> <span style="color:#f92672">@</span>original <span style="color:#66d9ef">VALUES</span>(<span style="color:#e6db74">&#39;C&#39;</span>, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> <span style="color:#f92672">@</span>original <span style="color:#66d9ef">VALUES</span>(<span style="color:#e6db74">&#39;C&#39;</span>, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">DECLARE</span> <span style="color:#f92672">@</span>temp <span style="color:#66d9ef">AS</span> <span style="color:#66d9ef">TABLE</span>([hash] varchar(<span style="color:#ae81ff">20</span>), [d] float)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> <span style="color:#f92672">@</span>temp
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span> [hash], [d] <span style="color:#66d9ef">FROM</span> <span style="color:#f92672">@</span>original 
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> [hash], [d]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">HAVING</span> <span style="color:#66d9ef">COUNT</span>(<span style="color:#f92672">*</span>) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">DELETE</span> O
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">FROM</span> <span style="color:#f92672">@</span>original O
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">JOIN</span> <span style="color:#f92672">@</span>temp T <span style="color:#66d9ef">ON</span> T.[hash] <span style="color:#f92672">=</span> O.[hash] <span style="color:#66d9ef">AND</span> T.[d] <span style="color:#f92672">=</span> O.[d]
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> <span style="color:#f92672">@</span>original
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span> [hash], [d] <span style="color:#66d9ef">FROM</span> <span style="color:#f92672">@</span>temp
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> <span style="color:#f92672">@</span>original
+</span></span></code></pre></div><h2 id="faqs-on-removing-duplicate-rows---sqlite">FAQs on Removing Duplicate Rows - SQLite</h2>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">What is the fastest way to delete duplicate rows in SQLite?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><p><strong>Answer:</strong> The fastest way to delete duplicate rows in SQLite is to use the special rowid column. A query can be used to delete duplicates by keeping the lowest rowid per <code>(hash,d)</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">delete</span> <span style="color:#66d9ef">from</span> YourTable
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">where</span> rowid <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">in</span> (<span style="color:#66d9ef">select</span> <span style="color:#66d9ef">min</span>(rowid) <span style="color:#66d9ef">from</span> YourTable <span style="color:#66d9ef">group</span> <span style="color:#66d9ef">by</span> hash, d)
+</span></span></code></pre></div></div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">How can I distinguish between duplicate rows in SQLite without a primary key?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>Answer:</strong> Without a primary key, you can distinguish between duplicate rows in SQLite by using the special rowid column. The query mentioned earlier deletes duplicates by keeping the lowest rowid per <code>(hash,d)</code>.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Can I use a temp table to remove duplicate rows in SQLite?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><p><strong>Answer:</strong> Yes, you can use a temp table to remove duplicate rows in SQLite. The approach involves storing the duplicates DISTINCT in a temp table, deleting all duplicated records from the existing table, and then adding the records back into the original table from the temp table.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- Example for SQL Server 2008
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">DECLARE</span> <span style="color:#f92672">@</span>original <span style="color:#66d9ef">AS</span> <span style="color:#66d9ef">TABLE</span>([hash] varchar(<span style="color:#ae81ff">20</span>), [d] float)
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- ... (insert data into @original)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">DECLARE</span> <span style="color:#f92672">@</span>temp <span style="color:#66d9ef">AS</span> <span style="color:#66d9ef">TABLE</span>([hash] varchar(<span style="color:#ae81ff">20</span>), [d] float)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> <span style="color:#f92672">@</span>temp
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> [hash], [d] <span style="color:#66d9ef">FROM</span> <span style="color:#f92672">@</span>original 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> [hash], [d]
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">HAVING</span> <span style="color:#66d9ef">COUNT</span>(<span style="color:#f92672">*</span>) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">DELETE</span> O
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#f92672">@</span>original O
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">JOIN</span> <span style="color:#f92672">@</span>temp T <span style="color:#66d9ef">ON</span> T.[hash] <span style="color:#f92672">=</span> O.[hash] <span style="color:#66d9ef">AND</span> T.[d] <span style="color:#f92672">=</span> O.[d]
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> <span style="color:#f92672">@</span>original
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> [hash], [d] <span style="color:#66d9ef">FROM</span> <span style="color:#f92672">@</span>temp
+</span></span></code></pre></div></div>
+    </div>
+</div>
+<h3 id="recape">Recape</h3>
 <p>When attempting to delete duplicate rows from a large SQLite database, the best way to go about it is to use the special rowid column. This can be done by running a query that deletes all rows except the one with the lowest rowid per <code>(hash,d)</code>. Alternatively, you can use the database itself by adding a new table with proper constraints and iterating through the original table. Lastly, you can use a temp table to store the duplicates, delete the duplicated records from the existing table, and then add the records back into the original table from the temp table.</p>
-<h3 id="faqs">FAQs</h3>
-<ul>
-<li><strong>What is a rowid column?</strong> A rowid column is a special column in a database table that is used to uniquely identify each row in a table. It is typically used when there is no primary key column present.</li>
-<li><strong>What is the purpose of using a temp table?</strong> A temp table is a temporary storage area in a database that can be used to store and manipulate data. In this case, it is used to store the duplicates so that they can be deleted from the existing table and then re-added.</li>
-</ul>
-<p>]]&gt;</p>
 
         </article>
 

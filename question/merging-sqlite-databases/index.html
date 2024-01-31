@@ -17,9 +17,7 @@
 <meta
   name="keywords"
   content="
-            
-              SQL, Databases, Big-Query, Oracle, MS SQL SErver, MySQL, PostgreSQL
-            
+            SQLite databases, ATTACH command, merge databases, SQLite GUI, Python SQLite, database merging methods, copy and paste databases, SQLiteStudio, database attachments, database merging limits
            "
 />
 <meta name="robots" content="noodp" />
@@ -183,6 +181,9 @@
   ">
   
       
+      <img src="/sqlite/Merging-Sqlite-Databases-cmd.png" alt="Merging Sqlite Databases" class="p-0 rounded-lg h-96 object-cover object-top">
+
+      
       <div class="p-6 gap-y-2">
         <h1 class="text-4xl font-semibold text-slate-800 dark:text-slate-100">
           <a href="/question/merging-sqlite-databases/">Merging Sqlite Databases</a>
@@ -281,7 +282,7 @@
 
     </i>
     <span>
-      3 minutes to read
+      5 minutes to read
     </span>
   </div>
 </div>
@@ -294,12 +295,17 @@
           <h2>Table of Contents</h2>
           <aside><nav id="TableOfContents">
   <ul>
-    <li>
+    <li><a href="#how-can-i-merge-many-sqlite-databases">How can I merge many SQLite databases?</a>
       <ul>
         <li><a href="#using-attach">Using ATTACH</a></li>
+        <li><a href="#example-merging-sqlite-databases---commandline-tool">Example Merging SQLite Databases - Commandline Tool</a></li>
         <li><a href="#using-an-sqlite-gui">Using an SQLite GUI</a></li>
         <li><a href="#using-python">Using Python</a></li>
-        <li><a href="#conclusion">Conclusion</a></li>
+      </ul>
+    </li>
+    <li><a href="#faqs-on">FAQs on</a>
+      <ul>
+        <li><a href="#recap">Recap</a></li>
       </ul>
     </li>
   </ul>
@@ -311,21 +317,65 @@
 
 
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
-       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" >
-          <p>How can I merge many SQLite databases?
-Merging Many SQLite Databases - A Guide<br>
-If you have a large number of SQLite databases, all with the same schema, what is the best way to merge them together in order to perform a query on all databases?</p>
+       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" 
+          itemscope itemtype="https://schema.org/FAQPage" >
+          <h2 id="how-can-i-merge-many-sqlite-databases">How can I merge many SQLite databases?</h2>
+<p>If you have a large number of SQLite databases, all with the same schema, what is the best way to merge them together in order to perform a query on all databases?</p>
 <p>Luckily, there are various methods available to merge SQLite databases. In this guide, we’ll explore the most efficient and effective methods for merging many SQLite databases.</p>
 <h3 id="using-attach">Using ATTACH</h3>
 <p>The <a href="http://www.sqlite.org/lang_attach.html" target="_blank" rel="noopener">ATTACH</a>
  command in SQLite can be used to attach multiple databases together and perform a query on all databases. However, this method has a limit of 32 and 64 databases depending on the memory system on the machine.</p>
 <p>To use ATTACH to merge multiple databases, you can use the following code:</p>
-<pre><code>attach 'c:\test\b.db3' as toMerge;           
-BEGIN; 
-insert into AuditRecords select * from toMerge.AuditRecords; 
-COMMIT; 
-detach toMerge;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span>    attach <span style="color:#e6db74">&#39;c:\test\b.db3&#39;</span> <span style="color:#66d9ef">as</span> toMerge;           
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">BEGIN</span>; 
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">insert</span> <span style="color:#66d9ef">into</span> AuditRecords <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> toMerge.AuditRecords; 
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">COMMIT</span>; 
+</span></span><span style="display:flex;"><span>    detach toMerge;
+</span></span></code></pre></div><h3 id="example-merging-sqlite-databases---commandline-tool">Example Merging SQLite Databases - Commandline Tool</h3>
+<h4 id="1-exit-and-attach-in-new-database">1. <strong>Exit and Attach in New Database:</strong></h4>
+<pre><code>```sql
+sqlite&gt; .exit
+sqlite3 new_database.db;
+sqlite&gt; attach &quot;d:\chinook\chinook.db&quot; as toMerge;
+```
 </code></pre>
+<h4 id="2-create-table-customer-sqlite">2. <strong>Create Table Customer SQLite:</strong></h4>
+<pre><code>```sql
+CREATE TABLE &quot;Customer&quot;
+(
+    &quot;CustomerId&quot; INT NOT NULL,
+    &quot;FirstName&quot; VARCHAR(40) NOT NULL,
+    &quot;LastName&quot; VARCHAR(20) NOT NULL,
+    &quot;Company&quot; VARCHAR(80),
+    &quot;Address&quot; VARCHAR(70),
+    &quot;City&quot; VARCHAR(40),
+    &quot;State&quot; VARCHAR(40),
+    &quot;Country&quot; VARCHAR(40),
+    &quot;PostalCode&quot; VARCHAR(10),
+    &quot;Phone&quot; VARCHAR(24),
+    &quot;Fax&quot; VARCHAR(24),
+    &quot;Email&quot; VARCHAR(60) NOT NULL,
+    &quot;SupportRepId&quot; INT
+);
+```
+</code></pre>
+<h4 id="3-commit-and-detach-in-new-database">3. <strong>Commit and Detach in New Database:</strong></h4>
+<pre><code>```sql
+sqlite&gt; BEGIN;
+sqlite&gt; INSERT INTO customer SELECT * FROM toMerge.customers;
+sqlite&gt; COMMIT;
+sqlite&gt; detach toMerge;
+```
+</code></pre>
+<p><div class="not-prose">
+<figure>
+    <img src="/sqlite/Merging-Sqlite-Databases-cmd.png"
+      alt="Merging Sqlite Databases using commandline tool in windows " 
+      loading="lazy"
+    >
+  </figure></div>
+
+<em>Caption: Merging Sqlite Databases using commandline tool in windows</em></p>
 <p>This code will attach the database b.db3 to the current one, and then insert all of the data from the attached database into the AuditRecords table. After finishing, it will detach the database from the current one. You can repeat this process as needed for each database.</p>
 <h3 id="using-an-sqlite-gui">Using an SQLite GUI</h3>
 <p>If the ATTACH method isn&rsquo;t suitable for you, you can use an SQLite GUI such as <a href="https://sqlitestudio.pl/index.rvt?act=download" target="_blank" rel="noopener">SQLiteStudio</a>
@@ -333,44 +383,85 @@ detach toMerge;
 <p>You can then simply right-click on each of the tables and click on <code>Copy</code>, and then go to the target database in the list of the loaded database files (or create new one if required) and right-click on the target db and click on <code>Paste</code>. This will copy all of the data from one database to the other.</p>
 <h3 id="using-python">Using Python</h3>
 <p>Lastly, if you&rsquo;re comfortable with Python, you can use the following code to either merge two database files or scan a directory to find all database files and merge them all together (by simply inserting all data in other files to the first database file found). Note that this code just attaches the databases with the same schema.</p>
-<pre><code>import sqlite3
-import os
-
-def merge_databases(db1, db2):
-    con3 = sqlite3.connect(db1)
-
-    con3.execute(&quot;ATTACH '&quot; + db2 +  &quot;' as dba&quot;)
-
-    con3.execute(&quot;BEGIN&quot;)
-    for row in con3.execute(&quot;SELECT * FROM dba.sqlite_master WHERE type=&quot;table&quot;&quot;):
-        combine = &quot;INSERT OR IGNORE INTO &quot;+ row[1] + &quot; SELECT * FROM dba.&quot; + row[1]
-        print(combine)
-        con3.execute(combine)
-    con3.commit()
-    con3.execute(&quot;detach database dba&quot;)
-
-def read_files(directory):
-    file_list = os.listdir(directory)
-    databases = []
-
-    for file in file_list:
-        if file.endswith('.db'):
-            databases.append(os.path.join(directory, file))
-
-    if len(databases) == 0:
-        print(&quot;No databases found in the directory&quot;)
-    elif len(databases) == 1:
-        print(&quot;Only one database found, nothing to merge&quot;)
-    else:
-        for i in range(len(databases)-1):
-            merge_databases(databases[0], databases[i+1])
-
-read_files('/path/to/database/files')
-</code></pre>
-<p>This code will attach each of the databases in the specified directory to the first database, and then insert all of the data from the attached databases into the first one. After finishing, it will detach the databases from the first one.</p>
-<h3 id="conclusion">Conclusion</h3>
-<p>In summary, there are several methods available to merge many SQLite databases. The ATTACH command in SQLite can be used to attach multiple databases together and perform a query on all databases, but it has a limit of 32 and 64 databases depending on the memory system on the machine. More, an SQLite GUI such as SQLiteStudio can be used to merge databases using a simple copy-and-paste method. Lastly, Python can be used to either merge two databases or scan a directory to find all database files and merge them all together.
-]]&gt;</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> sqlite3
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">merge_databases</span>(db1, db2):
+</span></span><span style="display:flex;"><span>    con3 <span style="color:#f92672">=</span> sqlite3<span style="color:#f92672">.</span>connect(db1)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    con3<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;ATTACH &#39;&#34;</span> <span style="color:#f92672">+</span> db2 <span style="color:#f92672">+</span>  <span style="color:#e6db74">&#34;&#39; as dba&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    con3<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;BEGIN&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> row <span style="color:#f92672">in</span> con3<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;SELECT * FROM dba.sqlite_master WHERE type=&#34;</span>table<span style="color:#e6db74">&#34;&#34;</span>):
+</span></span><span style="display:flex;"><span>        combine <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;INSERT OR IGNORE INTO &#34;</span><span style="color:#f92672">+</span> row[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34; SELECT * FROM dba.&#34;</span> <span style="color:#f92672">+</span> row[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>        print(combine)
+</span></span><span style="display:flex;"><span>        con3<span style="color:#f92672">.</span>execute(combine)
+</span></span><span style="display:flex;"><span>    con3<span style="color:#f92672">.</span>commit()
+</span></span><span style="display:flex;"><span>    con3<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;detach database dba&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">read_files</span>(directory):
+</span></span><span style="display:flex;"><span>    file_list <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>listdir(directory)
+</span></span><span style="display:flex;"><span>    databases <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> file <span style="color:#f92672">in</span> file_list:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> file<span style="color:#f92672">.</span>endswith(<span style="color:#e6db74">&#39;.db&#39;</span>):
+</span></span><span style="display:flex;"><span>            databases<span style="color:#f92672">.</span>append(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(directory, file))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> len(databases) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;No databases found in the directory&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elif</span> len(databases) <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;Only one database found, nothing to merge&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(len(databases)<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>):
+</span></span><span style="display:flex;"><span>            merge_databases(databases[<span style="color:#ae81ff">0</span>], databases[i<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>read_files(<span style="color:#e6db74">&#39;/path/to/database/files&#39;</span>)
+</span></span></code></pre></div><p>This code will attach each of the databases in the specified directory to the first database, and then insert all of the data from the attached databases into the first one. After finishing, it will detach the databases from the first one.</p>
+<h2 id="faqs-on">FAQs on</h2>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">What is the ATTACH command in SQLite?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>Answer:</strong> The ATTACH command in SQLite is used to attach multiple databases together. It allows you to perform queries that involve tables from multiple attached databases. However, it has a limit of 32 and 64 databases, depending on the memory system on the machine.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">How can I use ATTACH to merge SQLite databases?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><p><strong>Answer:</strong> To use ATTACH for merging SQLite databases, you can execute commands like the following:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span>attach <span style="color:#e6db74">&#39;c:\test\b.db3&#39;</span> <span style="color:#66d9ef">as</span> toMerge;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">BEGIN</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">insert</span> <span style="color:#66d9ef">into</span> AuditRecords <span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> toMerge.AuditRecords;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">COMMIT</span>;
+</span></span><span style="display:flex;"><span>detach toMerge;
+</span></span></code></pre></div><p>This code attaches a database (<code>b.db3</code> in this case), inserts all data from the attached database into a target table (<code>AuditRecords</code>), and then detaches the database. You can repeat this process for each database.</p>
+</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">What is an SQLite GUI, and how can it be used for merging databases?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><p><strong>Answer:</strong> An SQLite GUI, such as SQLiteStudio, provides a graphical interface for managing SQLite databases. To merge databases using an SQLite GUI:</p>
+<ol>
+<li>Open SQLiteStudio and load all database files.</li>
+<li>Copy tables from one database and paste them into another.
+This method involves a simple copy-and-paste process for merging databases.</li>
+</ol></div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">How can Python be used to merge SQLite databases?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>Answer:</strong> Python can be used to merge SQLite databases by attaching multiple databases to a target database and inserting data from the attached databases. The provided Python code demonstrates how to merge databases in a specified directory.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Is there a limit to the number of databases that can be attached using ATTACH in SQLite?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>Answer:</strong> Yes, there is a limit to the number of databases that can be attached using the ATTACH command in SQLite. The limit is 32 or 64 databases, depending on the memory system on the machine.</div>
+    </div>
+</div>
+<h3 id="recap">Recap</h3>
+<p>The ATTACH command in SQLite can be used to attach multiple databases together and perform a query on all databases, but it has a limit of 32 and 64 databases depending on the memory system on the machine. More, an SQLite GUI such as SQLiteStudio can be used to merge databases using a simple copy-and-paste method. Lastly, Python can be used to either merge two databases or scan a directory to find all database files and merge them all together.</p>
 
         </article>
 
