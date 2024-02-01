@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
-  <title>Understanding The Db Shm And Db Wal Extensions In Sqlite Databases :: sqlpey - SQL Databases</title>
+  <title>Understanding The .db-shm and .db-wal Extensions in SQLite Databases :: sqlpey - SQL Databases</title>
   
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,7 +9,7 @@
   name="description"
   content="
    
-  What are the .db-shm and .db-wal extensions in Sqlite databases? Understanding .db-shm and .db-wal Extensions in Sqlite Databases If you are dea...
+  Explore the significance of .db-shm and .db-wal extensions in SQLite databases, their role, and considerations when managing them.
   
   
   "
@@ -17,22 +17,20 @@
 <meta
   name="keywords"
   content="
-            
-              SQL, Databases, Big-Query, Oracle, MS SQL SErver, MySQL, PostgreSQL
-            
+            .db-shm extension, .db-wal extension, SQLite databases, database management, SQL
            "
 />
 <meta name="robots" content="noodp" />
-<meta property="og:title" content="Understanding The Db Shm And Db Wal Extensions In Sqlite Databases" />
-<meta property="og:description" content="What are the .db-shm and .db-wal extensions in Sqlite databases? Understanding .db-shm and .db-wal Extensions in Sqlite Databases If you are dea..." />
+<meta property="og:title" content="Understanding The .db-shm and .db-wal Extensions in SQLite Databases" />
+<meta property="og:description" content="Explore the significance of .db-shm and .db-wal extensions in SQLite databases, their role, and considerations when managing them." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://sqlpey.com/question/understanding-the-db-shm-and-db-wal-extensions-in-sqlite-databases/" /><meta property="article:section" content="question" />
 <meta property="article:published_time" content="2024-01-22T00:00:00+00:00" />
 <meta property="article:modified_time" content="2024-01-22T00:00:00+00:00" />
 
 
-<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Understanding The Db Shm And Db Wal Extensions In Sqlite Databases"/>
-<meta name="twitter:description" content="What are the .db-shm and .db-wal extensions in Sqlite databases? Understanding .db-shm and .db-wal Extensions in Sqlite Databases If you are dea..."/>
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Understanding The .db-shm and .db-wal Extensions in SQLite Databases"/>
+<meta name="twitter:description" content="Explore the significance of .db-shm and .db-wal extensions in SQLite databases, their role, and considerations when managing them."/>
 
 
 <link rel="canonical" href="https://sqlpey.com/question/understanding-the-db-shm-and-db-wal-extensions-in-sqlite-databases/" />
@@ -185,7 +183,7 @@
       
       <div class="p-6 gap-y-2">
         <h1 class="text-4xl font-semibold text-slate-800 dark:text-slate-100">
-          <a href="/question/understanding-the-db-shm-and-db-wal-extensions-in-sqlite-databases/">Understanding The Db Shm And Db Wal Extensions In Sqlite Databases</a>
+          <a href="/question/understanding-the-db-shm-and-db-wal-extensions-in-sqlite-databases/">Understanding The .db-shm and .db-wal Extensions in SQLite Databases</a>
         </h1>
 
         <div class="mt-2">
@@ -281,7 +279,7 @@
 
     </i>
     <span>
-      3 minutes to read
+      4 minutes to read
     </span>
   </div>
 </div>
@@ -294,14 +292,10 @@
           <h2>Table of Contents</h2>
           <aside><nav id="TableOfContents">
   <ul>
-    <li>
-      <ul>
-        <li><a href="#what-are-the-db-shm-and-db-wal-extensions">What are the .db-shm and .db-wal Extensions?</a></li>
-        <li><a href="#what-should-you-do">What Should You Do?</a></li>
-        <li><a href="#to-summarize">To Summarize:</a></li>
-        <li><a href="#faqs">FAQs</a></li>
-      </ul>
-    </li>
+    <li><a href="#what-are-the-db-shm-and-db-wal-extensions">What are the .db-shm and .db-wal Extensions?</a></li>
+    <li><a href="#what-should-you-do">What Should You Do?</a></li>
+    <li><a href="#to-summarize">To Summarize:</a></li>
+    <li><a href="#faqs">FAQs</a></li>
   </ul>
 </nav></aside>
 
@@ -311,27 +305,74 @@
 
 
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
-       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" >
-          <p>What are the .db-shm and .db-wal extensions in Sqlite databases?
-Understanding .db-shm and .db-wal Extensions in Sqlite Databases<br>
-If you are dealing with Sqlite databases, you may have noticed strange behavior with your application, and the state of its database file after running some tests which close the database, delete it, and replace it with a test fixture. When you examine the database file with a tool on your debugging PC, it doesn&rsquo;t match what the application itself seems to be reporting. It&rsquo;s possible that this strange behavior may be related to <a href="http://code.google.com/p/android/issues/detail?id=13727" target="_blank" rel="noopener">this bug</a>
+       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" 
+          itemscope itemtype="https://schema.org/FAQPage" >
+          <h1 id="understanding-the-db-shm-and-db-wal-extensions-in-sqlite-databases">Understanding The <code>.db-shm</code> and <code>.db-wal</code> Extensions in SQLite Databases</h1>
+<p>If you are dealing with SQLite databases, you may have encountered peculiar behavior in your application and observed changes in the state of its database file after certain operations, such as closing the database, deleting it, and replacing it with a test fixture. When examining the database file with a debugging tool on your PC, you might notice discrepancies with what the application reports. This behavior could be related to <a href="http://code.google.com/p/android/issues/detail?id=13727" target="_blank" rel="noopener">this bug</a>
 .</p>
-<p>When examining the database file, you may have noticed two files with the same base name as the database, having the normal <code>.db</code> extension. The file extensions are <code>.db-shm</code> and <code>.db-wal</code>, and each is newer than the <code>.db</code> file&rsquo;s timestamp.</p>
-<h3 id="what-are-the-db-shm-and-db-wal-extensions">What are the .db-shm and .db-wal Extensions?</h3>
-<p>These files are temporary files created by SQLite. If you are manually deleting the main db you should probably delete these too. The WAL is a replacement for the rollback journal that enables SQLite to rollback changes when a transaction fails. How SQLite uses them and why they are kept around for so long is up to the authors of SQLite.</p>
-<p>These files are a new feature of SQLite 3.7. Better documentation about the WAL is available at <a href="https://www.sqlite.org/wal.html" target="_blank" rel="noopener">https://www.sqlite.org/wal.html</a>
-. The contents of the WAL are periodically moved to the DB file but this is not guaranteed to occur each time the process exits. Thus when WAL is enabled each SQLite DB consists of two files on disk that must be preserved, both the .db file and the .db-wal file.</p>
-<p>The .db-shm file is a shared memory file that contains only temporary data.</p>
-<h3 id="what-should-you-do">What Should You Do?</h3>
-<p>If you are manually deleting the main db you should probably delete these temporary files too. This may help to avoid strange behavior with the application. It is also important to remember that when WAL is enabled each SQLite DB consists of two files on disk that must be preserved, both the .db file and the db-wal file.</p>
-<h3 id="to-summarize">To Summarize:</h3>
-<p>The .db-shm and .db-wal extensions are temporary files created by the SQLite database. They are a new feature of SQLite 3.7 and are used to enable SQLite to rollback changes when a transaction fails. It may be important to delete these files if you are manually deleting the main db, as this may help to avoid strange behavior with the application. When WAL is enabled each SQLite DB consists of two files on disk that must be preserved, both the .db file and the db-wal file.</p>
-<h3 id="faqs">FAQs</h3>
-<h4 id="what-is-the-db-shm-file">What is the db-shm file?</h4>
-<p>The .db-shm file is a shared memory file that contains only temporary data.</p>
-<h4 id="do-i-need-to-delete-the-db-shm-and-db-wal-files">Do I need to delete the db-shm and db-wal files?</h4>
-<p>It may be important to delete these files if you are manually deleting the main db, as this may help to avoid strange behavior with the application.
-]]&gt;</p>
+<p>During your investigation of the database file, you might come across two additional files with the same base name as the database but different extensions: <code>.db-shm</code> and <code>.db-wal</code>. Notably, each of these files has a timestamp newer than the <code>.db</code> file.</p>
+<h2 id="what-are-the-db-shm-and-db-wal-extensions">What are the .db-shm and .db-wal Extensions?</h2>
+<p>These files are temporary files created by SQLite. If you are manually deleting the main database file, it&rsquo;s advisable to delete these temporary files as well. The Write-Ahead Logging (WAL) file, represented by <a href="https://sqlpey.com/sql/sql-update" target="_blank" rel="noopener"><code>.db-wal</code></a>
+, serves as a replacement for the rollback journal, enabling <a href="https://sqlpey.com/sql/what-are-basics-advance-sql-cheatsheet/" target="_blank" rel="noopener">SQLite</a>
+ to rollback changes in case a transaction fails. The specifics of how SQLite uses these files and why they persist for a certain duration are determined by the <a href="https://sqlpey.com/sql/what-is-cte-in-sql" target="_blank" rel="noopener">SQLite</a>
+ authors.</p>
+<p>These files are introduced as a feature in <a href="https://www.sqlite.org/wal.html" target="_blank" rel="noopener">SQLite 3.7</a>
+. For detailed documentation on WAL, refer to <a href="https://www.sqlite.org/wal.html" target="_blank" rel="noopener">SQLite Write-Ahead Logging</a>
+. The contents of the WAL are periodically moved to the main <a href="https://sqlpey.com/sql/sql-select" target="_blank" rel="noopener"><code>.db</code></a>
+ file, but this operation is not guaranteed to occur every time the process exits. Therefore, when WAL is enabled, each SQLite database consists of two files on disk that must be preserved: the main <code>.db</code> file and the <code>.db-wal</code> file.</p>
+<p>The <code>.db-shm</code> file, on the other hand, is a shared memory file containing only temporary data.</p>
+<h2 id="what-should-you-do">What Should You Do?</h2>
+<p>If you are manually deleting the main database file, it is recommended to delete these temporary files as well. This practice can help avoid unexpected behavior within the application. Remember, when WAL is enabled, each SQLite database comprises two files on disk that must be preserved: the main <code>.db</code> file and the <code>.db-wal</code> file.</p>
+<h2 id="to-summarize">To Summarize:</h2>
+<p>The <code>.db-shm</code> and <code>.db-wal</code> extensions represent temporary files created by the <a href="https://sqlpey.com/sql/what-are-basics-advance-sql-cheatsheet/" target="_blank" rel="noopener">SQLite</a>
+ database. Introduced in <a href="https://www.sqlite.org/wal.html" target="_blank" rel="noopener">SQLite 3.7</a>
+, they play a crucial role in enabling <a href="https://sqlpey.com/sql/what-is-stored-procedure-in-sql" target="_blank" rel="noopener">SQLite</a>
+ to rollback changes in case of a transaction failure. Deleting these files is advisable when manually removing the main database file to prevent unexpected behavior in the application. With WAL enabled, each <a href="https://sqlpey.com/sql/what-are-basics-advance-sql-cheatsheet/" target="_blank" rel="noopener">SQLite</a>
+ database includes two files on disk that must be preserved: the main <code>.db</code> file and the <code>.db-wal</code> file.</p>
+<h2 id="faqs">FAQs</h2>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">What is the .db-shm file?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">The <code>.db-shm</code> file is a shared memory file that contains only temporary data.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">What is the .db-wal file?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">The <code>.db-wal</code> file is associated with Write-Ahead Logging (WAL) in SQLite databases. It serves as a replacement for the rollback journal, enabling SQLite to rollback changes in case a transaction fails.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Do I need to delete the .db-shm and .db-wal files?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">It is advisable to delete these files if you are manually deleting the main database file. This practice can help prevent unexpected behavior in the application. When Write-Ahead Logging (WAL) is enabled, each SQLite database comprises two files on disk that must be preserved: the main <code>.db</code> file and the <code>.db-wal</code> file.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Why are .db-shm and .db-wal files created?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">These files are temporary files created by SQLite as part of its Write-Ahead Logging (WAL) feature. The <code>.db-wal</code> file, in particular, plays a crucial role in ensuring data integrity by allowing SQLite to rollback changes in the event of a transaction failure.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Can I manually delete the .db-shm and .db-wal files?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">Yes, you can manually delete these files, especially when you are deleting the main database file. However, it&rsquo;s essential to be cautious and aware of the implications, as these files are integral to SQLite&rsquo;s data management processes.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">How often are changes written from .db-wal to the main .db file?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">The contents of the Write-Ahead Logging (WAL) file (<code>.db-wal</code>) are periodically moved to the main database file (<code>.db</code>). However, this operation is not guaranteed to occur every time the process exits. Understanding the Write-Ahead Logging mechanism is crucial for effective SQLite database management.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Where can I find more information about SQLite Write-Ahead Logging?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">For detailed documentation on SQLite Write-Ahead Logging (WAL), you can refer to <a href="https://www.sqlite.org/wal.html" target="_blank" rel="noopener">SQLite Write-Ahead Logging</a>
+.</div>
+    </div>
+</div>
 
         </article>
 
