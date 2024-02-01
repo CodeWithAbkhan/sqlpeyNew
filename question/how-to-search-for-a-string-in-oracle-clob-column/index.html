@@ -17,9 +17,7 @@
 <meta
   name="keywords"
   content="
-            
-              SQL, Databases, Big-Query, Oracle, MS SQL SErver, MySQL, PostgreSQL
-            
+            Oracle CLOB, CLOB column, dbms_lob.instr, dbms_lob.substr, Oracle SQL, String search
            "
 />
 <meta name="robots" content="noodp" />
@@ -292,7 +290,19 @@
         </div>
         <section class="prose prose-slate dark:prose-invert w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mt-6">
           <h2>Table of Contents</h2>
-          <aside><nav id="TableOfContents"></nav></aside>
+          <aside><nav id="TableOfContents">
+  <ul>
+    <li><a href="#code-explanation">Code Explanation:</a>
+      <ul>
+        <li><a href="#detailed-explanation">Detailed Explanation:</a></li>
+      </ul>
+    </li>
+    <li><a href="#alternative-ways">Alternative Ways:</a></li>
+    <li><a href="#practical-examples">Practical Examples:</a></li>
+    <li><a href="#faqs-on-search-for-a-string-in-oracle-clob-column">FAQs on Search For a String in Oracle Clob Column:</a></li>
+    <li><a href="#references">References:</a></li>
+  </ul>
+</nav></aside>
 
         </section>
         
@@ -300,49 +310,93 @@
 
 
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
-       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" >
-          <p>How to Search for a String in Oracle CLOB Column
-Summary:</p>
-<p>To get a particular string from a CLOB column in Oracle, you can use dbms_lob.instr and dbms_lob.substr functions. The instr function gives you the starting position of the substring you&rsquo;re searching for, while the substr function gives you the actual substring.</p>
-<p>Code Explanation:</p>
-<p>Let&rsquo;s break down the example code provided in the question:</p>
-<p>First, a table called &ldquo;t_clob&rdquo; is created with two columns - &ldquo;id&rdquo; and &ldquo;cl&rdquo; (the CLOB column).</p>
-<p>Then, a row is inserted into the table with some random text in the &ldquo;cl&rdquo; column.</p>
-<p>Next, a PL/SQL block is used to update the &ldquo;cl&rdquo; column of the same row multiple times with the same text, except for one line that has the string &ldquo;NEW.PRODUCT_NO&rdquo; in it.</p>
-<p>Lastly, the instr and substr functions are used to extract the value of &ldquo;NEW.PRODUCT_NO&rdquo; from the CLOB column.</p>
-<p>Here&rsquo;s a detailed explanation of the last two SELECT statements:</p>
-<p>The first SELECT statement retrieves the position of the substring &lsquo;NEW.PRODUCT_NO=[&rsquo; in the CLOB column using the dbms_lob.instr function:</p>
-<pre><code>select dbms_lob.instr( cl, 'NEW.PRODUCT_NO=[' ) from t_clob;
-</code></pre>
-<p>The result is the integer 12849, which is the starting index of the substring we want to extract.</p>
-<p>The second SELECT statement extracts the substring using the dbms_lob.substr function:</p>
-<pre><code>select dbms_lob.substr( cl, 5, dbms_lob.instr( cl, 'NEW.PRODUCT_NO=[' ) + length( 'NEW.PRODUCT_NO=[') ) new_product
-from t_clob;
-</code></pre>
-<p>The substr function takes three arguments:</p>
-<pre><code>1. The CLOB column (&quot;cl&quot;)
-2. The length of the substring we want to extract (5, in this case)
-3. The starting index of the substring (which is the result of the instr function, plus the length of 'NEW.PRODUCT_NO=[')
-</code></pre>
-<p>The result is the string &ldquo;T9856&rdquo;, which is the value of &ldquo;NEW.PRODUCT_NO&rdquo; in the CLOB column.</p>
-<p>Alternative Ways:</p>
-<p>There are other ways you can extract a substring from a CLOB column in Oracle:</p>
+       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" 
+          itemscope itemtype="https://schema.org/FAQPage" >
+          <p>To retrieve a specific string from a CLOB column in Oracle, the <code>dbms_lob.instr</code> and <code>dbms_lob.substr</code> functions can be utilized. The <code>instr</code> function provides the starting position of the sought substring, while the <code>substr</code> function extracts the actual substring.</p>
+<h2 id="code-explanation">Code Explanation:</h2>
+<p>Let&rsquo;s dissect the example code provided:</p>
 <ol>
 <li>
-<p>You can use the regular substr function instead of dbms_lob.substr, but this may not work as well for large CLOBs.</p>
+<p>First, a table named &ldquo;t_clob&rdquo; is created with two columns - &ldquo;id&rdquo; and &ldquo;cl&rdquo; (the CLOB column).</p>
 </li>
 <li>
-<p>You can use regular expression functions like regexp_substr or regexp_replace to extract or replace the substring you want.</p>
+<p>A row is inserted into the table with some random text in the &ldquo;cl&rdquo; column.</p>
+</li>
+<li>
+<p>A PL/SQL block is employed to update the &ldquo;cl&rdquo; column of the same row multiple times with the same text, except for one line that includes the string &ldquo;NEW.PRODUCT_NO.&rdquo;</p>
+</li>
+<li>
+<p>The <code>instr</code> and <code>substr</code> functions are then used to extract the value of &ldquo;NEW.PRODUCT_NO&rdquo; from the CLOB column.</p>
 </li>
 </ol>
-<p>Practical Examples:</p>
-<p>Here&rsquo;s an example of how you can use the instr and substr functions in a real-life scenario:</p>
-<p>Suppose you have a table called &ldquo;sales&rdquo; with a CLOB column called &ldquo;comments&rdquo;, and you want to find all rows where the comment mentions a &ldquo;discount&rdquo; on a particular product (identified by the string &ldquo;PRODUCT_NO=XYZ&rdquo;).</p>
-<p>You can use the following SQL query:</p>
-<pre><code>SELECT *
-FROM sales
-WHERE dbms_lob.instr(comments, 'PRODUCT_NO=XYZ') &gt; 0     AND dbms\_lob.instr(comments, 'discount') &gt; 0;  This will return all rows where both conditions are true - the comment contains both &quot;PRODUCT\_NO=XYZ&quot; and &quot;discount&quot;.  References: - Oracle documentation on dbms\_lob: http://docs.oracle.com/cd/B19306\_01/appdev.102/b14258/d\_lob.htm - Oracle documentation on regular expressions: http://docs.oracle.com/cd/B19306\_01/appdev.102/b14251/adfns\_regexp.htm]]&gt;
-</code></pre>
+<h3 id="detailed-explanation">Detailed Explanation:</h3>
+<p>The first SELECT statement retrieves the position of the substring &lsquo;NEW.PRODUCT_NO=[&rsquo; in the CLOB column using the <code>dbms_lob.instr</code> function:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> dbms_lob.instr(cl, <span style="color:#e6db74">&#39;NEW.PRODUCT_NO=[&#39;</span>) <span style="color:#66d9ef">FROM</span> t_clob;
+</span></span></code></pre></div><p>The result is the integer 12849, representing the starting index of the substring we want to extract.</p>
+<p>The second SELECT statement extracts the substring using the <code>dbms_lob.substr</code> function:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> dbms_lob.substr(cl, <span style="color:#ae81ff">5</span>, dbms_lob.instr(cl, <span style="color:#e6db74">&#39;NEW.PRODUCT_NO=&#39;</span>) <span style="color:#f92672">+</span> <span style="color:#66d9ef">LENGTH</span>(<span style="color:#e6db74">&#39;NEW.PRODUCT_NO=[&#39;</span>)) <span style="color:#66d9ef">AS</span> new_product
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> t_clob;
+</span></span></code></pre></div><p>The <code>substr</code> function takes three arguments:</p>
+<ol>
+<li>The CLOB column (&ldquo;cl&rdquo;).</li>
+<li>The length of the substring we want to extract (5, in this case).</li>
+<li>The starting index of the substring (result of the <code>instr</code> function, plus the length of &lsquo;NEW.PRODUCT_NO=[&rsquo;).</li>
+</ol>
+<p>The result is the string &ldquo;T9856,&rdquo; representing the value of &ldquo;NEW.PRODUCT_NO&rdquo; in the CLOB column.</p>
+<h2 id="alternative-ways">Alternative Ways:</h2>
+<p>There are other methods to extract a substring from a CLOB column in Oracle:</p>
+<ol>
+<li>
+<p>You can use the regular <code>substr</code> function instead of <code>dbms_lob.substr</code>, but this may not work optimally for large CLOBs.</p>
+</li>
+<li>
+<p>Regular expression functions like <code>regexp_substr</code> or <code>regexp_replace</code> can be used to extract or replace the desired substring.</p>
+</li>
+</ol>
+<h2 id="practical-examples">Practical Examples:</h2>
+<p>Suppose you have a table named &ldquo;sales&rdquo; with a CLOB column called &ldquo;comments,&rdquo; and you want to find all rows where the comment mentions a &ldquo;discount&rdquo; on a particular product (identified by the string &ldquo;PRODUCT_NO=XYZ&rdquo;).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> sales
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> dbms_lob.instr(comments, <span style="color:#e6db74">&#39;PRODUCT_NO=XYZ&#39;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> <span style="color:#66d9ef">AND</span> dbms_lob.instr(comments, <span style="color:#e6db74">&#39;discount&#39;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>;
+</span></span></code></pre></div><p>This query returns all rows where both conditions are true - the comment contains both &ldquo;PRODUCT_NO=XYZ&rdquo; and &ldquo;discount.&rdquo;</p>
+<h2 id="faqs-on-search-for-a-string-in-oracle-clob-column">FAQs on Search For a String in Oracle Clob Column:</h2>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">What is the purpose of using dbms_lob.instr and dbms_lob.substr in Oracle?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>Answer:</strong> dbms_lob.instr is used to find the starting position of a substring in a CLOB column, and dbms_lob.substr is used to extract a substring from a CLOB column based on a specified position and length.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">How does the instr function work in Oracle for CLOB columns?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>Answer:</strong> The instr function in Oracle returns the starting position of a substring within a CLOB column. It helps locate the position where a specific string begins.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">What is the alternative to dbms_lob.substr for extracting substrings from CLOB columns?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>Answer:</strong> While dbms_lob.substr is commonly used, you can also use the regular substr function. However, be cautious with large CLOBs, as regular substr may have limitations.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Can regular expressions be used to extract substrings from Oracle CLOB columns?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>Answer:</strong> Yes, Oracle provides regular expression functions like regexp_substr or regexp_replace that can be used for extracting or replacing substrings in CLOB columns.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Are there practical examples of using instr and substr functions for searching strings in Oracle CLOB columns?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>Answer:</strong> Certainly! For example, if you have a table &ldquo;sales&rdquo; with a CLOB column &ldquo;comments,&rdquo; you can use these functions to find rows mentioning a &ldquo;discount&rdquo; on a specific product identified by the string &ldquo;PRODUCT_NO=XYZ.&rdquo;</div>
+    </div>
+</div>
+<h2 id="references">References:</h2>
+<ul>
+<li><a href="http://docs.oracle.com/cd/B19306_01/appdev.102/b14258/d_lob.htm" target="_blank" rel="noopener">Oracle documentation on dbms_lob</a>
+</li>
+<li><a href="http://docs.oracle.com/cd/B19306_01/appdev.102/b14251/adfns_regexp.htm" target="_blank" rel="noopener">Oracle documentation on regular expressions</a>
+</li>
+</ul>
 
         </article>
 

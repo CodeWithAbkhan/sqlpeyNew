@@ -17,9 +17,7 @@
 <meta
   name="keywords"
   content="
-            
-              SQL, Databases, Big-Query, Oracle, MS SQL SErver, MySQL, PostgreSQL
-            
+            Oracle, Table Type, SELECT FROM, How-To Guide
            "
 />
 <meta name="robots" content="noodp" />
@@ -292,7 +290,18 @@
         </div>
         <section class="prose prose-slate dark:prose-invert w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mt-6">
           <h2>Table of Contents</h2>
-          <aside><nav id="TableOfContents"></nav></aside>
+          <aside><nav id="TableOfContents">
+  <ul>
+    <li><a href="#oracle-using-table-type-in-select-from-statement">Oracle: Using Table Type in SELECT FROM Statement</a></li>
+    <li><a href="#defining-table-types">Defining Table Types</a></li>
+    <li><a href="#using-table-type-in-sql">Using Table Type in SQL</a></li>
+    <li><a href="#utilizing-table-type-in-a-package">Utilizing Table Type in a Package</a></li>
+    <li><a href="#practical-example">Practical Example</a></li>
+    <li><a href="#alternative-ways">Alternative Ways</a></li>
+    <li><a href="#faqs-about-using-table-type-in-select-from-statement-in-oracle">FAQs about Using Table Type in SELECT FROM Statement in Oracle:</a></li>
+    <li><a href="#recap">Recap</a></li>
+  </ul>
+</nav></aside>
 
         </section>
         
@@ -300,103 +309,106 @@
 
 
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
-       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" >
-          <p>ORACLE: Using Table Type in SELECT FROM Statement: How-To Guide
-In this post, we will discuss how to use a table type in a SELECT FROM statement in Oracle. We will go through the code line by line, explaining what each part does, and provide a practical example.</p>
-<p>Firstly, let&rsquo;s define our table type. We will create two types: exch_row, which is a record type that contains three fields (currency_cd, exch_rt_eur, exch_rt_usd), and exch_tbl, which is a table of type exch_row.</p>
-<pre><code>CREATE OR REPLACE TYPE exch_row AS OBJECT(
-currency_cd VARCHAR2(9),
-exch_rt_eur NUMBER,
-exch_rt_usd NUMBER);
-
-CREATE OR REPLACE TYPE exch_tbl AS TABLE OF exch_row;
-
-				  With this in place, we can now use our table type in SQL statements. For example, let's say we have a table called 'item' that contains a column 'currency' that matches with the 'currency\_cd' column in our exch\_tbl. We can join these tables together like so:  
-				  
-
-SELECT i.*, rt.exch_rt_eur, rt.exch_rt_usd
-FROM item i, TABLE(exch_rt) rt
-WHERE i.currency = rt.currency_cd;
-</code></pre>
-<p>In this query, we are selecting all columns from the &lsquo;item&rsquo; table, plus the &rsquo;exch_rt_eur&rsquo; and &rsquo;exch_rt_usd&rsquo; columns from our exch_tbl (which we are referencing using the TABLE function). We then join the two tables together using the &lsquo;currency&rsquo; and &lsquo;currency_cd&rsquo; fields.  To use our table type in a package, we can define a variable of type exch_tbl, then use it in our procedures. For example:</p>
-<pre><code>CREATE OR REPLACE PACKAGE my_package AS
-  exch_rt exch_tbl;
-  PROCEDURE fill_exch_rt;
-  FUNCTION get_item(currency_cd IN VARCHAR2) RETURN item%ROWTYPE;
-END my_package;
-/
-CREATE OR REPLACE PACKAGE BODY my_package AS
-  PROCEDURE fill_exch_rt IS
-  BEGIN
-    exch_rt := exch_tbl();
-    -- add data to table here
-  END fill_exch_rt;
-
-  FUNCTION get_item(currency_cd IN VARCHAR2) RETURN item%ROWTYPE IS
-    result item%ROWTYPE;
-  BEGIN
-    SELECT *
-    INTO result
-    FROM item i, TABLE(exch_rt) rt
-    WHERE i.currency = rt.currency_cd
-      AND rt.currency_cd = currency_cd;
-
-    RETURN result;
-  END get_item;
-END my_package;
-/
-</code></pre>
-<p>In this package, we define a variable &rsquo;exch_rt&rsquo; of type exch_tbl, then create two procedures: &lsquo;fill_exch_rt&rsquo; to populate our table with data, and &lsquo;get_item&rsquo; to select an item record based on a given currency code. In the &lsquo;get_item&rsquo; procedure, we use the TABLE function again to reference our exch_rt table type.  Practical Example:  Let&rsquo;s say we are building a simple e-commerce application with items priced in multiple currencies. We have a table called &lsquo;item&rsquo; with a &lsquo;currency&rsquo; column, and a table called &rsquo;exchange_rates&rsquo; with columns &lsquo;currency_cd&rsquo;, &rsquo;exch_rt_eur&rsquo;, and &rsquo;exch_rt_usd&rsquo;. We want to create a package function that will return all items priced in a given currency, along with their prices converted to USD and EUR.  We can do this using our exch_tbl table type like so:</p>
-<pre><code>CREATE OR REPLACE PACKAGE item_pricing AS
-  exch_rt exch_tbl;
-  PROCEDURE fill_exchange_rates;
-  FUNCTION get_items(currency_cd IN VARCHAR2) RETURN SYS_REFCURSOR;
-END item_pricing;
-/
-
-CREATE OR REPLACE PACKAGE BODY item_pricing AS
-  PROCEDURE fill_exchange_rates IS
-  BEGIN
-    exch_rt := exch_tbl();
-
-    INSERT INTO TABLE(exch_rt) 
-    VALUES(exch_row('USD', 1, 1.17));
-    INSERT INTO TABLE(exch_rt) 
-    VALUES(exch_row('EUR', 0.85, 1));
-  END fill_exchange_rates;
-
-  FUNCTION get_items(currency_cd IN VARCHAR2) RETURN SYS_REFCURSOR IS
-    result SYS_REFCURSOR;
-
-  BEGIN
-    OPEN result FOR
-    SELECT item.*, 
-           CASE
-             WHEN exch_rt_eur IS NULL THEN NULL
-             ELSE item.price * exch_rt_eur
-           END AS price_eur,
-           CASE
-             WHEN exch_rt_usd IS NULL THEN NULL
-             ELSE item.price * exch_rt_usd
-           END AS price_usd
-    FROM item, TABLE(exch_rt)
-    WHERE item.currency = exch_currency_cd
-      AND exch_currency_cd = currency_cd;
-
-    RETURN result;
-  END get_items;
-END item_pricing;
-/
-</code></pre>
-<p>The &lsquo;fill_exchange_rates&rsquo; procedure populates our exch_rt table type with conversion rates, while the &lsquo;get_items&rsquo; function selects items from the &lsquo;item&rsquo; table and joins it with exch_rt using the TABLE function. We also calculate the USD and EUR prices based on the exchange rates.  Alternative Ways:  Prior to Oracle 12C, it was not possible to select from PL/SQL-defined tables, only from tables based on SQL types. If you are using an older version of Oracle, you can define nested tables like so:</p>
-<pre><code>CREATE TYPE exch_row AS OBJECT (
-    currency_cd VARCHAR2(9),
-    exch_rt_eur NUMBER,
-    exch_rt_usd NUMBER);
-
-CREATE TYPE exch_tbl AS TABLE OF exch_row;
-</code></pre>
-<p>You can then use this nested table in the same way as the exch_tbl defined in our previous examples.  Recap:  In this post, we learned how to use a table type in a SELECT FROM statement in Oracle. We showed how to define a table type, join it with other tables using the TABLE function, and use it in a package to pass data between procedures. We also provided a practical example of how to use table types in an e-commerce application.  References: - Oracle Documentation: Associative Arrays and Nested Tables - Oracle Documentation: Using Table Functions - Oracle Documentation: Defining PL/SQL Record Types and Cursor Variables]]&gt;</p>
+       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" 
+          itemscope itemtype="https://schema.org/FAQPage" >
+          <h2 id="oracle-using-table-type-in-select-from-statement">Oracle: Using Table Type in SELECT FROM Statement</h2>
+<p>In this post, we will delve into the usage of a table type in a SELECT FROM statement in Oracle. We will walk through the code line by line, elucidating each segment&rsquo;s purpose, and present a practical example.</p>
+<h2 id="defining-table-types">Defining Table Types</h2>
+<p>Firstly, let&rsquo;s define our table type. We will create two types:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">OR</span> <span style="color:#66d9ef">REPLACE</span> <span style="color:#66d9ef">TYPE</span> exch_row <span style="color:#66d9ef">AS</span> <span style="color:#66d9ef">OBJECT</span>(
+</span></span><span style="display:flex;"><span>    currency_cd VARCHAR2(<span style="color:#ae81ff">9</span>),
+</span></span><span style="display:flex;"><span>    exch_rt_eur NUMBER,
+</span></span><span style="display:flex;"><span>    exch_rt_usd NUMBER);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">OR</span> <span style="color:#66d9ef">REPLACE</span> <span style="color:#66d9ef">TYPE</span> exch_tbl <span style="color:#66d9ef">AS</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#66d9ef">OF</span> exch_row;
+</span></span></code></pre></div><p>With this in place, we can now incorporate our table type into SQL statements.</p>
+<h2 id="using-table-type-in-sql">Using Table Type in SQL</h2>
+<p>Assuming we have a table named &lsquo;item&rsquo; with a column &lsquo;currency&rsquo; that corresponds to the &lsquo;currency_cd&rsquo; column in our &rsquo;exch_tbl&rsquo;, we can perform a join:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> i.<span style="color:#f92672">*</span>, rt.exch_rt_eur, rt.exch_rt_usd
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> item i, <span style="color:#66d9ef">TABLE</span>(exch_rt) rt
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> i.currency <span style="color:#f92672">=</span> rt.currency_cd;
+</span></span></code></pre></div><p>Here, we select columns from the &lsquo;item&rsquo; table along with &rsquo;exch_rt_eur&rsquo; and &rsquo;exch_rt_usd&rsquo; columns from our &rsquo;exch_tbl,&rsquo; referencing it using the TABLE function. The join is based on the &lsquo;currency&rsquo; and &lsquo;currency_cd&rsquo; fields.</p>
+<h2 id="utilizing-table-type-in-a-package">Utilizing Table Type in a Package</h2>
+<p>To use our table type in a package, we can define a variable of type &rsquo;exch_tbl&rsquo; and incorporate it into our procedures:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">OR</span> <span style="color:#66d9ef">REPLACE</span> PACKAGE my_package <span style="color:#66d9ef">AS</span>
+</span></span><span style="display:flex;"><span>  exch_rt exch_tbl;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">PROCEDURE</span> fill_exch_rt;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">FUNCTION</span> get_item(currency_cd <span style="color:#66d9ef">IN</span> VARCHAR2) <span style="color:#66d9ef">RETURN</span> item<span style="color:#f92672">%</span>ROWTYPE;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">END</span> my_package;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">/</span>
+</span></span></code></pre></div><p>The &lsquo;fill_exch_rt&rsquo; procedure populates our table with data, and &lsquo;get_item&rsquo; selects an item record based on a given currency code, using the TABLE function to reference our &rsquo;exch_rt&rsquo; table type.</p>
+<h2 id="practical-example">Practical Example</h2>
+<p>Suppose we are building an e-commerce application with items priced in multiple currencies. We can create a package function to return all items priced in a given currency, along with their prices converted to USD and EUR:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">OR</span> <span style="color:#66d9ef">REPLACE</span> PACKAGE item_pricing <span style="color:#66d9ef">AS</span>
+</span></span><span style="display:flex;"><span>  exch_rt exch_tbl;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">PROCEDURE</span> fill_exchange_rates;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">FUNCTION</span> get_items(currency_cd <span style="color:#66d9ef">IN</span> VARCHAR2) <span style="color:#66d9ef">RETURN</span> SYS_REFCURSOR;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">END</span> item_pricing;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">/</span>
+</span></span></code></pre></div><p>The &lsquo;fill_exchange_rates&rsquo; procedure populates our &rsquo;exch_rt&rsquo; table type with conversion rates, and &lsquo;get_items&rsquo; selects items from the &lsquo;item&rsquo; table, joining it with &rsquo;exch_rt&rsquo; using the TABLE function. We also calculate the USD and EUR prices based on the exchange rates.</p>
+<h2 id="alternative-ways">Alternative Ways</h2>
+<p>Before Oracle 12C, selecting from PL/SQL-defined tables was not possible; only tables based on SQL types were supported. In older versions, you could define nested tables:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TYPE</span> exch_row <span style="color:#66d9ef">AS</span> <span style="color:#66d9ef">OBJECT</span> (
+</span></span><span style="display:flex;"><span>    currency_cd VARCHAR2(<span style="color:#ae81ff">9</span>),
+</span></span><span style="display:flex;"><span>    exch_rt_eur NUMBER,
+</span></span><span style="display:flex;"><span>    exch_rt_usd NUMBER);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TYPE</span> exch_tbl <span style="color:#66d9ef">AS</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#66d9ef">OF</span> exch_row;
+</span></span></code></pre></div><p>You could then use this nested table similarly to the &rsquo;exch_tbl&rsquo; defined in our previous examples.</p>
+<h2 id="faqs-about-using-table-type-in-select-from-statement-in-oracle">FAQs about Using Table Type in SELECT FROM Statement in Oracle:</h2>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">What is a table type in Oracle?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>Answer:</strong> In Oracle, a table type is a user-defined type that represents a collection of data, often used to pass sets of data between PL/SQL procedures or functions.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">How can I create a table type in Oracle?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>Answer:</strong> You can create a table type using the <code>CREATE OR REPLACE TYPE</code> statement, defining the structure of the type, such as its attributes and methods.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">What is the purpose of the TABLE function in Oracle?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>Answer:</strong> The <code>TABLE</code> function in Oracle is used to treat a nested table or a varray (variable-size array) as a relational table, allowing you to use it in SQL queries.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Can I join a table type with a regular table in Oracle?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>Answer:</strong> Yes, you can join a table type with a regular table in Oracle using the <code>TABLE</code> function in the <code>FROM</code> clause of a SQL query, specifying the table type.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">How do I use a table type in a PL/SQL package?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>Answer:</strong> To use a table type in a PL/SQL package, you declare a variable of that table type, and then you can manipulate and query it within the package procedures or functions.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">What are alternative ways to handle collections prior to Oracle 12C?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>Answer:</strong> Prior to Oracle 12C, you could use nested tables defined with the <code>CREATE TYPE</code> statement to handle collections in a way similar to the examples shown in this guide.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Can I use table types in a SELECT FROM statement for older versions of Oracle?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>Answer:</strong> For older versions of Oracle, you can use nested tables defined with the <code>CREATE TYPE</code> statement and handle them similarly to the examples shown in this guide.</div>
+    </div>
+</div>
+<h2 id="recap">Recap</h2>
+<p>In this post, we explored how to use a table type in a SELECT FROM statement in Oracle. We defined a table type, showcased joining it with other tables using the TABLE function, and demonstrated its use in a package to pass data between procedures. A practical example illustrated the application of table types in an e-commerce setting.</p>
+<p><strong>References:</strong></p>
+<ul>
+<li><a href="https://livesql.oracle.com/apex/livesql/docs/lnpls/plsql-collections-and-records/composites27.html" target="_blank" rel="noopener">Oracle Documentation: Associative Arrays and Nested Tables</a>
+</li>
+<li><a href="https://livesql.oracle.com/apex/livesql/file/tutorial_GSOTSK8FWLYZOG5CJJ9KPX7RX.html" target="_blank" rel="noopener">Oracle Documentation: Using Table Functions</a>
+</li>
+<li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/19/lnpls/plsql-collections-and-records.html" target="_blank" rel="noopener">Oracle Documentation: Defining PL/SQL Record Types and Cursor Variables</a>
+</li>
+</ul>
 
         </article>
 
