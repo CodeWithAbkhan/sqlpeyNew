@@ -18,7 +18,7 @@
   name="keywords"
   content="
             
-              SQL, Databases, Big-Query, Oracle, MS SQL SErver, MySQL, PostgreSQL
+              SQL, Databases, Big-Query, Oracle, MS SQL SErver, MySQL, PostgreSQL, create, table, oracle, sql, select, top, drop, if, exists, justless, books, database, insert, into, cengage, download, sum, example, delete, taking, long, time, approx_quantiles, statement, update/merge, match, source, row, target, foreign, key, mongo, db, except, columns, epoch, date, split, str, dividon, error, bq, wildcard, get, column, names, operator, case, all, then/else, arguments, coercible, common, type, int64, string, actual, when, else, bool, ssis, acquire, connection, azure, query, update, merge, export, csv, file, developer, check, view, bonus, spend, money, stores, catalog, identify, preferred, customers, country, origin, timestamp, add, days, list, meets, certain, value, range, extract, data, fields, open, multiple, tables, appending, single, quote, save, result, work, clob, alter, default, schema, resolve, division, zero, eoor, db-shm, could, server, file, lock, another, seconds,  bigquery, hibernate, dialect, extract, age, birth, entire, comparing, pivot, varchar2, nvarchar2, primary, key, google, double, bad, bugquery, existence, creating, newline, characters, invalid, url, specified, oracledatasource.makeurl, connect, database, ssms, divide, statement, like, string, count, unique, converter, em, numbers, places, even, negative, big, query, quartiles, partition, round, convert,  text, exported,   exporting, files, locate, package, modulenotfounderror, module, named, db_dtypes, use, ssms, o, postgresql, sysdate, installing, dbd::oracle, ns, clob, how, split, comma-separated, currency, big, handle, show, headers, csv, shm, wal, convert, commaseparated, escape, character, search, pattern, float, username, password, fix, syntax, join, condition, map, cursor, dict, criteria, hourly, grouping  view, employees, timestamp, value, range
             
            "
 />
@@ -302,14 +302,11 @@
           <h2>Table of Contents</h2>
           <aside><nav id="TableOfContents">
   <ul>
-    <li>
-      <ul>
-        <li><a href="#the-problem">The Problem</a></li>
-        <li><a href="#the-solution">The Solution</a></li>
-        <li><a href="#alternative-ways">Alternative Ways</a></li>
-        <li><a href="#summary">Summary</a></li>
-      </ul>
-    </li>
+    <li><a href="#dealing-with-large-floating-point-numbers-in-bigquery">Dealing with Large Floating-Point Numbers in BigQuery</a></li>
+    <li><a href="#the-problem">The Problem</a></li>
+    <li><a href="#the-solution">The Solution</a></li>
+    <li><a href="#alternative-ways">Alternative Ways</a></li>
+    <li><a href="#recap">Recap</a></li>
   </ul>
 </nav></aside>
           <div>
@@ -327,34 +324,28 @@
 
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
        prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" >
-          <p>Dealing with Large Floating-Point Numbers in BigQuery<br>
-Have you ever encountered an issue in BigQuery where the SUM() function returns large floating-point numbers in scientific notation? This problem can be frustrating, especially when exporting data to other applications like spreadsheets or charts. In this post, we&rsquo;ll discuss why this issue occurs and how to fix it.</p>
-<h3 id="the-problem">The Problem</h3>
-<p>Let&rsquo;s say you have a table in BigQuery with a column called UNIT_PRICE, which contains prices of products in a store. These prices have two decimal places and are stored as type float in the schema.</p>
-<p>Now, you want to calculate the total sales of the store by adding up all the unit prices. You run the following query:</p>
-<pre><code>SELECT SUM(Unit_Price) AS Total_Sales 
-FROM store.sales;
-</code></pre>
-<p>Although, instead of getting a decimal number like 26978291.65, you get a large floating-point number in scientific notation like 2.697829165015719E7. This can be a problem when you want to display or use this value in other applications.</p>
-<h3 id="the-solution">The Solution</h3>
-<p>The reason why this happens is that BigQuery uses default formatting for floating-point numbers, which means that depending on the size of the number, it may use scientific notation. To fix this issue, we need to format the output explicitly.</p>
-<p>We can use the FORMAT() function to format the output of the SUM() function. The FORMAT() function takes two arguments: the first argument is a format string, and the second argument is the value to format. The format string specifies how the value should be formatted, and we can use it to force the output to have a fixed number of decimal places.</p>
-<p>For example, to format the output with two decimal places, we can use the following query:</p>
-<pre><code>SELECT FORMAT('%2.2f', SUM(Unit_Price)) AS Total_Sales 
-FROM store.sales;
-</code></pre>
-<p>In this query, we use the format string &lsquo;%2.2f&rsquo;, which means that we want the output to have two decimal places. The SUM(Unit_Price) expression calculates the sum of all unit prices, and the resulting value is passed to the FORMAT() function.</p>
-<p>The output of this query will be a decimal number like 26978291.65, which is much easier to work with.</p>
-<h3 id="alternative-ways">Alternative Ways</h3>
-<p>If you prefer, you can also use the CAST() function to convert the output of the SUM() function to a FLOAT data type explicitly. This will ensure that the output has a fixed number of decimal places and is not displayed in scientific notation.</p>
-<p>For example, you can use the following query:</p>
-<pre><code>SELECT CAST(SUM(Unit_Price) AS FLOAT64) AS Total_Sales 
-FROM store.sales;
-</code></pre>
-<p>In this query, we use the CAST() function to convert the output of the SUM() function to the FLOAT64 data type explicitly. The resulting value will have a fixed number of decimal places and will not be displayed in scientific notation.</p>
-<h3 id="summary">Summary</h3>
-<p>The SUM() function in BigQuery can return large floating-point numbers in scientific notation, which can be a problem when working with the output in other applications. To fix this issue, we can use the FORMAT() function to format the output explicitly and force it to have a fixed number of decimal places. Alternatively, we can use the CAST() function to convert the output to a FLOAT data type explicitly.
-]]&gt;</p>
+          <h2 id="dealing-with-large-floating-point-numbers-in-bigquery">Dealing with Large Floating-Point Numbers in BigQuery</h2>
+<p>Encountering issues with the <code>SUM()</code> function returning large floating-point numbers in scientific notation in BigQuery can be a common frustration. Especially when dealing with applications like spreadsheets or charts that may not handle such notation well. This post aims to shed light on why this issue occurs and how to resolve it.</p>
+<h2 id="the-problem">The Problem</h2>
+<p>Consider having a table in BigQuery with a column named <code>UNIT_PRICE</code>, storing product prices with two decimal places and stored as type <code>float</code> in the schema. Suppose you want to calculate the total sales by summing up all the unit prices. You run the following query:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#66d9ef">SUM</span>(Unit_Price) <span style="color:#66d9ef">AS</span> Total_Sales 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> store.sales;
+</span></span></code></pre></div><p>However, instead of receiving a decimal number like 26978291.65, you get a large floating-point number in scientific notation, such as 2.697829165015719E7. This can be problematic when you need to display or use this value in other applications.</p>
+<h2 id="the-solution">The Solution</h2>
+<p>This issue arises because BigQuery uses default formatting for floating-point numbers, potentially resorting to scientific notation based on the number&rsquo;s size. To address this, you can format the output explicitly using the <code>FORMAT()</code> function.</p>
+<p>The <code>FORMAT()</code> function takes a format string as its first argument and the value to format as its second argument. The format string specifies how the value should be formatted, allowing you to control the number of decimal places explicitly.</p>
+<p>For instance, to format the output with two decimal places, you can use the following query:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> FORMAT(<span style="color:#e6db74">&#39;%2.2f&#39;</span>, <span style="color:#66d9ef">SUM</span>(Unit_Price)) <span style="color:#66d9ef">AS</span> Total_Sales 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> store.sales;
+</span></span></code></pre></div><p>In this query, the format string &lsquo;%2.2f&rsquo; ensures that the output has two decimal places. The <code>SUM(Unit_Price)</code> expression calculates the sum of all unit prices, and the resulting value is formatted accordingly.</p>
+<p>The output of this query will be a decimal number like 26978291.65, which is much more manageable.</p>
+<h2 id="alternative-ways">Alternative Ways</h2>
+<p>Alternatively, you can use the <code>CAST()</code> function to explicitly convert the output of the <code>SUM()</code> function to a <code>FLOAT64</code> data type. This guarantees a fixed number of decimal places and avoids scientific notation:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#66d9ef">CAST</span>(<span style="color:#66d9ef">SUM</span>(Unit_Price) <span style="color:#66d9ef">AS</span> FLOAT64) <span style="color:#66d9ef">AS</span> Total_Sales 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> store.sales;
+</span></span></code></pre></div><p>Here, the <code>CAST()</code> function is used to convert the output to the <code>FLOAT64</code> data type explicitly. The resulting value will have a fixed number of decimal places and won&rsquo;t be displayed in scientific notation.</p>
+<h2 id="recap">Recap</h2>
+<p>When using the <code>SUM()</code> function in BigQuery, large floating-point numbers in scientific notation may be returned, causing issues in downstream applications. To resolve this, you can use the <code>FORMAT()</code> function to explicitly format the output and enforce a fixed number of decimal places. Alternatively, the <code>CAST()</code> function can be employed to explicitly convert the output to a <code>FLOAT</code> data type.</p>
 
         </article>
 

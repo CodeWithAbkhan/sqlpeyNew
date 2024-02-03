@@ -18,7 +18,7 @@
   name="keywords"
   content="
             
-              SQL, Databases, Big-Query, Oracle, MS SQL SErver, MySQL, PostgreSQL
+              SQL, Databases, Big-Query, Oracle, MS SQL SErver, MySQL, PostgreSQL, create, table, oracle, sql, select, top, drop, if, exists, justless, books, database, insert, into, cengage, download, sum, example, delete, taking, long, time, approx_quantiles, statement, update/merge, match, source, row, target, foreign, key, mongo, db, except, columns, epoch, date, split, str, dividon, error, bq, wildcard, get, column, names, operator, case, all, then/else, arguments, coercible, common, type, int64, string, actual, when, else, bool, ssis, acquire, connection, azure, query, update, merge, export, csv, file, developer, check, view, bonus, spend, money, stores, catalog, identify, preferred, customers, country, origin, timestamp, add, days, list, meets, certain, value, range, extract, data, fields, open, multiple, tables, appending, single, quote, save, result, work, clob, alter, default, schema, resolve, division, zero, eoor, db-shm, could, server, file, lock, another, seconds,  bigquery, hibernate, dialect, extract, age, birth, entire, comparing, pivot, varchar2, nvarchar2, primary, key, google, double, bad, bugquery, existence, creating, newline, characters, invalid, url, specified, oracledatasource.makeurl, connect, database, ssms, divide, statement, like, string, count, unique, converter, em, numbers, places, even, negative, big, query, quartiles, partition, round, convert,  text, exported,   exporting, files, locate, package, modulenotfounderror, module, named, db_dtypes, use, ssms, o, postgresql, sysdate, installing, dbd::oracle, ns, clob, how, split, comma-separated, currency, big, handle, show, headers, csv, shm, wal, convert, commaseparated, escape, character, search, pattern, float, username, password, fix, syntax, join, condition, map, cursor, dict, criteria, hourly, grouping  view, employees, timestamp, value, range
             
            "
 />
@@ -281,7 +281,7 @@
 
     </i>
     <span>
-      3 minutes to read
+      2 minutes to read
     </span>
   </div>
 </div>
@@ -327,62 +327,55 @@
 
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
        prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" >
-          <p>5 Lengthy SQL Queries in Oracle To Watch Out For
-as a source.</p>
-<h2 id="identifying-poor-performing-sql-queries-in-oracle">Identifying Poor Performing SQL Queries in Oracle</h2>
-<p>To find poor performing SQL queries in Oracle, we can start by looking at the v$sql view. This view maintains statistics on shared SQL areas, and contains one row per SQL string. Once we have identified the SQL statements, we can use the SQL_ID and CHILD_NUMBER to get the actual plan and full text of the SQL statement.</p>
+          <h2 id="identifying-poor-performing-sql-queries-in-oracle">Identifying Poor Performing SQL Queries in Oracle</h2>
+<p>To effectively manage the performance of Oracle databases, it is crucial to identify and optimize poor-performing SQL queries. This article provides insights into identifying lengthy SQL queries in Oracle and offers steps to address performance issues.</p>
 <h3 id="step-1-finding-the-top-sql-statements">Step 1: Finding the Top SQL Statements</h3>
-<p>To start, we can use the following SQL statement to find the top SQL statements that are currently stored in the SQL cache, ordered by elapsed time:</p>
-<pre><code>SELECT *
-FROM (SELECT
-          sql_fulltext,
-          sql_id,
-          elapsed_time,
-          child_number,
-          disk_reads,
-          executions,
-          first_load_time,
-          last_load_time
-      FROM v$sql
-      ORDER BY elapsed_time DESC)
-WHERE ROWNUM &lt; 10;
-</code></pre>
-<p>This will return the top 10 SQL statements that have the highest elapsed time for execution.</p>
-<p>We can also order by disk_reads and executions to find disk-intensive full table scans and unnecessarily executed SQL statements.</p>
+<p>Start by examining the <code>v$sql</code> view, which maintains statistics on shared SQL areas. The following query retrieves the top 10 SQL statements stored in the SQL cache, ordered by elapsed time:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span>
+</span></span><span style="display:flex;"><span>        sql_fulltext,
+</span></span><span style="display:flex;"><span>        sql_id,
+</span></span><span style="display:flex;"><span>        elapsed_time,
+</span></span><span style="display:flex;"><span>        child_number,
+</span></span><span style="display:flex;"><span>        disk_reads,
+</span></span><span style="display:flex;"><span>        executions,
+</span></span><span style="display:flex;"><span>        first_load_time,
+</span></span><span style="display:flex;"><span>        last_load_time
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">FROM</span> v$sql
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> elapsed_time <span style="color:#66d9ef">DESC</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> ROWNUM <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">10</span>;
+</span></span></code></pre></div><p>This query helps identify SQL statements with the highest elapsed time, offering insights into potential performance bottlenecks.</p>
 <h3 id="step-2-getting-the-plan-and-full-text-of-the-sql-statement">Step 2: Getting the Plan and Full Text of the SQL Statement</h3>
-<p>To get the actual plan and full text of the SQL statement, we can use the SQL_ID and CHILD_NUMBER and feed them into the DBMS_XPLAN.DISPLAY_CURSOR procedure:</p>
-<pre><code>SELECT *
-FROM table(DBMS_XPLAN.DISPLAY_CURSOR('&amp;sql_id', &amp;child));
-</code></pre>
-<p>This will show the actual plan and full text of the SQL statement. This can help identify any performance bottlenecks in the execution plan and optimize the SQL statement accordingly.</p>
+<p>To delve deeper into problematic SQL statements, obtain the actual plan and full text using <code>DBMS_XPLAN.DISPLAY_CURSOR</code>. Feed the SQL_ID and CHILD_NUMBER into the procedure:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">table</span>(DBMS_XPLAN.DISPLAY_CURSOR(<span style="color:#e6db74">&#39;&amp;sql_id&#39;</span>, <span style="color:#f92672">&amp;</span>child));
+</span></span></code></pre></div><p>This step facilitates a comprehensive understanding of the execution plan, aiding in the identification and optimization of performance issues.</p>
 <h3 id="step-3-identifying-disk-intensive-full-table-scans">Step 3: Identifying Disk-Intensive Full Table Scans</h3>
-<p>We can use the following SQL statement to identify disk-intensive full table scans:</p>
-<pre><code>SELECT Disk_Reads DiskReads, Executions, SQL_ID, SQL_Text SQLText, 
-   SQL_FullText SQLFullText 
-FROM
-(
-   SELECT Disk_Reads, Executions, SQL_ID, LTRIM(SQL_Text) SQL_Text, 
-      SQL_FullText, Operation, Options, 
-      Row_Number() OVER 
-         (Partition By sql_text ORDER BY Disk_Reads * Executions DESC) 
-         KeepHighSQL
-   FROM
-   (
-       SELECT Avg(Disk_Reads) OVER (Partition By sql_text) Disk_Reads, 
-          Max(Executions) OVER (Partition By sql_text) Executions, 
-          t.SQL_ID, sql_text, sql_fulltext, p.operation,p.opt
-       FROM v$sql t, v$sql_plan p
-       WHERE t.sql_id=p.sql_id
-         AND p.operation LIKE '%TABLE ACCESS FULL%'
-   )
-)
-WHERE KeepHighSQL=1
-ORDER BY DiskReads DESC;
-</code></pre>
-<p>This will show the top SQL statements that have the highest number of disk reads, and may indicate full table scans that need to be optimized to reduce disk reads and improve performance.</p>
+<p>To pinpoint disk-intensive full table scans, execute the following query:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> Disk_Reads DiskReads, Executions, SQL_ID, SQL_Text SQLText, 
+</span></span><span style="display:flex;"><span>   SQL_FullText SQLFullText 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> (
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">SELECT</span> Disk_Reads, Executions, SQL_ID, LTRIM(SQL_Text) SQL_Text, 
+</span></span><span style="display:flex;"><span>      SQL_FullText, <span style="color:#66d9ef">Operation</span>, <span style="color:#66d9ef">Options</span>, 
+</span></span><span style="display:flex;"><span>      Row_Number() OVER 
+</span></span><span style="display:flex;"><span>         (Partition <span style="color:#66d9ef">By</span> sql_text <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> Disk_Reads <span style="color:#f92672">*</span> Executions <span style="color:#66d9ef">DESC</span>) 
+</span></span><span style="display:flex;"><span>         KeepHighSQL
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">FROM</span> (
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">SELECT</span> <span style="color:#66d9ef">Avg</span>(Disk_Reads) OVER (Partition <span style="color:#66d9ef">By</span> sql_text) Disk_Reads, 
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">Max</span>(Executions) OVER (Partition <span style="color:#66d9ef">By</span> sql_text) Executions, 
+</span></span><span style="display:flex;"><span>          t.SQL_ID, sql_text, sql_fulltext, p.<span style="color:#66d9ef">operation</span>,p.opt
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">FROM</span> v$sql t, v$sql_plan p
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">WHERE</span> t.sql_id<span style="color:#f92672">=</span>p.sql_id
+</span></span><span style="display:flex;"><span>         <span style="color:#66d9ef">AND</span> p.<span style="color:#66d9ef">operation</span> <span style="color:#66d9ef">LIKE</span> <span style="color:#e6db74">&#39;%TABLE ACCESS FULL%&#39;</span>
+</span></span><span style="display:flex;"><span>   )
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> KeepHighSQL<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> DiskReads <span style="color:#66d9ef">DESC</span>;
+</span></span></code></pre></div><p>This query reveals SQL statements with the highest disk reads, indicating potential areas for optimization to enhance performance.</p>
 <h3 id="summary">Summary</h3>
-<p>In summary, we can use the v$sql view and DBMS_XPLAN.DISPLAY_CURSOR procedure to identify poor performing SQL statements in Oracle. By analyzing the execution plan and the full text of the SQL statement, we can optimize the SQL statement and improve performance. We can also identify disk-intensive full table scans and optimize them to reduce disk reads and improve performance.
-]]&gt;</p>
+<p>In summary, leveraging the <code>v$sql</code> view and the <code>DBMS_XPLAN.DISPLAY_CURSOR</code> procedure allows for the identification and optimization of poor-performing SQL statements in Oracle. Analyzing execution plans and full text enables informed optimization, while the identification of disk-intensive full table scans facilitates improvements in performance. Stay vigilant for these lengthy SQL queries to ensure the efficient operation of your Oracle database.</p>
 
         </article>
 

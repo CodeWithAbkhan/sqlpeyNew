@@ -18,7 +18,7 @@
   name="keywords"
   content="
             
-              SQL, Databases, Big-Query, Oracle, MS SQL SErver, MySQL, PostgreSQL
+              SQL, Databases, Big-Query, Oracle, MS SQL SErver, MySQL, PostgreSQL, create, table, oracle, sql, select, top, drop, if, exists, justless, books, database, insert, into, cengage, download, sum, example, delete, taking, long, time, approx_quantiles, statement, update/merge, match, source, row, target, foreign, key, mongo, db, except, columns, epoch, date, split, str, dividon, error, bq, wildcard, get, column, names, operator, case, all, then/else, arguments, coercible, common, type, int64, string, actual, when, else, bool, ssis, acquire, connection, azure, query, update, merge, export, csv, file, developer, check, view, bonus, spend, money, stores, catalog, identify, preferred, customers, country, origin, timestamp, add, days, list, meets, certain, value, range, extract, data, fields, open, multiple, tables, appending, single, quote, save, result, work, clob, alter, default, schema, resolve, division, zero, eoor, db-shm, could, server, file, lock, another, seconds,  bigquery, hibernate, dialect, extract, age, birth, entire, comparing, pivot, varchar2, nvarchar2, primary, key, google, double, bad, bugquery, existence, creating, newline, characters, invalid, url, specified, oracledatasource.makeurl, connect, database, ssms, divide, statement, like, string, count, unique, converter, em, numbers, places, even, negative, big, query, quartiles, partition, round, convert,  text, exported,   exporting, files, locate, package, modulenotfounderror, module, named, db_dtypes, use, ssms, o, postgresql, sysdate, installing, dbd::oracle, ns, clob, how, split, comma-separated, currency, big, handle, show, headers, csv, shm, wal, convert, commaseparated, escape, character, search, pattern, float, username, password, fix, syntax, join, condition, map, cursor, dict, criteria, hourly, grouping  view, employees, timestamp, value, range
             
            "
 />
@@ -281,7 +281,7 @@
 
     </i>
     <span>
-      3 minutes to read
+      2 minutes to read
     </span>
   </div>
 </div>
@@ -300,7 +300,16 @@
 </div>
 
           <h2>Table of Contents</h2>
-          <aside><nav id="TableOfContents"></nav></aside>
+          <aside><nav id="TableOfContents">
+  <ul>
+    <li><a href="#check-for-table-existence-before-creating-in-oracle">Check For Table Existence Before Creating in Oracle</a></li>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#syntax-for-checking-table-existence-in-oracle">Syntax for Checking Table Existence in Oracle</a></li>
+    <li><a href="#code-example">Code Example</a></li>
+    <li><a href="#alternative-approach-using-exceptions">Alternative Approach using Exceptions</a></li>
+    <li><a href="#recap">Recap</a></li>
+  </ul>
+</nav></aside>
           <div>
     <a href="https://amzn.to/3w8Xksu" title="Explore the Acer Aspire 5 laptop on Amazon" rel="noopener noreferrer" class="max-w-full mx-auto mb-4">
         <img src="/ads/amazon-banner-2.png" alt="Acer Aspire 5 Laptop Advertisement"  
@@ -316,37 +325,38 @@
 
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
        prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" >
-          <p>Check for Table Existence Before Creating in Oracle
-Introduction:
-In Oracle, it is possible to check if a table exists in the database before creating it. This can be useful, for example, when running a script that creates tables; if the same script is run more than once, an error will occur if the table already exists. In this Q&amp;A style blog post, we will explore how to check if a table exists before creating it in Oracle, while providing comprehensive explanations and examples.</p>
-<p>Syntax for checking if a table exists in Oracle:
-To check if a table exists in Oracle, you can use the following SQL query:</p>
-<pre><code>SELECT COUNT(*) FROM user_tables WHERE table_name='table_name';
-
-				  This query returns the number of tables in the current user's schema that match the specified table name. If the query returns a count of 1 or greater, the table exists. Otherwise, the table does not exist.  Code explanation: Let's say we want to create a table called &quot;EMPLOYEE&quot;. Before creating the table, we first want to check if it already exists. Here's how we can do this using PL/SQL:  
-				  
-
-DECLARE
-   table_count INTEGER;
-BEGIN
-   SELECT COUNT(*) INTO table_count FROM user_tables WHERE table_name='EMPLOYEE';
-   IF table_count = 0 THEN
-      EXECUTE IMMEDIATE 'CREATE TABLE EMPLOYEE (ID NUMBER(3), NAME VARCHAR2(30))';
-   END IF;
-END;
-</code></pre>
-<p>This code declares a variable called &ldquo;table_count&rdquo; of type INTEGER. It then performs a SELECT statement to count the number of tables in the current user&rsquo;s schema that match the table name &ldquo;EMPLOYEE&rdquo;. The result is assigned to the &ldquo;table_count&rdquo; variable.  The code then uses an IF statement to check if &ldquo;table_count&rdquo; is zero. If it is zero, it means the table does not exist, so the code uses the EXECUTE IMMEDIATE statement to create the &ldquo;EMPLOYEE&rdquo; table with two columns called &ldquo;ID&rdquo; and &ldquo;NAME&rdquo;.  If the table already exists, the code does nothing.  Alternative approach using Exceptions: Another approach to create a table if it doesn&rsquo;t exist while avoiding checking if the table exists beforehand is using Exception Handling.</p>
-<pre><code>DECLARE
-   table_missing EXCEPTION;
-   PRAGMA EXCEPTION_INIT(table_missing, -00955);
-BEGIN
-   EXECUTE IMMEDIATE 'CREATE TABLE EMPLOYEE (ID NUMBER(3), NAME VARCHAR2(30))';
-EXCEPTION
-   WHEN table_missing THEN
-      NULL;
-END;
-</code></pre>
-<p>This code declares a user-defined exception called &ldquo;table_missing&rdquo; and initializes it with the ORA-00955 error code, which is thrown when a table already exists. The code then attempts to execute the CREATE TABLE statement using the EXECUTE IMMEDIATE statement. If the table already exists and the ORA-00955 exception is thrown, the code ignores the exception and continues execution. If the table does not exist, the CREATE TABLE statement is executed without any exceptions being thrown.  Recap: Checking if a table exists before creating it in Oracle can be accomplished using the SELECT COUNT(*) FROM user_tables WHERE table_name=&lsquo;table_name&rsquo; query. It is recommended to use exception handling to create tables if the goal is to avoid checking if the table exists in order to avoid unnecessary code. Both approaches are effective and can be used in different scenarios.]]&gt;</p>
+          <h2 id="check-for-table-existence-before-creating-in-oracle">Check For Table Existence Before Creating in Oracle</h2>
+<h2 id="introduction">Introduction</h2>
+<p>In Oracle, it is crucial to check if a table exists in the database before attempting to create it. This becomes especially important when running scripts that involve table creation, as running the same script multiple times may lead to errors if the table already exists. This Q&amp;A-style blog post will guide you through the process of checking for table existence before creating it in Oracle, providing comprehensive explanations and examples.</p>
+<h2 id="syntax-for-checking-table-existence-in-oracle">Syntax for Checking Table Existence in Oracle</h2>
+<p>To verify if a table exists in Oracle, you can use the following SQL query:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#66d9ef">COUNT</span>(<span style="color:#f92672">*</span>) <span style="color:#66d9ef">FROM</span> user_tables <span style="color:#66d9ef">WHERE</span> <span style="color:#66d9ef">table_name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#39;table_name&#39;</span>;
+</span></span></code></pre></div><p>This query returns the count of tables in the current user&rsquo;s schema that match the specified table name. If the count is 1 or greater, the table exists; otherwise, it does not.</p>
+<h2 id="code-example">Code Example</h2>
+<p>Let&rsquo;s say we want to create a table named &ldquo;EMPLOYEE&rdquo; and need to check if it already exists before doing so. The following PL/SQL code accomplishes this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">DECLARE</span>
+</span></span><span style="display:flex;"><span>   table_count INTEGER;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">BEGIN</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">SELECT</span> <span style="color:#66d9ef">COUNT</span>(<span style="color:#f92672">*</span>) <span style="color:#66d9ef">INTO</span> table_count <span style="color:#66d9ef">FROM</span> user_tables <span style="color:#66d9ef">WHERE</span> <span style="color:#66d9ef">table_name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#39;EMPLOYEE&#39;</span>;
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">IF</span> table_count <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span> <span style="color:#66d9ef">THEN</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">EXECUTE</span> <span style="color:#66d9ef">IMMEDIATE</span> <span style="color:#e6db74">&#39;CREATE TABLE EMPLOYEE (ID NUMBER(3), NAME VARCHAR2(30))&#39;</span>;
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">END</span> <span style="color:#66d9ef">IF</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">END</span>;
+</span></span></code></pre></div><p>This code declares a variable, <code>table_count</code>, and checks if the &ldquo;EMPLOYEE&rdquo; table already exists. If not, it creates the table with columns &ldquo;ID&rdquo; and &ldquo;NAME.&rdquo;</p>
+<h2 id="alternative-approach-using-exceptions">Alternative Approach using Exceptions</h2>
+<p>An alternative approach to creating a table if it doesn&rsquo;t exist involves using exception handling:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">DECLARE</span>
+</span></span><span style="display:flex;"><span>   table_missing <span style="color:#66d9ef">EXCEPTION</span>;
+</span></span><span style="display:flex;"><span>   PRAGMA EXCEPTION_INIT(table_missing, <span style="color:#f92672">-</span><span style="color:#ae81ff">00955</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">BEGIN</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">EXECUTE</span> <span style="color:#66d9ef">IMMEDIATE</span> <span style="color:#e6db74">&#39;CREATE TABLE EMPLOYEE (ID NUMBER(3), NAME VARCHAR2(30))&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">EXCEPTION</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">WHEN</span> table_missing <span style="color:#66d9ef">THEN</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">NULL</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">END</span>;
+</span></span></code></pre></div><p>This code declares a user-defined exception, <code>table_missing</code>, and attempts to create the &ldquo;EMPLOYEE&rdquo; table. If the table already exists, it catches the ORA-00955 exception and continues execution without any disruption.</p>
+<h2 id="recap">Recap</h2>
+<p>Checking for table existence before creating it in Oracle can be achieved using the <code>SELECT COUNT(*) FROM user_tables WHERE table_name='table_name'</code> query. Exception handling is recommended to create tables without explicitly checking existence, reducing unnecessary code. Both approaches are effective and can be employed based on specific scenarios.</p>
 
         </article>
 

@@ -18,7 +18,7 @@
   name="keywords"
   content="
             
-              SQL, Databases, Big-Query, Oracle, MS SQL SErver, MySQL, PostgreSQL
+              SQL, Databases, Big-Query, Oracle, MS SQL SErver, MySQL, PostgreSQL, create, table, oracle, sql, select, top, drop, if, exists, justless, books, database, insert, into, cengage, download, sum, example, delete, taking, long, time, approx_quantiles, statement, update/merge, match, source, row, target, foreign, key, mongo, db, except, columns, epoch, date, split, str, dividon, error, bq, wildcard, get, column, names, operator, case, all, then/else, arguments, coercible, common, type, int64, string, actual, when, else, bool, ssis, acquire, connection, azure, query, update, merge, export, csv, file, developer, check, view, bonus, spend, money, stores, catalog, identify, preferred, customers, country, origin, timestamp, add, days, list, meets, certain, value, range, extract, data, fields, open, multiple, tables, appending, single, quote, save, result, work, clob, alter, default, schema, resolve, division, zero, eoor, db-shm, could, server, file, lock, another, seconds,  bigquery, hibernate, dialect, extract, age, birth, entire, comparing, pivot, varchar2, nvarchar2, primary, key, google, double, bad, bugquery, existence, creating, newline, characters, invalid, url, specified, oracledatasource.makeurl, connect, database, ssms, divide, statement, like, string, count, unique, converter, em, numbers, places, even, negative, big, query, quartiles, partition, round, convert,  text, exported,   exporting, files, locate, package, modulenotfounderror, module, named, db_dtypes, use, ssms, o, postgresql, sysdate, installing, dbd::oracle, ns, clob, how, split, comma-separated, currency, big, handle, show, headers, csv, shm, wal, convert, commaseparated, escape, character, search, pattern, float, username, password, fix, syntax, join, condition, map, cursor, dict, criteria, hourly, grouping  view, employees, timestamp, value, range
             
            "
 />
@@ -302,14 +302,23 @@
           <h2>Table of Contents</h2>
           <aside><nav id="TableOfContents">
   <ul>
-    <li>
+    <li><a href="#syntax-for-updating-columns-with-null-values">Syntax for Updating Columns with Null Values</a>
       <ul>
-        <li><a href="#syntax-for-updating-columns-with-null-values">Syntax for Updating Columns with Null Values</a></li>
-        <li><a href="#using-is-null-and-is-not-null-with-null-values">Using IS NULL and IS NOT NULL with Null Values</a></li>
-        <li><a href="#alternative-ways-to-update-null-values-in-sql">Alternative Ways to Update Null Values in SQL</a></li>
-        <li><a href="#recap">Recap</a></li>
+        <li><a href="#example">Example</a></li>
       </ul>
     </li>
+    <li><a href="#using-is-null-and-is-not-null-with-null-values">Using IS NULL and IS NOT NULL with Null Values</a>
+      <ul>
+        <li><a href="#example-1">Example</a></li>
+      </ul>
+    </li>
+    <li><a href="#alternative-ways-to-update-null-values-in-sql">Alternative Ways to Update Null Values in SQL</a>
+      <ul>
+        <li><a href="#example-using-coalesce">Example (Using COALESCE)</a></li>
+        <li><a href="#example-using-nvl">Example (Using NVL)</a></li>
+      </ul>
+    </li>
+    <li><a href="#recap">Recap</a></li>
   </ul>
 </nav></aside>
           <div>
@@ -327,45 +336,37 @@
 
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
        prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" >
-          <p>ORACLE: Updating Columns with Null Values
-How to Update Columns with Null Values in SQL<br>
-When working with databases, it is not uncommon to encounter columns or rows with null values. Null values represent missing or unknown data. Updating columns with null values may be necessary to maintain the integrity of your data. Although, compared to other values, null values require special handling in SQL. This post will explain how to update columns with null values in SQL.</p>
-<h3 id="syntax-for-updating-columns-with-null-values">Syntax for Updating Columns with Null Values</h3>
+          <p>Handling null values is a crucial aspect of maintaining data integrity in SQL databases. When you encounter columns with null values that need updating, special considerations are necessary. This post explains the syntax and best practices for updating columns with null values in Oracle SQL.</p>
+<h2 id="syntax-for-updating-columns-with-null-values">Syntax for Updating Columns with Null Values</h2>
 <p>The basic syntax for updating columns with null values in SQL is as follows:</p>
-<pre><code>UPDATE table_name SET column_name = new_value WHERE column_name IS NULL;
-</code></pre>
-<p>This SQL statement updates the &ldquo;column_name&rdquo; column in &ldquo;table_name&rdquo; with the &ldquo;new_value&rdquo; where the &ldquo;column_name&rdquo; is null.</p>
-<h4 id="example">Example:</h4>
-<p>Let&rsquo;s use a hypothetical example to illustrate the syntax for updating null values. Suppose you have a table called &ldquo;customer_info&rdquo; with columns such as &ldquo;customer_id&rdquo;, &ldquo;customer_name&rdquo;, and &ldquo;phone_number&rdquo;. The &ldquo;phone_number&rdquo; column has several rows with null values, and you want to update them. Here&rsquo;s the SQL statement to do so:</p>
-<pre><code>UPDATE customer_info SET phone_number='+12345678' WHERE phone_number IS NULL;
-</code></pre>
-<p>This SQL statement updates the &ldquo;phone_number&rdquo; column with the value &ldquo;+12345678&rdquo; where &ldquo;phone_number&rdquo; is null.</p>
-<h3 id="using-is-null-and-is-not-null-with-null-values">Using IS NULL and IS NOT NULL with Null Values</h3>
-<p>When comparing null values in SQL, you must use IS NULL or IS NOT NULL rather than the equal operator (=) or not equal operator (!=). This is because null values are not equal to any value, not even to other null values.</p>
-<h4 id="example-1">Example:</h4>
-<p>Let&rsquo;s say you have a table called &ldquo;login_info&rdquo; with columns such as &ldquo;user_id&rdquo;, &ldquo;login_time&rdquo;, and &ldquo;logout_time&rdquo;. Some rows in the &ldquo;logout_time&rdquo; column have null values, and you want to update them with the current date and time. Here&rsquo;s the SQL statement to do so:</p>
-<pre><code>UPDATE login_info SET logout_time = SYSDATE WHERE logout_time IS NULL;
-</code></pre>
-<p>This SQL statement updates the &ldquo;logout_time&rdquo; column with the current date and time where the &ldquo;logout_time&rdquo; is null.</p>
-<h3 id="alternative-ways-to-update-null-values-in-sql">Alternative Ways to Update Null Values in SQL</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> <span style="color:#66d9ef">table_name</span> <span style="color:#66d9ef">SET</span> <span style="color:#66d9ef">column_name</span> <span style="color:#f92672">=</span> new_value <span style="color:#66d9ef">WHERE</span> <span style="color:#66d9ef">column_name</span> <span style="color:#66d9ef">IS</span> <span style="color:#66d9ef">NULL</span>;
+</span></span></code></pre></div><p>This SQL statement updates the &ldquo;column_name&rdquo; column in &ldquo;table_name&rdquo; with the &ldquo;new_value&rdquo; where the &ldquo;column_name&rdquo; is null.</p>
+<h3 id="example">Example</h3>
+<p>Let&rsquo;s consider a hypothetical example where you have a table named &ldquo;customer_info&rdquo; with columns like &ldquo;customer_id,&rdquo; &ldquo;customer_name,&rdquo; and &ldquo;phone_number.&rdquo; The &ldquo;phone_number&rdquo; column has several rows with null values, and you want to update them. Here&rsquo;s the SQL statement:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> customer_info <span style="color:#66d9ef">SET</span> phone_number<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;+12345678&#39;</span> <span style="color:#66d9ef">WHERE</span> phone_number <span style="color:#66d9ef">IS</span> <span style="color:#66d9ef">NULL</span>;
+</span></span></code></pre></div><p>This statement updates the &ldquo;phone_number&rdquo; column with the value &ldquo;+12345678&rdquo; where &ldquo;phone_number&rdquo; is null.</p>
+<h2 id="using-is-null-and-is-not-null-with-null-values">Using IS NULL and IS NOT NULL with Null Values</h2>
+<p>When comparing null values in SQL, it&rsquo;s crucial to use <code>IS NULL</code> or <code>IS NOT NULL</code> instead of the equal operator (<code>=</code>) or not equal operator (<code>!=</code>). This is because null values are not equal to any value, not even to other null values.</p>
+<h3 id="example-1">Example</h3>
+<p>Suppose you have a table named &ldquo;login_info&rdquo; with columns like &ldquo;user_id,&rdquo; &ldquo;login_time,&rdquo; and &ldquo;logout_time.&rdquo; Some rows in the &ldquo;logout_time&rdquo; column have null values, and you want to update them with the current date and time. Here&rsquo;s the SQL statement:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> login_info <span style="color:#66d9ef">SET</span> logout_time <span style="color:#f92672">=</span> SYSDATE <span style="color:#66d9ef">WHERE</span> logout_time <span style="color:#66d9ef">IS</span> <span style="color:#66d9ef">NULL</span>;
+</span></span></code></pre></div><p>This statement updates the &ldquo;logout_time&rdquo; column with the current date and time where the &ldquo;logout_time&rdquo; is null.</p>
+<h2 id="alternative-ways-to-update-null-values-in-sql">Alternative Ways to Update Null Values in SQL</h2>
 <p>Some alternative approaches to updating null values in SQL include:</p>
 <ul>
 <li>Using the COALESCE function</li>
 <li>Using the NVL function (for Oracle databases)</li>
 </ul>
-<h4 id="example-2">Example:</h4>
-<p>The COALESCE function allows you to return the first non-null value in a list. Here&rsquo;s an example SQL statement that uses this function to update null values:</p>
-<pre><code>UPDATE employee_info SET salary = COALESCE(salary, 50000) WHERE department = 'Sales';
-</code></pre>
-<p>This SQL statement updates the &ldquo;salary&rdquo; column in &ldquo;employee_info&rdquo; with the value 50000 where the department is &ldquo;Sales&rdquo; and salary is null. If the salary value is not null, the COALESCE function will return the original value.</p>
-<p>The NVL function is similar to the COALESCE function, but it is used in Oracle databases. Here&rsquo;s an example SQL statement that uses this function to update null values:</p>
-<pre><code>UPDATE employee_info SET salary = NVL(salary, 50000) WHERE department = 'Sales';
-</code></pre>
-<p>This SQL statement updates the &ldquo;salary&rdquo; column in &ldquo;employee_info&rdquo; with the value 50000 where the department is &ldquo;Sales&rdquo; and salary is null. If the salary value is not null, the NVL function will return the original value.</p>
-<h3 id="recap">Recap</h3>
-<p>Updating columns with null values is a common task when working with SQL databases. Although, handling null values in SQL requires special attention. To update columns with null values, you must use IS NULL or IS NOT NULL rather than the equal operator (=) or not equal operator (!=). More, alternative functions such as COALESCE and NVL can be used to update null values in more complex scenarios.</p>
-<p>By knowing the syntax and best practices for updating columns with null values, you can maintain the integrity of your data and ensure accurate query results.
-]]&gt;</p>
+<h3 id="example-using-coalesce">Example (Using COALESCE)</h3>
+<p>The COALESCE function allows you to return the first non-null value in a list. Here&rsquo;s an example SQL statement:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> employee_info <span style="color:#66d9ef">SET</span> salary <span style="color:#f92672">=</span> COALESCE(salary, <span style="color:#ae81ff">50000</span>) <span style="color:#66d9ef">WHERE</span> department <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Sales&#39;</span>;
+</span></span></code></pre></div><p>This statement updates the &ldquo;salary&rdquo; column in &ldquo;employee_info&rdquo; with the value 50000 where the department is &ldquo;Sales&rdquo; and salary is null. If the salary value is not null, the COALESCE function will return the original value.</p>
+<h3 id="example-using-nvl">Example (Using NVL)</h3>
+<p>The NVL function, specific to Oracle databases, serves a similar purpose. Here&rsquo;s an example SQL statement:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> employee_info <span style="color:#66d9ef">SET</span> salary <span style="color:#f92672">=</span> NVL(salary, <span style="color:#ae81ff">50000</span>) <span style="color:#66d9ef">WHERE</span> department <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Sales&#39;</span>;
+</span></span></code></pre></div><p>This statement updates the &ldquo;salary&rdquo; column in &ldquo;employee_info&rdquo; with the value 50000 where the department is &ldquo;Sales&rdquo; and salary is null. If the salary value is not null, the NVL function will return the original value.</p>
+<h2 id="recap">Recap</h2>
+<p>Updating columns with null values is a common task when working with SQL databases. However, handling null values requires special attention. To update columns with null values, use <code>IS NULL</code> or <code>IS NOT NULL</code> instead of the equal operator. Additionally, alternative functions such as COALESCE and NVL can be used for more complex scenarios. By following these best practices, you can maintain data integrity and ensure accurate query results.</p>
 
         </article>
 

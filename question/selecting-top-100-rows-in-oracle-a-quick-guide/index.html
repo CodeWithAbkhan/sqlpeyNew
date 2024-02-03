@@ -279,7 +279,7 @@
 
     </i>
     <span>
-      4 minutes to read
+      3 minutes to read
     </span>
   </div>
 </div>
@@ -300,7 +300,14 @@
           <h2>Table of Contents</h2>
           <aside><nav id="TableOfContents">
   <ul>
-    <li><a href="#select-top-100--n-rows-in-oracle">SELECT Top 100 / n rows in Oracle</a></li>
+    <li><a href="#select-top-100--n-rows-in-oracle">Select Top 100 / n rows in Oracle</a>
+      <ul>
+        <li><a href="#using-rownum">Using ROWNUM:</a></li>
+        <li><a href="#using-fetch-first">Using FETCH FIRST:</a></li>
+      </ul>
+    </li>
+    <li><a href="#faqs-on--select-top-100--n-rows-in-oracle">FAQs on  Select Top 100 / n rows in Oracle</a></li>
+    <li><a href="#recap">Recap:</a></li>
   </ul>
 </nav></aside>
           <div>
@@ -318,11 +325,10 @@
 
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
        prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" >
-          <h2 id="select-top-100--n-rows-in-oracle">SELECT Top 100 / n rows in Oracle</h2>
-<p>Learn how to efficiently select the top 100 rows in Oracle using either the ROWNUM pseudo-column or the FETCH FIRST syntax. This quick guide explores the use of ROW_NUMBER() function with PARTITION BY clause in a subquery to filter the latest orders for each client. Additionally, it covers the alternative approach with FETCH FIRST 100 ROWS ONLY clause in Oracle 12c or higher.</p>
-<p>Selecting the top N rows in Oracle is a common requirement, and this quick guide provides insights into two methods: using the ROWNUM pseudo-column and the FETCH FIRST syntax.</p>
-<p><strong>Using ROWNUM:</strong></p>
-<p>In Oracle, the ROWNUM pseudo-column allows us to limit the rows in the result set. For example, to select the top 100 rows based on a specific condition, you can employ the following query:</p>
+          <h2 id="select-top-100--n-rows-in-oracle">Select Top 100 / n rows in Oracle</h2>
+<p>Efficiently selecting the top rows in Oracle is a common requirement, and this guide explores two methods: using the ROWNUM pseudo-column and the FETCH FIRST syntax.</p>
+<h3 id="using-rownum">Using ROWNUM:</h3>
+<p>In Oracle, the ROWNUM pseudo-column allows limiting the result set. To select the top 100 rows based on a specific condition, use the following query:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> (
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span> id, client_id, create_time, 
@@ -330,9 +336,9 @@
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">FROM</span> orders
 </span></span><span style="display:flex;"><span>) 
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> rn <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">AND</span> ROWNUM <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">100</span>;
-</span></span></code></pre></div><p>This query utilizes a subquery to filter the latest orders for each client using ROW_NUMBER() and PARTITION BY to group by client_id. The condition <code>rn = 1</code> ensures that only the latest order per client is selected, and <code>ROWNUM &lt;= 100</code> limits the result to the top 100 rows.</p>
-<p><strong>Using FETCH FIRST:</strong></p>
-<p>With Oracle 12c or higher, you can leverage the FETCH FIRST syntax to achieve the same result with a slightly different approach:</p>
+</span></span></code></pre></div><p>This query employs a subquery to filter the latest orders for each client using ROW_NUMBER() and PARTITION BY to group by client_id. The condition <code>rn = 1</code> ensures selecting the latest order per client, and <code>ROWNUM &lt;= 100</code> limits the result to the top 100 rows.</p>
+<h3 id="using-fetch-first">Using FETCH FIRST:</h3>
+<p>With Oracle 12c or higher, leverage the FETCH FIRST syntax:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> id, client_id, create_time 
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> (
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span> id, client_id, create_time, 
@@ -342,18 +348,8 @@
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> rn <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> create_time <span style="color:#66d9ef">DESC</span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">FETCH</span> <span style="color:#66d9ef">FIRST</span> <span style="color:#ae81ff">100</span> <span style="color:#66d9ef">ROWS</span> <span style="color:#66d9ef">ONLY</span>;
-</span></span></code></pre></div><p>In this version, the ORDER BY clause is used to sort the result by create_time in descending order. The FETCH FIRST 100 ROWS ONLY clause then limits the selection to the top 100 rows from the ordered result.</p>
-<p><strong>Recap:</strong></p>
-<p>Selecting the top N rows in Oracle involves thoughtful consideration of the available methods. Whether using ROWNUM or FETCH FIRST, the choice depends on the Oracle version and personal preference. Understanding the nuances and syntax variations is crucial for optimizing queries based on specific requirements.</p>
-<p><strong>FAQs:</strong></p>
-<p><strong>Q: Can I use ROWNUM and FETCH FIRST together in Oracle queries?</strong>
-A: No, ROWNUM and FETCH FIRST are distinct methods, and attempting to combine them in a single query may lead to unexpected results. It&rsquo;s recommended to choose one method based on your specific needs.</p>
-<p><strong>Q: Are there any limitations to using ROWNUM or FETCH FIRST in Oracle?</strong>
-A: ROWNUM is applied before sorting, which may impact results. FETCH FIRST is more flexible but requires Oracle 12c or higher. Consider version compatibility and query optimization based on your database environment.</p>
-<p><strong>Q: Which method is more efficient for selecting top rows in Oracle?</strong>
-A: The efficiency depends on the Oracle version and the specific query. Both methods are valid, but testing and analyzing performance in your context are essential for optimal results.</p>
-<p>Explore more SQL query techniques, optimize data retrieval, and enhance your understanding of selecting top rows in Oracle for efficient data analysis.</p>
-<p>FAQs:</p>
+</span></span></code></pre></div><p>This version uses the ORDER BY clause to sort the result by create_time in descending order. The FETCH FIRST 100 ROWS ONLY clause limits the selection to the top 100 rows from the ordered result.</p>
+<h2 id="faqs-on--select-top-100--n-rows-in-oracle">FAQs on  Select Top 100 / n rows in Oracle</h2>
 <div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
     <h2 itemprop="name">Q: Can I use ROWNUM and FETCH FIRST together in Oracle queries?</h2>
     <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
@@ -374,6 +370,14 @@ A: The efficiency depends on the Oracle version and the specific query. Both met
 </div>
     </div>
 </div>
+<p><strong>Q: Can I use ROWNUM and FETCH FIRST together in Oracle queries?</strong>
+A: No, ROWNUM and FETCH FIRST are distinct methods, and attempting to combine them in a single query may lead to unexpected results. It&rsquo;s recommended to choose one method based on your specific needs.</p>
+<p><strong>Q: Are there any limitations to using ROWNUM or FETCH FIRST in Oracle?</strong>
+A: ROWNUM is applied before sorting, which may impact results. FETCH FIRST is more flexible but requires Oracle 12c or higher. Consider version compatibility and query optimization based on your database environment.</p>
+<p><strong>Q: Which method is more efficient for selecting top rows in Oracle?</strong>
+A: The efficiency depends on the Oracle version and the specific query. Both methods are valid, but testing and analyzing performance in your context are essential for optimal results.</p>
+<h2 id="recap">Recap:</h2>
+<p>Selecting the top N rows in Oracle involves choosing between ROWNUM and FETCH FIRST based on the Oracle version and personal preference. Understanding the nuances and syntax variations is crucial for optimizing queries based on specific requirements.</p>
 
         </article>
 
