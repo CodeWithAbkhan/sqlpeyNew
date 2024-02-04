@@ -17,9 +17,7 @@
 <meta
   name="keywords"
   content="
-            
-              SQL, Databases, Big-Query, Oracle, MS SQL SErver, MySQL, PostgreSQL, create, table, oracle, sql, select, top, drop, if, exists, justless, books, database, insert, into, cengage, download, sum, example, delete, taking, long, time, approx_quantiles, statement, update/merge, match, source, row, target, foreign, key, mongo, db, except, columns, epoch, date, split, str, dividon, error, bq, wildcard, get, column, names, operator, case, all, then/else, arguments, coercible, common, type, int64, string, actual, when, else, bool, ssis, acquire, connection, azure, query, update, merge, export, csv, file, developer, check, view, bonus, spend, money, stores, catalog, identify, preferred, customers, country, origin, timestamp, add, days, list, meets, certain, value, range, extract, data, fields, open, multiple, tables, appending, single, quote, save, result, work, clob, alter, default, schema, resolve, division, zero, eoor, db-shm, could, server, file, lock, another, seconds,  bigquery, hibernate, dialect, extract, age, birth, entire, comparing, pivot, varchar2, nvarchar2, primary, key, google, double, bad, bugquery, existence, creating, newline, characters, invalid, url, specified, oracledatasource.makeurl, connect, database, ssms, divide, statement, like, string, count, unique, converter, em, numbers, places, even, negative, big, query, quartiles, partition, round, convert,  text, exported,   exporting, files, locate, package, modulenotfounderror, module, named, db_dtypes, use, ssms, o, postgresql, sysdate, installing, dbd::oracle, ns, clob, how, split, comma-separated, currency, big, handle, show, headers, csv, shm, wal, convert, commaseparated, escape, character, search, pattern, float, username, password, fix, syntax, join, condition, map, cursor, dict, criteria, hourly, grouping  view, employees, timestamp, value, range
-            
+            Oracle for update nowait in Cursors, Use for update nowait in Oracle Cursors, Oracle cursor lock rows, ORA-00054 error in Oracle, Practical example Oracle for update nowait, Alternative ways to lock records in Oracle, Optimistic locking Oracle
            "
 />
 <meta name="robots" content="noodp" />
@@ -302,13 +300,18 @@
           <h2>Table of Contents</h2>
           <aside><nav id="TableOfContents">
   <ul>
-    <li><a href="#when-to-use-for-update-nowait-in-cursors">When to Use &ldquo;for update nowait&rdquo; in Cursors?</a>
+    <li><a href="#exploring-for-update-nowait-in-oracle-cursors-best-practices">Exploring &lsquo;For Update Nowait&rsquo; in Oracle Cursors: Best Practices</a></li>
+    <li><a href="#when-to-employ-for-update-nowait-in-cursors">When to Employ &ldquo;for update nowait&rdquo; in Cursors?</a>
       <ul>
-        <li><a href="#what-happens-when-you-use-for-update-nowait-in-cursors">What Happens When You Use &ldquo;for update nowait&rdquo; in Cursors?</a></li>
-        <li><a href="#practical-example">Practical Example:</a></li>
-        <li><a href="#using-for-update-instead-of-for-update-nowait">Using &ldquo;for update&rdquo; Instead of &ldquo;for update nowait&rdquo;:</a></li>
-        <li><a href="#alternative-ways">Alternative Ways:</a></li>
-        <li><a href="#summary">Summary:</a></li>
+        <li><a href="#effects-of-using-for-update-nowait-in-cursors">Effects of Using &ldquo;for update nowait&rdquo; in Cursors</a></li>
+        <li><a href="#practical-example">Practical Example</a></li>
+      </ul>
+    </li>
+    <li><a href="#using-for-update-instead-of-for-update-nowait">Using &ldquo;for update&rdquo; Instead of &ldquo;for update nowait&rdquo;</a></li>
+    <li><a href="#alternative-locking-methods">Alternative Locking Methods</a></li>
+    <li><a href="#summary">Summary</a>
+      <ul>
+        <li><a href="#faqs-on-exploring-for-update-nowait-in-oracle-cursors">FAQs on Exploring &lsquo;For Update Nowait&rsquo; in Oracle Cursors</a></li>
       </ul>
     </li>
   </ul>
@@ -327,48 +330,73 @@
 
 
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
-       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" >
-          <p>ORACLE: Using &lsquo;For Update Nowait&rsquo; in Cursors: When is it Appropriate?</p>
-<h2 id="when-to-use-for-update-nowait-in-cursors">When to Use &ldquo;for update nowait&rdquo; in Cursors?</h2>
-<p>If you want to lock a specific set of rows in a table and perform some manipulation on them without the risk of another session overwriting or modifying your data, you can use the <code>for update nowait</code> clause in a cursor. This will cause the rows to be locked until you either close the cursor or perform a commit or rollback.</p>
-<h3 id="what-happens-when-you-use-for-update-nowait-in-cursors">What Happens When You Use &ldquo;for update nowait&rdquo; in Cursors?</h3>
-<p>When you use <code>for update nowait</code> in a cursor, the rows that the cursor selects become locked, and any other session that tries to acquire a lock on these rows will receive the &ldquo;ORA-00054: resource busy and acquire with NOWAIT specified or timeout expired.&rdquo; error message instead of waiting for the lock to release.</p>
-<p>For instance, let&rsquo;s consider two sessions. In session 1, we create a cursor that selects all the rows from the <code>dept</code> table where the <code>deptno</code> column value equals 10 and adds the <code>for update nowait</code> clause:</p>
-<pre><code>CURSOR abc_cur 
-IS 
-select * from dept where deptno =10 for update nowait;
-</code></pre>
-<p>The rows selected by this cursor will remain locked until session 1 closes the cursor or performs a commit or rollback. Now, if another user from session 2 tries to access the same records, he or she will get the aforementioned error message.</p>
-<pre><code>select * from dept where deptno =10 for update nowait;
-ORA-00054: resource busy and acquire with NOWAIT specified or timeout expired
-</code></pre>
-<p>Moreover, session 2 cannot even update or delete the same records that have been locked by session 1.</p>
-<p>Using <code>for update nowait</code> in a cursor is generally helpful when you want to prevent multiple users from modifying or manipulating the same set of records simultaneously.</p>
-<h3 id="practical-example">Practical Example:</h3>
-<p>To illustrate the usage of <code>for update nowait</code>, let&rsquo;s consider the following script:</p>
-<pre><code>declare
-  cursor abc is select * from temp for update nowait;
-  temp abc%rowtype;
-begin
-  open abc;
-  -- do slow stuff here
-  close abc;
-  commit; 
-end;
-</code></pre>
-<p>This script creates a cursor <code>abc</code> that selects all the rows from the <code>temp</code> table and adds the <code>for update nowait</code> clause. Once the cursor is open, it performs some slow manipulation on the selected rows, and when the task is completed, it closes the cursor and performs a commit.  If another user from session 2 executes the following query while the script in session 1 is still running:</p>
-<pre><code>select * from temp;
-</code></pre>
-<p>They will see the rows selected by the cursor, albeit not the updated versions if any.  Although, if the user from session 2 tries to execute the same script that creates a cursor with the <code>for update nowait</code> clause, they will receive the &ldquo;ORA-00054: resource busy and acquire with NOWAIT specified or timeout expired.&rdquo; error message, indicating that the rows are locked by session 1 in their current state.</p>
-<h3 id="using-for-update-instead-of-for-update-nowait">Using &ldquo;for update&rdquo; Instead of &ldquo;for update nowait&rdquo;:</h3>
-<p>If you omit the <code>nowait</code> clause from the <code>for update</code> statement in your cursor, your cursor will acquire a lock on the rows, but other sessions will wait until your session releases the lock rather than throwing an error.  Therefore, if you want to perform some manipulation on a set of records that other users may want to modify simultaneously, using <code>for update nowait</code> is a better approach than <code>for update</code>.</p>
-<h3 id="alternative-ways">Alternative Ways:</h3>
-<p>Using <code>for update nowait</code> is just one of many ways to lock records and prevent other users from modifying or manipulating them simultaneously.  One alternative way to achieve a similar result is to use the <code>SELECT ... FOR UPDATE</code> statement instead of the cursor. This statement locks the specified rows until your session releases the lock. For example:</p>
-<pre><code>SELECT * FROM dept WHERE deptno =10 FOR UPDATE NOWAIT;
-</code></pre>
-<p>Another way is to use optimistic locking by adding a version number column to your table, and when a user tries to modify a row, you compare the version number of the row to the value the user read before updating. If the value is still the same, the user can update the row; if not, the user receives an error message.</p>
-<h3 id="summary">Summary:</h3>
-<p>Using <code>for update nowait</code> in cursors allows you to lock a specific set of records in a table, preventing other users from modifying or manipulating them simultaneously. The records remain locked until you either close the cursor or perform a commit or rollback. You can use alternative ways such as the <code>SELECT ... FOR UPDATE</code> statement or optimistic locking to achieve a similar result.]]&gt;</p>
+       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" 
+          itemscope itemtype="https://schema.org/FAQPage" >
+          <h2 id="exploring-for-update-nowait-in-oracle-cursors-best-practices">Exploring &lsquo;For Update Nowait&rsquo; in Oracle Cursors: Best Practices</h2>
+<p>Understanding when and how to utilize the &ldquo;for update nowait&rdquo; clause in Oracle Cursors is crucial for efficient data manipulation. Learn the appropriate scenarios, practical examples, and alternative locking methods to enhance your Oracle database interactions.</p>
+<h2 id="when-to-employ-for-update-nowait-in-cursors">When to Employ &ldquo;for update nowait&rdquo; in Cursors?</h2>
+<p>To secure a specific set of rows in an Oracle table for exclusive manipulation, consider using the <code>for update nowait</code> clause in a cursor. This ensures that the selected rows remain locked until the cursor is closed, or a commit or rollback is executed.</p>
+<h3 id="effects-of-using-for-update-nowait-in-cursors">Effects of Using &ldquo;for update nowait&rdquo; in Cursors</h3>
+<p>When incorporating <code>for update nowait</code> in a cursor, the selected rows are locked. Any other session attempting to acquire a lock on these rows will receive the &ldquo;ORA-00054: resource busy and acquire with NOWAIT specified or timeout expired&rdquo; error instead of waiting for the lock release.</p>
+<p>Illustrating this, consider two sessions. In session 1, a cursor is created to select rows from the <code>dept</code> table with a <code>deptno</code> value of 10, adding the <code>for update nowait</code> clause:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">CURSOR</span> abc_cur <span style="color:#66d9ef">IS</span> <span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> dept <span style="color:#66d9ef">WHERE</span> deptno <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span> <span style="color:#66d9ef">FOR</span> <span style="color:#66d9ef">UPDATE</span> NOWAIT;
+</span></span></code></pre></div><p>If session 2 attempts to access the same records, it will encounter the mentioned error:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> dept <span style="color:#66d9ef">WHERE</span> deptno <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span> <span style="color:#66d9ef">FOR</span> <span style="color:#66d9ef">UPDATE</span> NOWAIT;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- ORA-00054: resource busy and acquire with NOWAIT specified or timeout expired
+</span></span></span></code></pre></div><p>Moreover, session 2 cannot update or delete the locked records from session 1.</p>
+<p>Using <code>for update nowait</code> is beneficial to prevent concurrent modifications by multiple users.</p>
+<h3 id="practical-example">Practical Example</h3>
+<p>To demonstrate the usage of <code>for update nowait</code>, consider the following script:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">DECLARE</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">CURSOR</span> abc <span style="color:#66d9ef">IS</span> <span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> temp <span style="color:#66d9ef">FOR</span> <span style="color:#66d9ef">UPDATE</span> NOWAIT;
+</span></span><span style="display:flex;"><span>  temp abc<span style="color:#f92672">%</span>ROWTYPE;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">BEGIN</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">OPEN</span> abc;
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">-- Perform slow manipulations
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">CLOSE</span> abc;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">COMMIT</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">END</span>;
+</span></span></code></pre></div><p>This script creates a cursor that selects rows from the <code>temp</code> table with the <code>for update nowait</code> clause. It performs slow manipulations and commits after completion.</p>
+<p>If another user from session 2 queries the <code>temp</code> table during the script execution, they will see the selected rows but not any updates. If they attempt the same script, they will receive the &ldquo;ORA-00054&rdquo; error, indicating locked rows by session 1.</p>
+<h2 id="using-for-update-instead-of-for-update-nowait">Using &ldquo;for update&rdquo; Instead of &ldquo;for update nowait&rdquo;</h2>
+<p>Excluding the <code>nowait</code> clause from the <code>for update</code> statement in your cursor causes it to acquire a lock on the rows. Other sessions will wait until your session releases the lock without throwing an error. Therefore, if simultaneous modifications are acceptable, using <code>for update nowait</code> is preferable over <code>for update</code>.</p>
+<h2 id="alternative-locking-methods">Alternative Locking Methods</h2>
+<p>Employing <code>for update nowait</code> is one approach to lock records and prevent concurrent modifications. An alternative is to use the <code>SELECT ... FOR UPDATE</code> statement:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> dept <span style="color:#66d9ef">WHERE</span> deptno <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span> <span style="color:#66d9ef">FOR</span> <span style="color:#66d9ef">UPDATE</span> NOWAIT;
+</span></span></code></pre></div><p>Another method involves optimistic locking, adding a version number column to your table. When a user attempts to modify a row, the version number is compared to the value read before updating, allowing updates only if the values match.</p>
+<h2 id="summary">Summary</h2>
+<p>Utilizing <code>for update nowait</code> in Oracle Cursors enables the locking of specific records, preventing concurrent modifications by other users. The records stay locked until the cursor is closed, or a commit or rollback occurs. Explore alternative methods like the <code>SELECT ... FOR UPDATE</code> statement or optimistic locking for similar results.</p>
+<h3 id="faqs-on-exploring-for-update-nowait-in-oracle-cursors">FAQs on Exploring &lsquo;For Update Nowait&rsquo; in Oracle Cursors</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: When should I use the &#39;for update nowait&#39; clause in Oracle Cursors?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">The &lsquo;for update nowait&rsquo; clause in Oracle Cursors is useful when you want to lock specific rows for exclusive manipulation, preventing other sessions from modifying them simultaneously.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What happens when &#39;for update nowait&#39; is used in Oracle Cursors?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">When &lsquo;for update nowait&rsquo; is used in Oracle Cursors, the selected rows are locked, and any other session attempting to acquire a lock on these rows will receive the &ldquo;ORA-00054&rdquo; error instead of waiting for the lock release.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can you provide a practical example of using &#39;for update nowait&#39; in Oracle Cursors?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">Certainly! In the provided script example, a cursor is created with &lsquo;for update nowait,&rsquo; selecting rows from the &rsquo;temp&rsquo; table for exclusive manipulation. The script performs slow manipulations and commits after completion.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why would I use &#39;for update&#39; instead of &#39;for update nowait&#39; in Oracle Cursors?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">If you want other sessions to wait until your session releases the lock, use &lsquo;for update&rsquo; without &rsquo;nowait&rsquo; in your cursor statement. This is suitable when simultaneous modifications are acceptable.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Are there alternative methods to &#39;for update nowait&#39; for locking records in Oracle?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">Yes, alternatives include using the &lsquo;SELECT &hellip; FOR UPDATE&rsquo; statement and employing optimistic locking by adding a version number column to your table.</div>
+    </div>
+</div>
 
         </article>
 

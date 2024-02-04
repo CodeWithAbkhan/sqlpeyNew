@@ -17,9 +17,7 @@
 <meta
   name="keywords"
   content="
-            
-              SQL, Databases, Big-Query, Oracle, MS SQL SErver, MySQL, PostgreSQL, create, table, oracle, sql, select, top, drop, if, exists, justless, books, database, insert, into, cengage, download, sum, example, delete, taking, long, time, approx_quantiles, statement, update/merge, match, source, row, target, foreign, key, mongo, db, except, columns, epoch, date, split, str, dividon, error, bq, wildcard, get, column, names, operator, case, all, then/else, arguments, coercible, common, type, int64, string, actual, when, else, bool, ssis, acquire, connection, azure, query, update, merge, export, csv, file, developer, check, view, bonus, spend, money, stores, catalog, identify, preferred, customers, country, origin, timestamp, add, days, list, meets, certain, value, range, extract, data, fields, open, multiple, tables, appending, single, quote, save, result, work, clob, alter, default, schema, resolve, division, zero, eoor, db-shm, could, server, file, lock, another, seconds,  bigquery, hibernate, dialect, extract, age, birth, entire, comparing, pivot, varchar2, nvarchar2, primary, key, google, double, bad, bugquery, existence, creating, newline, characters, invalid, url, specified, oracledatasource.makeurl, connect, database, ssms, divide, statement, like, string, count, unique, converter, em, numbers, places, even, negative, big, query, quartiles, partition, round, convert,  text, exported,   exporting, files, locate, package, modulenotfounderror, module, named, db_dtypes, use, ssms, o, postgresql, sysdate, installing, dbd::oracle, ns, clob, how, split, comma-separated, currency, big, handle, show, headers, csv, shm, wal, convert, commaseparated, escape, character, search, pattern, float, username, password, fix, syntax, join, condition, map, cursor, dict, criteria, hourly, grouping  view, employees, timestamp, value, range
-            
+            WITH (NOLOCK) in SQL Server, SQL Server transaction isolation level, Implications of NOLOCK in SQL Server, Using NOLOCK in high transaction applications, Risk of using NOLOCK, Avoiding deadlocks in SQL Server, Alternative methods to NOLOCK
            "
 />
 <meta name="robots" content="noodp" />
@@ -27,8 +25,8 @@
 <meta property="og:description" content="What is quot with (nolock) quot in SQL Server? What is with (nolock) in SQL Server? Can someone explain the implications of using `with (nol..." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://sqlpey.com/question/understanding-with-nolock-in-sql-server/" /><meta property="article:section" content="question" />
-<meta property="article:published_time" content="2024-01-22T00:00:00+00:00" />
-<meta property="article:modified_time" content="2024-01-22T00:00:00+00:00" />
+<meta property="article:published_time" content="2024-02-04T00:00:00+00:00" />
+<meta property="article:modified_time" content="2024-02-04T00:00:00+00:00" />
 
 
 <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Understanding With Nolock In Sql Server"/>
@@ -265,8 +263,8 @@
 </svg>
 
     </i>
-    <time datetime="2024-01-22T00:00:00&#43;00:00">
-      2024-01-22
+    <time datetime="2024-02-04T00:00:00&#43;00:00">
+      2024-02-04
     </time>
   </div>
 
@@ -281,7 +279,7 @@
 
     </i>
     <span>
-      4 minutes to read
+      3 minutes to read
     </span>
   </div>
 </div>
@@ -302,12 +300,16 @@
           <h2>Table of Contents</h2>
           <aside><nav id="TableOfContents">
   <ul>
-    <li>
+    <li><a href="#introduction-understanding-with-nolock-in-sql-server">Introduction Understanding &ldquo;WITH (NOLOCK)&rdquo; in SQL Server</a></li>
+    <li><a href="#exploring-with-nolock">Exploring WITH (NOLOCK)</a></li>
+    <li><a href="#risk-assessment-in-financial-databases">Risk Assessment in Financial Databases</a></li>
+    <li><a href="#further-reading">Further Reading</a></li>
+    <li><a href="#limitations-and-considerations">Limitations and Considerations</a></li>
+    <li><a href="#when-to-use-with-nolock">When to Use WITH (NOLOCK)</a></li>
+    <li><a href="#alternative-methods-to-reduce-deadlocks">Alternative Methods to Reduce Deadlocks</a></li>
+    <li><a href="#in-conclusion">In Conclusion</a>
       <ul>
-        <li><a href="#further-reading">Further Reading</a></li>
-        <li><a href="#when-to-use-with-nolock">When to Use With (Nolock)</a></li>
-        <li><a href="#alternative-methods">Alternative Methods</a></li>
-        <li><a href="#to-summarize">To Summarize</a></li>
+        <li><a href="#faqs-on-with-nolock-in-sql-server">FAQs on &ldquo;WITH (NOLOCK)&rdquo; in SQL Server</a></li>
       </ul>
     </li>
   </ul>
@@ -326,44 +328,64 @@
 
 
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
-       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" >
-          <p>What is &quot;with (nolock)&quot; in SQL Server?
-What is &ldquo;with (nolock)&rdquo; in SQL Server?<br>
-Can someone explain the implications of using <code>with (nolock)</code> on queries, when you should/shouldn&rsquo;t use it? For example, if you have a banking application with high transaction rates and a lot of data in certain tables, in what types of queries would nolock be okay? Are there cases when you should always use it/never use it?</p>
-<p>WITH (NOLOCK) is the equivalent of using READ UNCOMMITED as a transaction isolation level. So, you stand the risk of reading an uncommitted row that is subsequently rolled back, i.e. data that never made it into the database. So, while it can prevent reads being deadlocked by other operations, it comes with a risk.</p>
-<p>The question is what is worse:</p>
+       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" 
+          itemscope itemtype="https://schema.org/FAQPage" >
+          <h2 id="introduction-understanding-with-nolock-in-sql-server">Introduction Understanding &ldquo;WITH (NOLOCK)&rdquo; in SQL Server</h2>
+<p>The use of <code>WITH (NOLOCK)</code> in SQL Server is a commonly debated topic, prompting questions about its implications on queries, scenarios where it&rsquo;s suitable, and potential risks. This guide aims to provide insights into the considerations surrounding the use of <code>WITH (NOLOCK)</code>.</p>
+<h2 id="exploring-with-nolock">Exploring WITH (NOLOCK)</h2>
+<p><code>WITH (NOLOCK)</code> is akin to employing READ UNCOMMITTED as a transaction isolation level. While it prevents reads from being deadlocked by other operations, it introduces a risk of reading uncommitted data, leading to potential inconsistencies. The crucial question arises: Is the risk of a deadlock more tolerable than the possibility of incorrect values?</p>
+<h2 id="risk-assessment-in-financial-databases">Risk Assessment in Financial Databases</h2>
+<p>In financial databases, where data accuracy is paramount, the preference often leans toward avoiding deadlocks at the expense of temporarily inaccurate values. Using business transactions and the end-of-day reconciliation process helps mitigate the impact of temporary inaccuracies. SQL Server 2005 addressed many issues, making <code>NOLOCK</code> less necessary in modern contexts.</p>
+<h2 id="further-reading">Further Reading</h2>
+<p>For a deeper understanding, you can explore <a href="http://www.sqlservercentral.com/articles/SQL&#43;Server&#43;2005/62464/" target="_blank" rel="noopener">Row-Level Versioning</a>
+ to grasp the nuances of dealing with uncommitted data.</p>
+<h2 id="limitations-and-considerations">Limitations and Considerations</h2>
+<p>Beyond reading uncommitted data, using <code>NOLOCK</code> may result in reading pages multiple times or missing pages due to background processes like page splits. This can significantly skew results, making it essential to evaluate the trade-offs.</p>
+<h2 id="when-to-use-with-nolock">When to Use WITH (NOLOCK)</h2>
+<p>In practice, <code>WITH (NOLOCK)</code> is advisable when there&rsquo;s an acceptable risk of reading uncommitted data. This scenario typically arises when no other method can retrieve data without risking deadlocks or performance degradation.</p>
+<p>For instance, a high-contention table accessed by a frequently run report might necessitate <code>WITH (NOLOCK)</code> to prevent deadlocks. The temporary risk of inaccurate data is acceptable as subsequent report runs will correct any discrepancies.</p>
+<p>Conversely, in applications relying on a highly contested table, using <code>WITH (NOLOCK)</code> is ill-advised. The prolonged use of incorrect values until the application restarts poses an unacceptable risk. In such cases, consider employing alternative techniques to reduce contention.</p>
+<h2 id="alternative-methods-to-reduce-deadlocks">Alternative Methods to Reduce Deadlocks</h2>
+<p>When <code>WITH (NOLOCK)</code> is unsuitable, alternative methods can help mitigate the risk of deadlocks:</p>
 <ul>
-<li>a deadlock, or</li>
-<li>a wrong value?</li>
+<li><strong>Separate databases for read-only and write operations</strong></li>
+<li><strong>Adding indexes to frequently queried tables</strong></li>
+<li><strong>Using query hints for specific transaction isolation levels</strong></li>
+<li><strong>Performing operations in batches instead of individually</strong></li>
 </ul>
-<p>For financial databases, deadlocks are far worse than wrong values. I know that sounds backwards, but hear me out. The traditional example of DB transactions is you update two rows, subtracting from one and adding to another. That is wrong.</p>
-<p>In a financial database you use business transactions. That means adding one row to each account. It is of utmost importance that these transactions complete and the rows are successfully written.</p>
-<p>Getting the account balance temporarily wrong isn&rsquo;t a big deal, that is what the end of day reconciliation is for. And an overdraft from an account is far more likely to occur because two ATMs are being used at once than because of a uncommitted read from a database.</p>
-<p>That said, SQL Server 2005 fixed most of the bugs that made <code>NOLOCK</code> necessary. So unless you are using SQL Server 2000 or earlier, you shouldn&rsquo;t need it.</p>
-<h3 id="further-reading">Further Reading</h3>
-<p><a href="http://www.sqlservercentral.com/articles/SQL&#43;Server&#43;2005/62464/" target="_blank" rel="noopener">Row-Level Versioning</a>
-</p>
-<p>Unfortunately it&rsquo;s not just about reading uncommitted data. In the background you may end up reading pages twice (in the case of a page split), or you may miss the pages altogether. So your results may be grossly skewed.</p>
-<p>Check out <a href="http://www.itprotoday.com/software-development/quaere-verum-clustered-index-scans-part-iii" target="_blank" rel="noopener">Itzik Ben-Gan&rsquo;s article</a>
-. Here&rsquo;s an excerpt:</p>
-<blockquote>
-<p>&quot; With the NOLOCK hint (or setting the isolation level of the session to READ UNCOMMITTED) you tell SQL Server that you don&rsquo;t expect consistency, so there are no guarantees. Bear in mind though that &ldquo;in</p>
-</blockquote>
-<h3 id="when-to-use-with-nolock">When to Use With (Nolock)</h3>
-<p>To summarize, using <code>WITH (NOLOCK)</code> should only be used when there is an acceptable risk of reading uncommitted data. This should really only happen when there is no other way to read the data without an unacceptable risk of deadlocks or performance issues.</p>
-<p>For example, if there is a report that needs to run every minute, and it requires reading data from a table that has a high degree of contention, then <code>WITH (NOLOCK)</code> might be needed to prevent deadlocks. In this case, the risk of reading uncommitted data is acceptable because the report will be run again in a minute, so any wrong values will be corrected soon.</p>
-<p>On the other hand, if you have an application that needs to read from a table that has a high degree of contention, then <code>WITH (NOLOCK)</code> should not be used. In this case, the risk of reading uncommitted data is too high, as the application will likely continue to use the wrong values until it is stopped and restarted. In this case, it&rsquo;s better to use other techniques to reduce contention, such as using a separate reporting database.</p>
-<h3 id="alternative-methods">Alternative Methods</h3>
-<p>If <code>WITH (NOLOCK)</code> is not an option, there are other techniques that can be used to reduce the chance of deadlocks. These include:</p>
-<ul>
-<li>Using separate databases for read-only and write operations</li>
-<li>Adding indexes to tables that are frequently queried</li>
-<li>Using query hints to force specific transaction isolation levels</li>
-<li>Performing operations in batches instead of one at a time</li>
-</ul>
-<h3 id="to-summarize">To Summarize</h3>
-<p>Using the <code>WITH (NOLOCK)</code> hint should only be done when there is an acceptable risk of reading uncommitted data, and when there is no other way to read the data without an unacceptable risk of deadlocks or performance issues. In other cases, alternative methods should be considered to reduce contention.
-]]&gt;</p>
+<h2 id="in-conclusion">In Conclusion</h2>
+<p>The use of <code>WITH (NOLOCK)</code> should be a deliberate choice made when an acceptable risk of reading uncommitted data exists, and no other viable method ensures data retrieval without risking deadlocks or performance issues. In scenarios where alternatives can reduce contention, they should be seriously considered to maintain a balance between performance and data accuracy.</p>
+<h3 id="faqs-on-with-nolock-in-sql-server">FAQs on &ldquo;WITH (NOLOCK)&rdquo; in SQL Server</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the equivalent of &#39;WITH (NOLOCK)&#39; in SQL Server?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">The equivalent of <code>WITH (NOLOCK)</code> in SQL Server is READ UNCOMMITTED as a transaction isolation level.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why is the risk of a deadlock considered less severe than the possibility of incorrect values in financial databases?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">In financial databases, ensuring transaction completion and successful row writes take precedence, making deadlocks less detrimental than temporary inaccuracies, which can be reconciled at the end of the day.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is &#39;WITH (NOLOCK)&#39; necessary in modern SQL Server versions like SQL Server 2005 and later?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">SQL Server 2005 and later versions have addressed many bugs, reducing the necessity of using <code>NOLOCK</code> except in specific legacy contexts.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: When is it advisable to use &#39;WITH (NOLOCK)&#39;?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">Using <code>WITH (NOLOCK)</code> is advisable when there&rsquo;s an acceptable risk of reading uncommitted data, usually in scenarios where deadlocks need to be avoided, and no alternative method ensures data retrieval without performance issues.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What are alternative methods to &#39;WITH (NOLOCK)&#39; for reducing the risk of deadlocks?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">Alternative methods include using separate databases for read-only and write operations, adding indexes to frequently queried tables, employing specific transaction isolation levels with query hints, and performing operations in batches.</div>
+    </div>
+</div>
 
         </article>
 

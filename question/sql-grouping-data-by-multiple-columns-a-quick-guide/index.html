@@ -17,9 +17,7 @@
 <meta
   name="keywords"
   content="
-            
-              SQL, Databases, Big-Query, Oracle, MS SQL SErver, MySQL, PostgreSQL, create, table, oracle, sql, select, top, drop, if, exists, justless, books, database, insert, into, cengage, download, sum, example, delete, taking, long, time, approx_quantiles, statement, update/merge, match, source, row, target, foreign, key, mongo, db, except, columns, epoch, date, split, str, dividon, error, bq, wildcard, get, column, names, operator, case, all, then/else, arguments, coercible, common, type, int64, string, actual, when, else, bool, ssis, acquire, connection, azure, query, update, merge, export, csv, file, developer, check, view, bonus, spend, money, stores, catalog, identify, preferred, customers, country, origin, timestamp, add, days, list, meets, certain, value, range, extract, data, fields, open, multiple, tables, appending, single, quote, save, result, work, clob, alter, default, schema, resolve, division, zero, eoor, db-shm, could, server, file, lock, another, seconds,  bigquery, hibernate, dialect, extract, age, birth, entire, comparing, pivot, varchar2, nvarchar2, primary, key, google, double, bad, bugquery, existence, creating, newline, characters, invalid, url, specified, oracledatasource.makeurl, connect, database, ssms, divide, statement, like, string, count, unique, converter, em, numbers, places, even, negative, big, query, quartiles, partition, round, convert,  text, exported,   exporting, files, locate, package, modulenotfounderror, module, named, db_dtypes, use, ssms, o, postgresql, sysdate, installing, dbd::oracle, ns, clob, how, split, comma-separated, currency, big, handle, show, headers, csv, shm, wal, convert, commaseparated, escape, character, search, pattern, float, username, password, fix, syntax, join, condition, map, cursor, dict, criteria, hourly, grouping  view, employees, timestamp, value, range
-            
+            SQL GROUP BY multiple columns, GROUP BY clause in SQL, SQL aggregation with GROUP BY, GROUP BY x, y syntax, SQL GROUP BY example, PARTITION BY in SQL, SQL OVER() clause
            "
 />
 <meta name="robots" content="noodp" />
@@ -302,9 +300,12 @@
           <h2>Table of Contents</h2>
           <aside><nav id="TableOfContents">
   <ul>
-    <li><a href="#learning-the-group-by-clause-with-multiple-columns-in-sql">Learning the GROUP BY Clause with Multiple Columns in SQL</a>
+    <li><a href="#group-by-clause-with-multiple-columns-in-sql">GROUP BY Clause with Multiple Columns in SQL</a></li>
+    <li><a href="#the-power-of-group-by">The Power of GROUP BY</a>
       <ul>
-        <li><a href="#group-by-x-y">GROUP BY x, y</a></li>
+        <li><a href="#group-by-x-y-syntax">GROUP BY x, y Syntax</a></li>
+        <li><a href="#alternative-syntax-over-clause">Alternative Syntax: OVER() Clause</a></li>
+        <li><a href="#faqs-on-mastering-the-group-by-clause-with-multiple-columns-in-sql">FAQs on Mastering the GROUP BY Clause with Multiple Columns in SQL</a></li>
       </ul>
     </li>
   </ul>
@@ -323,92 +324,249 @@
 
 
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
-       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" >
-          <p>SQL: Grouping Data by Multiple Columns: A Quick Guide</p>
-<h2 id="learning-the-group-by-clause-with-multiple-columns-in-sql">Learning the GROUP BY Clause with Multiple Columns in SQL</h2>
-<p>The <code>GROUP BY</code> clause in SQL is used to group rows which have the same values in a specified column. By using the <code>GROUP BY</code> clause, you can aggregate data using functions such as <code>COUNT</code>, <code>SUM</code>, <code>AVERAGE</code>, etc. The aggregation function operates on the group and returns a single value for each group.</p>
-<h3 id="group-by-x-y">GROUP BY x, y</h3>
-<p>The syntax for using <code>GROUP BY</code> is quite straightforward: <code>GROUP BY x</code>. Although, in some cases, you may need to group your data by multiple columns. This is where you use <code>GROUP BY x, y</code>. When you use <code>GROUP BY x, y</code>, it means that you want to group rows by the combination of values in columns x and y.</p>
-<h4 id="example">Example</h4>
-<p>Let&rsquo;s consider the following table of students and grades:</p>
-<pre><code>Table: Grades
-
-++-+
-| Student | Subject | Grade |
-++-+
-| Alice   | Math    | A     |
-| Alice   | Science | B     |
-| Bob     | Math    | C     |
-| Bob     | Science | A     |
-| Charlie | Math    | A     |
-| Charlie | Science | A     |
-| Dan     | Math    | B     |
-| Dan     | Science | B     |
-++-+
-</code></pre>
-<p>If you want to find the total count of students by subject, you can use the <code>GROUP BY</code> syntax as follows:</p>
-<pre><code>SELECT Subject, COUNT(*) as Total
-FROM Grades
-GROUP BY Subject
-</code></pre>
-<p>This will group the rows by the <code>Subject</code> column and return the total count of students by subject:</p>
-<pre><code>++-+
-| Math    |     4 |
-| Science |     4 |
-++-+-+
-| Subject | Grade | Total |
-++-+-+
-</code></pre>
-<p>As we can see, the data is now grouped by both <code>Subject</code> and <code>Grade</code> columns. The <code>COUNT(*)</code> function returns the total count of students for each subject and grade combination.</p>
-<h4 id="learn-how-the-group-by-clause-works">Learn how the GROUP BY clause works</h4>
-<p>The <code>GROUP BY</code> clause works by first sorting the data into groups based on the columns specified in the <code>GROUP BY</code> clause. Once the data is sorted into groups, the aggregation function(s) specified in the <code>SELECT</code> clause are applied to the data in each group to obtain the result.</p>
-<p>Using the first example above, the data is first sorted by <code>Subject</code> column:</p>
-<pre><code>++-+
-| Student | Subject | Grade |
-++-+
-| Alice   | Math    | A     |
-| Bob     | Math    | C     |
-| Charlie | Math    | A     |
-| Dan     | Math    | B     |
-| Alice   | Science | B     |
-| Bob     | Science | A     |
-| Charlie | Science | A     |
-| Dan     | Science | B     |
-++-+
-</code></pre>
-<p>The data is then grouped by <code>Subject</code> column:</p>
-<pre><code>++-+
-| Student | Subject | Grade |
-++-+
-| Alice   | Math    | A     |
-| Bob     | Math    | C     |
-| Charlie | Math    | A     |
-| Dan     | Math    | B     |
-++-+
-| Alice   | Science | B     |
-| Bob     | Science | A     |
-| Charlie | Science | A     |
-| Dan     | Science | B     |
-++-+
-</code></pre>
-<p>The <code>COUNT(*)</code> function is then applied to each group to get the total count of students by subject:</p>
-<pre><code>++-+
-| Math    |     4 |
-| Science |     4 |
-+----+
-</code></pre>
-<p>The same process is followed when grouping by multiple columns. The data is first sorted by the columns specified in the <code>GROUP BY</code> clause, then the aggregation function(s) are applied to each group to get the final result.</p>
-<h4 id="alternative-syntax">Alternative Syntax</h4>
-<p>Along with the <code>GROUP BY</code> clause, there is another way to group data using the <code>OVER()</code> clause. The <code>OVER()</code> clause is used in combination with functions such as <code>COUNT()</code>, <code>SUM()</code>, etc. to calculate aggregate values for groups of rows.</p>
+       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" 
+          itemscope itemtype="https://schema.org/FAQPage" >
+          <h2 id="group-by-clause-with-multiple-columns-in-sql">GROUP BY Clause with Multiple Columns in SQL</h2>
+<p>Understanding the <code>GROUP BY</code> clause in SQL is essential for aggregating and summarizing data effectively. This guide delves into the nuances of using the <code>GROUP BY</code> clause with multiple columns, providing examples and alternative syntax.</p>
+<h2 id="the-power-of-group-by">The Power of GROUP BY</h2>
+<p>The <code>GROUP BY</code> clause is a powerful tool in SQL, enabling the grouping of rows with identical values in a specified column. It facilitates data aggregation using functions like <code>COUNT</code>, <code>SUM</code>, and <code>AVERAGE</code>. Each aggregation function processes the grouped data, yielding a consolidated result for each group.</p>
+<h3 id="group-by-x-y-syntax">GROUP BY x, y Syntax</h3>
+<p>While the basic syntax of <code>GROUP BY</code> is straightforward (<code>GROUP BY x</code>), there are scenarios where grouping by multiple columns (<code>GROUP BY x, y</code>) is necessary. In such cases, the grouping is based on the combination of values in columns x and y.</p>
+<h4 id="example-counting-students-by-subject">Example: Counting Students by Subject</h4>
+<p>Consider a table named Grades with student information:</p>
+<table>
+<thead>
+<tr>
+<th>Student</th>
+<th>Subject</th>
+<th>Grade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alice</td>
+<td>Math</td>
+<td>A</td>
+</tr>
+<tr>
+<td>Alice</td>
+<td>Science</td>
+<td>B</td>
+</tr>
+<tr>
+<td>Bob</td>
+<td>Math</td>
+<td>C</td>
+</tr>
+<tr>
+<td>Bob</td>
+<td>Science</td>
+<td>A</td>
+</tr>
+<tr>
+<td>Charlie</td>
+<td>Math</td>
+<td>A</td>
+</tr>
+<tr>
+<td>Charlie</td>
+<td>Science</td>
+<td>A</td>
+</tr>
+<tr>
+<td>Dan</td>
+<td>Math</td>
+<td>B</td>
+</tr>
+<tr>
+<td>Dan</td>
+<td>Science</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+<p>To find the total count of students by subject, use the following query:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> Subject, <span style="color:#66d9ef">COUNT</span>(<span style="color:#f92672">*</span>) <span style="color:#66d9ef">as</span> Total
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> Grades
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> Subject
+</span></span></code></pre></div><p>This query groups the data by the <code>Subject</code> column, presenting the total count of students for each subject.</p>
+<h4 id="understanding-the-group-by-clause">Understanding the GROUP BY Clause</h4>
+<p>The <code>GROUP BY</code> clause functions by initially sorting data into groups based on the specified columns. Subsequently, aggregation functions in the <code>SELECT</code> clause are applied to each group, producing the final result.</p>
+<p>Visualizing the sorting and grouping process, consider the initial data sorted by the <code>Subject</code> column:</p>
+<table>
+<thead>
+<tr>
+<th>Student</th>
+<th>Subject</th>
+<th>Grade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alice</td>
+<td>Math</td>
+<td>A</td>
+</tr>
+<tr>
+<td>Bob</td>
+<td>Math</td>
+<td>C</td>
+</tr>
+<tr>
+<td>Charlie</td>
+<td>Math</td>
+<td>A</td>
+</tr>
+<tr>
+<td>Dan</td>
+<td>Math</td>
+<td>B</td>
+</tr>
+<tr>
+<td>Alice</td>
+<td>Science</td>
+<td>B</td>
+</tr>
+<tr>
+<td>Bob</td>
+<td>Science</td>
+<td>A</td>
+</tr>
+<tr>
+<td>Charlie</td>
+<td>Science</td>
+<td>A</td>
+</tr>
+<tr>
+<td>Dan</td>
+<td>Science</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+<p>The data is then grouped by the <code>Subject</code> column:</p>
+<table>
+<thead>
+<tr>
+<th>Student</th>
+<th>Subject</th>
+<th>Grade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alice</td>
+<td>Math</td>
+<td>A</td>
+</tr>
+<tr>
+<td>Bob</td>
+<td>Math</td>
+<td>C</td>
+</tr>
+<tr>
+<td>Charlie</td>
+<td>Math</td>
+<td>A</td>
+</tr>
+<tr>
+<td>Dan</td>
+<td>Math</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Student</th>
+<th>Subject</th>
+<th>Grade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alice</td>
+<td>Science</td>
+<td>B</td>
+</tr>
+<tr>
+<td>Bob</td>
+<td>Science</td>
+<td>A</td>
+</tr>
+<tr>
+<td>Charlie</td>
+<td>Science</td>
+<td>A</td>
+</tr>
+<tr>
+<td>Dan</td>
+<td>Science</td>
+<td>B</td>
+</tr>
+</tbody>
+</table>
+<p>Applying the <code>COUNT(*)</code> function to each group yields the total count of students for each subject:</p>
+<table>
+<thead>
+<tr>
+<th>Subject</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Math</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Science</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<p>The same principles apply when grouping by multiple columns.</p>
+<h3 id="alternative-syntax-over-clause">Alternative Syntax: OVER() Clause</h3>
+<p>In addition to the <code>GROUP BY</code> clause, an alternative method for grouping data involves the <code>OVER()</code> clause. Used with functions like <code>COUNT()</code> and <code>SUM()</code>, this clause calculates aggregate values for groups of rows.</p>
 <p>The syntax for using <code>OVER()</code> is as follows:</p>
-<pre><code>SELECT column1, column2, ..., columnN,
-       COUNT(*) OVER(PARTITION BY column1, column2, ..., columnN) as Total
-FROM table_name;
-</code></pre>
-<p>The <code>PARTITION BY</code> keyword is used to specify the columns by which the data should be partitioned. In other words, it is used to group the data by the specified columns. The aggregate function is then applied to each group to get the final result.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> column1, column2, ..., columnN,
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">COUNT</span>(<span style="color:#f92672">*</span>) OVER(PARTITION <span style="color:#66d9ef">BY</span> column1, column2, ..., columnN) <span style="color:#66d9ef">as</span> Total
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">table_name</span>;
+</span></span></code></pre></div><p>The <code>PARTITION BY</code> keyword specifies the columns for data partitioning, grouping rows by the specified columns before applying the aggregate function.</p>
 <h4 id="recap">Recap</h4>
-<p>The <code>GROUP BY</code> clause
-]]&gt;</p>
+<p>Mastering the <code>GROUP BY</code> clause in SQL opens avenues for powerful data analysis. Whether using the traditional <code>GROUP BY</code> syntax or exploring the alternative <code>OVER()</code> clause, understanding how to group data enhances your SQL proficiency.</p>
+<h3 id="faqs-on-mastering-the-group-by-clause-with-multiple-columns-in-sql">FAQs on Mastering the GROUP BY Clause with Multiple Columns in SQL</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the purpose of the GROUP BY clause in SQL?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">The <code>GROUP BY</code> clause in SQL is used to group rows with identical values in a specified column, enabling data aggregation using functions like <code>COUNT</code>, <code>SUM</code>, and <code>AVERAGE</code>.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How does the GROUP BY x, y syntax work?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">The <code>GROUP BY x, y</code> syntax in SQL groups rows based on the combination of values in columns x and y, allowing for more granular data grouping.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can you provide an example of using GROUP BY to count students by subject?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">Certainly! To find the total count of students by subject, you can use the query: <code>SELECT Subject, COUNT(*) as Total FROM Grades GROUP BY Subject</code>.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How does the GROUP BY clause function in SQL?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">The <code>GROUP BY</code> clause works by sorting data into groups based on specified columns and then applying aggregation functions to each group to obtain consolidated results.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the alternative syntax involving the OVER() clause in SQL?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">The <code>OVER()</code> clause, used with functions like <code>COUNT()</code> and <code>SUM()</code>, calculates aggregate values for groups of rows. The <code>PARTITION BY</code> keyword specifies columns for data partitioning.</div>
+    </div>
+</div>
 
         </article>
 
