@@ -17,9 +17,7 @@
 <meta
   name="keywords"
   content="
-            
-              SQL, Databases, Big-Query, Oracle, MS SQL SErver, MySQL, PostgreSQL, create, table, oracle, sql, select, top, drop, if, exists, justless, books, database, insert, into, cengage, download, sum, example, delete, taking, long, time, approx_quantiles, statement, update/merge, match, source, row, target, foreign, key, mongo, db, except, columns, epoch, date, split, str, dividon, error, bq, wildcard, get, column, names, operator, case, all, then/else, arguments, coercible, common, type, int64, string, actual, when, else, bool, ssis, acquire, connection, azure, query, update, merge, export, csv, file, developer, check, view, bonus, spend, money, stores, catalog, identify, preferred, customers, country, origin, timestamp, add, days, list, meets, certain, value, range, extract, data, fields, open, multiple, tables, appending, single, quote, save, result, work, clob, alter, default, schema, resolve, division, zero, eoor, db-shm, could, server, file, lock, another, seconds,  bigquery, hibernate, dialect, extract, age, birth, entire, comparing, pivot, varchar2, nvarchar2, primary, key, google, double, bad, bugquery, existence, creating, newline, characters, invalid, url, specified, oracledatasource.makeurl, connect, database, ssms, divide, statement, like, string, count, unique, converter, em, numbers, places, even, negative, big, query, quartiles, partition, round, convert,  text, exported,   exporting, files, locate, package, modulenotfounderror, module, named, db_dtypes, use, ssms, o, postgresql, sysdate, installing, dbd::oracle, ns, clob, how, split, comma-separated, currency, big, handle, show, headers, csv, shm, wal, convert, commaseparated, escape, character, search, pattern, float, username, password, fix, syntax, join, condition, map, cursor, dict, criteria, hourly, grouping  view, employees, timestamp, value, range
-            
+            cx_Oracle, exception handling
            "
 />
 <meta name="robots" content="noodp" />
@@ -281,7 +279,7 @@
 
     </i>
     <span>
-      4 minutes to read
+      3 minutes to read
     </span>
   </div>
 </div>
@@ -302,11 +300,15 @@
           <h2>Table of Contents</h2>
           <aside><nav id="TableOfContents">
   <ul>
-    <li>
+    <li><a href="#using-cx_oracle-and-exception-handling-best-practices">Using cx_Oracle and Exception Handling: Best Practices</a>
       <ul>
         <li><a href="#cx_oracle-a-brief-introduction">Cx_Oracle: A Brief Introduction</a></li>
         <li><a href="#exception-handling-with-cx_oracle">Exception Handling with Cx_Oracle</a></li>
         <li><a href="#alternative-ways-to-handle-exceptions">Alternative Ways to Handle Exceptions</a></li>
+      </ul>
+    </li>
+    <li><a href="#faqs">FAQs</a>
+      <ul>
         <li><a href="#recap">Recap</a></li>
       </ul>
     </li>
@@ -326,72 +328,104 @@
 
 
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
-       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" >
-          <p>Best Practices for Handling Exceptions in cx_Oracle?
-Using cx_Oracle and Exception Handling: Best Practices<br>
-If you are developing software in Python, you will probably find yourself working with databases sooner or later. In this Q&amp;A Session, we will cover the basics of using cx_Oracle and implementing best practices for exception handling with this library.</p>
+       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" 
+          itemscope itemtype="https://schema.org/FAQPage" >
+          <h2 id="using-cx_oracle-and-exception-handling-best-practices">Using cx_Oracle and Exception Handling: Best Practices</h2>
 <h3 id="cx_oracle-a-brief-introduction">Cx_Oracle: A Brief Introduction</h3>
-<p>Cx_Oracle is a Python extension module that allows Python to connect to Oracle databases. It conforms to the Python database API 2.0 specification and provides features and performance enhancements specific to Oracle databases. Here is an example of how to use cx_Oracle to connect to an Oracle instance and execute some DDL statements:</p>
-<pre><code>import cx_Oracle
-
-dsn_tns = cx_Oracle.makedsn('host', 'port', service_name='servicename') 
-conn = cx_Oracle.connect(user='username', password='password', dsn=dsn_tns)
-
-cursor = conn.cursor()
-ddl_statement = &quot;CREATE TABLE my_table(col1 INT, col2 VARCHAR(50))&quot;
-cursor.execute(ddl_statement)
-
-cursor.close()
-conn.close()
-</code></pre>
-<p>First, we create a DSN (data source name) using the <code>makedsn</code> function. This function takes four parameters: the hostname, the port number, the service name, and the optional keyword parameter <code>sid</code> if you are using an SID instead of a service name. Next, we connect to the database using the <code>connect</code> function and pass in the user credentials and DSN. Lastly, we create a cursor object and execute a DDL statement to create a table called <code>my_table</code>.</p>
+<p>Cx_Oracle serves as a Python extension module facilitating connections between Python and Oracle databases. Adhering to the Python database API 2.0 specification, it provides Oracle-specific features and performance enhancements.</p>
+<p>Example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> cx_Oracle
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>dsn_tns <span style="color:#f92672">=</span> cx_Oracle<span style="color:#f92672">.</span>makedsn(<span style="color:#e6db74">&#39;host&#39;</span>, <span style="color:#e6db74">&#39;port&#39;</span>, service_name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;servicename&#39;</span>) 
+</span></span><span style="display:flex;"><span>conn <span style="color:#f92672">=</span> cx_Oracle<span style="color:#f92672">.</span>connect(user<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;username&#39;</span>, password<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;password&#39;</span>, dsn<span style="color:#f92672">=</span>dsn_tns)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>cursor <span style="color:#f92672">=</span> conn<span style="color:#f92672">.</span>cursor()
+</span></span><span style="display:flex;"><span>ddl_statement <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;CREATE TABLE my_table(col1 INT, col2 VARCHAR(50))&#34;</span>
+</span></span><span style="display:flex;"><span>cursor<span style="color:#f92672">.</span>execute(ddl_statement)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>cursor<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>conn<span style="color:#f92672">.</span>close()
+</span></span></code></pre></div><p>Here, a DSN (data source name) is created using the <code>makedsn</code> function, and a connection to the database is established using the <code>connect</code> function. Subsequently, a table named <code>my_table</code> is created using a cursor.</p>
 <h3 id="exception-handling-with-cx_oracle">Exception Handling with Cx_Oracle</h3>
-<p>When working with databases, it is crucial to handle exceptions properly. Let&rsquo;s take a look at how we can implement best practices for exception handling with cx_Oracle. Here is an example:</p>
-<pre><code>import cx_Oracle
-
-try:
-    dsn_tns = cx_Oracle.makedsn('host', 'port', service_name='servicename') 
-    conn = cx_Oracle.connect(user='username', password='password', dsn=dsn_tns)
-except cx_Oracle.DatabaseError as e:
-    error, = e.args
-    if error.code == 1017:
-        print('Please check your credentials.')
-        # sys.exit()?
-    else:
-        print('Database connection error: {}'.format(e))
-    raise
-
-ddl_statement = &quot;CREATE TABLE my_table(col1 INT, col2 VARCHAR(50))&quot;
-try:
-    cursor = conn.cursor()
-    cursor.execute(ddl_statement)
-except cx_Oracle.DatabaseError as e:
-    error, = e.args
-    if error.code == 955:
-        print('Table already exists.')
-    elif error.code == 1031:
-        print(&quot;Insufficient privileges - are you sure you're using the owner account?&quot;)
-    print(error.code)
-    print(error.message)
-    print(error.context)
-    raise
-finally:
-    cursor.close()
-    conn.close()
-</code></pre>
-<p>In this example, we use a try-except block to catch any connection errors that may occur. If the connection is not established successfully, we raise an exception and display an appropriate error message. We also use an <code>if-else</code> statement to check the error code returned by cx_Oracle and handle the error accordingly. For example, if the error code is 1017, we know that the user credentials were incorrect, so we display a message to the user to check their credentials.</p>
-<p>Next, we create a cursor object and execute our DDL statement within a try block. If an error occurs during statement execution, we display an appropriate error message and raise an exception. We also close the cursor and the connection within a finally block to ensure that resources are released appropriately.</p>
-<p>It is important to note that the <code>finally</code> block will be executed even if an exception is raised. This ensures that cursor and connection objects are always closed properly.</p>
+<p>Proper exception handling is vital when working with databases. The following example illustrates best practices for exception handling with cx_Oracle:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> cx_Oracle
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    dsn_tns <span style="color:#f92672">=</span> cx_Oracle<span style="color:#f92672">.</span>makedsn(<span style="color:#e6db74">&#39;host&#39;</span>, <span style="color:#e6db74">&#39;port&#39;</span>, service_name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;servicename&#39;</span>) 
+</span></span><span style="display:flex;"><span>    conn <span style="color:#f92672">=</span> cx_Oracle<span style="color:#f92672">.</span>connect(user<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;username&#39;</span>, password<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;password&#39;</span>, dsn<span style="color:#f92672">=</span>dsn_tns)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> cx_Oracle<span style="color:#f92672">.</span>DatabaseError <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>    error, <span style="color:#f92672">=</span> e<span style="color:#f92672">.</span>args
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> error<span style="color:#f92672">.</span>code <span style="color:#f92672">==</span> <span style="color:#ae81ff">1017</span>:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#39;Please check your credentials.&#39;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># sys.exit()?</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#39;Database connection error: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>format(e))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">raise</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ddl_statement <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;CREATE TABLE my_table(col1 INT, col2 VARCHAR(50))&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    cursor <span style="color:#f92672">=</span> conn<span style="color:#f92672">.</span>cursor()
+</span></span><span style="display:flex;"><span>    cursor<span style="color:#f92672">.</span>execute(ddl_statement)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> cx_Oracle<span style="color:#f92672">.</span>DatabaseError <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>    error, <span style="color:#f92672">=</span> e<span style="color:#f92672">.</span>args
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> error<span style="color:#f92672">.</span>code <span style="color:#f92672">==</span> <span style="color:#ae81ff">955</span>:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#39;Table already exists.&#39;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elif</span> error<span style="color:#f92672">.</span>code <span style="color:#f92672">==</span> <span style="color:#ae81ff">1031</span>:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;Insufficient privileges - are you sure you&#39;re using the owner account?&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(error<span style="color:#f92672">.</span>code)
+</span></span><span style="display:flex;"><span>    print(error<span style="color:#f92672">.</span>message)
+</span></span><span style="display:flex;"><span>    print(error<span style="color:#f92672">.</span>context)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">raise</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">finally</span>:
+</span></span><span style="display:flex;"><span>    cursor<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>    conn<span style="color:#f92672">.</span>close()
+</span></span></code></pre></div><p>This example uses try-except blocks to catch connection errors and execute DDL statements. The finally block ensures proper closure of cursor and connection objects.</p>
 <h3 id="alternative-ways-to-handle-exceptions">Alternative Ways to Handle Exceptions</h3>
-<p>There are many ways to handle exceptions in Python, and not all of them involve using try-except blocks. Here are a few alternative techniques:</p>
+<p>Various techniques exist for handling exceptions in Python:</p>
 <ul>
-<li><strong>Error Logging</strong>: Instead of displaying an error message to the user, you can log the error to a file or a database. This can be useful for tracking errors and debugging code.</li>
-<li><strong>Retry Logic</strong>: Sometimes, an error may occur simply because of a temporary network outage or a database issue. In these cases, it may be appropriate to retry the operation after waiting for a certain amount of time.</li>
-<li><strong>Custom Exceptions</strong>: You can define your own exception classes that inherit from the built-in <code>Exception</code> class. This can be useful for handling exceptions in a more granular and specific manner.</li>
+<li>
+<p><strong>Error Logging</strong>: Instead of displaying errors to users, log them to a file or database for tracking and debugging.</p>
+</li>
+<li>
+<p><strong>Retry Logic</strong>: Introduce retry mechanisms for transient issues caused by temporary network outages or database problems.</p>
+</li>
+<li>
+<p><strong>Custom Exceptions</strong>: Define custom exception classes for more granular and specific exception handling.</p>
+</li>
 </ul>
+<h2 id="faqs">FAQs</h2>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is cx_Oracle?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">A: cx_Oracle is a Python extension module enabling Python to connect to Oracle databases, following the Python database API 2.0 specification and offering Oracle-specific features and performance enhancements.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why is exception handling crucial when working with databases?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">A: Exception handling is crucial to gracefully manage errors during database operations, ensuring appropriate responses to various error scenarios.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What are some alternative ways to handle exceptions in Python?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">A: Alternative techniques include error logging, retry logic, and defining custom exceptions. These approaches enhance error tracking, provide resilience against transient issues, and enable granular exception handling.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why is the finally block important in exception handling?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">A: The finally block ensures the execution of specific code, such as closing resources (e.g., cursor and connection objects), regardless of whether an exception occurs. It contributes to proper resource management.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can cx_Oracle be used for other databases besides Oracle?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">A: No, cx_Oracle is specifically designed for connecting to Oracle databases and does not support other database systems.</div>
+    </div>
+</div>
 <h3 id="recap">Recap</h3>
-<p>Using cx_Oracle to connect to an Oracle database can be straightforward, but handling exceptions properly is crucial. By using try-except blocks and implementing the best practices discussed in this Q&amp;A Session, you can ensure that your code is robust and reliable. Remember to release resources appropriately and log errors for debugging purposes.
-]]&gt;</p>
+<p>While using cx_Oracle to connect to Oracle databases is straightforward, effective exception handling is crucial. By implementing best practices and using try-except blocks, you can ensure robust and reliable code. Proper resource management and error logging contribute to a resilient application.</p>
 
         </article>
 

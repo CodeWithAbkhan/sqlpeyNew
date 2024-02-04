@@ -17,9 +17,7 @@
 <meta
   name="keywords"
   content="
-            
-              SQL, Databases, Big-Query, Oracle, MS SQL SErver, MySQL, PostgreSQL, create, table, oracle, sql, select, top, drop, if, exists, justless, books, database, insert, into, cengage, download, sum, example, delete, taking, long, time, approx_quantiles, statement, update/merge, match, source, row, target, foreign, key, mongo, db, except, columns, epoch, date, split, str, dividon, error, bq, wildcard, get, column, names, operator, case, all, then/else, arguments, coercible, common, type, int64, string, actual, when, else, bool, ssis, acquire, connection, azure, query, update, merge, export, csv, file, developer, check, view, bonus, spend, money, stores, catalog, identify, preferred, customers, country, origin, timestamp, add, days, list, meets, certain, value, range, extract, data, fields, open, multiple, tables, appending, single, quote, save, result, work, clob, alter, default, schema, resolve, division, zero, eoor, db-shm, could, server, file, lock, another, seconds,  bigquery, hibernate, dialect, extract, age, birth, entire, comparing, pivot, varchar2, nvarchar2, primary, key, google, double, bad, bugquery, existence, creating, newline, characters, invalid, url, specified, oracledatasource.makeurl, connect, database, ssms, divide, statement, like, string, count, unique, converter, em, numbers, places, even, negative, big, query, quartiles, partition, round, convert,  text, exported,   exporting, files, locate, package, modulenotfounderror, module, named, db_dtypes, use, ssms, o, postgresql, sysdate, installing, dbd::oracle, ns, clob, how, split, comma-separated, currency, big, handle, show, headers, csv, shm, wal, convert, commaseparated, escape, character, search, pattern, float, username, password, fix, syntax, join, condition, map, cursor, dict, criteria, hourly, grouping  view, employees, timestamp, value, range
-            
+            Oracle SQL change decimal separator, Format numbers in Oracle SQL, TO_CHAR function in Oracle, Brazilian currency format in Oracle, Oracle SQL number formatting, Decimal dot to comma Oracle SQL, Change numeric characters Oracle SQL
            "
 />
 <meta name="robots" content="noodp" />
@@ -281,7 +279,7 @@
 
     </i>
     <span>
-      3 minutes to read
+      4 minutes to read
     </span>
   </div>
 </div>
@@ -302,10 +300,14 @@
           <h2>Table of Contents</h2>
           <aside><nav id="TableOfContents">
   <ul>
-    <li>
+    <li><a href="#how-to-change-decimal-dot-for-a-comma-in-oracle-sql">How to Change Decimal Dot for a Comma in Oracle SQL?</a>
       <ul>
         <li><a href="#the-problem">The Problem</a></li>
         <li><a href="#the-solution">The Solution</a></li>
+      </ul>
+    </li>
+    <li><a href="#faqs-on--changing-decimal-dot-to-comma-in-oracle-sql">FAQs on  Changing Decimal Dot to Comma in Oracle SQL</a>
+      <ul>
         <li><a href="#recap">Recap</a></li>
       </ul>
     </li>
@@ -325,56 +327,86 @@
 
 
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
-       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" >
-          <p>Changing Decimal Dot to Comma in Oracle SQL
-How to Change Decimal Dot for a Comma in Oracle SQL?<br>
-If you are working with Oracle SQL and need to change the decimal dot for a comma, there are several ways to achieve it. In this blog post, we will explore different techniques to format numbers according to Brazilian currency and discuss their advantages and disadvantages.</p>
+       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" 
+          itemscope itemtype="https://schema.org/FAQPage" >
+          <h2 id="how-to-change-decimal-dot-for-a-comma-in-oracle-sql">How to Change Decimal Dot for a Comma in Oracle SQL?</h2>
+<p>If you are working with Oracle SQL and need to change the decimal dot for a comma, there are several ways to achieve it. In this blog post, we will explore different techniques to format numbers according to Brazilian currency and discuss their advantages and disadvantages.</p>
 <h3 id="the-problem">The Problem</h3>
 <p>In Brazil, our currency format is something like &lsquo;R$ 9.999,00&rsquo;. Although, when working with Oracle SQL, decimal separators are represented by a dot instead of a comma, which can cause confusion and errors when dealing with financial data.</p>
 <p>Let&rsquo;s suppose you have the following data:</p>
-<pre><code>CREATE TABLE Sales (
-    id INT PRIMARY KEY,
-    revenue DECIMAL(10,2) NOT NULL
-);
-
-INSERT INTO Sales VALUES 
-(1, 1000.50), 
-(2, 2000.75),
-(3, 3000.00),
-(4, 4000.25);
-</code></pre>
-<p>If you run the following query:</p>
-<pre><code>SELECT revenue FROM Sales;
-</code></pre>
-<p>You will get the following result:</p>
-<pre><code>REVENUE
---
-1000.50
-2000.75
-3000.00
-4000.25
-</code></pre>
-<p>As you can see, the decimal separator is represented by a dot instead of a comma. To fix this, you need to format the numbers using the Brazilian currency format, which is &lsquo;9.999,00&rsquo;.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> Sales (
+</span></span><span style="display:flex;"><span>    id INT <span style="color:#66d9ef">PRIMARY</span> <span style="color:#66d9ef">KEY</span>,
+</span></span><span style="display:flex;"><span>    revenue DECIMAL(<span style="color:#ae81ff">10</span>,<span style="color:#ae81ff">2</span>) <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>
+</span></span><span style="display:flex;"><span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> Sales <span style="color:#66d9ef">VALUES</span> 
+</span></span><span style="display:flex;"><span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1000</span>.<span style="color:#ae81ff">50</span>), 
+</span></span><span style="display:flex;"><span>(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">2000</span>.<span style="color:#ae81ff">75</span>),
+</span></span><span style="display:flex;"><span>(<span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">3000</span>.<span style="color:#ae81ff">00</span>),
+</span></span><span style="display:flex;"><span>(<span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">4000</span>.<span style="color:#ae81ff">25</span>);
+</span></span></code></pre></div><p>If you run the following query:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> revenue <span style="color:#66d9ef">FROM</span> Sales;
+</span></span></code></pre></div><p>You will get the following result:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span>REVENUE
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-------
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#ae81ff">1000</span>.<span style="color:#ae81ff">50</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2000</span>.<span style="color:#ae81ff">75</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">3000</span>.<span style="color:#ae81ff">00</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">4000</span>.<span style="color:#ae81ff">25</span>
+</span></span></code></pre></div><p>As you can see, the decimal separator is represented by a dot instead of a comma. To fix this, you need to format the numbers using the Brazilian currency format, which is &lsquo;9.999,00&rsquo;.</p>
 <h3 id="the-solution">The Solution</h3>
 <p>There are several ways to format numbers in Oracle SQL. Let&rsquo;s explore some of them:</p>
 <h4 id="1-using-the-to_char-function">1. Using the TO_CHAR Function</h4>
 <p>The most common way to format numbers in Oracle SQL is to use the TO_CHAR function. This function converts a number to a string using a specified format. For example, to format the number 1000.50 using the Brazilian currency format, you can use the following code:</p>
-<pre><code>SELECT TO_CHAR(1000.50, '999G999G999D99', 'NLS_NUMERIC_CHARACTERS='',.''') 
-AS FORMATTED_REVENUE FROM DUAL;
-</code></pre>
-<p>The first argument of the TO_CHAR function is the number you want to format. The second argument is the format string, which in this case is &lsquo;999G999G999D99&rsquo;. The G symbol represents the thousands separator, and the D symbol represents the decimal separator. The third argument is the NLS_NUMERIC_CHARACTERS parameter, which tells Oracle SQL to use a comma as the decimal separator and a dot as the thousands separator.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> TO_CHAR(<span style="color:#ae81ff">1000</span>.<span style="color:#ae81ff">50</span>, <span style="color:#e6db74">&#39;999G999G999D99&#39;</span>, <span style="color:#e6db74">&#39;NLS_NUMERIC_CHARACTERS=&#39;&#39;,.&#39;&#39;&#39;</span>) 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">AS</span> FORMATTED_REVENUE <span style="color:#66d9ef">FROM</span> DUAL;
+</span></span></code></pre></div><p>The first argument of the TO_CHAR function is the number you want to format. The second argument is the format string, which in this case is &lsquo;999G999G999D99&rsquo;. The G symbol represents the thousands separator, and the D symbol represents the decimal separator. The third argument is the NLS_NUMERIC_CHARACTERS parameter, which tells Oracle SQL to use a comma as the decimal separator and a dot as the thousands separator.</p>
 <p>The result of the query will be:</p>
-<pre><code>FORMATTED_REVENUE
------
-1000,50
-2000,75
-3000,00
-4000,25
-</code></pre>
-<p>As you can see, the decimal separator has been changed to a comma.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span>FORMATTED_REVENUE
+</span></span><span style="display:flex;"><span><span style="color:#75715e">----------------
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#ae81ff">1000</span>,<span style="color:#ae81ff">50</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2000</span>,<span style="color:#ae81ff">75</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">3000</span>,<span style="color:#ae81ff">00</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">4000</span>,<span style="color:#ae81ff">25</span>
+</span></span></code></pre></div><p>As you can see, the decimal separator has been changed to a comma.</p>
+<h2 id="faqs-on--changing-decimal-dot-to-comma-in-oracle-sql">FAQs on  Changing Decimal Dot to Comma in Oracle SQL</h2>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How can I change the decimal dot to a comma in Oracle SQL?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">A: If you need to change the decimal dot to a comma in Oracle SQL, you can use the TO_CHAR function or the ALTER SESSION statement. The TO_CHAR function is commonly used and allows you to format numbers according to a specified format string. The ALTER SESSION statement, on the other hand, changes the session-level settings for numeric characters, affecting all subsequent SQL statements.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the Brazilian currency format for numbers?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">A: The Brazilian currency format is typically represented as &lsquo;9.999,00&rsquo;, where a comma is used as the decimal separator, and a dot is used as the thousands separator. When working with financial data in Oracle SQL, it might be necessary to format numbers in this specific way.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can you provide an example of using the TO_CHAR function to change the decimal separator?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><p>A: Certainly! You can use the TO_CHAR function with a specified format string to achieve this. For instance:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> TO_CHAR(<span style="color:#ae81ff">1000</span>.<span style="color:#ae81ff">50</span>, <span style="color:#e6db74">&#39;999G999G999D99&#39;</span>, <span style="color:#e6db74">&#39;NLS_NUMERIC_CHARACTERS=&#39;&#39;,.&#39;&#39;&#39;</span>) 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">AS</span> FORMATTED_REVENUE <span style="color:#66d9ef">FROM</span> DUAL;
+</span></span></code></pre></div><p>This query formats the number 1000.50 using the Brazilian currency format, changing the decimal separator to a comma.</p>
+</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Are there any disadvantages to using the TO_CHAR function for number formatting?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">A: While the TO_CHAR function is a common and widely used method for number formatting in Oracle SQL, it might have a slight impact on performance, especially when dealing with large datasets. It&rsquo;s essential to weigh the advantages of formatting against any potential performance considerations.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is it recommended to test queries thoroughly before implementing them in production environments?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">A: Yes, it is highly recommended to test queries thoroughly before implementing them in production environments. Testing helps ensure that the formatting changes do not introduce unexpected issues or errors. It&rsquo;s crucial to validate the accuracy and consistency of the data after applying such modifications.</div>
+    </div>
+</div>
+<hr>
 <h3 id="recap">Recap</h3>
-<p>If you need to format numbers in Oracle SQL according to the Brazilian currency format, you can use the TO_CHAR function or the ALTER SESSION statement. Both techniques have their advantages and disadvantages, so choose the one that suits your needs the best. Remember to test your queries thoroughly before using them in production environments, and always make sure your data is accurate and consistent.
-]]&gt;</p>
+<p>If you need to format numbers in Oracle SQL according to the Brazilian currency format, you can use the TO_CHAR function or the ALTER SESSION statement. Both techniques have their advantages and disadvantages, so choose the one that suits your needs the best. Remember to test your queries thoroughly before using them in production environments, and always make sure your data is accurate and consistent.</p>
 
         </article>
 

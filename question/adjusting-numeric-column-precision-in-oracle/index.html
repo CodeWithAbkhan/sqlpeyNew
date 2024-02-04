@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
-  <title>Adjusting Numeric Column Precision In Oracle :: sqlpey - SQL Databases</title>
+  <title>Adjusting Numeric Column Precision in Oracle :: sqlpey - SQL Databases</title>
   
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -17,13 +17,11 @@
 <meta
   name="keywords"
   content="
-            
-              SQL, Databases, Big-Query, Oracle, MS SQL SErver, MySQL, PostgreSQL, create, table, oracle, sql, select, top, drop, if, exists, justless, books, database, insert, into, cengage, download, sum, example, delete, taking, long, time, approx_quantiles, statement, update/merge, match, source, row, target, foreign, key, mongo, db, except, columns, epoch, date, split, str, dividon, error, bq, wildcard, get, column, names, operator, case, all, then/else, arguments, coercible, common, type, int64, string, actual, when, else, bool, ssis, acquire, connection, azure, query, update, merge, export, csv, file, developer, check, view, bonus, spend, money, stores, catalog, identify, preferred, customers, country, origin, timestamp, add, days, list, meets, certain, value, range, extract, data, fields, open, multiple, tables, appending, single, quote, save, result, work, clob, alter, default, schema, resolve, division, zero, eoor, db-shm, could, server, file, lock, another, seconds,  bigquery, hibernate, dialect, extract, age, birth, entire, comparing, pivot, varchar2, nvarchar2, primary, key, google, double, bad, bugquery, existence, creating, newline, characters, invalid, url, specified, oracledatasource.makeurl, connect, database, ssms, divide, statement, like, string, count, unique, converter, em, numbers, places, even, negative, big, query, quartiles, partition, round, convert,  text, exported,   exporting, files, locate, package, modulenotfounderror, module, named, db_dtypes, use, ssms, o, postgresql, sysdate, installing, dbd::oracle, ns, clob, how, split, comma-separated, currency, big, handle, show, headers, csv, shm, wal, convert, commaseparated, escape, character, search, pattern, float, username, password, fix, syntax, join, condition, map, cursor, dict, criteria, hourly, grouping  view, employees, timestamp, value, range
-            
+            Oracle Numeric Column, Change Column Precision, Oracle ALTER TABLE, Rename Column, Copy Data, Modify Column Precision, Oracle Database
            "
 />
 <meta name="robots" content="noodp" />
-<meta property="og:title" content="Adjusting Numeric Column Precision In Oracle" />
+<meta property="og:title" content="Adjusting Numeric Column Precision in Oracle" />
 <meta property="og:description" content="Adjusting Numeric Column Precision in Oracle Summary This blog discusses how to change the precision of a numeric column in Oracle. It offers two..." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://sqlpey.com/question/adjusting-numeric-column-precision-in-oracle/" /><meta property="article:section" content="question" />
@@ -31,7 +29,7 @@
 <meta property="article:modified_time" content="2024-01-22T00:00:00+00:00" />
 
 
-<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Adjusting Numeric Column Precision In Oracle"/>
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Adjusting Numeric Column Precision in Oracle"/>
 <meta name="twitter:description" content="Adjusting Numeric Column Precision in Oracle Summary This blog discusses how to change the precision of a numeric column in Oracle. It offers two..."/>
 
 
@@ -185,7 +183,7 @@
       
       <div class="p-6 gap-y-2">
         <h1 class="text-4xl font-semibold text-slate-800 dark:text-slate-100">
-          <a href="/question/adjusting-numeric-column-precision-in-oracle/">Adjusting Numeric Column Precision In Oracle</a>
+          <a href="/question/adjusting-numeric-column-precision-in-oracle/">Adjusting Numeric Column Precision in Oracle</a>
         </h1>
 
         <div class="mt-2">
@@ -302,14 +300,18 @@
           <h2>Table of Contents</h2>
           <aside><nav id="TableOfContents">
   <ul>
-    <li>
+    <li><a href="#changing-precision-of-numeric-column-in-oracle">Changing Precision of Numeric Column in Oracle</a>
       <ul>
         <li><a href="#approach-1-rename-column-and-copy-data">Approach 1: Rename Column and Copy Data</a></li>
         <li><a href="#approach-2-move-data-twice">Approach 2: Move Data Twice</a></li>
         <li><a href="#alternative-ways">Alternative Ways</a></li>
         <li><a href="#practical-example">Practical Example</a></li>
-        <li><a href="#recap">Recap</a></li>
-        <li><a href="#references">References</a></li>
+      </ul>
+    </li>
+    <li><a href="#recap">Recap</a></li>
+    <li><a href="#references">References</a>
+      <ul>
+        <li><a href="#faqs-on-adjusting-numeric-column-precision-in-oracle">FAQs on Adjusting Numeric Column Precision in Oracle</a></li>
       </ul>
     </li>
   </ul>
@@ -328,110 +330,136 @@
 
 
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
-       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" >
-          <p>Adjusting Numeric Column Precision in Oracle
-Summary: This blog discusses how to change the precision of a numeric column in Oracle. It offers two approaches, including renaming the column, copying the data, and dropping the original column, or moving the data twice.</p>
-<p>Changing Precision of Numeric Column in Oracle</p>
+       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" 
+          itemscope itemtype="https://schema.org/FAQPage" >
+          <p>This blog discusses how to change the precision of a numeric column in Oracle. It offers two approaches, including renaming the column, copying the data, and dropping the original column, or moving the data twice.</p>
+<h2 id="changing-precision-of-numeric-column-in-oracle">Changing Precision of Numeric Column in Oracle</h2>
 <h3 id="approach-1-rename-column-and-copy-data">Approach 1: Rename Column and Copy Data</h3>
 <p>The first approach involves renaming the column, copying the data, and dropping the original column:</p>
-<pre><code>alter table EVAPP_FEES rename column AMOUNT to AMOUNT_OLD;
-
-alter table EVAPP_FEES add AMOUNT NUMBER(14,2);
-
-update EVAPP_FEES set AMOUNT = AMOUNT_OLD;
-
-alter table EVAPP_FEES drop column AMOUNT_OLD;
-</code></pre>
-<p>Explanation:</p>
-<blockquote>
-<p><code>alter table EVAPP_FEES rename column AMOUNT to AMOUNT_OLD;</code></p>
-</blockquote>
-<p>This renames the original column to a temporary name.</p>
-<blockquote>
-<p><code>alter table EVAPP_FEES add AMOUNT NUMBER(14,2);</code></p>
-</blockquote>
-<p>This adds the new column with the desired precision.</p>
-<blockquote>
-<p><code>update EVAPP_FEES set AMOUNT = AMOUNT_OLD;</code></p>
-</blockquote>
-<p>This copies the data from the original column to the new column.</p>
-<blockquote>
-<p><code>alter table EVAPP_FEES drop column AMOUNT_OLD;</code></p>
-</blockquote>
-<p>This drops the temporary column.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">alter</span> <span style="color:#66d9ef">table</span> EVAPP_FEES <span style="color:#66d9ef">rename</span> <span style="color:#66d9ef">column</span> AMOUNT <span style="color:#66d9ef">to</span> AMOUNT_OLD;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">alter</span> <span style="color:#66d9ef">table</span> EVAPP_FEES <span style="color:#66d9ef">add</span> AMOUNT NUMBER(<span style="color:#ae81ff">14</span>,<span style="color:#ae81ff">2</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">update</span> EVAPP_FEES <span style="color:#66d9ef">set</span> AMOUNT <span style="color:#f92672">=</span> AMOUNT_OLD;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">alter</span> <span style="color:#66d9ef">table</span> EVAPP_FEES <span style="color:#66d9ef">drop</span> <span style="color:#66d9ef">column</span> AMOUNT_OLD;
+</span></span></code></pre></div><p><strong>Explanation:</strong></p>
+<ul>
+<li>
+<p><code>alter table EVAPP_FEES rename column AMOUNT to AMOUNT_OLD;</code><br>
+This renames the original column to a temporary name.</p>
+</li>
+<li>
+<p><code>alter table EVAPP_FEES add AMOUNT NUMBER(14,2);</code><br>
+This adds the new column with the desired precision.</p>
+</li>
+<li>
+<p><code>update EVAPP_FEES set AMOUNT = AMOUNT_OLD;</code><br>
+This copies the data from the original column to the new column.</p>
+</li>
+<li>
+<p><code>alter table EVAPP_FEES drop column AMOUNT_OLD;</code><br>
+This drops the temporary column.</p>
+</li>
+</ul>
 <h3 id="approach-2-move-data-twice">Approach 2: Move Data Twice</h3>
 <p>The second approach involves moving the data twice:</p>
-<pre><code>alter table EVAPP_FEES add AMOUNT_TEMP NUMBER(14,2);
-
-update EVAPP_FEES set AMOUNT_TEMP = AMOUNT;
-
-update EVAPP_FEES set AMOUNT = null;
-
-alter table EVAPP_FEES modify AMOUNT NUMBER(14,2);
-
-update EVAPP_FEES set AMOUNT = AMOUNT_TEMP;
-
-alter table EVAPP_FEES drop column AMOUNT_TEMP;
-</code></pre>
-<p>Explanation:</p>
-<blockquote>
-<p><code>alter table EVAPP_FEES add AMOUNT_TEMP NUMBER(14,2);</code></p>
-</blockquote>
-<p>This adds a temporary column with the desired precision.</p>
-<blockquote>
-<p><code>update EVAPP_FEES set AMOUNT_TEMP = AMOUNT;</code></p>
-</blockquote>
-<p>This copies the data from the original column to the temporary column.</p>
-<blockquote>
-<p><code>update EVAPP_FEES set AMOUNT = null;</code></p>
-</blockquote>
-<p>This sets the original column to null.</p>
-<blockquote>
-<p><code>alter table EVAPP_FEES modify AMOUNT NUMBER(14,2);</code></p>
-</blockquote>
-<p>This modifies the original column to the desired precision.</p>
-<blockquote>
-<p><code>update EVAPP_FEES set AMOUNT = AMOUNT_TEMP;</code></p>
-</blockquote>
-<p>This copies the data back from the temporary column to the modified original column.</p>
-<blockquote>
-<p><code>alter table EVAPP_FEES drop column AMOUNT_TEMP;</code></p>
-</blockquote>
-<p>This drops the temporary column.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">alter</span> <span style="color:#66d9ef">table</span> EVAPP_FEES <span style="color:#66d9ef">add</span> AMOUNT_TEMP NUMBER(<span style="color:#ae81ff">14</span>,<span style="color:#ae81ff">2</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">update</span> EVAPP_FEES <span style="color:#66d9ef">set</span> AMOUNT_TEMP <span style="color:#f92672">=</span> AMOUNT;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">update</span> EVAPP_FEES <span style="color:#66d9ef">set</span> AMOUNT <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">alter</span> <span style="color:#66d9ef">table</span> EVAPP_FEES <span style="color:#66d9ef">modify</span> AMOUNT NUMBER(<span style="color:#ae81ff">14</span>,<span style="color:#ae81ff">2</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">update</span> EVAPP_FEES <span style="color:#66d9ef">set</span> AMOUNT <span style="color:#f92672">=</span> AMOUNT_TEMP;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">alter</span> <span style="color:#66d9ef">table</span> EVAPP_FEES <span style="color:#66d9ef">drop</span> <span style="color:#66d9ef">column</span> AMOUNT_TEMP;
+</span></span></code></pre></div><p><strong>Explanation:</strong></p>
+<ul>
+<li>
+<p><code>alter table EVAPP_FEES add AMOUNT_TEMP NUMBER(14,2);</code><br>
+This adds a temporary column with the desired precision.</p>
+</li>
+<li>
+<p><code>update EVAPP_FEES set AMOUNT_TEMP = AMOUNT;</code><br>
+This copies the data from the original column to the temporary column.</p>
+</li>
+<li>
+<p><code>update EVAPP_FEES set AMOUNT = null;</code><br>
+This sets the original column to null.</p>
+</li>
+<li>
+<p><code>alter table EVAPP_FEES modify AMOUNT NUMBER(14,2);</code><br>
+This modifies the original column to the desired precision.</p>
+</li>
+<li>
+<p><code>update EVAPP_FEES set AMOUNT = AMOUNT_TEMP;</code><br>
+This copies the data back from the temporary column to the modified original column.</p>
+</li>
+<li>
+<p><code>alter table EVAPP_FEES drop column AMOUNT_TEMP;</code><br>
+This drops the temporary column.</p>
+</li>
+</ul>
 <h3 id="alternative-ways">Alternative Ways</h3>
 <p>If the table is compressed, the second approach can be used.</p>
 <h3 id="practical-example">Practical Example</h3>
 <p>Assume the following table:</p>
-<pre><code>CREATE TABLE EVAPP_FEES (
-  ID NUMBER,
-  AMOUNT NUMBER
-);
-</code></pre>
-<p>The following command can be used to change the precision of the AMOUNT column:</p>
-<pre><code>alter table EVAPP_FEES add AMOUNT_TEMP NUMBER(14,2);
-
-update EVAPP_FEES set AMOUNT_TEMP = AMOUNT;
-
-update EVAPP_FEES set AMOUNT = null;
-
-alter table EVAPP_FEES modify AMOUNT NUMBER(14,2);
-
-update EVAPP_FEES set AMOUNT = AMOUNT_TEMP;
-
-alter table EVAPP_FEES drop column AMOUNT_TEMP;
-</code></pre>
-<p>This will result in the following table:</p>
-<pre><code>CREATE TABLE EVAPP_FEES (
-  ID NUMBER,
-  AMOUNT NUMBER(14,2)
-);
-</code></pre>
-<h3 id="recap">Recap</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> EVAPP_FEES (
+</span></span><span style="display:flex;"><span>  ID NUMBER,
+</span></span><span style="display:flex;"><span>  AMOUNT NUMBER
+</span></span><span style="display:flex;"><span>);
+</span></span></code></pre></div><p>The following command can be used to change the precision of the AMOUNT column:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">alter</span> <span style="color:#66d9ef">table</span> EVAPP_FEES <span style="color:#66d9ef">add</span> AMOUNT_TEMP NUMBER(<span style="color:#ae81ff">14</span>,<span style="color:#ae81ff">2</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">update</span> EVAPP_FEES <span style="color:#66d9ef">set</span> AMOUNT_TEMP <span style="color:#f92672">=</span> AMOUNT;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">update</span> EVAPP_FEES <span style="color:#66d9ef">set</span> AMOUNT <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">alter</span> <span style="color:#66d9ef">table</span> EVAPP_FEES <span style="color:#66d9ef">modify</span> AMOUNT NUMBER(<span style="color:#ae81ff">14</span>,<span style="color:#ae81ff">2</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">update</span> EVAPP_FEES <span style="color:#66d9ef">set</span> AMOUNT <span style="color:#f92672">=</span> AMOUNT_TEMP;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">alter</span> <span style="color:#66d9ef">table</span> EVAPP_FEES <span style="color:#66d9ef">drop</span> <span style="color:#66d9ef">column</span> AMOUNT_TEMP;
+</span></span></code></pre></div><p>This will result in the following table:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> EVAPP_FEES (
+</span></span><span style="display:flex;"><span>  ID NUMBER,
+</span></span><span style="display:flex;"><span>  AMOUNT NUMBER(<span style="color:#ae81ff">14</span>,<span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>);
+</span></span></code></pre></div><h2 id="recap">Recap</h2>
 <p>Changing the precision of a numeric column in Oracle can be accomplished using the two approaches mentioned above. By copying data and dropping temporary columns, this task can be executed without risking the loss of data.</p>
-<h3 id="references">References</h3>
-<p><a href="https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_3001.htm" target="_blank" rel="noopener">Oracle Documentation - ALTER TABLE</a>
-
-]]&gt;</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_3001.htm" target="_blank" rel="noopener">Oracle Documentation - ALTER TABLE</a>
+</li>
+</ul>
+<hr>
+<h3 id="faqs-on-adjusting-numeric-column-precision-in-oracle">FAQs on Adjusting Numeric Column Precision in Oracle</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I use the first approach on a column with constraints?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">Yes, you can use the first approach on a column with constraints. However, make sure to consider any dependencies or triggers associated with the column, and update them accordingly to avoid conflicts.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Does changing column precision impact existing data?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">Changing column precision using the provided approaches should not result in data loss. However, it&rsquo;s always recommended to perform a backup before making structural changes to a table, especially in a production environment.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can these approaches be used for columns with indexes?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">While these approaches are generally safe, modifying columns with indexes may require additional considerations. Ensure that you review and update indexes as needed after changing column precision to maintain optimal performance.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Are there performance implications when using these approaches on large tables?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">For large tables, these approaches may involve copying a significant amount of data, impacting performance. It&rsquo;s advisable to schedule such changes during low-traffic periods and consider potential downtime for maintenance activities.</div>
+    </div>
+</div>
 
         </article>
 
