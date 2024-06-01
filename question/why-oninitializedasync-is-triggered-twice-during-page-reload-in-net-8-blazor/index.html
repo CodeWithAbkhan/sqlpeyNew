@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Why is OnInitializedAsync() Called Twice on Page Reload in .NET 8 Blazor? :: sqlpey - SQL Databases</title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta
+  name="description"
+  content="
+   
+  Learn why OnInitializedAsync() is called twice in Blazor and explore various solutions to handle this behavior effectively.
+  
+  
+  "
+/>
+<meta
+  name="keywords"
+  content="
+            .NET 8, Blazor, dotnet
+           "
+/>
+<meta name="robots" content="noodp" />
+<meta property="og:title" content="Why is OnInitializedAsync() Called Twice on Page Reload in .NET 8 Blazor?" />
+<meta property="og:description" content="Learn why OnInitializedAsync() is called twice in Blazor and explore various solutions to handle this behavior effectively." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://sqlpey.com/question/why-oninitializedasync-is-triggered-twice-during-page-reload-in-net-8-blazor/" /><meta property="article:section" content="question" />
+<meta property="article:published_time" content="2024-06-01T00:00:00+00:00" />
+<meta property="article:modified_time" content="2024-06-01T00:00:00+00:00" />
+
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Why is OnInitializedAsync() Called Twice on Page Reload in .NET 8 Blazor?"/>
+<meta name="twitter:description" content="Learn why OnInitializedAsync() is called twice in Blazor and explore various solutions to handle this behavior effectively."/>
+
+
+<link rel="canonical" href="https://sqlpey.com/question/why-oninitializedasync-is-triggered-twice-during-page-reload-in-net-8-blazor/" />
+
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="stylesheet" href="/css/index.min.624cc9dc4f4f169433ac8c97a15d33ee6dc3cf0c03b4b653d20c0cf4c646028d.css">
+
+
+
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script>
+
+  
+</head>
+<body class="w-full bg-slate-50 dark:bg-gray-800">
+  <header class="flex flex-none justify-center z-10">
+    <div class="flex flex-row gap justify-between w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl h-12 mt-3">
+  <div class="flex-none ml-2 md:ml-0">
+    <a href="/" class="">
+      <img class="h-12 w-12 rounded-full object-cover bg-gray-100" src="/header.webp" alt="logo">
+    </a>
+  </div>
+  <div class="flex-1"></div>
+  <div class="flex-none">
+    
+
+
+
+<nav class="h-full static">
+  <button id="navbar-menu-toggle" type="button" class="inline-flex items-center p-2 text-sm text-slate-800 dark:text-slate-200 rounded-lg md:hidden" aria-controls="navbar-menu" aria-expanded="false">
+    <span class="sr-only">Open main menu</span>
+    <i class="w-8 h-8">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-menu-2" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 6l16 0" />
+  <path d="M4 12l16 0" />
+  <path d="M4 18l16 0" />
+</svg>
+
+    </i>
+
+  </button>
+  
+  <div class="absolute md:static top-16 left-0 right-0 z-50 hidden w-full md:block md:w-auto" id="navbar-menu">
+    <ul class="flex flex-col mx-2 md:mx-0 md:flex-row md:border-0 rounded-sm md:rounded-full px-3 text-base font-medium text-slate-800 dark:text-slate-200 shadow-lg bg-white dark:bg-gray-600 shadow-slate-800/5 dark:shadow-slate-200/5 ring-1 ring-slate-900/5 dark:ring-slate-100/5">
+    
+    
+        <li id="" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="/" title="Home">Home</a>
+        </li>
+      
+      
+    
+     <li style="  margin-top: 12px; padding: 0; "> 
+      <button id="dropdownNavbarLink" data-dropdown-toggle="dropdownNavbar" class="flex items-center justify-between w-full py-2 px-3 text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:w-auto dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:hover:bg-gray-700 md:dark:hover:bg-transparent">
+        Tutorials 
+        <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+      </svg></button>
+       
+                
+                <div id="dropdownNavbar" class="z-10 hidden font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
+                    <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownLargeButton">
+                      
+                      <li>
+                        <a href="/mysql/" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Complete MySQL</a>
+                      </li>
+                      
+                      <li>
+                        <a href="/sql/" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Complete SQL</a>
+                      </li>
+                      
+                      <li>
+                        <a href="/database/" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Database Blog</a>
+                      </li>
+                      
+                      
+                    </ul> 
+                  </div>
+                  
+                </li>
+      
+    
+        <li id="" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="" title="About">About</a>
+        </li>
+      
+      
+    
+    
+    </ul>
+  </div>
+</nav>
+
+
+  </div>
+  
+  <div class="flex-none mx-1"></div>
+  
+  <div class="darkmode-toggle flex flex-none mr-2 md:mr-0">
+    <label for="darkmode-toggle" class="flex items-center px-3 cursor-pointer rounded-full bg-gray-100 dark:bg-gray-600" title="Toggle dark mode">
+      <input name="darkmode-toggle" id="darkmode-toggle" type="checkbox" class="sr-only peer" aria-label="Toggle dark mode">
+      <div class="group flex flex-row gap-1 justify-center h-8 px-1 rounded-full bg-white dark:bg-gray-700">
+        <i class="h-6 w-6 flex-none rounded-full bg-yellow-400 place-self-center peer-checked:group-[]:invisible">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brightness-down" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+   <path d="M12 5l0 .01"></path>
+   <path d="M17 7l0 .01"></path>
+   <path d="M19 12l0 .01"></path>
+   <path d="M17 17l0 .01"></path>
+   <path d="M12 19l0 .01"></path>
+   <path d="M7 17l0 .01"></path>
+   <path d="M5 12l0 .01"></path>
+   <path d="M7 7l0 .01"></path>
+</svg>
+
+        </i>
+        <i class="h-6 w-6 flex-none rounded-full place-self-center invisible peer-checked:group-[]:visible">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-moon-stars" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"></path>
+   <path d="M17 4a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2"></path>
+   <path d="M19 11h2m-1 -1v2"></path>
+</svg>
+
+        </i>
+      </div>
+    </label>
+  </div>
+</div>
+
+  </header>
+  <main class="flex flex-auto justify-center">
+    
+<div class="flex flex-col w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl relative">
+  <div class="flex flex-row">
+    <section class="flex flex-col w-full md:w-2/3 mt-6 m-2 md:mx-0 
+  rounded-lg shadow-md bg-white dark:bg-gray-700
+  ">
+  
+      
+      <img src="/dotnet/Why-OnInitializedAsync%28%29-is-Triggered-Twice-During-Page-Reload-in-NET-8-Blazor.jpg" alt="Why is OnInitializedAsync() Called Twice on Page Reload in .NET 8 Blazor?" class="p-0 rounded-lg h-96 object-cover object-top" loading="lazy"/>
+>
+
+      
+      <div class="p-6 gap-y-2">
+        <h1 class="text-4xl font-semibold text-slate-800 dark:text-slate-100">
+          <a href="/question/why-oninitializedasync-is-triggered-twice-during-page-reload-in-net-8-blazor/">Why is OnInitializedAsync() Called Twice on Page Reload in .NET 8 Blazor?</a>
+        </h1>
+
+        <div class="mt-2">
+          
+  <ul class="flex flex-row flex-wrap text-slate-500 dark:text-slate-300">
+    
+      
+      <li>
+        <a href="/categories/.net-8/"
+          class="text-sm mr-2 px-2 py-2 rounded border border-emerald-800 bg-emerald-800 text-slate-50">
+          .NET 8
+        </a>
+      </li>
+      
+      <li>
+        <a href="/categories/blazor/"
+          class="text-sm mr-2 px-2 py-2 rounded border border-emerald-800 bg-emerald-800 text-slate-50">
+          Blazor
+        </a>
+      </li>
+      
+      <li>
+        <a href="/categories/web/"
+          class="text-sm mr-2 px-2 py-2 rounded border border-emerald-800 bg-emerald-800 text-slate-50">
+          Web
+        </a>
+      </li>
+      
+      <li>
+        <a href="/categories/dotnet/"
+          class="text-sm mr-2 px-2 py-2 rounded border border-emerald-800 bg-emerald-800 text-slate-50">
+          dotnet
+        </a>
+      </li>
+      
+    
+    
+      
+      <li>
+        <a href="/tags/.net-8/"
+          class="flex flex-row text-sm mr-2 py-2">
+          <i class="h-5 w-5 flex-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M5 9l14 0"></path>
+   <path d="M5 15l14 0"></path>
+   <path d="M11 4l-4 16"></path>
+   <path d="M17 4l-4 16"></path>
+</svg>
+
+          </i>
+          <span class="ml-0">.NET 8</span>
+        </a>
+      </li>
+      
+      <li>
+        <a href="/tags/blazor/"
+          class="flex flex-row text-sm mr-2 py-2">
+          <i class="h-5 w-5 flex-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M5 9l14 0"></path>
+   <path d="M5 15l14 0"></path>
+   <path d="M11 4l-4 16"></path>
+   <path d="M17 4l-4 16"></path>
+</svg>
+
+          </i>
+          <span class="ml-0">Blazor</span>
+        </a>
+      </li>
+      
+      <li>
+        <a href="/tags/dotnet/"
+          class="flex flex-row text-sm mr-2 py-2">
+          <i class="h-5 w-5 flex-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M5 9l14 0"></path>
+   <path d="M5 15l14 0"></path>
+   <path d="M11 4l-4 16"></path>
+   <path d="M17 4l-4 16"></path>
+</svg>
+
+          </i>
+          <span class="ml-0">dotnet</span>
+        </a>
+      </li>
+      
+    
+  </ul>
+
+
+
+          <div class="flex flex-col gap-y-1 md:flex-row md:gap-y-0 md:gap-x-4 text-slate-500 dark:text-slate-300">
+  
+  
+  <div class="flex flex-row text-base gap-x-1">
+    <i class="h-6 w-6 flex-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"></path>
+   <path d="M16 3v4"></path>
+   <path d="M8 3v4"></path>
+   <path d="M4 11h16"></path>
+   <path d="M11 15h1"></path>
+   <path d="M12 15v3"></path>
+</svg>
+
+    </i>
+    <time datetime="2024-06-01T00:00:00&#43;00:00">
+      2024-06-01
+    </time>
+  </div>
+
+  <div class="flex flex-row text-base gap-x-1">
+    <i class="h-6 w-6 flex-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hourglass-high" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M6.5 7h11"></path>
+   <path d="M6 20v-2a6 6 0 1 1 12 0v2a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1z"></path>
+   <path d="M6 4v2a6 6 0 1 0 12 0v-2a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1z"></path>
+</svg>
+
+    </i>
+    <span>
+      4 minutes to read
+    </span>
+  </div>
+</div>
+
+
+          
+          
+        </div>
+        <section class="prose prose-slate dark:prose-invert w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mt-6">
+          <div class="mx-auto my-8 max-w-full">
+    <a href="https://codewithabkhan.github.io" title="Explore the Acer Aspire 5 laptop on Amazon" rel="noopener noreferrer">
+        <img src="/ads/intro.png" alt="codewithabkhan . github . io" 
+        class="w-full h-auto rounded-md shadow-md hover:shadow-lg transition duration-300" 
+        loading="lazy"/>
+    </a>
+</div>
+
+          <h2>Table of Contents</h2>
+          <aside><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#why-is-oninitializedasync-called-twice-on-page-reload-in-net-8-blazor">Why is OnInitializedAsync() Called Twice on Page Reload in .NET 8 Blazor?</a></li>
+        <li><a href="#detailed-explanation">Detailed Explanation</a></li>
+        <li><a href="#practical-examples-and-solutions">Practical Examples and Solutions</a></li>
+        <li><a href="#faqs-on-handling-oninitializedasync-in-blazor">FAQs on Handling OnInitializedAsync() in Blazor</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></aside>
+          <div class="m-10">
+    
+    
+    <script async="async" data-cfasync="false" src="//pl23457079.highcpmgate.com/c01dd06e02f866bb4fc4588f3a71d18b/invoke.js"></script>
+    <div id="container-c01dd06e02f866bb4fc4588f3a71d18b"></div>
+    
+</div>
+
+
+        </section>
+        
+        
+
+
+        <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
+       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" 
+          itemscope itemtype="https://schema.org/FAQPage" >
+          <h3 id="why-is-oninitializedasync-called-twice-on-page-reload-in-net-8-blazor">Why is OnInitializedAsync() Called Twice on Page Reload in .NET 8 Blazor?</h3>
+<p>In Blazor, particularly when using <code>RenderMode.InteractiveServer</code>, you might notice that <code>OnInitializedAsync()</code> gets called twice during a page reload. This behavior can be perplexing, especially when it causes unnecessary database queries or other repeated operations. Let&rsquo;s dive into why this happens and explore different strategies to manage it effectively.</p>
+<h4 id="summary">Summary</h4>
+<p>When using <code>RenderMode.InteractiveServer</code> in Blazor, <code>OnInitializedAsync()</code> is called twice during a page reload: once during the initial prerendering phase and once after establishing the server connection. This post explains the reasons behind this behavior and offers various approaches to handle it efficiently, ensuring that database queries or other operations are executed only once per page load.</p>
+<h4 id="the-problem">The Problem</h4>
+<p>When a page is created and rendered in Blazor with <code>RenderMode.InteractiveServer</code>, <code>OnInitializedAsync()</code> is called twice upon reloading in Chrome. This also affects all child components, causing them to be initialized twice as well. The primary concern is how to avoid executing expensive operations, like database queries, multiple times while ensuring the page initializes correctly.</p>
+<h3 id="detailed-explanation">Detailed Explanation</h3>
+<ol>
+<li>
+<p><strong>Prerendering and Server-Side Initialization</strong></p>
+<ul>
+<li>During prerendering, the page content is rendered statically and sent to the client. This is the first call to <code>OnInitializedAsync()</code>.</li>
+<li>After the server connection is established, Blazor reinitializes the page to enable interactivity. This triggers the second call to <code>OnInitializedAsync()</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong>Why Two Calls?</strong></p>
+<ul>
+<li><strong>Initial Prerender:</strong> This call prepares the page content quickly to reduce perceived load times.</li>
+<li><strong>Server-Side Initialization:</strong> This sets up the interactive components necessary for a fully functional page after the initial render.</li>
+</ul>
+</li>
+<li>
+<p><strong>Challenges</strong></p>
+<ul>
+<li><strong>Performance:</strong> Executing expensive operations twice can degrade performance.</li>
+<li><strong>State Management:</strong> Ensuring consistent state across prerender and post-render phases can be complex.</li>
+</ul>
+</li>
+</ol>
+<h3 id="practical-examples-and-solutions">Practical Examples and Solutions</h3>
+<h4 id="using-onafterrenderasyncbool-firstrender">Using <code>OnAfterRenderAsync(bool firstRender)</code></h4>
+<p>A common approach is to move expensive operations to <code>OnAfterRenderAsync()</code> and only execute them during the first render.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">async</span> Task OnAfterRenderAsync(<span style="color:#66d9ef">bool</span> firstRender)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (firstRender)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Execute expensive operations here, e.g., database queries</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">await</span> LoadDataAsync();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">async</span> Task LoadDataAsync()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Simulate data loading</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">await</span> Task.Delay(<span style="color:#ae81ff">1000</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Your data loading logic</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="detecting-prerendering-with-httpcontext">Detecting Prerendering with <code>HttpContext</code></h4>
+<p>You can use the presence of <code>HttpContext</code> to determine if the component is being prerendered.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#a6e22e">[CascadingParameter]</span> <span style="color:#66d9ef">private</span> HttpContext? HttpContext { <span style="color:#66d9ef">get</span>; <span style="color:#66d9ef">set</span>; }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">async</span> Task OnInitializedAsync()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (HttpContext != <span style="color:#66d9ef">null</span>)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Prerender phase</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Server-side initialization</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">await</span> LoadDataAsync();
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="caching-the-initial-data">Caching the Initial Data</h4>
+<p>To avoid repeated database queries, cache the results during prerendering and reuse them during server-side initialization.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> WeatherForecast[]? _cachedForecasts;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> DateTime _cacheExpiry;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">async</span> Task OnInitializedAsync()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (HttpContext != <span style="color:#66d9ef">null</span>)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Prerender phase</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (_cachedForecasts == <span style="color:#66d9ef">null</span> || DateTime.UtcNow &gt; _cacheExpiry)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            _cachedForecasts = <span style="color:#66d9ef">await</span> FetchDataFromDatabaseAsync();
+</span></span><span style="display:flex;"><span>            _cacheExpiry = DateTime.UtcNow.AddSeconds(<span style="color:#ae81ff">15</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Server-side initialization</span>
+</span></span><span style="display:flex;"><span>    forecasts = _cachedForecasts;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">async</span> Task&lt;WeatherForecast[]&gt; FetchDataFromDatabaseAsync()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Simulate database call</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">await</span> Task.Delay(<span style="color:#ae81ff">1000</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Fetch and return data</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="disabling-prerendering">Disabling Prerendering</h4>
+<p>If prerendering is not required for your application, you can disable it.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span>&lt;Routes @rendermode=<span style="color:#e6db74">&#34;new InteractiveServerRenderMode(prerender:false)&#34;</span> /&gt;
+</span></span></code></pre></div><h3 id="faqs-on-handling-oninitializedasync-in-blazor">FAQs on Handling OnInitializedAsync() in Blazor</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why is OnInitializedAsync() called twice in Blazor?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>A:</strong> OnInitializedAsync() is called twice in Blazor when using RenderMode.InteractiveServer due to prerendering. The first call is during the initial static prerender, and the second call occurs after the server connection is established.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How can I prevent OnInitializedAsync() from executing expensive operations twice?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>A:</strong> You can prevent this by moving expensive operations to OnAfterRenderAsync(bool firstRender) and executing them only when firstRender is true.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is there a way to detect if a call is during prerendering?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>A:</strong> Yes, you can detect prerendering by checking if HttpContext is not null within the component.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How can I cache data to avoid repeated database queries in Blazor?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>A:</strong> You can cache data during the prerender phase and reuse it during the server-side initialization by storing the data in a static variable and setting an expiry time.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I disable prerendering in Blazor?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>A:</strong> Yes, you can disable prerendering by setting the render mode in App.razor to new InteractiveServerRenderMode(prerender:false).</div>
+    </div>
+</div>
+<p>For more details on Blazor prerendering, you can refer to the <a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/prerendering-and-integration" target="_blank" rel="noopener">Microsoft Documentation</a>
+.</p>
+
+        </article>
+
+        
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const themeToggle = document.querySelector('.darkmode-toggle input');
+      const light = 'light';
+      const dark = 'dark';
+      let isDark = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      let theme = isDark ? dark : light;
+  
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/sqlpeyNew',
+          repoId: 'R_kgDOLGnEAw',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDOLGnEA84Cchw3',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+  
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+  
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+  
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+  
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+  
+      themeToggle.addEventListener('change', function () {
+        if (this.checked) {
+          theme = dark;
+        } else {
+          theme = light;
+        }
+        sendMessage({
+          setConfig: {
+            theme: theme,
+          }
+        });
+      });
+    })();
+  </script>
+  
+  
+
+
+      </div>
+    </section>
+    <aside class="hidden md:flex flex-col md:w-1/3 mx-3 top-0 sticky self-start
+">
+   
+    <div class="mt-12 items-center ml-6 mr-10 start-0">
+  <form class="flex items-center m-1 w-full" action="https://sqlpey.com/search/" method="get">
+    <label for="search-input" class="sr-only">Search</label>
+    <div class="relative w-full">
+        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <svg alt="Search icon" class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 6c0 1.7-3.1 3-7 3S5 7.7 5 6m14 0c0-1.7-3.1-3-7-3S5 4.3 5 6m14 0v6M5 6v6m0 0c0 1.7 3.1 3 7 3s7-1.3 7-3M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>
+            </svg>
+        </div>
+        <input type="text" name="query" id="search-input" class="bg-white border  text-gray-900 text-sm rounded-full focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+         placeholder="Search ..." required>
+        <button type="submit" aria-label="Submit Search" class="absolute inset-y-0 end-0 flex items-center pe-3">
+            <svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+            </svg>
+        </button>
+    </div>
+    <input type="submit" value="" title="Submit Search">
+</form>
+
+</div>
+
+  
+  
+
+<section class="flex flex-col w-full gap-y-2 px-6 mt-3 text-slate-800 dark:text-slate-200">
+  <div class="flex flex-row">
+    <a class="flex flex-row" href='/categories/'>
+      <i class="h-6 w-6 flex-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-category-2" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M14 4h6v6h-6z"></path>
+   <path d="M4 14h6v6h-6z"></path>
+   <path d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+   <path d="M7 7m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+</svg>
+
+      </i>
+      <h2 class="pl-1 uppercase">
+        Categories
+      </h2>
+    </a>
+  </div>
+
+  <ul class="flex flex-row flex-wrap">
+    
+    <li class="mt-2 mr-2">
+      <a href="/categories/sql/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        sql
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/categories/database/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        database
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/categories/queries/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        queries
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/categories/mysql/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        mysql
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/categories/oracle/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        oracle
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/categories/azure-sql-database/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        azure-sql-database
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/categories/sql-server/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        sql-server
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/categories/.net-8/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        .NET 8
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/categories/blazor/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        Blazor
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/categories/dotnet/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        dotnet
+      </a>
+    </li>
+    
+  </ul>
+
+   
+</section>
+
+  
+
+  
+
+  
+  
+
+<section class="flex flex-col w-full gap-y-2 px-6 mt-3 text-slate-800 dark:text-slate-200">
+  <div class="flex flex-row">
+    <a class="flex flex-row" href='/tags/'>
+      <i class="h-6 w-6 flex-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M5 9l14 0"></path>
+   <path d="M5 15l14 0"></path>
+   <path d="M11 4l-4 16"></path>
+   <path d="M17 4l-4 16"></path>
+</svg>
+
+      </i>
+      <h2 class="pl-1 uppercase">
+        Tags
+      </h2>
+    </a>
+  </div>
+
+  <ul class="flex flex-row flex-wrap">
+    
+    <li class="mt-2 mr-2">
+      <a href="/tags/sql/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        sql
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/tags/database/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        database
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/tags/mysql/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        mysql
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/tags/oracle/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        oracle
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/tags/azure-sql-database-2/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        azure-sql-database-2
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/tags/postgresql/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        postgresql
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/tags/queries/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        queries
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/tags/sql-server-2/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        sql-server-2
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/tags/.net-8/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        .NET 8
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/tags/blazor/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        Blazor
+      </a>
+    </li>
+    
+  </ul>
+
+   
+</section>
+
+  
+
+<div class="max-w-full mx-auto my-4 flex items-start">
+    
+    <script type="text/javascript">
+        atOptions = {
+            'key' : '8d6abf6bda5e2b637b21aff20948ef91',
+            'format' : 'iframe',
+            'height' : 300,
+            'width' : 160,
+            'params' : {}
+        };
+    </script>
+    <script type="text/javascript" src="//www.topcreativeformat.com/8d6abf6bda5e2b637b21aff20948ef91/invoke.js"></script>
+</div>
+
+    </aside>
+  </div>
+</div>
+
+  </main>
+  <footer class="flex flex-none justify-center">
+    <section class="flex flex-col md:flex-row mx-2 md:mx-0 gap-2 md:gap-0 justify-between w-full max-w-4xl lg:max-w-5xl py-6 text-slate-500 dark:text-slate-300">
+  <div class="flex flex-row">
+    
+  
+  
+    <a href="https://www.facebook.com/sqlpey" target="_blank" title="Facebook" class="flex flex-row mr-2">
+      <span class="hidden">Facebook</span>
+      <i class="h-6 w-6 flex-none"> <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-facebook" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3"></path>
+</svg>
+ </i>
+    </a>
+  
+  
+  
+    <a href="https://twitter.com/sqlpey" target="_blank" title="Twitter" class="flex flex-row mr-2">
+      <span class="hidden">Twitter</span>
+      <i class="h-6 w-6 flex-none"> <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-x" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M4 4l11.733 16h4.267l-11.733 -16z"></path>
+   <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"></path>
+</svg>
+ </i>
+    </a>
+  
+  
+  
+    <a href="https://www.instagram.com/sqlpey" target="_blank" title="Instagram" class="flex flex-row mr-2">
+      <span class="hidden">Instagram</span>
+      <i class="h-6 w-6 flex-none"> <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-instagram" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M4 4m0 4a4 4 0 0 1 4 -4h8a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-8a4 4 0 0 1 -4 -4z"></path>
+   <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+   <path d="M16.5 7.5l0 .01"></path>
+</svg>
+ </i>
+    </a>
+  
+  
+  
+    <a href="https://www.linkedin.com/sqlpey" target="_blank" title="LinkedIn" class="flex flex-row mr-2">
+      <span class="hidden">LinkedIn</span>
+      <i class="h-6 w-6 flex-none"> <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-linkedin" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"></path>
+   <path d="M8 11l0 5"></path>
+   <path d="M8 8l0 .01"></path>
+   <path d="M12 16l0 -5"></path>
+   <path d="M16 16v-3a2 2 0 0 0 -4 0"></path>
+</svg>
+ </i>
+    </a>
+  
+  
+  
+  
+
+
+  </div>
+  <div class="grow"></div>
+  <div class="flex flex-row">
+    <i class="h-6 w-6 flex-none"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+   <path d="M14 9.75a3.016 3.016 0 0 0 -4.163 .173a2.993 2.993 0 0 0 0 4.154a3.016 3.016 0 0 0 4.163 .173"></path>
+</svg>
+</i> 2024 abkhan
+    
+  </div>
+  
+  <div class="flex flex-row">
+    <span class="ml-0 pl-0 md:ml-2 md:pl-2 border-l-0 md:border-l border-slate-300 dark:border-slate-400">
+      Powered by <a href="https://gohugo.io" target="_blank" rel="noopener" class="underline"> Ab</a> <span class="text-red-600">&hearts;</span> <a href="https://github.com/tomowang/hugo-theme-tailwind" target="_blank" rel="noopener" class="underline">Khan</a>
+    </span>
+  </div>
+ 
+  
+ 
+ 
+</section>
+
+  </footer><script src="/main.min.9e403a07cf93acc04c92ff004d87dd03d93ea2ac475bbb69443afecce166a976.js"></script>
+  
+  <div class="hidden top-1 right-1" id="code-copy">
+    <i class="h-6 w-6 block">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" />
+  <path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" />
+</svg>
+
+    </i>
+  </div>
+  <div class="hidden top-1 right-1" id="code-copy-done">
+    <i class="h-6 w-6 block">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M5 12l5 5l10 -10" />
+</svg>
+
+    </i>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},5e3)}();
+</script>
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+</body>
+</html>
