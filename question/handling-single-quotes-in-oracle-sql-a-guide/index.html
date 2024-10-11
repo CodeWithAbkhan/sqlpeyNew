@@ -28,8 +28,8 @@
   <meta property="og:locale" content="en">
   <meta property="og:type" content="article">
     <meta property="article:section" content="question">
-    <meta property="article:published_time" content="2024-01-22T00:00:00+00:00">
-    <meta property="article:modified_time" content="2024-01-22T00:00:00+00:00">
+    <meta property="article:published_time" content="2024-10-09T00:00:00+00:00">
+    <meta property="article:modified_time" content="2024-10-09T00:00:00+00:00">
     <meta property="article:tag" content="Sql">
     <meta property="article:tag" content="Database">
 
@@ -273,8 +273,8 @@
 </svg>
 
     </i>
-    <time datetime="2024-01-22T00:00:00&#43;00:00">
-      2024-01-22
+    <time datetime="2024-10-09T00:00:00&#43;00:00">
+      2024-10-09
     </time>
   </div>
 
@@ -289,7 +289,7 @@
 
     </i>
     <span>
-      2 minutes to read
+      5 minutes to read
     </span>
   </div>
 </div>
@@ -310,10 +310,36 @@
           <h2>Table of Contents</h2>
           <aside><nav id="TableOfContents">
   <ul>
-    <li><a href="#summary">Summary</a></li>
-    <li><a href="#code-explanation">Code Explanation</a></li>
-    <li><a href="#practical-example">Practical Example</a></li>
-    <li><a href="#alternative-ways">Alternative Ways</a></li>
+    <li><a href="#why-handling-single-quotes-is-important">Why Handling Single Quotes Is Important</a>
+      <ul>
+        <li><a href="#common-sql-errors-related-to-single-quotes">Common SQL Errors Related to Single Quotes</a></li>
+        <li><a href="#best-practices-for-avoiding-errors">Best Practices for Avoiding Errors</a></li>
+      </ul>
+    </li>
+    <li><a href="#methods-for-handling-single-quotes-in-oracle-sql">Methods for Handling Single Quotes in Oracle SQL</a>
+      <ul>
+        <li><a href="#1-escaping-single-quotes-with-two-single-quotes">1. <strong>Escaping Single Quotes with Two Single Quotes</strong></a></li>
+        <li><a href="#2-using-the-quoting-method-introduced-in-oracle-10g">2. <strong>Using the Quoting Method Introduced in Oracle 10g</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#handling-longer-strings-with-single-quotes">Handling Longer Strings with Single Quotes</a>
+      <ul>
+        <li><a href="#3-using-square-brackets-to-enclose-strings">3. <strong>Using Square Brackets to Enclose Strings</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#practical-example-inserting-records-with-single-quotes">Practical Example: Inserting Records with Single Quotes</a>
+      <ul>
+        <li><a href="#sql-query-example">SQL Query Example:</a></li>
+      </ul>
+    </li>
+    <li><a href="#alternative-ways-to-handle-single-quotes">Alternative Ways to Handle Single Quotes</a>
+      <ul>
+        <li><a href="#1-using-the-replace-function">1. <strong>Using the REPLACE Function</strong></a></li>
+        <li><a href="#2-using-bind-variables">2. <strong>Using Bind Variables</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#faqs-on-handling-single-quotes-in-oracle-sql">FAQs on Handling Single Quotes in Oracle SQL</a></li>
+    <li><a href="#recape">Recape</a></li>
   </ul>
 </nav></aside>
           <div class="m-10">
@@ -356,41 +382,118 @@
 
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
        prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" >
-          <h2 id="summary">Summary</h2>
-<p>When dealing with varchar data types in Oracle SQL, particularly when inserting records with single quotes, it&rsquo;s crucial to handle quotes carefully to prevent SQL errors. This guide explores two methods for accomplishing this: using two single quotes and leveraging the new quoting method introduced in Oracle 10g.</p>
-<h2 id="code-explanation">Code Explanation</h2>
-<p>To insert a record with a single quote in the column, you can use the following SQL query:</p>
+          <p>Handling single quotes in SQL queries is a common challenge when working with text data. If you&rsquo;re working with Oracle SQL, specifically with <code>varchar</code> data types, you’ll frequently encounter situations where you need to insert or manipulate strings that contain single quotes, like names (O&rsquo;Brien, D&rsquo;Costa) or other text.</p>
+<p>Single quotes (<code>'</code>) in Oracle SQL are treated as a string delimiter, and failing to escape them properly can cause SQL errors. Oracle SQL provides various ways to handle single quotes in string values, which we will cover in this detailed guide.</p>
+<hr>
+<h2 id="why-handling-single-quotes-is-important">Why Handling Single Quotes Is Important</h2>
+<p>Single quotes are used to delimit string literals in SQL. For example, to insert a string like <code>'O'Brien'</code>, the SQL engine would interpret the first quote as the beginning of the string and the next one as the end, leading to a syntax error. Therefore, we need to &ldquo;escape&rdquo; the quote in such cases.</p>
+<h3 id="common-sql-errors-related-to-single-quotes">Common SQL Errors Related to Single Quotes</h3>
+<p>Errors like these may occur if quotes aren&rsquo;t handled correctly:</p>
+<ul>
+<li><strong>ORA-00917</strong>: Missing comma</li>
+<li><strong>ORA-00933</strong>: SQL command not properly ended</li>
+<li><strong>ORA-01756</strong>: Quoted string not properly terminated</li>
+</ul>
+<h3 id="best-practices-for-avoiding-errors">Best Practices for Avoiding Errors</h3>
+<ol>
+<li><strong>Always escape single quotes</strong> within string literals.</li>
+<li><strong>Use the right quoting method</strong> depending on your Oracle version.</li>
+<li><strong>Test queries</strong> with single quotes before using them in production to avoid SQL errors.</li>
+</ol>
+<hr>
+<h2 id="methods-for-handling-single-quotes-in-oracle-sql">Methods for Handling Single Quotes in Oracle SQL</h2>
+<p>Oracle SQL provides multiple ways to handle single quotes when inserting or querying string literals.</p>
+<h3 id="1-escaping-single-quotes-with-two-single-quotes">1. <strong>Escaping Single Quotes with Two Single Quotes</strong></h3>
+<p>One of the simplest ways to handle a single quote in a string is by using two single quotes (<code>''</code>).</p>
+<h4 id="example-query">Example Query:</h4>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#e6db74">&#39;D&#39;&#39;COSTA&#39;</span> name <span style="color:#66d9ef">FROM</span> DUAL;
-</span></span></code></pre></div><p>Here, two single quotes are used to escape the single quote in the last name &lsquo;D&rsquo;COSTA&rsquo;. This ensures that Oracle SQL recognizes the single quote as a character in the string and not as a SQL operator.</p>
-<p>Alternatively, the new quoting method introduced in Oracle 10g can be utilized:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> q<span style="color:#e6db74">&#39;$D&#39;</span>COSTA$<span style="color:#e6db74">&#39; NAME FROM DUAL;
-</span></span></span></code></pre></div><p><div class="not-prose">
-<figure>
-    <img src="/oracle/how-to-handle-single-ouotes-in-oracle-21c-sql-example.png"
-      alt="how to handle single ouotes in oracle 21c sql example" 
-      loading="lazy"
-    >
-  </figure></div>
-</p>
-<p>This method allows using any delimiter between <code>q</code> and <code>$</code> to avoid conflicts with the string.</p>
-<p>To handle a single quote in a longer string, enclose the string inside square brackets:</p>
+</span></span></code></pre></div><ul>
+<li><strong>Explanation</strong>: Here, <code>D''COSTA</code> will be interpreted as the string <code>D'COSTA</code>. The two consecutive single quotes (<code>''</code>) act as an escape sequence, ensuring the single quote is treated as part of the string.</li>
+</ul>
+<h4 id="practical-use-case">Practical Use Case:</h4>
+<p>Consider a table <code>Employees</code> where you need to insert a record for an employee with the last name &ldquo;D&rsquo;COSTA&rdquo;.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> Employees (ID, Last_Name) <span style="color:#66d9ef">VALUES</span> (<span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#39;D&#39;&#39;COSTA&#39;</span>);
+</span></span></code></pre></div><h3 id="2-using-the-quoting-method-introduced-in-oracle-10g">2. <strong>Using the Quoting Method Introduced in Oracle 10g</strong></h3>
+<p>Oracle 10g introduced the <code>q</code> quoting mechanism, which provides a more flexible way to deal with strings containing special characters, including single quotes.</p>
+<h4 id="example-query-1">Example Query:</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> q<span style="color:#e6db74">&#39;$D&#39;</span>COSTA$<span style="color:#e6db74">&#39; name FROM DUAL;
+</span></span></span></code></pre></div><ul>
+<li><strong>Explanation</strong>: This method allows you to use different delimiters for string literals, avoiding the need for escaping single quotes. The string <code>D'COSTA</code> is enclosed between <code>q</code> and <code>$</code>, and Oracle SQL correctly interprets the single quote within the string.</li>
+</ul>
+<h4 id="practical-use-case-1">Practical Use Case:</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> Employees (ID, Last_Name) <span style="color:#66d9ef">VALUES</span> (<span style="color:#ae81ff">1</span>, q<span style="color:#e6db74">&#39;$D&#39;</span>COSTA$<span style="color:#e6db74">&#39;);
+</span></span></span></code></pre></div><p>This method becomes particularly useful when dealing with multiple single quotes in a string.</p>
+<hr>
+<h2 id="handling-longer-strings-with-single-quotes">Handling Longer Strings with Single Quotes</h2>
+<p>When dealing with longer strings, especially in cases like names or sentences with contractions, you can use square brackets to enclose the string.</p>
+<h3 id="3-using-square-brackets-to-enclose-strings">3. <strong>Using Square Brackets to Enclose Strings</strong></h3>
+<p>Square brackets can also be used as delimiters for strings containing single quotes.</p>
+<h4 id="example-query-2">Example Query:</h4>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> Q<span style="color:#e6db74">&#39;[Paddy O&#39;</span>Reilly]<span style="color:#e6db74">&#39; FROM DUAL;
-</span></span></span></code></pre></div><p><div class="not-prose">
-<figure>
-    <img src="/oracle/single-ouotes-in-oracle-21c-sql-example.png"
-      alt="single ouotes in oracle 21c sql example" 
-      loading="lazy"
-    >
-  </figure></div>
-</p>
-<p>Here, the string &lsquo;Paddy O&rsquo;Reilly&rsquo; is enclosed in square brackets to escape the single quote in &lsquo;O&rsquo;Reilly&rsquo;, ensuring proper recognition by Oracle SQL.</p>
-<h2 id="practical-example">Practical Example</h2>
-<p>Suppose you have a customer data table with columns: ID (number), First_Name (varchar), Last_Name (varchar), and Address (varchar). To insert a record for a customer with the details: ID = 1, First Name = John, Last Name = O&rsquo;Brien, and Address = 123 Main St., use the following SQL query:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> Customer (ID, First_Name, Last_Name, Address) <span style="color:#66d9ef">VALUES</span> (<span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#39;John&#39;</span>, <span style="color:#e6db74">&#39;O&#39;&#39;Brien&#39;</span>, <span style="color:#e6db74">&#39;123 Main St&#39;</span>);
-</span></span></code></pre></div><p>Here, two single quotes are used to escape the single quote in the last name &lsquo;O&rsquo;Brien&rsquo;.</p>
-<h2 id="alternative-ways">Alternative Ways</h2>
-<p>While the discussed methods are common, other approaches include using the REPLACE function to replace the single quote with a double quote or using bind variables to pass values separately to the database.</p>
-<p>In recap, handling single quotes in Oracle SQL is vital to prevent SQL errors and ensure the proper functioning of the database. The methods discussed above provide effective ways to escape single quotes in string values and insert records correctly.</p>
+</span></span></span></code></pre></div><ul>
+<li><strong>Explanation</strong>: In this case, the string <code>'Paddy O'Reilly'</code> contains a single quote. By using square brackets (<code>[]</code>), Oracle recognizes the entire string as a literal, avoiding conflicts with the single quote.</li>
+</ul>
+<h4 id="practical-use-case-2">Practical Use Case:</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> Customers (ID, Last_Name) <span style="color:#66d9ef">VALUES</span> (<span style="color:#ae81ff">1</span>, Q<span style="color:#e6db74">&#39;[O&#39;</span>Reilly]<span style="color:#e6db74">&#39;);
+</span></span></span></code></pre></div><hr>
+<h2 id="practical-example-inserting-records-with-single-quotes">Practical Example: Inserting Records with Single Quotes</h2>
+<p>Consider a customer data table with columns <code>ID</code>, <code>First_Name</code>, <code>Last_Name</code>, and <code>Address</code>. You need to insert a record where the customer&rsquo;s last name contains a single quote.</p>
+<h3 id="sql-query-example">SQL Query Example:</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> Customers (ID, First_Name, Last_Name, Address) 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">VALUES</span> (<span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#39;John&#39;</span>, <span style="color:#e6db74">&#39;O&#39;&#39;Brien&#39;</span>, <span style="color:#e6db74">&#39;123 Main St&#39;</span>);
+</span></span></code></pre></div><ul>
+<li><strong>Explanation</strong>: In this query, the last name <code>O'Brien</code> is inserted by escaping the single quote with two single quotes (<code>O''Brien</code>).</li>
+</ul>
+<hr>
+<h2 id="alternative-ways-to-handle-single-quotes">Alternative Ways to Handle Single Quotes</h2>
+<p>Besides escaping or using quoting methods, there are other techniques to handle single quotes in Oracle SQL.</p>
+<h3 id="1-using-the-replace-function">1. <strong>Using the REPLACE Function</strong></h3>
+<p>If you want to avoid handling single quotes directly in your SQL query, you can use the <code>REPLACE</code> function to dynamically replace single quotes in the string.</p>
+<h4 id="example-query-3">Example Query:</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#66d9ef">REPLACE</span>(<span style="color:#e6db74">&#39;D&#39;&#39;COSTA&#39;</span>, <span style="color:#e6db74">&#39;&#39;&#39;&#39;</span>, <span style="color:#e6db74">&#39;&#34;&#39;</span>) <span style="color:#66d9ef">FROM</span> DUAL;
+</span></span></code></pre></div><ul>
+<li><strong>Explanation</strong>: In this query, the single quote is replaced with a double quote using the <code>REPLACE</code> function. This is useful when you want to avoid manual escaping.</li>
+</ul>
+<h3 id="2-using-bind-variables">2. <strong>Using Bind Variables</strong></h3>
+<p>Using bind variables is a secure and efficient way to insert or query values that may contain single quotes. This method helps prevent SQL injection and avoids the need to manually escape quotes.</p>
+<h4 id="example-query-4">Example Query:</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span>VAR lastName VARCHAR2(<span style="color:#ae81ff">50</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">EXEC</span> :lastName :<span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;O&#39;&#39;Brien&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> Customers (ID, Last_Name) <span style="color:#66d9ef">VALUES</span> (<span style="color:#ae81ff">2</span>, :lastName);
+</span></span></code></pre></div><h2 id="faqs-on-handling-single-quotes-in-oracle-sql">FAQs on Handling Single Quotes in Oracle SQL</h2>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the best method for handling single quotes in Oracle SQL?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">A: Both escaping the single quote with two single quotes and using the q quoting method introduced in Oracle 10g are effective. The q method provides more flexibility and readability, especially for complex strings.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I avoid escaping single quotes altogether?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">A: Yes, you can avoid escaping by using the q quoting method or bind variables. Using bind variables is recommended for performance and security reasons.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Are there performance issues when using quotes in Oracle SQL queries?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">A: Escaping quotes does not significantly impact performance. However, using bind variables can improve performance by reducing the parsing overhead and preventing SQL injection.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How do I handle single quotes in dynamic SQL queries?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">A: In dynamic SQL, you can handle single quotes either by escaping them or using the REPLACE function to sanitize the input before running the query.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What happens if I forget to escape a single quote?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">A: If you forget to escape a single quote in Oracle SQL, it will lead to syntax errors, such as ORA-00917 (missing comma) or ORA-01756 (quoted string not properly terminated).</div>
+    </div>
+</div>
+<h2 id="recape">Recape</h2>
+<p>Handling single quotes in Oracle SQL is essential for preventing SQL errors and ensuring proper data insertion and retrieval. The methods described—using two single quotes, the <code>q</code> quoting method, or bind variables—are reliable approaches to safely managing single quotes within SQL queries. Depending on the complexity of your data, you can choose the most suitable method for your use case.</p>
+<p>By following these practices, you can confidently handle string values containing single quotes in Oracle SQL, ensuring both functionality and security in your queries.</p>
 
         </article>
 
@@ -529,13 +632,6 @@
     </li>
     
     <li class="mt-2 mr-2">
-      <a href="/categories/blazor/"
-        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
-        Blazor
-      </a>
-    </li>
-    
-    <li class="mt-2 mr-2">
       <a href="/categories/.net-8/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
         .NET 8
@@ -553,6 +649,13 @@
       <a href="/categories/dotnet/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
         Dotnet
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/categories/blazor-8/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        Blazor 8
       </a>
     </li>
     
@@ -632,16 +735,16 @@
     </li>
     
     <li class="mt-2 mr-2">
-      <a href="/tags/blazor/"
+      <a href="/tags/.net-8/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
-        Blazor
+        .NET 8
       </a>
     </li>
     
     <li class="mt-2 mr-2">
-      <a href="/tags/.net-8/"
+      <a href="/tags/blazor-8/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
-        .NET 8
+        Blazor 8
       </a>
     </li>
     
@@ -681,9 +784,9 @@
     </li>
     
     <li class="mt-2 mr-2">
-      <a href="/tags/queries/"
+      <a href="/tags/blazor/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
-        Queries
+        Blazor
       </a>
     </li>
     
