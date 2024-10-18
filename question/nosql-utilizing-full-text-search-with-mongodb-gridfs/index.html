@@ -17,9 +17,7 @@
 <meta
   name="keywords"
   content="
-            
-              SQL, Databases, Big-Query, .NET, Blazor, Dotnet, Oracle, MS SQL SErver, MySQL, PostgreSQL, create, table, oracle, sql, select, top, drop, if, exists, justless, books, database, insert, into, cengage, download, sum, example, delete, taking, long, time, approx_quantiles, statement, update/merge, match, source, row, target, foreign, key, mongo, db, except, columns, epoch, date, split, str, dividon, error, bq, wildcard, get, column, names, operator, case, all, then/else, arguments, coercible, common, type, int64, string, actual, when, else, bool, ssis, acquire, connection, azure, query, update, merge, export, csv, file, developer, check, view, bonus, spend, money, stores, catalog, identify, preferred, customers, country, origin, timestamp, add, days, list, meets, certain, value, range, extract, data, fields, open, multiple, tables, appending, single, quote, save, result, work, clob, alter, default, schema, resolve, division, zero, eoor, db-shm, could, server, file, lock, another, seconds,  bigquery, hibernate, dialect, extract, age, birth, entire, comparing, pivot, varchar2, nvarchar2, primary, key, google, double, bad, bugquery, existence, creating, newline, characters, invalid, url, specified, oracledatasource.makeurl, connect, database, ssms, divide, statement, like, string, count, unique, converter, em, numbers, places, even, negative, big, query, quartiles, partition, round, convert,  text, exported,   exporting, files, locate, package, modulenotfounderror, module, named, db_dtypes, use, ssms, o, postgresql, sysdate, installing, dbd::oracle, ns, clob, how, split, comma-separated, currency, big, handle, show, headers, csv, shm, wal, convert, commaseparated, escape, character, search, pattern, float, username, password, fix, syntax, join, condition, map, cursor, dict, criteria, hourly, grouping  view, employees, timestamp, value, range
-            
+            MongoDB, GridFS, Full-text search, NoSQL database, Elasticsearch integration, FUSE-based file system, Binary data storage, Text extraction techniques, Document storage solutions, Scalable file storage, Large file handling in MongoDB, Search engine integration, PDF text extraction with Python, Python libraries for text extraction, Search capabilities in MongoDB, Metadata retrieval from GridFS, Advanced search solutions, MongoDB document retrieval, Real-time text search, Efficient file indexing methods, Open-source search engines
            "
 />
 <meta name="robots" content="noodp" />
@@ -30,8 +28,8 @@
   <meta property="og:locale" content="en">
   <meta property="og:type" content="article">
     <meta property="article:section" content="question">
-    <meta property="article:published_time" content="2024-01-22T00:00:00+00:00">
-    <meta property="article:modified_time" content="2024-01-22T00:00:00+00:00">
+    <meta property="article:published_time" content="2024-10-17T00:00:00+00:00">
+    <meta property="article:modified_time" content="2024-10-17T00:00:00+00:00">
     <meta property="article:tag" content="Sql">
     <meta property="article:tag" content="Database">
 
@@ -271,8 +269,8 @@
 </svg>
 
     </i>
-    <time datetime="2024-01-22T00:00:00&#43;00:00">
-      2024-01-22
+    <time datetime="2024-10-17T00:00:00&#43;00:00">
+      2024-10-17
     </time>
   </div>
 
@@ -287,7 +285,7 @@
 
     </i>
     <span>
-      4 minutes to read
+      6 minutes to read
     </span>
   </div>
 </div>
@@ -306,7 +304,19 @@
 </div>
 
           <h2>Table of Contents</h2>
-          <aside><nav id="TableOfContents"></nav></aside>
+          <aside><nav id="TableOfContents">
+  <ul>
+    <li><a href="#why-cant-we-perform-full-text-search-on-gridfs">Why Can’t We Perform Full-Text Search on GridFS?</a></li>
+    <li><a href="#two-possible-ways-to-perform-full-text-search-on-gridfs">Two Possible Ways to Perform Full-Text Search on GridFS</a>
+      <ul>
+        <li><a href="#1-integrate-mongodb-with-a-text-search-engine-like-elasticsearch">1. Integrate MongoDB with a Text Search Engine like Elasticsearch</a></li>
+        <li><a href="#2-use-a-fuse-based-file-system-to-mount-gridfs-as-a-local-directory">2. Use a FUSE-Based File System to Mount GridFS as a Local Directory</a></li>
+      </ul>
+    </li>
+    <li><a href="#final-thoughts">Final Thoughts</a></li>
+    <li><a href="#faqs-on-nosql-utilizing-full-text-search-with-mongodb-gridfs">FAQs on Nosql-Utilizing-Full-Text-Search-With-Mongodb-Gridfs</a></li>
+  </ul>
+</nav></aside>
           <div class="m-10">
     
 
@@ -347,21 +357,102 @@
 
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
        prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" >
-          <p>NOSQL: Utilizing Full-Text Search with MongoDB GridFS
-Learning Full-Text Search on MongoDB GridFS</p>
-<p>If you want to store large files such as PDFs, images, or videos, MongoDB&rsquo;s GridFS is an excellent option. It enables you to break down large files into smaller chunks and store them in a separate collection, making it easier for you to read and write the files without downloading the entire document.</p>
-<p>Although, suppose you want to search for a specific word or phrase within these documents. In that case, you might be wondering, can you perform full-text search on data files in MongoDB&rsquo;s GridFS? The answer is it&rsquo;s not possible with MongoDB APIs as MongoDB doesn&rsquo;t offer full-text search capabilities.</p>
-<p>But don&rsquo;t worry, in this blog post, we&rsquo;ll discuss some possible workarounds to achieve full-text search on GridFS.</p>
-<p>Why can&rsquo;t we perform full-text search on GridFS?</p>
-<p>In MongoDB&rsquo;s GridFS, files are stored as chunks in binary format. MongoDB doesn&rsquo;t provide any indexing or query capabilities on binary data stored in GridFS.</p>
-<p>Suppose you want to search for text inside a binary document stored in GridFS. In that case, you need to extract the text data from the binary document, index it in a searchable format, and then perform the search.</p>
-<p>Two possible ways to perform full-text search on GridFS</p>
+          <p>MongoDB&rsquo;s GridFS is a powerful tool for storing and managing large files in a NoSQL database environment. It allows you to divide files into manageable chunks and saves them in separate collections. However, one of the common challenges developers face is the lack of built-in full-text search capabilities for documents stored in GridFS.</p>
+<h2 id="why-cant-we-perform-full-text-search-on-gridfs">Why Can’t We Perform Full-Text Search on GridFS?</h2>
+<p>In MongoDB&rsquo;s GridFS, files are stored in binary format as chunks. The limitation arises because MongoDB does not provide indexing or query capabilities for binary data stored in GridFS. Therefore, if you want to search for specific text within a binary document, you must first extract the text from the document, convert it into a searchable format, and then perform the search.</p>
+<h2 id="two-possible-ways-to-perform-full-text-search-on-gridfs">Two Possible Ways to Perform Full-Text Search on GridFS</h2>
+<h3 id="1-integrate-mongodb-with-a-text-search-engine-like-elasticsearch">1. Integrate MongoDB with a Text Search Engine like Elasticsearch</h3>
+<p>Integrating MongoDB with Elasticsearch is one of the best approaches to achieve full-text search on GridFS. Elasticsearch is a distributed, open-source search engine that provides advanced search features like full-text search, faceted search, and geospatial search.</p>
+<h4 id="steps-to-integrate">Steps to Integrate:</h4>
 <ol>
-<li>Integrate MongoDB with a text search engine like Elasticsearch</li>
+<li><strong>Store the Binary Data</strong>: Use GridFS to store the binary data of your documents.</li>
+<li><strong>Extract Text Data</strong>: Extract the text data from the files.</li>
+<li><strong>Index Text Data in Elasticsearch</strong>: Index the extracted text data, making it searchable.</li>
 </ol>
-<p>One of the best ways to achieve full-text search on GridFS is to integrate it with a text search engine like Elasticsearch. Elasticsearch is a distributed, open-source search engine that provides advanced search features like full-text search, faceted search, and geospatial search.</p>
-<p>You can store the binary data of the documents in GridFS and extract the text data. Then, index the text data in Elasticsearch, making it searchable. You can use the Elasticsearch APIs to perform the search and retrieve the matching documents&rsquo; metadata from GridFS.</p>
-<p>Here&rsquo;s an example of how you can extract text data from a PDF document in Python using the PyMuPDF library and index it in Elasticsearch using the Elasticsearch-Python library.</p>
+<h4 id="example-extracting-text-from-a-pdf-document">Example: Extracting Text from a PDF Document</h4>
+<p>Here’s an example using Python to extract text from a PDF file and index it in Elasticsearch using the <code>elasticsearch</code> and <code>PyMuPDF</code> libraries:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> elasticsearch
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> fitz  <span style="color:#75715e"># PyMuPDF</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Connect to Elasticsearch</span>
+</span></span><span style="display:flex;"><span>es <span style="color:#f92672">=</span> elasticsearch<span style="color:#f92672">.</span>Elasticsearch(<span style="color:#e6db74">&#34;http://localhost:9200&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Open the PDF document</span>
+</span></span><span style="display:flex;"><span>doc <span style="color:#f92672">=</span> fitz<span style="color:#f92672">.</span>open(<span style="color:#e6db74">&#34;document.pdf&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Extract text from each PDF page</span>
+</span></span><span style="display:flex;"><span>text <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> page <span style="color:#f92672">in</span> doc:
+</span></span><span style="display:flex;"><span>    text <span style="color:#f92672">+=</span> page<span style="color:#f92672">.</span>getText()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Index the extracted text data in Elasticsearch</span>
+</span></span><span style="display:flex;"><span>es<span style="color:#f92672">.</span>index(index<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;gridfs_index&#34;</span>, body<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#34;text&#34;</span>: text})
+</span></span></code></pre></div><p>This code snippet connects to Elasticsearch, opens a PDF file, extracts its text, and indexes it for search queries.</p>
+<h4 id="performing-a-full-text-search">Performing a Full-Text Search</h4>
+<p>Once the data is indexed, you can perform a full-text search using Elasticsearch&rsquo;s Query DSL:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Search for documents containing the word &#34;example&#34;</span>
+</span></span><span style="display:flex;"><span>query <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;query&#34;</span>: {<span style="color:#e6db74">&#34;match&#34;</span>: {<span style="color:#e6db74">&#34;text&#34;</span>: <span style="color:#e6db74">&#34;example&#34;</span>}}}
+</span></span><span style="display:flex;"><span>hits <span style="color:#f92672">=</span> es<span style="color:#f92672">.</span>search(index<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;gridfs_index&#34;</span>, body<span style="color:#f92672">=</span>query)[<span style="color:#e6db74">&#34;hits&#34;</span>][<span style="color:#e6db74">&#34;hits&#34;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Retrieve matching documents from GridFS</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> hit <span style="color:#f92672">in</span> hits:
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> gridfs<span style="color:#f92672">.</span>get(ObjectId(hit[<span style="color:#e6db74">&#34;_id&#34;</span>]))
+</span></span><span style="display:flex;"><span>    print(data<span style="color:#f92672">.</span>filename)  <span style="color:#75715e"># Display the filename of the matching document</span>
+</span></span></code></pre></div><p>This code searches for documents that contain the word &ldquo;example&rdquo; and retrieves the filenames of those documents stored in GridFS.</p>
+<h3 id="2-use-a-fuse-based-file-system-to-mount-gridfs-as-a-local-directory">2. Use a FUSE-Based File System to Mount GridFS as a Local Directory</h3>
+<p>Another effective method to perform full-text search on GridFS is to use a FUSE-based file system like <code>gridfs-fuse</code>. This tool allows you to mount GridFS as a local directory, enabling you to utilize any file search tool for searching files.</p>
+<h4 id="steps-to-mount-gridfs">Steps to Mount GridFS:</h4>
+<ol>
+<li><strong>Install <code>gridfs-fuse</code></strong>: You can install it using pip.</li>
+<li><strong>Mount GridFS as a Local Directory</strong>: Create a directory and mount GridFS.</li>
+</ol>
+<h4 id="example-of-mounting-gridfs">Example of Mounting GridFS:</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Install gridfs-fuse</span>
+</span></span><span style="display:flex;"><span>$ pip install gridfs-fuse
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create a directory to mount GridFS</span>
+</span></span><span style="display:flex;"><span>$ mkdir gridfs_dir
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Mount GridFS as a directory</span>
+</span></span><span style="display:flex;"><span>$ gridfs-fuse mongo_db_name.fs.files mongo_db_name.fs.chunks gridfs_dir
+</span></span></code></pre></div><p>After mounting, you can use standard file search tools like <code>grep</code>, <code>ack</code>, or <code>ag</code> to search for text within files.</p>
+<h4 id="searching-for-files">Searching for Files:</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Search for files containing the word &#34;example&#34;</span>
+</span></span><span style="display:flex;"><span>$ grep -r <span style="color:#e6db74">&#34;example&#34;</span> gridfs_dir/
+</span></span></code></pre></div><p>This command recursively searches through the <code>gridfs_dir</code> directory for any files that contain the word &ldquo;example&rdquo;.</p>
+<h2 id="final-thoughts">Final Thoughts</h2>
+<p>MongoDB&rsquo;s GridFS is a robust solution for storing large files efficiently. While it does not provide built-in full-text search capabilities, you can utilize powerful workarounds such as integrating with Elasticsearch or using a FUSE-based file system to achieve your search goals.</p>
+<p>By employing these methods, you can easily extract text data, index it for search, and effectively perform full-text queries on your documents stored in GridFS.</p>
+<hr>
+<h2 id="faqs-on-nosql-utilizing-full-text-search-with-mongodb-gridfs">FAQs on Nosql-Utilizing-Full-Text-Search-With-Mongodb-Gridfs</h2>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is MongoDB GridFS?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>A</strong>: MongoDB GridFS is a specification for storing and retrieving large files, like PDFs, images, and videos, by splitting them into smaller chunks and saving them in a MongoDB collection. It allows efficient reading and writing of large files without downloading the entire document at once.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I perform full-text search directly on GridFS data?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>A</strong>: No, MongoDB does not provide direct full-text search capabilities on binary data stored in GridFS. The files are stored in binary format, and MongoDB lacks indexing or querying capabilities for these files by default.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What are some workarounds for full-text search in GridFS?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>A</strong>: You can perform full-text search on data stored in GridFS by integrating MongoDB with a text search engine like Elasticsearch or using a FUSE-based file system such as <code>gridfs-fuse</code> to mount GridFS as a local directory for searching using file search tools.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How does Elasticsearch help in performing full-text search on GridFS?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>A</strong>: By integrating MongoDB with Elasticsearch, you can extract text data from binary files, such as PDFs, stored in GridFS. Then, you index this text data in Elasticsearch, allowing you to use its advanced full-text search capabilities to search the documents.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can you give an example of extracting text from a PDF and indexing it in Elasticsearch?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><p><strong>A</strong>: Yes, here’s an example using Python to extract text from a PDF using the <code>PyMuPDF</code> library and index it in Elasticsearch:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> elasticsearch
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> fitz
 </span></span><span style="display:flex;"><span>
@@ -378,35 +469,48 @@ Learning Full-Text Search on MongoDB GridFS</p>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e"># Index text data in Elasticsearch</span>
 </span></span><span style="display:flex;"><span>es<span style="color:#f92672">.</span>index(index<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;gridfs_index&#34;</span>, body<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#34;text&#34;</span>: text})
-</span></span></code></pre></div><p>The above code extracts the text data from the &ldquo;document.pdf&rdquo; file using the <code>fitz</code> library and indexes it in Elasticsearch using the <code>elasticsearch</code> library.</p>
-<p>Once the data is indexed, you can perform a full-text search using Elasticsearch&rsquo;s Query DSL.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Search for documents containing the word &#34;example&#34;</span>
-</span></span><span style="display:flex;"><span>query <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;query&#34;</span>: {<span style="color:#e6db74">&#34;match&#34;</span>: {<span style="color:#e6db74">&#34;text&#34;</span>: <span style="color:#e6db74">&#34;example&#34;</span>}}}
+</span></span></code></pre></div><p>This code retrieves the text from a PDF and indexes it into Elasticsearch for future searching.</p>
+</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How do I perform a full-text search using Elasticsearch after indexing?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><p><strong>A</strong>: After indexing your documents in Elasticsearch, you can run a search query to find matching documents. For example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>query <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;query&#34;</span>: {<span style="color:#e6db74">&#34;match&#34;</span>: {<span style="color:#e6db74">&#34;text&#34;</span>: <span style="color:#e6db74">&#34;example&#34;</span>}}}
 </span></span><span style="display:flex;"><span>hits <span style="color:#f92672">=</span> es<span style="color:#f92672">.</span>search(index<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;gridfs_index&#34;</span>, body<span style="color:#f92672">=</span>query)[<span style="color:#e6db74">&#34;hits&#34;</span>][<span style="color:#e6db74">&#34;hits&#34;</span>]
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Retrieve matching documents from GridFS</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> hit <span style="color:#f92672">in</span> hits:
-</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> gridfs<span style="color:#f92672">.</span>get(ObjectId(hit[<span style="color:#e6db74">&#34;_id&#34;</span>]))
-</span></span><span style="display:flex;"><span>    print(data<span style="color:#f92672">.</span>filename)
-</span></span></code></pre></div><p>The above code performs a full-text search for the word &ldquo;example&rdquo; in the indexed documents and retrieves the matching documents from GridFS.</p>
-<ol start="2">
-<li>Use a FUSE-based file system to mount GridFS as a local directory</li>
-</ol>
-<p>Another possible way to perform full-text search on GridFS is to use a FUSE-based file system like <code>gridfs-fuse</code>. It allows you to mount GridFS as a local directory and use any file search tool to search for files.</p>
-<p>Here&rsquo;s an example of how you can use <code>gridfs-fuse</code> to mount GridFS as a local directory.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Install gridfs-fuse</span>
-</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">$</span> pip install gridfs<span style="color:#f92672">-</span>fuse
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Mount GridFS as a directory</span>
-</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">$</span> mkdir gridfs_dir
-</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">$</span> gridfs<span style="color:#f92672">-</span>fuse mongo_db_name<span style="color:#f92672">.</span>fs<span style="color:#f92672">.</span>files mongo_db_name<span style="color:#f92672">.</span>fs<span style="color:#f92672">.</span>chunks gridfs_dir
-</span></span></code></pre></div><p>Once mounted, you can use any file search tool like <code>grep</code>, <code>ack</code>, or <code>ag</code> to search for files.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Search for files containing the word &#34;example&#34;</span>
-</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">$</span> grep <span style="color:#f92672">-</span>r <span style="color:#e6db74">&#34;example&#34;</span> gridfs_dir<span style="color:#f92672">/</span>
-</span></span></code></pre></div><p>The above code searches for files containing the word &ldquo;example&rdquo; in the <code>gridfs_dir</code> directory.</p>
-<p>Recap</p>
-<p>MongoDB&rsquo;s GridFS is an excellent option to store large files in a scalable and efficient way. Although, it doesn&rsquo;t offer full-text search capabilities out of the box.</p>
-<p>To achieve full-text search on GridFS, you can integrate it with a text search engine like Elasticsearch or mount it as a local directory using <code>gridfs-fuse</code>. Both options provide a way to extract the text data, index it in a searchable format, and perform full-text search.]]&gt;</p>
+</span></span></code></pre></div><p>This query searches for documents containing the word &ldquo;example&rdquo; and retrieves the matching documents from GridFS.</p>
+</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is a FUSE-based file system and how does it work with GridFS?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><strong>A</strong>: A FUSE-based file system allows you to mount MongoDB GridFS as a local directory. By using a tool like <code>gridfs-fuse</code>, you can mount GridFS and use standard file search tools, such as <code>grep</code> or <code>ack</code>, to search for text within files stored in GridFS.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How can I mount GridFS as a local directory using gridfs-fuse?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><p><strong>A</strong>: Here’s an example of how to mount GridFS using <code>gridfs-fuse</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ mkdir gridfs_dir
+</span></span><span style="display:flex;"><span>$ gridfs-fuse mongo_db_name.fs.files mongo_db_name.fs.chunks gridfs_dir
+</span></span></code></pre></div><p>This command mounts GridFS as a local directory, allowing you to use file search tools.</p>
+</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How can I perform full-text search after mounting GridFS?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text"><p><strong>A</strong>: After mounting GridFS as a local directory, you can use tools like <code>grep</code> to perform full-text search. For example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ grep -r <span style="color:#e6db74">&#34;example&#34;</span> gridfs_dir/
+</span></span></code></pre></div><p>This command searches for the word &ldquo;example&rdquo; across all files in the <code>gridfs_dir</code>.</p>
+</div>
+    </div>
+</div>
+<hr>
+<p>We would love to hear your thoughts! Have you implemented full-text search with MongoDB GridFS? What challenges did you face, and how did you overcome them? Please share your experiences or any questions you have in the comments below!</p>
+<hr>
 
         </article>
 
