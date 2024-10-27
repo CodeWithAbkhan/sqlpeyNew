@@ -1,0 +1,1867 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Solved: How to Optimize Retry Logic in .NET Core? :: sqlpey</title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta
+  name="description"
+  content="
+   
+  
+Occasionally I have a need to retry an operation several times before giving up My code is like
+int retries  3 whiletrue try DoSomething break  success catch ifretries  0 throw else ThreadSleep1000
+I would like to rewrite this in a general retry function like
+TryThreeTimesDoSomething
+Is it possible in C What would be the code for the TryThreeTimes method 
+  
+  
+  "
+/>
+<meta
+  name="keywords"
+  content="
+            .net, dotnet, csharp, How to Optimize Retry Logic in .NET Core?, .net 8, 
+Occasionally I have a need to retry an operation several times before giving up My code is like
+int retries  3 whiletrue try DoSomething break  success catch ifretries  0 throw else ThreadSleep1000
+I would like to rewrite this in a general retry function like
+TryThreeTimesDoSomething
+Is it possible in C What would be the code for the TryThreeTimes method , collection ToList ForEach c gt c PropertyToSet value Sha, I am doing this Collection All c gt c needsChange value r, I actually found an extension method that will do what I , Use ListOfStuff Where w gt w Thing value ToList ForEach f, Although you specifically asked for a LINQ solution and t, There is no built-in extension method to do this Although, I ve tried a few variations on this and I keep going back , Some people consider this is a comment but for me is an an, No LINQ doesn t support a manner of mass updating The only
+           "
+/>
+<meta name="robots" content="noodp" />
+<meta property="og:url" content="https://sqlpey.com/netcore/how-to-optimize-retry-logic-in-net-core/">
+  <meta property="og:site_name" content="sqlpey">
+  <meta property="og:title" content="Solved: How to Optimize Retry Logic in .NET Core?">
+  <meta property="og:description" content="
+Occasionally I have a need to retry an operation several times before giving up My code is like
+int retries  3 whiletrue try DoSomething break  success catch ifretries  0 throw else ThreadSleep1000
+I would like to rewrite this in a general retry function like
+TryThreeTimesDoSomething
+Is it possible in C What would be the code for the TryThreeTimes method ">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="netcore">
+    <meta property="article:published_time" content="2024-10-26T00:00:00+00:00">
+    <meta property="article:modified_time" content="2024-10-26T00:00:00+00:00">
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Solved: How to Optimize Retry Logic in .NET Core?">
+  <meta name="twitter:description" content="
+Occasionally I have a need to retry an operation several times before giving up My code is like
+int retries  3 whiletrue try DoSomething break  success catch ifretries  0 throw else ThreadSleep1000
+I would like to rewrite this in a general retry function like
+TryThreeTimesDoSomething
+Is it possible in C What would be the code for the TryThreeTimes method ">
+
+
+<link rel="canonical" href="https://sqlpey.com/netcore/how-to-optimize-retry-logic-in-net-core/" />
+
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="stylesheet" href="/css/index.min.624cc9dc4f4f169433ac8c97a15d33ee6dc3cf0c03b4b653d20c0cf4c646028d.css">
+
+
+
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script>
+
+  
+</head>
+<body class="w-full bg-slate-50 dark:bg-gray-800">
+  <header class="flex flex-none justify-center z-10">
+    <div class="flex flex-row gap justify-between w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl h-12 mt-3">
+  <div class="flex-none ml-2 md:ml-0">
+    <a href="/" class="">
+      <img class="h-12 w-12 rounded-full object-cover bg-gray-100" src="/header.webp" alt="logo">
+    </a>
+  </div>
+  <div class="flex-1"></div>
+  <div class="flex-none">
+    
+
+
+
+<nav class="h-full static">
+  <button id="navbar-menu-toggle" type="button" class="inline-flex items-center p-2 text-sm text-slate-800 dark:text-slate-200 rounded-lg md:hidden" aria-controls="navbar-menu" aria-expanded="false">
+    <span class="sr-only">Open main menu</span>
+    <i class="w-8 h-8">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-menu-2" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 6l16 0" />
+  <path d="M4 12l16 0" />
+  <path d="M4 18l16 0" />
+</svg>
+
+    </i>
+
+  </button>
+  
+  <div class="absolute md:static top-16 left-0 right-0 z-50 hidden w-full md:block md:w-auto" id="navbar-menu">
+    <ul class="flex flex-col mx-2 md:mx-0 md:flex-row md:border-0 rounded-sm md:rounded-full px-3 text-base font-medium text-slate-800 dark:text-slate-200 shadow-lg bg-white dark:bg-gray-600 shadow-slate-800/5 dark:shadow-slate-200/5 ring-1 ring-slate-900/5 dark:ring-slate-100/5">
+    
+    
+        <li id="" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="/" title="Home">Home</a>
+        </li>
+      
+      
+    
+     <li style="  margin-top: 12px; padding: 0; "> 
+      <button id="dropdownNavbarLink" data-dropdown-toggle="dropdownNavbar" class="flex items-center justify-between w-full py-2 px-3 text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:w-auto dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:hover:bg-gray-700 md:dark:hover:bg-transparent">
+        Tutorials 
+        <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+      </svg></button>
+       
+                
+                <div id="dropdownNavbar" class="z-10 hidden font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
+                    <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownLargeButton">
+                      
+                      <li>
+                        <a href="/mysql/" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Complete MySQL</a>
+                      </li>
+                      
+                      <li>
+                        <a href="/sql/" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Complete SQL</a>
+                      </li>
+                      
+                      <li>
+                        <a href="/database/" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Database Blog</a>
+                      </li>
+                      
+                      
+                    </ul> 
+                  </div>
+                  
+                </li>
+      
+    
+        <li id="" class="">
+          <a class="block px-3 py-3 hover:text-emerald-600"
+            href="" title="About">About</a>
+        </li>
+      
+      
+    
+    
+    </ul>
+  </div>
+</nav>
+
+
+  </div>
+  
+  <div class="flex-none mx-1"></div>
+  
+  <div class="darkmode-toggle flex flex-none mr-2 md:mr-0">
+    <label for="darkmode-toggle" class="flex items-center px-3 cursor-pointer rounded-full bg-gray-100 dark:bg-gray-600" title="Toggle dark mode">
+      <input name="darkmode-toggle" id="darkmode-toggle" type="checkbox" class="sr-only peer" aria-label="Toggle dark mode">
+      <div class="group flex flex-row gap-1 justify-center h-8 px-1 rounded-full bg-white dark:bg-gray-700">
+        <i class="h-6 w-6 flex-none rounded-full bg-yellow-400 place-self-center peer-checked:group-[]:invisible">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brightness-down" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+   <path d="M12 5l0 .01"></path>
+   <path d="M17 7l0 .01"></path>
+   <path d="M19 12l0 .01"></path>
+   <path d="M17 17l0 .01"></path>
+   <path d="M12 19l0 .01"></path>
+   <path d="M7 17l0 .01"></path>
+   <path d="M5 12l0 .01"></path>
+   <path d="M7 7l0 .01"></path>
+</svg>
+
+        </i>
+        <i class="h-6 w-6 flex-none rounded-full place-self-center invisible peer-checked:group-[]:visible">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-moon-stars" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"></path>
+   <path d="M17 4a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2"></path>
+   <path d="M19 11h2m-1 -1v2"></path>
+</svg>
+
+        </i>
+      </div>
+    </label>
+  </div>
+</div>
+
+  </header>
+  <main class="flex flex-auto justify-center">
+    
+<div class="flex flex-col w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl relative">
+  <div class="flex flex-row">
+    <section class="flex flex-col w-full md:w-2/3 mt-6 m-2 md:mx-0 
+  rounded-lg shadow-md bg-white dark:bg-gray-700
+  ">
+  
+      
+      <div class="p-6 gap-y-2">
+        <h1 class="text-4xl font-semibold text-slate-800 dark:text-slate-100">
+          <a href="/netcore/how-to-optimize-retry-logic-in-net-core/">Solved: How to Optimize Retry Logic in .NET Core?</a>
+        </h1>
+
+        <div class="mt-2">
+          
+  <ul class="flex flex-row flex-wrap text-slate-500 dark:text-slate-300">
+    
+      
+      <li>
+        <a href="/categories/.net/"
+          class="text-sm mr-2 px-2 py-2 rounded border border-emerald-800 bg-emerald-800 text-slate-50">
+          .net
+        </a>
+      </li>
+      
+      <li>
+        <a href="/categories/dotnet/"
+          class="text-sm mr-2 px-2 py-2 rounded border border-emerald-800 bg-emerald-800 text-slate-50">
+          dotnet
+        </a>
+      </li>
+      
+      <li>
+        <a href="/categories/csharp/"
+          class="text-sm mr-2 px-2 py-2 rounded border border-emerald-800 bg-emerald-800 text-slate-50">
+          csharp
+        </a>
+      </li>
+      
+    
+    
+  </ul>
+
+
+
+          <div class="flex flex-col gap-y-1 md:flex-row md:gap-y-0 md:gap-x-4 text-slate-500 dark:text-slate-300">
+  
+  
+  <div class="flex flex-row text-base gap-x-1">
+    <i class="h-6 w-6 flex-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"></path>
+   <path d="M16 3v4"></path>
+   <path d="M8 3v4"></path>
+   <path d="M4 11h16"></path>
+   <path d="M11 15h1"></path>
+   <path d="M12 15v3"></path>
+</svg>
+
+    </i>
+    <time datetime="2024-10-26T00:00:00&#43;00:00">
+      2024-10-26
+    </time>
+  </div>
+
+  <div class="flex flex-row text-base gap-x-1">
+    <i class="h-6 w-6 flex-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hourglass-high" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M6.5 7h11"></path>
+   <path d="M6 20v-2a6 6 0 1 1 12 0v2a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1z"></path>
+   <path d="M6 4v2a6 6 0 1 0 12 0v-2a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1z"></path>
+</svg>
+
+    </i>
+    <span>
+      18 minutes to read
+    </span>
+  </div>
+</div>
+
+
+          
+          
+        </div>
+        <section class="prose prose-slate dark:prose-invert w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mt-6">
+          <div class="mx-auto my-8 max-w-full">
+    <a href="https://codewithabkhan.github.io" title="Explore the Acer Aspire 5 laptop on Amazon" rel="noopener noreferrer">
+        <img src="/ads/intro.png" alt="codewithabkhan . github . io" 
+        class="w-full h-auto rounded-md shadow-md hover:shadow-lg transition duration-300" 
+        loading="lazy"/>
+    </a>
+</div>
+
+          <h2>Table of Contents</h2>
+          <aside><nav id="TableOfContents">
+  <ul>
+    <li><a href="#method-1">Method 1</a></li>
+    <li><a href="#method-2">Method 2</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#method-3">Method 3</a></li>
+    <li><a href="#method-4">Method 4</a></li>
+    <li><a href="#method-5">Method 5</a></li>
+    <li><a href="#method-6">Method 6</a></li>
+    <li><a href="#method-7">Method 7</a></li>
+    <li><a href="#method-8">Method 8</a></li>
+    <li><a href="#method-9">Method 9</a></li>
+    <li><a href="#method-10">Method 10</a></li>
+    <li><a href="#method-11">Method 11</a></li>
+    <li><a href="#method-12">Method 12</a></li>
+    <li><a href="#method-13">Method 13</a></li>
+    <li><a href="#method-14">Method 14</a></li>
+    <li><a href="#method-15">Method 15</a></li>
+    <li><a href="#method-16">Method 16</a></li>
+    <li><a href="#method-17">Method 17</a></li>
+    <li><a href="#method-18">Method 18</a></li>
+    <li><a href="#method-19">Method 19</a></li>
+    <li><a href="#method-20">Method 20</a></li>
+    <li><a href="#method-21">Method 21</a></li>
+    <li><a href="#method-22">Method 22</a></li>
+    <li><a href="#method-23">Method 23</a></li>
+    <li><a href="#method-24">Method 24</a></li>
+    <li><a href="#method-25">Method 25</a></li>
+    <li><a href="#method-26">Method 26</a></li>
+    <li><a href="#method-27">Method 27</a></li>
+    <li><a href="#method-28">Method 28</a></li>
+    <li><a href="#method-29">Method 29</a></li>
+    <li><a href="#method-30">Method 30</a></li>
+  </ul>
+</nav></aside>
+          <div class="m-10">
+    
+
+    
+    
+
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-format="autorelaxed"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4842527204"></ins>
+
+<script>
+    setTimeout(function() {
+        
+        const adScript = document.createElement("script");
+        adScript.async = true;
+        adScript.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+        adScript.setAttribute("crossorigin", "anonymous");
+        document.head.appendChild(adScript);
+
+        
+        adScript.onload = function() {
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        };
+    }, 2500); 
+</script>
+
+
+    
+</div>
+
+
+        </section>
+        
+        
+
+
+        <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
+       prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" 
+          itemscope itemtype="https://schema.org/FAQPage" >
+          <p>Occasionally I have a need to retry an operation several times before giving up. My code is like:</p>
+<p>int retries = 3;
+while(true) {
+try {
+DoSomething();
+break; // success!
+} catch {
+if(&ndash;retries == 0) throw;
+else Thread.Sleep(1000);
+}
+}</p>
+<p>I would like to rewrite this in a general retry function like:</p>
+<p>TryThreeTimes(DoSomething);</p>
+<p>Is it possible in C#? What would be the code for the TryThreeTimes() method?</p>
+<h2 id="method-1">Method 1</h2>
+<blockquote>
+<p>Blanket catch statements that simply retry the same call can be dangerous if used as a general exception handling mechanism. Having said that, here&rsquo;s a lambda-based retry wrapper that you can use with any method. I chose to factor the number of retries and the retry timeout out as parameters for a bit more flexibility:</p>
+<pre><code>public static class Retry
+{
+ public static void Do(
+ Action action,
+ TimeSpan retryInterval,
+ int maxAttemptCount = 3)
+ {
+ Do&lt;object&gt;(() =&gt;
+ {
+ action();
+ return null;
+ }, retryInterval, maxAttemptCount);
+ }
+
+ public static T Do&lt;T&gt;(
+ Func&lt;T&gt; action,
+ TimeSpan retryInterval,
+ int maxAttemptCount = 3)
+ {
+ var exceptions = new List&lt;Exception&gt;();
+
+ for (int attempted = 0; attempted &lt; maxAttemptCount; attempted++)
+ {
+ try
+ {
+ if (attempted &gt; 0)
+ {
+ Thread.Sleep(retryInterval);
+ }
+ return action();
+ }
+ catch (Exception ex)
+ {
+ exceptions.Add(ex);
+ }
+ }
+ throw new AggregateException(exceptions);
+ }
+}
+</code></pre>
+<p>You can now use this utility method to perform retry logic:</p>
+<pre><code>Retry.Do(() =&gt; SomeFunctionThatCanFail(), TimeSpan.FromSeconds(1));
+</code></pre>
+<p>or:</p>
+<pre><code>Retry.Do(SomeFunctionThatCanFail, TimeSpan.FromSeconds(1));
+</code></pre>
+<p>or:</p>
+<pre><code>int result = Retry.Do(SomeFunctionWhichReturnsInt, TimeSpan.FromSeconds(1), 4);
+</code></pre>
+<p>Or you could even make an <code>async</code> overload.</p>
+</blockquote>
+<h2 id="method-2">Method 2</h2>
+<p>You should try <a href="https://github.com/michael-wolfenden/Polly" target="_blank" rel="noopener"><strong>Polly</strong></a>
+. It&rsquo;s a .NET library written by me that allows developers to express transient exception handling policies such as Retry, Retry Forever, Wait and Retry or Circuit Breaker in a fluent manner.</p>
+<h1 id="example">Example</h1>
+<pre><code>Policy
+ .Handle&lt;SqlException&gt;(ex =&gt; ex.Number == 1205)
+ .Or&lt;ArgumentException&gt;(ex =&gt; ex.ParamName == &quot;example&quot;)
+ .WaitAndRetry(3, _ =&gt; TimeSpan.FromSeconds(3))
+ .Execute(DoSomething);
+</code></pre>
+<h2 id="method-3">Method 3</h2>
+<p>public void TryThreeTimes(Action action)
+{
+var tries = 3;
+while (true) {
+try {
+action();
+break; // success!
+} catch {
+if (&ndash;tries == 0)
+throw;
+Thread.Sleep(1000);
+}
+}
+}</p>
+<p>Then you would call:</p>
+<pre><code>TryThreeTimes(DoSomething);
+</code></pre>
+<p>&hellip;or alternatively&hellip;</p>
+<pre><code>TryThreeTimes(() =&gt; DoSomethingElse(withLocalVariable));
+</code></pre>
+<hr>
+<p>A more flexible option:</p>
+<pre><code>public void DoWithRetry(Action action, TimeSpan sleepPeriod, int tryCount = 3)
+{
+ if (tryCount &lt;= 0)
+ throw new ArgumentOutOfRangeException(nameof(tryCount));
+
+ while (true) {
+ try {
+ action();
+ break; // success!
+ } catch {
+ if (--tryCount == 0)
+ throw;
+ Thread.Sleep(sleepPeriod);
+ }
+ }
+}
+</code></pre>
+<p>To be used as:</p>
+<pre><code>DoWithRetry(DoSomething, TimeSpan.FromSeconds(2), tryCount: 10);
+</code></pre>
+<hr>
+<p>A more modern version with support for async/await:</p>
+<pre><code>public async Task DoWithRetryAsync(Func&lt;Task&gt; action, TimeSpan sleepPeriod, int tryCount = 3)
+{
+ if (tryCount &lt;= 0)
+ throw new ArgumentOutOfRangeException(nameof(tryCount));
+
+ while (true) {
+ try {
+ await action();
+ return; // success!
+ } catch {
+ if (--tryCount == 0)
+ throw;
+ await Task.Delay(sleepPeriod);
+ }
+ }
+}
+</code></pre>
+<p>To be used as:</p>
+<pre><code>await DoWithRetryAsync(DoSomethingAsync, TimeSpan.FromSeconds(2), tryCount: 10);
+</code></pre>
+<h2 id="method-4">Method 4</h2>
+<p>This is possibly a bad idea. First, it is emblematic of the maxim &ldquo;the definition of insanity is doing the same thing twice and expecting different results each time&rdquo;. Second, this coding pattern does not compose well with itself. For example:</p>
+<p>Suppose your network hardware layer resends a packet three times on failure, waiting, say, a second between failures.</p>
+<p>Now suppose the software layer resends a notification about a failure three times on packet failure.</p>
+<p>Now suppose the notification layer reactivates the notification three times on a notification delivery failure.</p>
+<p>Now suppose the error reporting layer reactivates the notification layer three times on a notification failure.</p>
+<p>And now suppose the web server reactivates the error reporting three times on error failure.</p>
+<p>And now suppose the web client resends the request three times upon getting an error from the server.</p>
+<p>Now suppose the line on the network switch that is supposed to route the notification to the administrator is unplugged. When does the user of the web client finally get their error message? I make it at about twelve minutes later.</p>
+<p>Lest you think this is just a silly example: we have seen this bug in customer code, though far, far worse than I&rsquo;ve described here. In the particular customer code, the gap between the error condition happening and it finally being reported to the user was several <em>weeks</em> because so many layers were automatically retrying with waits. Just imagine what would happen if there were <em>ten</em> retries instead of <em>three</em>.</p>
+<p>Usually the right thing to do with an error condition is <em>report it immediately and let the user decide what to do.</em> If the user wants to create a policy of automatic retries, let them create that policy at the appropriate level in the software abstraction.</p>
+<h2 id="method-5">Method 5</h2>
+<p>The <a href="http://aka.ms/topaz" target="_blank" rel="noopener">Transient Fault Handling Application Block</a>
+ provides an extensible collection of retry strategies including:</p>
+<ul>
+<li>Incremental</li>
+<li>Fixed interval</li>
+<li>Exponential back-off</li>
+</ul>
+<p>It also includes a collection of error detection strategies for cloud-based services.</p>
+<p>For more information see <a href="http://msdn.microsoft.com/en-us/library/hh680901%28v=pandp.50%29" target="_blank" rel="noopener">this chapter</a>
+ of the Developer&rsquo;s Guide.</p>
+<p>Available via <a href="http://nuget.org/packages/EnterpriseLibrary.WindowsAzure.TransientFaultHandling" target="_blank" rel="noopener">NuGet</a>
+ (search for &lsquo;<em>topaz</em>&rsquo;).</p>
+<h2 id="method-6">Method 6</h2>
+<p>I&rsquo;m a fan of recursion and extension methods, so here are my two cents:</p>
+<pre><code>public static void InvokeWithRetries(this Action @this, ushort numberOfRetries)
+{
+ try
+ {
+ @this();
+ }
+ catch
+ {
+ if (numberOfRetries == 0)
+ throw;
+
+ InvokeWithRetries(@this, --numberOfRetries);
+ }
+}
+</code></pre>
+<h2 id="method-7">Method 7</h2>
+<p>Allowing for functions and retry messages</p>
+<pre><code>public static T RetryMethod&lt;T&gt;(Func&lt;T&gt; method, int numRetries, int retryTimeout, Action onFailureAction)
+{
+ Guard.IsNotNull(method, &quot;method&quot;); 
+ T retval = default(T);
+ do
+ {
+ try
+ {
+ retval = method();
+ return retval;
+ }
+ catch
+ {
+ onFailureAction();
+ if (numRetries &lt;= 0) throw; // improved to avoid silent failure
+ Thread.Sleep(retryTimeout);
+ }
+} while (numRetries-- &gt; 0);
+ return retval;
+}
+</code></pre>
+<h2 id="method-8">Method 8</h2>
+<p>You might also consider adding the exception type you want to retry for. For instance is this a timeout exception you want to retry? A database exception?</p>
+<pre><code>RetryForExcpetionType(DoSomething, typeof(TimeoutException), 5, 1000);
+
+public static void RetryForExcpetionType(Action action, Type retryOnExceptionType, int numRetries, int retryTimeout)
+{
+ if (action == null)
+ throw new ArgumentNullException(&quot;action&quot;);
+ if (retryOnExceptionType == null)
+ throw new ArgumentNullException(&quot;retryOnExceptionType&quot;);
+ while (true)
+ {
+ try
+ {
+ action();
+ return;
+ }
+ catch(Exception e)
+ {
+ if (--numRetries &lt;= 0 || !retryOnExceptionType.IsAssignableFrom(e.GetType()))
+ throw;
+
+ if (retryTimeout &gt; 0)
+ System.Threading.Thread.Sleep(retryTimeout);
+ }
+ }
+}
+</code></pre>
+<p>You might also note that all of the other examples have a similar issue with testing for retries == 0 and either retry infinity or fail to raise exceptions when given a negative value. Also Sleep(-1000) will fail in the catch blocks above. Depends on how &lsquo;silly&rsquo; you expect people to be but defensive programming never hurts.</p>
+<h2 id="method-9">Method 9</h2>
+<p>Implemented LBushkin&rsquo;s answer in the latest fashion:</p>
+<pre><code> public static async Task Do(Func&lt;Task&gt; task, TimeSpan retryInterval, int maxAttemptCount = 3)
+ {
+ var exceptions = new List&lt;Exception&gt;();
+ for (int attempted = 0; attempted &lt; maxAttemptCount; attempted++)
+ {
+ try
+ {
+ if (attempted &gt; 0)
+ {
+ await Task.Delay(retryInterval);
+ }
+
+ await task();
+ return;
+ }
+ catch (Exception ex)
+ {
+ exceptions.Add(ex);
+ }
+ }
+ throw new AggregateException(exceptions);
+ }
+
+ public static async Task&lt;T&gt; Do&lt;T&gt;(Func&lt;Task&lt;T&gt;&gt; task, TimeSpan retryInterval, int maxAttemptCount = 3)
+ {
+ var exceptions = new List&lt;Exception&gt;();
+ for (int attempted = 0; attempted &lt; maxAttemptCount; attempted++)
+ {
+ try
+ {
+ if (attempted &gt; 0)
+ {
+ await Task.Delay(retryInterval);
+ }
+ return await task();
+ }
+ catch (Exception ex)
+ {
+ exceptions.Add(ex);
+ }
+ }
+ throw new AggregateException(exceptions);
+ } 
+</code></pre>
+<p>and to use it:</p>
+<pre><code>await Retry.Do([TaskFunction], retryInterval, retryAttempts);
+</code></pre>
+<p>whereas the function <code>[TaskFunction]</code> can either be <code>Task&lt;T&gt;</code> or just <code>Task</code>.</p>
+<h2 id="method-10">Method 10</h2>
+<p>Use Polly</p>
+<p><a href="https://github.com/App-vNext/Polly-Samples" target="_blank" rel="noopener">https://github.com/App-vNext/Polly-Samples</a>
+</p>
+<p>Here is a retry-generic I use with Polly</p>
+<pre><code>public T Retry&lt;T&gt;(Func&lt;T&gt; action, int retryCount = 0)
+{
+ PolicyResult&lt;T&gt; policyResult = Policy
+ .Handle&lt;Exception&gt;()
+ .Retry(retryCount)
+ .ExecuteAndCapture&lt;T&gt;(action);
+
+ if (policyResult.Outcome == OutcomeType.Failure)
+ {
+ throw policyResult.FinalException;
+ }
+
+ return policyResult.Result;
+}
+</code></pre>
+<p>Use it like this</p>
+<pre><code>var result = Retry(() =&gt; MyFunction()), 3);
+</code></pre>
+<h2 id="method-11">Method 11</h2>
+<p>Keep it simple with C# 6.0</p>
+<pre><code>public async Task&lt;T&gt; Retry&lt;T&gt;(Func&lt;T&gt; action, TimeSpan retryInterval, int retryCount)
+{
+ try
+ {
+ return action();
+ }
+ catch when (retryCount != 0)
+ {
+ await Task.Delay(retryInterval);
+ return await Retry(action, retryInterval, --retryCount);
+ }
+}
+</code></pre>
+<h2 id="method-12">Method 12</h2>
+<p>Building on the previous work, I thought about enhancing the retry logic in three ways:</p>
+<ol>
+<li>
+<p>Specifying what exception type to catch/retry. This is the primary enhacement as retrying for any exception is just plain wrong.</p>
+</li>
+<li>
+<p>Not nesting the last try in a try/catch, achieving slightly better performance</p>
+</li>
+<li>
+<p>Making it an <code>Action</code> extension method</p>
+<pre><code> static class ActionExtensions
+ {
+  public static void InvokeAndRetryOnException&lt;T&gt; (this Action action, int retries, TimeSpan retryDelay) where T : Exception
+  {
+  if (action == null)
+  throw new ArgumentNullException(&quot;action&quot;);
+
+  while( retries-- &gt; 0 )
+  {
+  try
+  {
+  action( );
+  return;
+  }
+  catch (T)
+  {
+  Thread.Sleep( retryDelay );
+  }
+  }
+
+  action( );
+  }
+ }
+</code></pre>
+</li>
+</ol>
+<p>The method can then be invoked like so (anonymous methods can be used as well, of course):</p>
+<pre><code>new Action( AMethodThatMightThrowIntermittentException )
+ .InvokeAndRetryOnException&lt;IntermittentException&gt;( 2, TimeSpan.FromSeconds( 1 ) );
+</code></pre>
+<h2 id="method-13">Method 13</h2>
+<p>I have two implementations of this pattern using Polly. One is async.</p>
+<p>My synchronous method is based on <a href="https://stackoverflow.com/a/35683338" target="_blank" rel="noopener">this answer</a>
+ by <a href="https://stackoverflow.com/users/966643/erik-bergstedt" target="_blank" rel="noopener">Erik Bergstedt</a>
+</p>
+<pre><code>public static T Retry&lt;T&gt;(Func&lt;T&gt; action, TimeSpan retryWait, int retryCount = 0)
+{
+ PolicyResult&lt;T&gt; policyResult = Policy
+ .Handle&lt;ApiException&gt;(ex =&gt; ex.ResponseCode == (int)HttpStatusCode.TooManyRequests)
+ .WaitAndRetry(retryCount, retryAttempt =&gt; retryWait)
+ .ExecuteAndCapture(action);
+
+ if (policyResult.Outcome == OutcomeType.Failure)
+ {
+ throw policyResult.FinalException;
+ }
+
+ return policyResult.Result;
+}
+</code></pre>
+<p>Async:</p>
+<pre><code>public static async Task&lt;T&gt; RetryAsync&lt;T&gt;(Func&lt;Task&lt;T&gt;&gt; action, TimeSpan retryWait, int retryCount = 0)
+{
+ PolicyResult&lt;T&gt; policyResult = await Policy
+ .Handle&lt;ApiException&gt;(ex =&gt; ex.ResponseCode == (int)HttpStatusCode.TooManyRequests)
+ .WaitAndRetryAsync(retryCount, retryAttempt =&gt; retryWait)
+ .ExecuteAndCaptureAsync(action);
+
+ if (policyResult.Outcome == OutcomeType.Failure)
+ {
+ throw policyResult.FinalException;
+ }
+
+ return policyResult.Result;
+}
+</code></pre>
+<p>It would also be easy to allow an exception type to be passed in as well as the lambda for the exception type.</p>
+<h2 id="method-14">Method 14</h2>
+<p>I&rsquo;d implement this:</p>
+<pre><code>public static bool Retry(int maxRetries, Func&lt;bool, bool&gt; method)
+{
+ while (maxRetries &gt; 0)
+ {
+ if (method(maxRetries == 1))
+ {
+ return true;
+ }
+ maxRetries--;
+ }
+ return false; 
+}
+</code></pre>
+<p>I wouldn&rsquo;t use exceptions the way they&rsquo;re used in the other examples. It seems to me that if we&rsquo;re expecting the possibility that a method won&rsquo;t succeed, its failure isn&rsquo;t an exception. So the method I&rsquo;m calling should return true if it succeeded, and false if it failed.</p>
+<p>Why is it a <code>Func&lt;bool, bool&gt;</code> and not just a <code>Func&lt;bool&gt;</code>? So that if I <em>want</em> a method to be able to throw an exception on failure, I have a way of informing it that this is the last try.</p>
+<p>So I might use it with code like:</p>
+<pre><code>Retry(5, delegate(bool lastIteration)
+ {
+ // do stuff
+ if (!succeeded &amp;&amp; lastIteration)
+ {
+ throw new InvalidOperationException(...)
+ }
+ return succeeded;
+ });
+</code></pre>
+<p>or</p>
+<pre><code>if (!Retry(5, delegate(bool lastIteration)
+ {
+ // do stuff
+ return succeeded;
+ }))
+{
+ Console.WriteLine(&quot;Well, that didn't work.&quot;);
+}
+</code></pre>
+<p>If passing a parameter that the method doesn&rsquo;t use proves to be awkward, it&rsquo;s trivial to implement an overload of <code>Retry</code> that just takes a <code>Func&lt;bool&gt;</code> as well.</p>
+<h2 id="method-15">Method 15</h2>
+<p><strong>Update after 6 years:</strong> now I consider that the approach below is pretty bad. To create a retry logic we should consider to use a library like Polly.</p>
+<hr>
+<p>My <code>async</code> implementation of the retry method:</p>
+<pre><code>public static async Task&lt;T&gt; DoAsync&lt;T&gt;(Func&lt;dynamic&gt; action, TimeSpan retryInterval, int retryCount = 3)
+ {
+ var exceptions = new List&lt;Exception&gt;();
+
+ for (int retry = 0; retry &lt; retryCount; retry++)
+ {
+ try
+ {
+ return await action().ConfigureAwait(false);
+ }
+ catch (Exception ex)
+ {
+ exceptions.Add(ex);
+ }
+
+ await Task.Delay(retryInterval).ConfigureAwait(false);
+ }
+ throw new AggregateException(exceptions);
+ }
+</code></pre>
+<p>Key points: I used <code>.ConfigureAwait(false);</code> and <code>Func&lt;dynamic&gt;</code> instead <code>Func&lt;T&gt;</code></p>
+<h2 id="method-16">Method 16</h2>
+<p>I needed a method that supports cancellation, while I was at it, I added support for returning intermediate failures.</p>
+<pre><code>public static class ThreadUtils
+{
+ public static RetryResult Retry(
+ Action target,
+ CancellationToken cancellationToken,
+ int timeout = 5000,
+ int retries = 0)
+ {
+ CheckRetryParameters(timeout, retries)
+ var failures = new List&lt;Exception&gt;();
+ while(!cancellationToken.IsCancellationRequested)
+ {
+ try
+ {
+ target();
+ return new RetryResult(failures);
+ }
+ catch (Exception ex)
+ {
+ failures.Add(ex);
+ }
+
+ if (retries &gt; 0)
+ {
+ retries--;
+ if (retries == 0)
+ {
+ throw new AggregateException(
+ &quot;Retry limit reached, see InnerExceptions for details.&quot;,
+ failures);
+ }
+ }
+
+ if (cancellationToken.WaitHandle.WaitOne(timeout))
+ {
+ break;
+ }
+ }
+
+ failures.Add(new OperationCancelledException(
+ &quot;The Retry Operation was cancelled.&quot;));
+ throw new AggregateException(&quot;Retry was cancelled.&quot;, failures);
+ }
+
+ private static void CheckRetryParameters(int timeout, int retries)
+ {
+ if (timeout &lt; 1)
+ {
+ throw new ArgumentOutOfRangeException(...
+ }
+
+ if (retries &lt; 0)
+ {
+ throw new ArgumentOutOfRangeException(...
+
+ }
+ }
+
+ public class RetryResult : IEnumerable&lt;Exception&gt;
+ {
+ private readonly IEnumerable&lt;Exception&gt; failureExceptions;
+ private readonly int failureCount;
+
+ protected internal RetryResult(
+ ICollection&lt;Exception&gt; failureExceptions)
+ {
+ this.failureExceptions = failureExceptions;
+ this.failureCount = failureExceptions.Count;
+ }
+ }
+
+ public int FailureCount
+ {
+ get { return this.failureCount; }
+ }
+
+ public IEnumerator&lt;Exception&gt; GetEnumerator()
+ {
+ return this.failureExceptions.GetEnumerator();
+ }
+
+ System.Collections.IEnumerator 
+ System.Collections.IEnumerable.GetEnumerator()
+ {
+ return this.GetEnumerator();
+ }
+}
+</code></pre>
+<p>You can use the <code>Retry</code> function like this, retry 3 times with a 10 second delay but without cancellation.</p>
+<pre><code>try
+{
+ var result = ThreadUtils.Retry(
+ SomeAction, 
+ CancellationToken.None,
+ 10000,
+ 3);
+
+ // it worked
+ result.FailureCount // but failed this many times first.
+}
+catch (AggregationException ex)
+{
+ // oops, 3 retries wasn't enough.
+}
+</code></pre>
+<p>Or, retry eternally every five seconds, unless cancelled.</p>
+<pre><code>try
+{
+ var result = ThreadUtils.Retry(
+ SomeAction, 
+ someTokenSource.Token);
+
+ // it worked
+ result.FailureCount // but failed this many times first.
+}
+catch (AggregationException ex)
+{
+ // operation was cancelled before success.
+}
+</code></pre>
+<p>As you can guess, In my source code I&rsquo;ve overloaded the <code>Retry</code> function to support the differing delgate types I desire to use.</p>
+<h2 id="method-17">Method 17</h2>
+<p>This method allows retries on certain exception types (throws others immediately).</p>
+<pre><code>public static void DoRetry(
+ List&lt;Type&gt; retryOnExceptionTypes,
+ Action actionToTry,
+ int retryCount = 5,
+ int msWaitBeforeEachRety = 300)
+{
+ for (var i = 0; i &lt; retryCount; ++i)
+ {
+ try
+ {
+ actionToTry();
+ break;
+ }
+ catch (Exception ex)
+ {
+ // Retries exceeded
+ // Throws on last iteration of loop
+ if (i == retryCount - 1) throw;
+
+ // Is type retryable?
+ var exceptionType = ex.GetType();
+ if (!retryOnExceptionTypes.Contains(exceptionType))
+ {
+ throw;
+ }
+
+ // Wait before retry
+ Thread.Sleep(msWaitBeforeEachRety);
+ }
+ }
+}
+public static void DoRetry(
+ Type retryOnExceptionType,
+ Action actionToTry,
+ int retryCount = 5,
+ int msWaitBeforeEachRety = 300)
+ =&gt; DoRetry(new List&lt;Type&gt; {retryOnExceptionType}, actionToTry, retryCount, msWaitBeforeEachRety);
+</code></pre>
+<p>Example usage:</p>
+<pre><code>DoRetry(typeof(IOException), () =&gt; {
+ using (var fs = new FileStream(requestedFilePath, FileMode.Create, FileAccess.Write))
+ {
+ fs.Write(entryBytes, 0, entryBytes.Length);
+ }
+});
+</code></pre>
+<h2 id="method-18">Method 18</h2>
+<p><a href="https://en.wikipedia.org/wiki/Exponential_backoff" target="_blank" rel="noopener">Exponential backoff</a>
+ is a good retry strategy than simply trying x number of times. You can use a library like Polly to implement it.</p>
+<h2 id="method-19">Method 19</h2>
+<p>For those who want to have both the option to retry on any exception or explicitly set the exception type, use this:</p>
+<pre><code>public class RetryManager 
+{
+ public void Do(Action action, 
+ TimeSpan interval, 
+ int retries = 3)
+ {
+ Try&lt;object, Exception&gt;(() =&gt; {
+ action();
+ return null;
+ }, interval, retries);
+ }
+
+ public T Do&lt;T&gt;(Func&lt;T&gt; action, 
+ TimeSpan interval, 
+ int retries = 3)
+ {
+ return Try&lt;T, Exception&gt;(
+ action
+ , interval
+ , retries);
+ }
+
+ public T Do&lt;E, T&gt;(Func&lt;T&gt; action, 
+ TimeSpan interval, 
+ int retries = 3) where E : Exception
+ {
+ return Try&lt;T, E&gt;(
+ action
+ , interval
+ , retries);
+ }
+
+ public void Do&lt;E&gt;(Action action, 
+ TimeSpan interval, 
+ int retries = 3) where E : Exception
+ {
+ Try&lt;object, E&gt;(() =&gt; {
+ action();
+ return null;
+ }, interval, retries);
+ }
+
+ private T Try&lt;T, E&gt;(Func&lt;T&gt; action, 
+ TimeSpan interval, 
+ int retries = 3) where E : Exception
+ {
+ var exceptions = new List&lt;E&gt;();
+
+ for (int retry = 0; retry &lt; retries; retry++)
+ {
+ try
+ {
+ if (retry &gt; 0)
+ Thread.Sleep(interval);
+ return action();
+ }
+ catch (E ex)
+ {
+ exceptions.Add(ex);
+ }
+ }
+
+ throw new AggregateException(exceptions);
+ }
+}
+</code></pre>
+<h2 id="method-20">Method 20</h2>
+<p>Here&rsquo;s an <code>async</code>/<code>await</code> version that aggregates exceptions and supports cancellation.</p>
+<pre><code>/// &lt;seealso href=&quot;https://learn.microsoft.com/en-us/azure/architecture/patterns/retry&quot;/&gt;
+protected static async Task&lt;T&gt; DoWithRetry&lt;T&gt;( Func&lt;Task&lt;T&gt;&gt; action, CancellationToken cancelToken, int maxRetries = 3 )
+{
+ var exceptions = new List&lt;Exception&gt;();
+
+ for ( int retries = 0; !cancelToken.IsCancellationRequested; retries++ )
+ try {
+ return await action().ConfigureAwait( false );
+ } catch ( Exception ex ) {
+ exceptions.Add( ex );
+
+ if ( retries &lt; maxRetries )
+ await Task.Delay( 500, cancelToken ).ConfigureAwait( false ); //ease up a bit
+ else
+ throw new AggregateException( &quot;Retry limit reached&quot;, exceptions );
+ }
+
+ exceptions.Add( new OperationCanceledException( cancelToken ) );
+ throw new AggregateException( &quot;Retry loop was canceled&quot;, exceptions );
+}
+</code></pre>
+<h2 id="method-21">Method 21</h2>
+<p>I had the need to pass some parameter to my method to retry, and have a result value; so i need an expression..
+I build up this class that does the work (it is inspired to the the LBushkin&rsquo;s one)
+you can use it like this:</p>
+<pre><code>static void Main(string[] args)
+{
+ // one shot
+ var res = Retry&lt;string&gt;.Do(() =&gt; retryThis(&quot;try&quot;), 4, TimeSpan.FromSeconds(2), fix);
+
+ // delayed execute
+ var retry = new Retry&lt;string&gt;(() =&gt; retryThis(&quot;try&quot;), 4, TimeSpan.FromSeconds(2), fix);
+ var res2 = retry.Execute();
+}
+
+static void fix()
+{
+ Console.WriteLine(&quot;oh, no! Fix and retry!!!&quot;);
+}
+
+static string retryThis(string tryThis)
+{
+ Console.WriteLine(&quot;Let's try!!!&quot;);
+ throw new Exception(tryThis);
+}
+
+public class Retry&lt;TResult&gt;
+{
+ Expression&lt;Func&lt;TResult&gt;&gt;_Method;
+ int _NumRetries;
+ TimeSpan _RetryTimeout;
+ Action _OnFailureAction;
+
+ public Retry(Expression&lt;Func&lt;TResult&gt;&gt; method, int numRetries, TimeSpan retryTimeout, Action onFailureAction)
+ {
+ _Method = method;
+ _NumRetries = numRetries;
+ _OnFailureAction = onFailureAction;
+ _RetryTimeout = retryTimeout;
+ }
+
+ public TResult Execute()
+ {
+ TResult result = default(TResult);
+ while (_NumRetries &gt; 0)
+ {
+ try
+ {
+ result = _Method.Compile()();
+ break;
+ }
+ catch
+ {
+ _OnFailureAction();
+ _NumRetries--;
+ if (_NumRetries &lt;= 0) throw; // improved to avoid silent failure
+ Thread.Sleep(_RetryTimeout);
+ }
+ }
+ return result;
+ }
+
+ public static TResult Do(Expression&lt;Func&lt;TResult&gt;&gt; method, int numRetries, TimeSpan retryTimeout, Action onFailureAction)
+ {
+ var retry = new Retry&lt;TResult&gt;(method, numRetries, retryTimeout, onFailureAction);
+ return retry.Execute();
+ }
+}
+</code></pre>
+<p>ps.
+the LBushkin&rsquo;s solution does one more retry =D</p>
+<h2 id="method-22">Method 22</h2>
+<p>I would add the following code to the accepted answer</p>
+<pre><code>public static class Retry&lt;TException&gt; where TException : Exception //ability to pass the exception type
+ {
+ //same code as the accepted answer ....
+
+ public static T Do&lt;T&gt;(Func&lt;T&gt; action, TimeSpan retryInterval, int retryCount = 3)
+ {
+ var exceptions = new List&lt;Exception&gt;();
+
+ for (int retry = 0; retry &lt; retryCount; retry++)
+ {
+ try
+ {
+ return action();
+ }
+ catch (TException ex) //Usage of the exception type
+ {
+ exceptions.Add(ex);
+ Thread.Sleep(retryInterval);
+ }
+ }
+
+ throw new AggregateException(String.Format(&quot;Failed to excecute after {0} attempt(s)&quot;, retryCount), exceptions);
+ }
+ }
+</code></pre>
+<p>Basically the above code is making the <code>Retry</code> class generic so you can pass the type of the exception you want to catch for retry.</p>
+<p>Now use it almost in the same way but specifying the exception type</p>
+<pre><code>Retry&lt;EndpointNotFoundException&gt;.Do(() =&gt; SomeFunctionThatCanFail(), TimeSpan.FromSeconds(1));
+</code></pre>
+<h2 id="method-23">Method 23</h2>
+<p>I know this answer is very old but I just wanted to comment on this because I have run into issues using these while, do, whatever statement with counters.</p>
+<p>Over the years I have settled on a better approach I think. That is to use some sort of event aggregation like a reactive extensions &ldquo;Subject&rdquo; or the like. When a try fails, you simply publish an event saying the try failed, and have the aggregator function re-schedule the event. This allows you much more control over the retry without polluting the call itself with a bunch of retry loops and what not. Nor are you tying up a single thread with a bunch of thread sleeps.</p>
+<h2 id="method-24">Method 24</h2>
+<p>Do it simple in C#, Java or other languages:</p>
+<pre><code> internal class ShouldRetryHandler {
+ private static int RETRIES_MAX_NUMBER = 3;
+ private static int numberTryes;
+
+ public static bool shouldRetry() {
+ var statusRetry = false;
+
+ if (numberTryes&lt; RETRIES_MAX_NUMBER) {
+ numberTryes++;
+ statusRetry = true;
+ //log msg -&gt; 'retry number' + numberTryes
+
+ }
+
+ else {
+ statusRetry = false;
+ //log msg -&gt; 'reached retry number limit' 
+ }
+
+ return statusRetry;
+ }
+}
+</code></pre>
+<p>and use it in your code very simple:</p>
+<pre><code> void simpleMethod(){
+ //some code
+
+ if(ShouldRetryHandler.shouldRetry()){
+ //do some repetitive work
+ }
+
+ //some code 
+ }
+</code></pre>
+<p>or you can use it in recursive methods:</p>
+<pre><code>void recursiveMethod(){
+ //some code
+
+ if(ShouldRetryHandler.shouldRetry()){
+ recursiveMethod();
+ }
+
+ //some code 
+ }
+</code></pre>
+<h2 id="method-25">Method 25</h2>
+<p>It is also possible to use a recursive retry, by simply returning itself with an attempt counter when you need to retry. Then you need two extra parameters, one for the attempt counter, and one for the number of max attempts. Remember to increase the attempt counter upon retry. If you use an interface, you can choose to add the parameters to the interface, or add a wrapper method that calls the method with those parameters. Here is an example of the latter.</p>
+<pre><code>public interface ISomeService
+{
+ Task TryThreeTimes();
+}
+
+public class SomeService : ISomeService
+{
+ public async Task TryTreeTimes() {
+ return await TryTreeTimes(attempt = 0, maxAttempt = 3);
+ }
+
+ private void TryTreeTimes(int attempt = 0, int maxAttempt = 3)
+ {
+ try
+ {
+ // execute code
+ }
+ catch (Exception exception)
+ {
+ // handle exception
+
+ var needToRetry = /*some condition*/ true;
+ if (needToRetry &amp;&amp; attempt &lt; maxAttempt)
+ {
+ await Task.Delay(1000);
+ return TryTreeTimes(attempt + 1, maxAttempt);
+ }
+ }
+ }
+}
+</code></pre>
+<p>Make sure to handle any disposable variables properly to avoid memory leak, for instance with a finally block at the end. Remember that this will recursively add data to the stack, so be advised to balance memory usage with max possible attempts.</p>
+<h2 id="method-26">Method 26</h2>
+<p>There are many good answers already, but most of them should be improved by not rethrowing at the end, instead use <code>catch (...) when ...</code> (<a href="https://github.com/dotnet/roslyn/blob/main/docs/wiki/New-Language-Features-in-C%23-6.md#exception-filters" target="_blank" rel="noopener">since C# 6</a>
+)</p>
+<blockquote>
+<p>Exception filters are preferable to catching and rethrowing because
+they leave the stack unharmed.</p>
+</blockquote>
+<pre><code>/// &lt;summary&gt;
+/// Retries an async action when a specific exception occurs, on last try the exception is not catched
+/// &lt;/summary&gt;
+public static async Task RetryAsync&lt;T&gt;(Func&lt;Task&gt; action, int tries = 3, int sleep = 0, ILogger? logger = null) where T : Exception
+{
+ while (true)
+ {
+ try
+ {
+ await action();
+ return;
+ }
+ catch (T ex) when (--tries &gt; 0)
+ {
+ logger?.LogError(ex, &quot;{Message}\nRetrying ({tries} remaining)...&quot;, ex.Message, tries);
+ await Task.Delay(sleep);
+ }
+ }
+}
+
+/// &lt;summary&gt;
+/// Retries an action when a specific exception occurs, on last try the exception is not catched
+/// &lt;/summary&gt;
+public static void Retry&lt;T&gt;(Action action, int tries = 3, int sleep = 0, ILogger? logger = null) where T : Exception
+{
+ while (true)
+ {
+ try
+ {
+ action();
+ return;
+ }
+ catch (T ex) when (--tries &gt; 0)
+ {
+ logger?.LogError(ex, &quot;{Message}\nRetrying ({tries} remaining)...&quot;, ex.Message, tries);
+ Thread.Sleep(sleep);
+ }
+ }
+}
+
+//TODO: we need additional versions to return results
+</code></pre>
+<p><a href="https://dotnetfiddle.net/yP2UtW" target="_blank" rel="noopener">Fiddle</a>
+</p>
+<h2 id="method-27">Method 27</h2>
+<p>Or how about doing it a bit neater&hellip;.</p>
+<pre><code>int retries = 3;
+while (retries &gt; 0)
+{
+ if (DoSomething())
+ {
+ retries = 0;
+ }
+ else
+ {
+ retries--;
+ }
+}
+</code></pre>
+<p>I believe throwing exceptions should generally be avoided as a mechanism unless your a passing them between boundaries (such as building a library other people can use). Why not just have the <code>DoSomething()</code> command return <code>true</code> if it was successful and <code>false</code> otherwise?</p>
+<p><strong>EDIT:</strong> And this can be encapsulated inside a function like others have suggested as well. Only problem is if you are not writing the <code>DoSomething()</code> function yourself</p>
+<h2 id="method-28">Method 28</h2>
+<p>int retries = 3;
+while (true)
+{
+try
+{
+//Do Somthing
+break;
+}
+catch (Exception ex)
+{
+if (&ndash;retries == 0)
+return Request.BadRequest(ApiUtil.GenerateRequestResponse(false, &ldquo;3 Times tried it failed do to : &quot; + ex.Message, new JObject()));
+else
+System.Threading.Thread.Sleep(100);
+}</p>
+<h2 id="method-29">Method 29</h2>
+<p>I&rsquo;ve implemented an async version of the accepted answer like so - and it seems to work nicely - any comments?</p>
+<pre><code> public static async Task DoAsync(
+ Action action,
+ TimeSpan retryInterval,
+ int maxAttemptCount = 3)
+ {
+ DoAsync&lt;object&gt;(() =&gt;
+ {
+ action();
+ return null;
+ }, retryInterval, maxAttemptCount);
+ }
+
+ public static async Task&lt;T&gt; DoAsync&lt;T&gt;(
+ Func&lt;Task&lt;T&gt;&gt; action,
+ TimeSpan retryInterval,
+ int maxAttemptCount = 3)
+ {
+ var exceptions = new List&lt;Exception&gt;();
+
+ for (int attempted = 0; attempted &lt; maxAttemptCount; attempted++)
+ {
+ try
+ {
+ if (attempted &gt; 0)
+ {
+ Thread.Sleep(retryInterval);
+ }
+ return await action();
+ }
+ catch (Exception ex)
+ {
+ exceptions.Add(ex);
+ }
+ }
+ throw new AggregateException(exceptions);
+ }
+</code></pre>
+<p>And, call it simply like this:</p>
+<pre><code>var result = await Retry.DoAsync(() =&gt; MyAsyncMethod(), TimeSpan.FromSeconds(5), 4);
+</code></pre>
+<h2 id="method-30">Method 30</h2>
+<p>public delegate void ThingToTryDeletage();</p>
+<pre><code>public static void TryNTimes(ThingToTryDelegate, int N, int sleepTime)
+{
+ while(true)
+ {
+ try
+ {
+ ThingToTryDelegate();
+ } catch {
+
+ if( --N == 0) throw;
+ else Thread.Sleep(time); 
+ }
+}
+</code></pre>
+<p>? What would be the code for the <code>TryThreeTimes()</code> method?</p>
+
+        </article>
+
+        
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const themeToggle = document.querySelector('.darkmode-toggle input');
+      const light = 'light';
+      const dark = 'dark';
+      let isDark = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      let theme = isDark ? dark : light;
+  
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/sqlpeyNew',
+          repoId: 'R_kgDOLGnEAw',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDOLGnEA84Cchw3',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+  
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+  
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+  
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+  
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+  
+      themeToggle.addEventListener('change', function () {
+        if (this.checked) {
+          theme = dark;
+        } else {
+          theme = light;
+        }
+        sendMessage({
+          setConfig: {
+            theme: theme,
+          }
+        });
+      });
+    })();
+  </script>
+  
+  
+
+
+      </div>
+    </section>
+    <aside class="hidden md:flex flex-col md:w-1/3 mx-3 top-0 sticky self-start
+">
+   
+    <div class="mt-12 items-center ml-6 mr-10 start-0">
+  <form class="flex items-center m-1 w-full" action="https://sqlpey.com/search/" method="get">
+    <label for="search-input" class="sr-only">Search</label>
+    <div class="relative w-full">
+        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <svg alt="Search icon" class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 6c0 1.7-3.1 3-7 3S5 7.7 5 6m14 0c0-1.7-3.1-3-7-3S5 4.3 5 6m14 0v6M5 6v6m0 0c0 1.7 3.1 3 7 3s7-1.3 7-3M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>
+            </svg>
+        </div>
+        <input type="text" name="query" id="search-input" class="bg-white border  text-gray-900 text-sm rounded-full focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+         placeholder="Search ..." required>
+        <button type="submit" aria-label="Submit Search" class="absolute inset-y-0 end-0 flex items-center pe-3">
+            <svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+            </svg>
+        </button>
+    </div>
+    <input type="submit" value="" title="Submit Search">
+</form>
+
+</div>
+
+  
+  
+
+<section class="flex flex-col w-full gap-y-2 px-6 mt-3 text-slate-800 dark:text-slate-200">
+  <div class="flex flex-row">
+    <a class="flex flex-row" href='/categories/'>
+      <i class="h-6 w-6 flex-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-category-2" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M14 4h6v6h-6z"></path>
+   <path d="M4 14h6v6h-6z"></path>
+   <path d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+   <path d="M7 7m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+</svg>
+
+      </i>
+      <h2 class="pl-1 uppercase">
+        Categories
+      </h2>
+    </a>
+  </div>
+
+  <ul class="flex flex-row flex-wrap">
+    
+    <li class="mt-2 mr-2">
+      <a href="/categories/sql/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        Sql
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/categories/database/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        Database
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/categories/dotnet/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        Dotnet
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/categories/.net/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        .Net
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/categories/csharp/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        Csharp
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/categories/.net-8/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        .NET 8
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/categories/blazor-8/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        Blazor 8
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/categories/web/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        Web
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/categories/queries/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        Queries
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/categories/mysql/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        Mysql
+      </a>
+    </li>
+    
+  </ul>
+
+   
+</section>
+
+  
+
+  
+
+  
+  
+
+<section class="flex flex-col w-full gap-y-2 px-6 mt-3 text-slate-800 dark:text-slate-200">
+  <div class="flex flex-row">
+    <a class="flex flex-row" href='/tags/'>
+      <i class="h-6 w-6 flex-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M5 9l14 0"></path>
+   <path d="M5 15l14 0"></path>
+   <path d="M11 4l-4 16"></path>
+   <path d="M17 4l-4 16"></path>
+</svg>
+
+      </i>
+      <h2 class="pl-1 uppercase">
+        Tags
+      </h2>
+    </a>
+  </div>
+
+  <ul class="flex flex-row flex-wrap">
+    
+    <li class="mt-2 mr-2">
+      <a href="/tags/sql/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        Sql
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/tags/database/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        Database
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/tags/.net-8/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        .NET 8
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/tags/blazor-8/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        Blazor 8
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/tags/dotnet/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        Dotnet
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/tags/mysql/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        MySQL
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/tags/oracle/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        Oracle
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/tags/azure-sql-database-2/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        Azure-Sql-Database-2
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/tags/postgresql/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        Postgresql
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
+      <a href="/tags/blazor/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        Blazor
+      </a>
+    </li>
+    
+  </ul>
+
+   
+</section>
+
+  
+
+<div class="max-w-full mx-auto my-4 flex items-start">
+    <a href="https://codewithabkhan.github.io" title="Get IT Services Starts from 10$" rel="noopener noreferrer">
+        <img src="/ads/sqlpey_ads.gif" alt="Need IT Services now? Get any IT Serverce from 10 $, create website, create mobile app" 
+        class="h-96 rounded-md shadow-md hover:shadow-lg transition duration-300" loading="lazy"/>
+    </a>
+   
+</div>
+
+    </aside>
+  </div>
+</div>
+
+  </main>
+  <footer class="flex flex-none justify-center">
+    <section class="flex flex-col md:flex-row mx-2 md:mx-0 gap-2 md:gap-0 justify-between w-full max-w-4xl lg:max-w-5xl py-6 text-slate-500 dark:text-slate-300">
+  <div class="flex flex-row">
+    
+  
+  
+    <a href="https://www.facebook.com/sqlpey" target="_blank" title="Facebook" class="flex flex-row mr-2">
+      <span class="hidden">Facebook</span>
+      <i class="h-6 w-6 flex-none"> <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-facebook" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3"></path>
+</svg>
+ </i>
+    </a>
+  
+  
+  
+    <a href="https://twitter.com/sqlpey" target="_blank" title="Twitter" class="flex flex-row mr-2">
+      <span class="hidden">Twitter</span>
+      <i class="h-6 w-6 flex-none"> <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-x" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M4 4l11.733 16h4.267l-11.733 -16z"></path>
+   <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"></path>
+</svg>
+ </i>
+    </a>
+  
+  
+  
+    <a href="https://www.instagram.com/sqlpey" target="_blank" title="Instagram" class="flex flex-row mr-2">
+      <span class="hidden">Instagram</span>
+      <i class="h-6 w-6 flex-none"> <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-instagram" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M4 4m0 4a4 4 0 0 1 4 -4h8a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-8a4 4 0 0 1 -4 -4z"></path>
+   <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+   <path d="M16.5 7.5l0 .01"></path>
+</svg>
+ </i>
+    </a>
+  
+  
+  
+    <a href="https://www.linkedin.com/sqlpey" target="_blank" title="LinkedIn" class="flex flex-row mr-2">
+      <span class="hidden">LinkedIn</span>
+      <i class="h-6 w-6 flex-none"> <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-linkedin" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"></path>
+   <path d="M8 11l0 5"></path>
+   <path d="M8 8l0 .01"></path>
+   <path d="M12 16l0 -5"></path>
+   <path d="M16 16v-3a2 2 0 0 0 -4 0"></path>
+</svg>
+ </i>
+    </a>
+  
+  
+  
+  
+
+
+  </div>
+  <div class="grow"></div>
+  <div class="flex flex-row">
+    <i class="h-6 w-6 flex-none"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+   <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+   <path d="M14 9.75a3.016 3.016 0 0 0 -4.163 .173a2.993 2.993 0 0 0 0 4.154a3.016 3.016 0 0 0 4.163 .173"></path>
+</svg>
+</i> 2024 abkhan
+    
+  </div>
+  
+  <div class="flex flex-row">
+    <span class="ml-0 pl-0 md:ml-2 md:pl-2 border-l-0 md:border-l border-slate-300 dark:border-slate-400">
+      Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="underline"> Ab</a> <span class="text-red-600">&hearts;</span> <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="underline">Khan</a>
+    </span>
+  </div>
+ 
+  
+ 
+ 
+</section>
+
+  </footer><script src="/main.min.9e403a07cf93acc04c92ff004d87dd03d93ea2ac475bbb69443afecce166a976.js"></script>
+  
+  <div class="hidden top-1 right-1" id="code-copy">
+    <i class="h-6 w-6 block">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copy" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" />
+  <path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" />
+</svg>
+
+    </i>
+  </div>
+  <div class="hidden top-1 right-1" id="code-copy-done">
+    <i class="h-6 w-6 block">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M5 12l5 5l10 -10" />
+</svg>
+
+    </i>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+</script>
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+</body>
+</html>
