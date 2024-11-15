@@ -342,8 +342,9 @@
           <h2>Table of Contents</h2>
           <aside><nav id="TableOfContents">
   <ul>
-    <li>
+    <li><a href="#summary">Summary</a>
       <ul>
+        <li><a href="#step-1-create-a-model-for-your-data">Step 1: <strong>Create a Model for Your Data</strong></a></li>
         <li><a href="#step-2-implement-asynchronous-operations">Step 2: <strong>Implement Asynchronous Operations</strong></a></li>
         <li><a href="#step-3-modify-the-blazor-component">Step 3: <strong>Modify the Blazor Component</strong></a></li>
         <li><a href="#step-4-handle-ui-state-refresh-efficiently">Step 4: <strong>Handle UI State Refresh Efficiently</strong></a></li>
@@ -396,51 +397,44 @@
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
        prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" 
           itemscope itemtype="https://schema.org/FAQPage" >
-          <pre tabindex="0"><code>
-When building Blazor applications, handling long-running operations can become a challenge, especially when the UI becomes unresponsive. By leveraging asynchronous operations, you can significantly improve the user experience. Below is a detailed guide on how to achieve this in your Blazor applications.
-
-## Summary
-
-Implementing asynchronous operations in Blazor is essential for maintaining a responsive UI, especially during long-running tasks. This guide walks through five steps, providing code examples and alternative approaches to ensure your Blazor applications run smoothly.
-
-### Step 1: **Create a Model for Your Data**
-
-Before diving into asynchronous operations, start by defining your model. Here’s a simple example:
-
-```csharp
-namespace ExampleApp.Model
-{
-    public class Item
-    {
-        public string Content { get; set; } = &#34;default&#34;;
-    }
-
-    public class ItemCollection
-    {
-        private List&lt;Item&gt; items = new List&lt;Item&gt;() { new Item() };
-        public string? ProcessedResult { get; private set; }
-
-        public IList&lt;Item&gt; GetItems() =&gt; items;
-
-        public void AddItem(int index)
-        {
-            items.Insert(index, new Item());
-            UpdateProcessedResult();
-        }
-
-        public void RemoveItem(int index)
-        {
-            items.RemoveAt(index);
-            UpdateProcessedResult();
-        }
-
-        private void UpdateProcessedResult()
-        {
-            ProcessedResult = string.Join(&#34;, &#34;, items.Select(i =&gt; i.Content));
-        }
-    }
-}
-</code></pre><h3 id="step-2-implement-asynchronous-operations">Step 2: <strong>Implement Asynchronous Operations</strong></h3>
+          <p>When building Blazor applications, handling long-running operations can become a challenge, especially when the UI becomes unresponsive. By leveraging asynchronous operations, you can significantly improve the user experience. Below is a detailed guide on how to achieve this in your Blazor applications.</p>
+<h2 id="summary">Summary</h2>
+<p>Implementing asynchronous operations in Blazor is essential for maintaining a responsive UI, especially during long-running tasks. This guide walks through five steps, providing code examples and alternative approaches to ensure your Blazor applications run smoothly.</p>
+<h3 id="step-1-create-a-model-for-your-data">Step 1: <strong>Create a Model for Your Data</strong></h3>
+<p>Before diving into asynchronous operations, start by defining your model. Here’s a simple example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span> ExampleApp.Model
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Item</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">string</span> Content { <span style="color:#66d9ef">get</span>; <span style="color:#66d9ef">set</span>; } = <span style="color:#e6db74">&#34;default&#34;</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ItemCollection</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">private</span> List&lt;Item&gt; items = <span style="color:#66d9ef">new</span> List&lt;Item&gt;() { <span style="color:#66d9ef">new</span> Item() };
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">string?</span> ProcessedResult { <span style="color:#66d9ef">get</span>; <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">set</span>; }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> IList&lt;Item&gt; GetItems() =&gt; items;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> AddItem(<span style="color:#66d9ef">int</span> index)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            items.Insert(index, <span style="color:#66d9ef">new</span> Item());
+</span></span><span style="display:flex;"><span>            UpdateProcessedResult();
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> RemoveItem(<span style="color:#66d9ef">int</span> index)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            items.RemoveAt(index);
+</span></span><span style="display:flex;"><span>            UpdateProcessedResult();
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">void</span> UpdateProcessedResult()
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            ProcessedResult = <span style="color:#66d9ef">string</span>.Join(<span style="color:#e6db74">&#34;, &#34;</span>, items.Select(i =&gt; i.Content));
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="step-2-implement-asynchronous-operations">Step 2: <strong>Implement Asynchronous Operations</strong></h3>
 <p>To avoid blocking the UI, convert the processing methods to asynchronous versions.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span> ExampleApp.Model
 </span></span><span style="display:flex;"><span>{
@@ -622,11 +616,11 @@ else
       const s = document.createElement('script');
       s.type = 'text/javascript';
       const dataset = {
-          repo: 'CodeWithAbkhan\/sqlpeyNew',
-          repoId: 'R_kgDOLGnEAw',
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
           category: 'Announcements',
-          categoryId: 'DIC_kwDOLGnEA84Cchw3',
-          mapping: 'pathname',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'url',
           reactionsEnabled: '1',
           emitMetadata: '0',
           theme: theme,
@@ -728,6 +722,13 @@ else
   <ul class="flex flex-row flex-wrap">
     
     <li class="mt-2 mr-2">
+      <a href="/categories/python/"
+        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
+        Python
+      </a>
+    </li>
+    
+    <li class="mt-2 mr-2">
       <a href="/categories/sql/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
         Sql
@@ -738,13 +739,6 @@ else
       <a href="/categories/database/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
         Database
-      </a>
-    </li>
-    
-    <li class="mt-2 mr-2">
-      <a href="/categories/python/"
-        class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
-        Python
       </a>
     </li>
     
