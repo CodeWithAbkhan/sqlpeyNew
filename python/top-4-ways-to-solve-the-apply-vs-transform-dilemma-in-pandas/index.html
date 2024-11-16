@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
-  <title>Top 4 Ways to Solve the Apply vs Transform Dilemma in Pandas :: sqlpey</title>
+  <title>Top 4 Ways to Solve the Apply vs Transform Dilemma in Pandas …</title>
+
   
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -322,7 +323,7 @@
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create a DataFrame</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Create a DataFrame</span>
 </span></span><span style="display:flex;"><span>columns <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;A&#39;</span>, <span style="color:#e6db74">&#39;B&#39;</span>, <span style="color:#e6db74">&#39;C&#39;</span>, <span style="color:#e6db74">&#39;D&#39;</span>]
 </span></span><span style="display:flex;"><span>records <span style="color:#f92672">=</span> [
 </span></span><span style="display:flex;"><span>    [<span style="color:#e6db74">&#39;foo&#39;</span>, <span style="color:#e6db74">&#39;one&#39;</span>, <span style="color:#ae81ff">0.162003</span>, <span style="color:#ae81ff">0.087469</span>],
@@ -338,13 +339,13 @@
 </span></span></code></pre></div><p>This DataFrame has four columns where &lsquo;A&rsquo; contains categorical strings and columns &lsquo;C&rsquo; and &lsquo;D&rsquo; contain numerical values which we will work with.</p>
 <h3 id="method-1-using-apply">Method 1: Using <code>apply()</code></h3>
 <p>The <code>.apply()</code> method allows for custom functions to be applied to each group:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Subtract two columns and get mean using apply</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">## Subtract two columns and get mean using apply</span>
 </span></span><span style="display:flex;"><span>result_apply <span style="color:#f92672">=</span> df<span style="color:#f92672">.</span>groupby(<span style="color:#e6db74">&#39;A&#39;</span>)<span style="color:#f92672">.</span>apply(<span style="color:#66d9ef">lambda</span> x: (x[<span style="color:#e6db74">&#39;C&#39;</span>] <span style="color:#f92672">-</span> x[<span style="color:#e6db74">&#39;D&#39;</span>])<span style="color:#f92672">.</span>mean())
 </span></span><span style="display:flex;"><span>print(result_apply)
 </span></span></code></pre></div><p><strong>Output Explained</strong>: This will provide the mean of the differences between columns &lsquo;C&rsquo; and &lsquo;D&rsquo; for each group in column &lsquo;A&rsquo;.</p>
 <h3 id="method-2-using-transform">Method 2: Using <code>transform()</code></h3>
 <p>In contrast, <code>.transform()</code> is intended for operations that return a Series with the same length as the group:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Trying to use transform to subtract columns</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">## Trying to use transform to subtract columns</span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
 </span></span><span style="display:flex;"><span>    result_transform <span style="color:#f92672">=</span> df<span style="color:#f92672">.</span>groupby(<span style="color:#e6db74">&#39;A&#39;</span>)<span style="color:#f92672">.</span>transform(<span style="color:#66d9ef">lambda</span> x: (x[<span style="color:#e6db74">&#39;C&#39;</span>] <span style="color:#f92672">-</span> x[<span style="color:#e6db74">&#39;D&#39;</span>]))
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
@@ -352,13 +353,13 @@
 </span></span></code></pre></div><p><strong>Error Explanation</strong>: The <code>KeyError</code> arises because <code>transform()</code> does not handle cases where multiple columns need to be accessed simultaneously. It only deals with single Series at a time.</p>
 <h3 id="method-3-alternative-uses-of-transform">Method 3: Alternative Uses of <code>transform()</code></h3>
 <p>To employ <code>transform()</code> effectively, we can calculate aggregate values on a single column and then insert those values back into the DataFrame:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Calculating the sum of &#39;C&#39; for each group and adding to DataFrame</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">## Calculating the sum of &#39;C&#39; for each group and adding to DataFrame</span>
 </span></span><span style="display:flex;"><span>df[<span style="color:#e6db74">&#39;sum_C&#39;</span>] <span style="color:#f92672">=</span> df<span style="color:#f92672">.</span>groupby(<span style="color:#e6db74">&#39;A&#39;</span>)[<span style="color:#e6db74">&#39;C&#39;</span>]<span style="color:#f92672">.</span>transform(<span style="color:#e6db74">&#39;sum&#39;</span>)
 </span></span><span style="display:flex;"><span>print(df)
 </span></span></code></pre></div><p><strong>Output Explained</strong>: This provides the sum of the &lsquo;C&rsquo; column for each group replicated back to the original DataFrame, allowing for straightforward comparisons.</p>
 <h3 id="method-4-leveraging-custom-functions">Method 4: Leveraging Custom Functions</h3>
 <p>You can also perform more tailored operations through user-defined functions with <code>apply()</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Custom function to calculate column difference</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">## Custom function to calculate column difference</span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">column_difference</span>(gr):
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> gr[<span style="color:#e6db74">&#39;C&#39;</span>] <span style="color:#f92672">-</span> gr[<span style="color:#e6db74">&#39;D&#39;</span>]
 </span></span><span style="display:flex;"><span>
@@ -376,28 +377,36 @@
 <h3 id="feedback">Feedback</h3>
 <p>What are your experiences with using <code>.apply()</code> and <code>.transform()</code> in Pandas? Do you have any challenges you&rsquo;d like to share or specific use cases you found interesting? We would love to hear your thoughts in the comments below!</p>
 <h3 id="faqs-on-top-4-ways-to-solve-the-apply-vs-transform-dilemma-in-pandas">FAQs on Top 4 Ways to Solve the Apply vs Transform Dilemma in Pandas</h3>
-<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
-    <h2 itemprop="name">Q: What is the main difference between apply and transform in Pandas?</h2>
-    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
-    <div itemprop="text">A: The primary difference is that <code>.apply()</code> can reduce data to a different shape or size, while <code>.transform()</code> must return a result that matches the original DataFrame&rsquo;s length.</div>
+<div itemscope itemtype="https://schema.org/FAQPage">
+    <div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+      <h2 itemprop="name">Q: What is the main difference between apply and transform in Pandas?</h2>
+      <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+        <div itemprop="text">A: The primary difference is that <code>.apply()</code> can reduce data to a different shape or size, while <code>.transform()</code> must return a result that matches the original DataFrame&rsquo;s length.</div>
+      </div>
     </div>
 </div>
-<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
-    <h2 itemprop="name">Q: Can I use multiple columns with transform?</h2>
-    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
-    <div itemprop="text">A: No, <code>transform()</code> operates on a single Series at a time; it doesn’t aggregate data from multiple columns together.</div>
+<div itemscope itemtype="https://schema.org/FAQPage">
+    <div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+      <h2 itemprop="name">Q: Can I use multiple columns with transform?</h2>
+      <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+        <div itemprop="text">A: No, <code>transform()</code> operates on a single Series at a time; it doesn’t aggregate data from multiple columns together.</div>
+      </div>
     </div>
 </div>
-<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
-    <h2 itemprop="name">Q: When should I use apply instead of transform?</h2>
-    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
-    <div itemprop="text">A: Use <code>.apply()</code> when performing complex operations that may reduce the DataFrame size or when working with multiple columns simultaneously.</div>
+<div itemscope itemtype="https://schema.org/FAQPage">
+    <div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+      <h2 itemprop="name">Q: When should I use apply instead of transform?</h2>
+      <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+        <div itemprop="text">A: Use <code>.apply()</code> when performing complex operations that may reduce the DataFrame size or when working with multiple columns simultaneously.</div>
+      </div>
     </div>
 </div>
-<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
-    <h2 itemprop="name">Q: Are there performance differences between apply and transform?</h2>
-    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
-    <div itemprop="text">A: Yes, <code>.transform()</code> is usually faster since it is designed to work column-wise without aggregating or reshaping, making it more efficient for operations that apply directly to columns.</div>
+<div itemscope itemtype="https://schema.org/FAQPage">
+    <div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+      <h2 itemprop="name">Q: Are there performance differences between apply and transform?</h2>
+      <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+        <div itemprop="text">A: Yes, <code>.transform()</code> is usually faster since it is designed to work column-wise without aggregating or reshaping, making it more efficient for operations that apply directly to columns.</div>
+      </div>
     </div>
 </div>
 
@@ -580,16 +589,16 @@
     </li>
     
     <li class="mt-2 mr-2">
-      <a href="/categories/data-science/"
+      <a href="/categories/django/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
-        Data Science
+        Django
       </a>
     </li>
     
     <li class="mt-2 mr-2">
-      <a href="/categories/django/"
+      <a href="/categories/data-science/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
-        Django
+        Data Science
       </a>
     </li>
     

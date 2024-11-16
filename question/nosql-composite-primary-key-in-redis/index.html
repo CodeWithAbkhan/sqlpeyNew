@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
-  <title>Nosql Composite Primary Key In Redis :: sqlpey</title>
+  <title>Nosql Composite Primary Key In Redis - sqlpey</title>
+
   
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -354,11 +355,11 @@ Redis is a NoSQL database that is key-value based. To efficiently query data, fo
 To answer the first query (&lsquo;get all where business_id=x&rsquo;), the key should hold relevant data for each x, separated by a colon. For instance, business:1 and business:a1b2c3. Each such key could be a Redis set where each member would represent the rest of the tuple.</p>
 <p>Code Example:
 To execute the above logic in Redis, you can use the following code:</p>
-<pre tabindex="0"><code># Connect to Redis
+<pre tabindex="0"><code>## Connect to Redis
 import redis
 r = redis.StrictRedis(host=&#39;localhost&#39;, port=6379, db=0)
 
-# Initialize sample data
+## Initialize sample data
 data = [
     {&#39;user_id&#39;: &#39;foo&#39;, &#39;business_id&#39;: &#39;bar&#39;, &#39;last_seen_ts&#39;: 987, &#39;first_seen_ts&#39;: 123},
     {&#39;user_id&#39;: &#39;baz&#39;, &#39;business_id&#39;: &#39;bar&#39;, &#39;last_seen_ts&#39;: 654, &#39;first_seen_ts&#39;: 789},
@@ -366,7 +367,7 @@ data = [
     {&#39;user_id&#39;: &#39;baz&#39;, &#39;business_id&#39;: &#39;qux&#39;, &#39;last_seen_ts&#39;: 987, &#39;first_seen_ts&#39;: 321},
 ]
 
-# Store data
+## Store data
 for d in data:
     key1 = f&#34;business:{d[&#39;business_id&#39;]}&#34;
     val1 = f&#34;{d[&#39;user_id&#39;]}|{d[&#39;last_seen_ts&#39;]}|{d[&#39;first_seen_ts&#39;]}&#34;
@@ -376,14 +377,14 @@ for d in data:
     val2 = f&#34;{d[&#39;business_id&#39;]}|{d[&#39;last_seen_ts&#39;]}|{d[&#39;first_seen_ts&#39;]}&#34;
     r.sadd(key2, val2)
 
-# Retrieve data for business_id=bar
+## Retrieve data for business_id=bar
 key = &#34;business:bar&#34;
 results = r.smembers(key)
 for r in results:
     user_id, last_seen_ts, first_seen_ts = r.decode().split(&#39;|&#39;)
     print(user_id, last_seen_ts, first_seen_ts)
 
-# Retrieve data for user_id=baz
+## Retrieve data for user_id=baz
 key = &#34;user:baz&#34;
 results = r.smembers(key)
 for r in results:
@@ -399,7 +400,7 @@ for r in results:
 </ol>
 <p>Alternative Way:
 One alternative way is to use Redis&rsquo; sorted sets, where the score is the timestamp and member is the user or business ID. This could make retrieving data by timestamp more efficient. To implement this, the above code needs to be slightly tweaked, as shown below:</p>
-<pre tabindex="0"><code># Store data - using sorted sets
+<pre tabindex="0"><code>## Store data - using sorted sets
 for d in data:
     t = d[&#39;last_seen_ts&#39;]  # Use last_seen_ts as score for sorted set
     key1 = f&#34;business:{d[&#39;business_id&#39;]}&#34;
@@ -410,7 +411,7 @@ for d in data:
     val2 = d[&#39;business_id&#39;]
     r.zadd(key2, {val2: t})
 
-# Retrieve data for business_id=bar
+## Retrieve data for business_id=bar
 key = &#34;business:bar&#34;
 results = r.zrange(key, 0, -1)
 for r in results:
@@ -418,7 +419,7 @@ for r in results:
     score = r.score()
     print(user_id, score)
 
-# Retrieve data for user_id=baz
+## Retrieve data for user_id=baz
 key = &#34;user:baz&#34;
 results = r.zrange(key, 0, -1)
 for r in results:
@@ -608,16 +609,16 @@ To efficiently query data in Redis, foremost to design data in such a way that e
     </li>
     
     <li class="mt-2 mr-2">
-      <a href="/categories/data-science/"
+      <a href="/categories/django/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
-        Data Science
+        Django
       </a>
     </li>
     
     <li class="mt-2 mr-2">
-      <a href="/categories/django/"
+      <a href="/categories/data-science/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
-        Django
+        Data Science
       </a>
     </li>
     

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
-  <title>Solved: How to Understand the Implementation of Python Dictionaries as Hash Tables :: sqlpey</title>
+  <title>Solved: How to Understand the Implementation of Python …</title>
+
   
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -325,19 +326,19 @@
 <p>A Python dictionary facilitates the association of unique keys with values of any datatype, allowing programmers to utilize the structure for efficient lookups. However, is this functionality achieved through a traditional hash table mechanism? To determine this, we need to delve into some practical experimentation.</p>
 <h3 id="solution-1-observing-hash-collisions">Solution 1: Observing Hash Collisions</h3>
 <p>Through careful observation, we can witness the occurrence of <strong>hash collisions</strong> in practice. Consider the following code snippet which demonstrates this concept:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Checking hash collision</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">## Checking hash collision</span>
 </span></span><span style="display:flex;"><span>hash_value_1 <span style="color:#f92672">=</span> hash(<span style="color:#ae81ff">1.1</span>)
 </span></span><span style="display:flex;"><span>hash_value_2 <span style="color:#f92672">=</span> hash(<span style="color:#ae81ff">4504.1</span>)
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>print(hash_value_1)  <span style="color:#75715e"># Output: 2040142438</span>
 </span></span><span style="display:flex;"><span>print(hash_value_2)  <span style="color:#75715e"># Output: 2040142438</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Creating a dictionary with colliding keys</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Creating a dictionary with colliding keys</span>
 </span></span><span style="display:flex;"><span>d <span style="color:#f92672">=</span> {<span style="color:#ae81ff">1.1</span>: <span style="color:#e6db74">&#39;a&#39;</span>, <span style="color:#ae81ff">4504.1</span>: <span style="color:#e6db74">&#39;b&#39;</span>}
 </span></span><span style="display:flex;"><span>print(d[<span style="color:#ae81ff">1.1</span>])    <span style="color:#75715e"># Output: &#39;a&#39;</span>
 </span></span><span style="display:flex;"><span>print(d[<span style="color:#ae81ff">4504.1</span>])  <span style="color:#75715e"># Output: &#39;b&#39;</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Validating the hash values in the dictionary</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Validating the hash values in the dictionary</span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> k, v <span style="color:#f92672">in</span> d<span style="color:#f92672">.</span>items(): 
 </span></span><span style="display:flex;"><span>    print(hash(k))  <span style="color:#75715e"># Output: 2040142438 for both</span>
 </span></span></code></pre></div><p>In this case, both <code>1.1</code> and <code>4504.1</code> yield the same hash value yet remain distinguishable as dictionary keys. This suggests the existence of an additional lookup mechanism within the dictionary that circumvents collisions.</p>
@@ -348,35 +349,41 @@
 .</p>
 <h3 id="solutions-in-practice-alternative-approaches">Solutions in Practice: Alternative Approaches</h3>
 <p>Consider another notable aspect of Python dictionaries related to non-hashable keys. When using lists as dictionary keys, one must convert them into immutable tuples:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Attempt to use mutable list as a dictionary key</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">## Attempt to use mutable list as a dictionary key</span>
 </span></span><span style="display:flex;"><span>a <span style="color:#f92672">=</span> {}
 </span></span><span style="display:flex;"><span>b <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;some&#39;</span>, <span style="color:#e6db74">&#39;list&#39;</span>]
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># This will fail because lists are unhashable</span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># a[b] = &#39;some&#39;  </span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## This will fail because lists are unhashable</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## a[b] = &#39;some&#39;  </span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Convert the list to a tuple to store it as a key</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Convert the list to a tuple to store it as a key</span>
 </span></span><span style="display:flex;"><span>a[tuple(b)] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;some&#39;</span>
 </span></span><span style="display:flex;"><span>print(a[tuple(b)])  <span style="color:#75715e"># Output: &#39;some&#39;</span>
 </span></span></code></pre></div><p>This transformation showcases the need for immutability for dictionary keys, aligning with the principles of hashing.</p>
 <h3 id="feedback-and-comments">Feedback and Comments</h3>
 <p>Your thoughts and experiences regarding Python dictionaries would be greatly appreciated! Feel free to share your insights in the comments section.</p>
 <h3 id="faqs-on-how-to-understand-the-implementation-of-python-dictionaries-as-hash-tables">FAQs on How to Understand the Implementation of Python Dictionaries as Hash Tables</h3>
-<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
-    <h2 itemprop="name">Q: Are Python dictionaries really hash tables?</h2>
-    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
-    <div itemprop="text">A: Yes, Python dictionaries are essentially implemented using a variation of hash tables, utilizing open hashing to manage key-value associations while handling hash collisions effectively.</div>
+<div itemscope itemtype="https://schema.org/FAQPage">
+    <div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+      <h2 itemprop="name">Q: Are Python dictionaries really hash tables?</h2>
+      <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+        <div itemprop="text">A: Yes, Python dictionaries are essentially implemented using a variation of hash tables, utilizing open hashing to manage key-value associations while handling hash collisions effectively.</div>
+      </div>
     </div>
 </div>
-<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
-    <h2 itemprop="name">Q: What happens if two keys have the same hash?</h2>
-    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
-    <div itemprop="text">A: Python dictionaries can handle key collisions using internal mechanisms that ensure each key, even with the same hash, can be uniquely identified.</div>
+<div itemscope itemtype="https://schema.org/FAQPage">
+    <div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+      <h2 itemprop="name">Q: What happens if two keys have the same hash?</h2>
+      <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+        <div itemprop="text">A: Python dictionaries can handle key collisions using internal mechanisms that ensure each key, even with the same hash, can be uniquely identified.</div>
+      </div>
     </div>
 </div>
-<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
-    <h2 itemprop="name">Q: Can I use mutable types as keys in a dictionary?</h2>
-    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
-    <div itemprop="text">A: No, mutable types like lists cannot be used as dictionary keys. Instead, you should use immutable types such as tuples.</div>
+<div itemscope itemtype="https://schema.org/FAQPage">
+    <div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+      <h2 itemprop="name">Q: Can I use mutable types as keys in a dictionary?</h2>
+      <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+        <div itemprop="text">A: No, mutable types like lists cannot be used as dictionary keys. Instead, you should use immutable types such as tuples.</div>
+      </div>
     </div>
 </div>
 <p>For further reading on Python dictionaries, check out these resources:</p>
@@ -567,16 +574,16 @@
     </li>
     
     <li class="mt-2 mr-2">
-      <a href="/categories/data-science/"
+      <a href="/categories/django/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
-        Data Science
+        Django
       </a>
     </li>
     
     <li class="mt-2 mr-2">
-      <a href="/categories/django/"
+      <a href="/categories/data-science/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
-        Django
+        Data Science
       </a>
     </li>
     
