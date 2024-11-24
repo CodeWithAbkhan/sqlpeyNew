@@ -9,12 +9,12 @@
 <meta
   name="description"
   content="
-   
-  Explore 12 solutions to tackle NaN loss issues in TensorFlow when training Convolutional Neural Networks, including optimizer adjustments and label handling.
-  
-  
-  "
+              
+                  Explore 12 solutions to tackle NaN loss issues in TensorFlow when training Convolutional Neural Networks, including optimizer adjustments and label handling.
+              
+           "
 />
+
 <meta
   name="keywords"
   content="
@@ -318,7 +318,7 @@
 <p>A common cause of NaN loss when using cross-entropy is when the output probabilities approach zero, resulting in the logarithm of zero (log(0)), which is undefined. To mitigate this, adding a small epsilon (e.g., 1e-8) to your output probabilities prevents the log function from encountering zero values.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> tensorflow <span style="color:#66d9ef">as</span> tf
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Adding epsilon to avoid log(0) in cross-entropy</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Adding epsilon to avoid log(0) in cross-entropy</span>
 </span></span><span style="display:flex;"><span>probabilities <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>nn<span style="color:#f92672">.</span>softmax(logits)
 </span></span><span style="display:flex;"><span>epsilon <span style="color:#f92672">=</span> <span style="color:#ae81ff">1e-8</span>
 </span></span><span style="display:flex;"><span>adjusted_probabilities <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>clip_by_value(probabilities, epsilon, <span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> epsilon)
@@ -330,7 +330,7 @@
 </span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> keras.models <span style="color:#f92672">import</span> Sequential
 </span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> keras.layers <span style="color:#f92672">import</span> Dense, Activation
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Example with distant labels leading to NaN</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Example with distant labels leading to NaN</span>
 </span></span><span style="display:flex;"><span>X <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>random(size<span style="color:#f92672">=</span>(<span style="color:#ae81ff">20</span>, <span style="color:#ae81ff">5</span>))
 </span></span><span style="display:flex;"><span>y <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>randint(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">5</span>, size<span style="color:#f92672">=</span>(<span style="color:#ae81ff">20</span>, <span style="color:#ae81ff">1</span>))
 </span></span><span style="display:flex;"><span>
@@ -341,10 +341,10 @@
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>compile(optimizer<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Adam&#34;</span>, loss<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;sparse_categorical_crossentropy&#34;</span>, metrics<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#34;accuracy&#34;</span>])
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Training with labels from range 0 to 5</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Training with labels from range 0 to 5</span>
 </span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>fit(X, y, epochs<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>)
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Adding distant label (e.g., 8000) causes NaN</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Adding distant label (e.g., 8000) causes NaN</span>
 </span></span><span style="display:flex;"><span>X <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>vstack((X, np<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>random(size<span style="color:#f92672">=</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">5</span>))))
 </span></span><span style="display:flex;"><span>y <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>vstack((y, [[<span style="color:#ae81ff">8000</span>]]))  <span style="color:#75715e"># Distant label</span>
 </span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>fit(X, y, epochs<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>)
@@ -358,10 +358,10 @@
 <p>Sometimes, NaN issues occur due to vanishing gradients. The ReLU activation function can result in zero values for certain neurons, halting the training process. Replacing it with <code>LeakyReLU</code> can solve the problem by allowing small gradients to pass through.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> tensorflow.keras.layers <span style="color:#f92672">import</span> LeakyReLU
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># ReLU activation that could cause NaN due to zero gradients</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## ReLU activation that could cause NaN due to zero gradients</span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e"># model.add(Dense(units, activation=&#39;relu&#39;))</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Replace with LeakyReLU</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Replace with LeakyReLU</span>
 </span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>add(Dense(units))
 </span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>add(LeakyReLU(alpha<span style="color:#f92672">=</span><span style="color:#ae81ff">0.01</span>))
 </span></span></code></pre></div><h4 id="5-handling-division-by-zero">5. <strong>Handling Division by Zero</strong></h4>
@@ -372,13 +372,13 @@
 </span></span><span style="display:flex;"><span>b <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>constant([<span style="color:#ae81ff">0.</span>, <span style="color:#ae81ff">0.</span>, <span style="color:#ae81ff">0.</span>])
 </span></span><span style="display:flex;"><span>c <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>constant([<span style="color:#ae81ff">1.</span>, <span style="color:#ae81ff">1.</span>, <span style="color:#ae81ff">1.</span>])
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Division by zero handled with epsilon</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Division by zero handled with epsilon</span>
 </span></span><span style="display:flex;"><span>result <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>math<span style="color:#f92672">.</span>divide_no_nan(a, b) <span style="color:#f92672">+</span> c
 </span></span></code></pre></div><h4 id="6-check-output-layer-dimensions">6. <strong>Check Output Layer Dimensions</strong></h4>
 <p>If your output layer is mismatched with the number of classes in your target, it can cause NaN loss. For example, if you set your output to 3 classes but you are working with 5 classes, the training will diverge.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> tensorflow.keras.layers <span style="color:#f92672">import</span> Dense
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Output layer for 5 classes</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Output layer for 5 classes</span>
 </span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>add(Dense(<span style="color:#ae81ff">5</span>, activation<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;softmax&#39;</span>))
 </span></span></code></pre></div><h4 id="7-regularization-to-prevent-nan-values">7. <strong>Regularization to Prevent NaN Values</strong></h4>
 <p>To stabilize the training, you can apply regularization to the model, which can help control large weights and prevent NaN issues. This is particularly useful in classifiers.</p>
@@ -389,7 +389,7 @@
 <p>Sometimes, NaN issues occur due to poorly shuffled training data. In such cases, shuffling the data can ensure that the model doesn&rsquo;t learn patterns that could cause the loss to diverge.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.utils <span style="color:#f92672">import</span> shuffle
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Shuffle your dataset</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Shuffle your dataset</span>
 </span></span><span style="display:flex;"><span>x, y <span style="color:#f92672">=</span> shuffle(x, y)
 </span></span></code></pre></div><h4 id="9-ensure-correct-label-range">9. <strong>Ensure Correct Label Range</strong></h4>
 <p>In TensorFlow, labels should be indexed as 0, 1, 2, &hellip;, L-1 for L classes. Using non-integer labels or negative numbers can cause NaN errors in the model.</p>
@@ -397,7 +397,7 @@
 <p>Very small values (e.g., <code>1e-9</code>) can cause NaN issues during backpropagation. Replace these with the smallest available floating point values for stability.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> tensorflow <span style="color:#66d9ef">as</span> tf
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Replace very small values with tf.float32.min</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Replace very small values with tf.float32.min</span>
 </span></span><span style="display:flex;"><span>small_value <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>float32<span style="color:#f92672">.</span>min
 </span></span></code></pre></div><h4 id="11-conflicting-data-preprocessing">11. <strong>Conflicting Data Preprocessing</strong></h4>
 <p>If the data preprocessing steps conflict with the pre-trained model, such as using a different tokenizer or input format, it can cause NaN loss. Ensure that the model and the data are consistent.</p>
@@ -405,7 +405,7 @@
 <p>If your loss function involves small values, like the square root of a tiny number (close to 0), the gradient might become NaN. Use an epsilon to bound small values.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> torch
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Handle small values in loss function</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Handle small values in loss function</span>
 </span></span><span style="display:flex;"><span>eps <span style="color:#f92672">=</span> <span style="color:#ae81ff">1e-8</span>
 </span></span><span style="display:flex;"><span>diff <span style="color:#f92672">=</span> diff<span style="color:#f92672">.</span>pow(<span style="color:#ae81ff">2</span>)<span style="color:#f92672">.</span>sum(dim<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
 </span></span><span style="display:flex;"><span>diff <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>where(diff <span style="color:#f92672">&lt;</span> eps, torch<span style="color:#f92672">.</span>tensor(eps, device<span style="color:#f92672">=</span>diff<span style="color:#f92672">.</span>device), diff)
@@ -577,16 +577,16 @@
     </li>
     
     <li class="mt-2 mr-2">
-      <a href="/categories/programming/"
+      <a href="/categories/javascript/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
-        Programming
+        JavaScript
       </a>
     </li>
     
     <li class="mt-2 mr-2">
-      <a href="/categories/javascript/"
+      <a href="/categories/programming/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
-        JavaScript
+        Programming
       </a>
     </li>
     

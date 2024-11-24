@@ -9,12 +9,13 @@
 <meta
   name="description"
   content="
-   
-  Learn to efficiently use groupby operations in Pandas to assign calculated results back to your DataFrame columns.
-  
-  
-  "
+              
+                  How to Assign GroupBy Operation Results Back to Columns in a Parent DataFrame Using Python Pandas When dealing with large datasets, especially in financial …
+
+              
+           "
 />
+
 <meta
   name="keywords"
   content="
@@ -262,6 +263,7 @@
           <h2>Table of Contents</h2>
           <aside><nav id="TableOfContents">
   <ul>
+    <li><a href="#how-to-assign-groupby-operation-results-back-to-columns-in-a-parent-dataframe-using-python-pandas">How to Assign GroupBy Operation Results Back to Columns in a Parent DataFrame Using Python Pandas</a></li>
     <li><a href="#the-problem">The Problem</a></li>
     <li><a href="#common-pitfall">Common Pitfall</a></li>
     <li><a href="#solutions">Solutions</a>
@@ -320,14 +322,14 @@
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
        prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" 
           itemscope itemtype="https://schema.org/FAQPage" >
-          <h1 id="how-to-assign-groupby-operation-results-back-to-columns-in-a-parent-dataframe-using-python-pandas">How to Assign GroupBy Operation Results Back to Columns in a Parent DataFrame Using Python Pandas</h1>
+          <h2 id="how-to-assign-groupby-operation-results-back-to-columns-in-a-parent-dataframe-using-python-pandas">How to Assign GroupBy Operation Results Back to Columns in a Parent DataFrame Using Python Pandas</h2>
 <p>When dealing with large datasets, especially in financial contexts, you often need to perform calculations that summarize entire sections of your data. A common task is to compute a group-by aggregation and then assign the result back to a new column in the original DataFrame. Here, we&rsquo;ll explore the right way to approach this in Python using Pandas, specifically aiming to create a column representing the cap-weighted average returns for each date encapsulated in a <code>yearmonth</code> column.</p>
 <h2 id="the-problem">The Problem</h2>
 <p>Suppose you have the following DataFrame that contains stock data, where each row corresponds to a single stock:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Sample DataFrame creation</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Sample DataFrame creation</span>
 </span></span><span style="display:flex;"><span>data <span style="color:#f92672">=</span> {
 </span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;BloombergTicker&#39;</span>: [<span style="color:#e6db74">&#39;AAPL&#39;</span>, <span style="color:#e6db74">&#39;MSFT&#39;</span>, <span style="color:#e6db74">&#39;GOOG&#39;</span>, <span style="color:#e6db74">&#39;AMZN&#39;</span>, <span style="color:#e6db74">&#39;TSLA&#39;</span>],
 </span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;Company&#39;</span>: [<span style="color:#e6db74">&#39;Apple Inc&#39;</span>, <span style="color:#e6db74">&#39;Microsoft Corp&#39;</span>, <span style="color:#e6db74">&#39;Google LLC&#39;</span>, <span style="color:#e6db74">&#39;Amazon.com Inc&#39;</span>, <span style="color:#e6db74">&#39;Tesla Inc&#39;</span>],
@@ -367,7 +369,7 @@
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create sample DataFrame</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Create sample DataFrame</span>
 </span></span><span style="display:flex;"><span>data <span style="color:#f92672">=</span> {
 </span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;yearmonth&#39;</span>: [<span style="color:#e6db74">&#39;202201&#39;</span>, <span style="color:#e6db74">&#39;202201&#39;</span>, <span style="color:#e6db74">&#39;202202&#39;</span>, <span style="color:#e6db74">&#39;202202&#39;</span>],
 </span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;PriceReturn&#39;</span>: [<span style="color:#ae81ff">0.20</span>, <span style="color:#ae81ff">0.15</span>, <span style="color:#ae81ff">0.10</span>, <span style="color:#ae81ff">0.12</span>],
@@ -375,20 +377,20 @@
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>bdata <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>DataFrame(data)
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Method 1: Using transform</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Method 1: Using transform</span>
 </span></span><span style="display:flex;"><span>bdata[<span style="color:#e6db74">&#39;MarketReturn&#39;</span>] <span style="color:#f92672">=</span> bdata<span style="color:#f92672">.</span>groupby(<span style="color:#e6db74">&#39;yearmonth&#39;</span>)[<span style="color:#e6db74">&#39;MarketCap&#39;</span>]<span style="color:#f92672">.</span>transform(
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">lambda</span> x: (bdata[<span style="color:#e6db74">&#34;PriceReturn&#34;</span>] <span style="color:#f92672">*</span> x <span style="color:#f92672">/</span> x<span style="color:#f92672">.</span>sum())<span style="color:#f92672">.</span>sum()
 </span></span><span style="display:flex;"><span>)
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Method 2: Using merge</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Method 2: Using merge</span>
 </span></span><span style="display:flex;"><span>marketRetsByDate <span style="color:#f92672">=</span> bdata<span style="color:#f92672">.</span>groupby(<span style="color:#e6db74">&#39;yearmonth&#39;</span>)<span style="color:#f92672">.</span>apply(
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">lambda</span> x: (x[<span style="color:#e6db74">&#39;PriceReturn&#39;</span>] <span style="color:#f92672">*</span> x[<span style="color:#e6db74">&#39;MarketCap&#39;</span>] <span style="color:#f92672">/</span> x[<span style="color:#e6db74">&#39;MarketCap&#39;</span>]<span style="color:#f92672">.</span>sum())<span style="color:#f92672">.</span>sum()
 </span></span><span style="display:flex;"><span>)<span style="color:#f92672">.</span>reset_index(name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;MarketReturn&#39;</span>)
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Merging method</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Merging method</span>
 </span></span><span style="display:flex;"><span>bdata <span style="color:#f92672">=</span> bdata<span style="color:#f92672">.</span>merge(marketRetsByDate, on<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;yearmonth&#39;</span>, how<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;left&#39;</span>)
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Display the final DataFrame</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Display the final DataFrame</span>
 </span></span><span style="display:flex;"><span>print(bdata)
 </span></span></code></pre></div><p>This code computes the market returns in both a direct and a join approach, demonstrating how to effectively utilize Pandas for data analysis.</p>
 <h3 id="alternative-approaches">Alternative Approaches</h3>
@@ -556,16 +558,16 @@
     </li>
     
     <li class="mt-2 mr-2">
-      <a href="/categories/programming/"
+      <a href="/categories/javascript/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
-        Programming
+        JavaScript
       </a>
     </li>
     
     <li class="mt-2 mr-2">
-      <a href="/categories/javascript/"
+      <a href="/categories/programming/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
-        JavaScript
+        Programming
       </a>
     </li>
     

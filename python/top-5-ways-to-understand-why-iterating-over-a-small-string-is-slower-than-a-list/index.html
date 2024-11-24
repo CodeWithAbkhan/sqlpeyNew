@@ -9,12 +9,12 @@
 <meta
   name="description"
   content="
-   
-  Explore the reasons for the performance differences between iterating over strings and lists in Python, backed by code examples and benchmarks.
-  
-  
-  "
+              
+                  Explore the reasons for the performance differences between iterating over strings and lists in Python, backed by code examples and benchmarks.
+              
+           "
 />
+
 <meta
   name="keywords"
   content="
@@ -262,6 +262,7 @@
           <h2>Table of Contents</h2>
           <aside><nav id="TableOfContents">
   <ul>
+    <li><a href="#reasons-behind-the-performance-difference">Reasons Behind the Performance Difference</a></li>
     <li><a href="#1-memory-management-and-object-creation">1. <strong>Memory Management and Object Creation</strong></a></li>
     <li><a href="#2-reception-of-results-and-complexity">2. <strong>Reception of Results and Complexity</strong></a></li>
     <li><a href="#3-python-version-differences">3. <strong>Python Version Differences</strong></a></li>
@@ -271,10 +272,7 @@
         <li><a href="#takeaway">Takeaway</a></li>
       </ul>
     </li>
-  </ul>
-
-  <ul>
-    <li>
+    <li><a href="#feedback-and-comments">Feedback and Comments</a>
       <ul>
         <li><a href="#faqs-on-top-5-ways-to-understand-why-iterating-over-a-small-string-is-slower-than-a-list">FAQs on Top 5 Ways to Understand Why Iterating Over a Small String is Slower than a List</a></li>
       </ul>
@@ -333,7 +331,7 @@
 </span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Time for string: </span><span style="color:#e6db74">{</span>time_string<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
 </span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Time for list: </span><span style="color:#e6db74">{</span>time_list<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
 </span></span></code></pre></div><p>The results were perplexing. What lies behind this difference in performance? What underlying mechanics are at play that explain such behavior?</p>
-<h1 id="reasons-behind-the-performance-difference">Reasons Behind the Performance Difference</h1>
+<h2 id="reasons-behind-the-performance-difference">Reasons Behind the Performance Difference</h2>
 <h2 id="1-memory-management-and-object-creation">1. <strong>Memory Management and Object Creation</strong></h2>
 <p>Despite initial assumptions, the speed discrepancy isn&rsquo;t due to object creation, as both methods utilize cached single-character strings. A deeper dive reveals that a greater number of checks occur during string indexing in Python.</p>
 <h2 id="2-reception-of-results-and-complexity">2. <strong>Reception of Results and Complexity</strong></h2>
@@ -344,7 +342,7 @@
 </span></span><span style="display:flex;"><span>python3_result_string <span style="color:#f92672">=</span> timeit(<span style="color:#e6db74">&#39;[x for x in &#34;abc&#34;]&#39;</span>, number<span style="color:#f92672">=</span><span style="color:#ae81ff">1000000</span>)
 </span></span><span style="display:flex;"><span>python3_result_list <span style="color:#f92672">=</span> timeit(<span style="color:#e6db74">&#39;[x for x in [&#34;a&#34;, &#34;b&#34;, &#34;c&#34;]]&#39;</span>, number<span style="color:#f92672">=</span><span style="color:#ae81ff">1000000</span>)
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># For Python 2</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## For Python 2</span>
 </span></span><span style="display:flex;"><span>python2_result_string <span style="color:#f92672">=</span> timeit(<span style="color:#e6db74">&#39;[x for x in &#34;abc&#34;]&#39;</span>, number<span style="color:#f92672">=</span><span style="color:#ae81ff">1000000</span>)
 </span></span><span style="display:flex;"><span>python2_result_list <span style="color:#f92672">=</span> timeit(<span style="color:#e6db74">&#39;[x for x in [&#34;a&#34;, &#34;b&#34;, &#34;c&#34;]]&#39;</span>, number<span style="color:#f92672">=</span><span style="color:#ae81ff">1000000</span>)
 </span></span></code></pre></div><p>In my tests, I noted that Python 2 iterations were faster than Python 3, underscoring the optimization evolution across versions.</p>
@@ -370,13 +368,13 @@
 </span></span><span style="display:flex;"><span>iterable_str <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span><span style="color:#f92672">.</span>join(chr(random<span style="color:#f92672">.</span>randint(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">127</span>)) <span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">100000</span>))
 </span></span><span style="display:flex;"><span>iterable_list <span style="color:#f92672">=</span> [chr(random<span style="color:#f92672">.</span>randint(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">127</span>)) <span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">100000</span>)]
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Iterating with deque</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Iterating with deque</span>
 </span></span><span style="display:flex;"><span>deque_str <span style="color:#f92672">=</span> deque(iterable_str)
 </span></span><span style="display:flex;"><span>deque_list <span style="color:#f92672">=</span> deque(iterable_list)
 </span></span></code></pre></div><p>Benchmarks indicate that <code>deque</code> optimizes the iteration process effectively across both string-based and list-based collections.</p>
 <h3 id="takeaway">Takeaway</h3>
 <p>Despite the seemingly straightforward nature of iterating through strings and lists, nuances in memory management, indexing, and Python version differences result in differing performance characteristics. Understanding these underlying principles can enhance our coding efficiency in Python, making our applications both faster and more responsive.</p>
-<h1 id="feedback-and-comments">Feedback and Comments</h1>
+<h2 id="feedback-and-comments">Feedback and Comments</h2>
 <p>What are your thoughts on this topic? Have you noticed similar performance discrepancies in your projects? Feel free to leave your feedback or any questions you may have in the comments below!</p>
 <h3 id="faqs-on-top-5-ways-to-understand-why-iterating-over-a-small-string-is-slower-than-a-list">FAQs on Top 5 Ways to Understand Why Iterating Over a Small String is Slower than a List</h3>
 <div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
@@ -563,16 +561,16 @@
     </li>
     
     <li class="mt-2 mr-2">
-      <a href="/categories/programming/"
+      <a href="/categories/javascript/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
-        Programming
+        JavaScript
       </a>
     </li>
     
     <li class="mt-2 mr-2">
-      <a href="/categories/javascript/"
+      <a href="/categories/programming/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
-        JavaScript
+        Programming
       </a>
     </li>
     

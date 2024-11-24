@@ -9,12 +9,13 @@
 <meta
   name="description"
   content="
-   
-  Learn how to dynamically create OR query filters in Django with examples and optimizations.
-  
-  
-  "
+              
+                  Question: How can one dynamically create an OR query filter in Django based on a list? For instance, when you have an original query like:
+Article.objects. …
+              
+           "
 />
+
 <meta
   name="keywords"
   content="
@@ -332,38 +333,38 @@
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>values <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>]
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Generate Q objects for each primary key in the values list</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Generate Q objects for each primary key in the values list</span>
 </span></span><span style="display:flex;"><span>query_conditions <span style="color:#f92672">=</span> [Q(pk<span style="color:#f92672">=</span>value) <span style="color:#66d9ef">for</span> value <span style="color:#f92672">in</span> values]
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Remove the first Q object to use as the base for chaining</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Remove the first Q object to use as the base for chaining</span>
 </span></span><span style="display:flex;"><span>base_query <span style="color:#f92672">=</span> query_conditions<span style="color:#f92672">.</span>pop()
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Chain all other Q objects using the OR operator</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Chain all other Q objects using the OR operator</span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> condition <span style="color:#f92672">in</span> query_conditions:
 </span></span><span style="display:flex;"><span>    base_query <span style="color:#f92672">|=</span> condition
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Execute the filter query</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Execute the filter query</span>
 </span></span><span style="display:flex;"><span>result_set <span style="color:#f92672">=</span> Article<span style="color:#f92672">.</span>objects<span style="color:#f92672">.</span>filter(base_query)
 </span></span></code></pre></div><h3 id="solution-2-building-queries-with-q-objects-and-dynamic-fields">Solution 2: Building Queries with Q Objects and Dynamic Fields</h3>
 <p>For cases where you may need to deal with more complex queries, such as those requiring dynamic fields, you can leverage the <code>add()</code> method along with <code>Q()</code> objects. Here’s how you can implement such functionality:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> django.db.models <span style="color:#f92672">import</span> Q
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Example list of primary keys</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Example list of primary keys</span>
 </span></span><span style="display:flex;"><span>primary_keys <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>]
 </span></span><span style="display:flex;"><span><span style="color:#75715e"># Optionally for dynamic fields</span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e"># db_fields = [&#39;field1&#39;, &#39;field2&#39;, &#39;field3&#39;]</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Initialize Q object for dynamic OR conditions</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Initialize Q object for dynamic OR conditions</span>
 </span></span><span style="display:flex;"><span>combined_query <span style="color:#f92672">=</span> Q(pk__in<span style="color:#f92672">=</span>[])
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Build the dynamic conditions</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Build the dynamic conditions</span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> primary_key <span style="color:#f92672">in</span> primary_keys:
 </span></span><span style="display:flex;"><span>    combined_query<span style="color:#f92672">.</span>add(Q(pk<span style="color:#f92672">=</span>primary_key), Q<span style="color:#f92672">.</span>OR)
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Execute the filter using combined conditions</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Execute the filter using combined conditions</span>
 </span></span><span style="display:flex;"><span>queryset <span style="color:#f92672">=</span> Article<span style="color:#f92672">.</span>objects<span style="color:#f92672">.</span>filter(combined_query)
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Debugging: Output the SQL for verification</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Debugging: Output the SQL for verification</span>
 </span></span><span style="display:flex;"><span>print(queryset<span style="color:#f92672">.</span>query)
 </span></span></code></pre></div><p>This method facilitates flexibility when building out your query filters through loops and dynamic key-value handling.</p>
 <h2 id="alternative-ways">Alternative Ways</h2>
@@ -559,16 +560,16 @@
     </li>
     
     <li class="mt-2 mr-2">
-      <a href="/categories/programming/"
+      <a href="/categories/javascript/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
-        Programming
+        JavaScript
       </a>
     </li>
     
     <li class="mt-2 mr-2">
-      <a href="/categories/javascript/"
+      <a href="/categories/programming/"
         class="rounded px-2 py-1 text-sm text-slate-800 dark:text-slate-300 ring-1 ring-slate-900/5 dark:ring-slate-50/5 backdrop-blur bg-slate-50 dark:bg-gray-700">
-        JavaScript
+        Programming
       </a>
     </li>
     
