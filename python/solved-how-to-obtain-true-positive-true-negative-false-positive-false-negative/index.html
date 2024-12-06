@@ -10,7 +10,8 @@
   name="description"
   content="
               
-                   ## How to Obtain True Positive, True Negative, False Positive, and False Negative from Scikit-learn In machine learning, especially in classification …
+                  How to Obtain True Positive, True Negative, False Positive, and False Negative from Scikit-learn In machine learning, especially in classification tasks, …
+
               
            "
 />
@@ -289,8 +290,10 @@
           <h2>Table of Contents</h2>
           <aside><nav id="TableOfContents">
   <ul>
-    <li>
+    <li><a href="#how-to-obtain-true-positive-true-negative-false-positive-and-false-negative-from-scikit-learn">How to Obtain True Positive, True Negative, False Positive, and False Negative from Scikit-learn</a>
       <ul>
+        <li><a href="#the-challenge">The Challenge</a></li>
+        <li><a href="#sample-code-to-get-started">Sample Code to Get Started</a></li>
         <li><a href="#alternative-approaches">Alternative Approaches</a></li>
         <li><a href="#feedback-and-comments">Feedback and Comments</a></li>
         <li><a href="#faqs-on-how-to-obtain-true-positive-true-negative-false-positive-and-false-negative">FAQs on How to Obtain True Positive, True Negative, False Positive, and False Negative</a></li>
@@ -339,75 +342,67 @@
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
        prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" 
           itemscope itemtype="https://schema.org/FAQPage" >
-          <pre tabindex="0"><code>
-## How to Obtain True Positive, True Negative, False Positive, and False Negative from Scikit-learn
-
-In machine learning, especially in classification tasks, accurately assessing model performance using metrics such as True Positives (TP), True Negatives (TN), False Positives (FP), and False Negatives (FN) is crucial. If you&#39;re dealing with a substantial dataset and looking to evaluate your model accurately, you&#39;ll likely find yourself reaching for Scikit-learn&#39;s capabilities.
-
-### The Challenge
-
-Imagine you have a large dataset formatted in JSON. After preprocessing it and preparing for classification, you deploy a model using KFold cross-validation. You successfully get the classification predictions but are unsure how to extract and utilize the true positive, true negative, false positive, and false negative values to derive additional metrics like Sensitivity and Specificity.
-
-Here&#39;s an overview of your process to clarify the steps:
-
-1. You read a JSON dataset into a variable (`trainList`) for processing.
-2. Following preprocessing, you apply KFold cross-validation to train a classifier.
-3. After making predictions and generating a confusion matrix, you aim to calculate TP, TN, FP, and FN for further analysis.
-
-### Sample Code to Get Started
-
-Here&#39;s a unique rewrite of the code you&#39;re working on, integrated with some defined functionalities. This code fragment illustrates the steps mentioned above, aiming at clarity and efficiency:
-
-```python
-import numpy as np
-from sklearn.preprocessing import scale
-from sklearn.model_selection import KFold
-from sklearn.metrics import accuracy_score, confusion_matrix
-from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
-
-## Assume vec is a pre-initialized vectorizer and listaLabels contain your labels
-X = vec.fit_transform(trainList)   # Transforming JSON to numerical form
-X = scale(X.toarray())              # Scaling the feature matrix
-kf = KFold(n_splits=10, shuffle=True, random_state=1)
-
-qda = QuadraticDiscriminantAnalysis()  # initializing the classifier
-all_cm = []  # To store all confusion matrices for each fold
-
-## Cross-validation execution
-for train_indices, test_indices in kf.split(X):
-    X_train = X[train_indices]
-    X_test = X[test_indices]
-    y_train = labelList[train_indices]
-    y_test = labelList[test_indices]
-
-    model = qda.fit(X_train, y_train)           # Training the classifier
-    preds = model.predict(X_test)                # Making predictions
-    ac = accuracy_score(y_test, preds)          # Accuracy for this fold
-    cm = confusion_matrix(y_test, preds)        # Obtaining the confusion matrix
-    all_cm.append(cm)
-
-## Merging all confusion matrices if needed or analyzing a single one
-total_cm = sum(all_cm)  # Note: Ensure correct dimensionality if doing this
-
-## Extracting TP, TN, FP, FN from the confusion matrix
-def calculate_metrics(confusion_mtx):
-    TP = np.diag(confusion_mtx)
-    FP = confusion_mtx.sum(axis=0) - TP
-    FN = confusion_mtx.sum(axis=1) - TP
-    TN = confusion_mtx.sum() - (FP + FN + TP)
-    return TP, TN, FP, FN
-
-TP, TN, FP, FN = calculate_metrics(total_cm)
-
-## Sensitivity, Specificity calculations
-TPR = TP / (TP + FN)  # True Positive Rate
-TNR = TN / (TN + FP)  # True Negative Rate
-PPV = TP / (TP + FP)  # Positive Predictive Value
-NPV = TN / (TN + FN)  # Negative Predictive Value
-
-## Print out metrics
-print(f&#34;TPR: {TPR}, TNR: {TNR}, PPV: {PPV}, NPV: {NPV}&#34;)
-</code></pre><h3 id="alternative-approaches">Alternative Approaches</h3>
+          <h2 id="how-to-obtain-true-positive-true-negative-false-positive-and-false-negative-from-scikit-learn">How to Obtain True Positive, True Negative, False Positive, and False Negative from Scikit-learn</h2>
+<p>In machine learning, especially in classification tasks, accurately assessing model performance using metrics such as True Positives (TP), True Negatives (TN), False Positives (FP), and False Negatives (FN) is crucial. If you&rsquo;re dealing with a substantial dataset and looking to evaluate your model accurately, you&rsquo;ll likely find yourself reaching for Scikit-learn&rsquo;s capabilities.</p>
+<h3 id="the-challenge">The Challenge</h3>
+<p>Imagine you have a large dataset formatted in JSON. After preprocessing it and preparing for classification, you deploy a model using KFold cross-validation. You successfully get the classification predictions but are unsure how to extract and utilize the true positive, true negative, false positive, and false negative values to derive additional metrics like Sensitivity and Specificity.</p>
+<p>Here&rsquo;s an overview of your process to clarify the steps:</p>
+<ol>
+<li>You read a JSON dataset into a variable (<code>trainList</code>) for processing.</li>
+<li>Following preprocessing, you apply KFold cross-validation to train a classifier.</li>
+<li>After making predictions and generating a confusion matrix, you aim to calculate TP, TN, FP, and FN for further analysis.</li>
+</ol>
+<h3 id="sample-code-to-get-started">Sample Code to Get Started</h3>
+<p>Here&rsquo;s a unique rewrite of the code you&rsquo;re working on, integrated with some defined functionalities. This code fragment illustrates the steps mentioned above, aiming at clarity and efficiency:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.preprocessing <span style="color:#f92672">import</span> scale
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.model_selection <span style="color:#f92672">import</span> KFold
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.metrics <span style="color:#f92672">import</span> accuracy_score, confusion_matrix
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.discriminant_analysis <span style="color:#f92672">import</span> QuadraticDiscriminantAnalysis
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Assume vec is a pre-initialized vectorizer and listaLabels contain your labels</span>
+</span></span><span style="display:flex;"><span>X <span style="color:#f92672">=</span> vec<span style="color:#f92672">.</span>fit_transform(trainList)   <span style="color:#75715e"># Transforming JSON to numerical form</span>
+</span></span><span style="display:flex;"><span>X <span style="color:#f92672">=</span> scale(X<span style="color:#f92672">.</span>toarray())              <span style="color:#75715e"># Scaling the feature matrix</span>
+</span></span><span style="display:flex;"><span>kf <span style="color:#f92672">=</span> KFold(n_splits<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>, shuffle<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, random_state<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>qda <span style="color:#f92672">=</span> QuadraticDiscriminantAnalysis()  <span style="color:#75715e"># initializing the classifier</span>
+</span></span><span style="display:flex;"><span>all_cm <span style="color:#f92672">=</span> []  <span style="color:#75715e"># To store all confusion matrices for each fold</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Cross-validation execution</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> train_indices, test_indices <span style="color:#f92672">in</span> kf<span style="color:#f92672">.</span>split(X):
+</span></span><span style="display:flex;"><span>    X_train <span style="color:#f92672">=</span> X[train_indices]
+</span></span><span style="display:flex;"><span>    X_test <span style="color:#f92672">=</span> X[test_indices]
+</span></span><span style="display:flex;"><span>    y_train <span style="color:#f92672">=</span> labelList[train_indices]
+</span></span><span style="display:flex;"><span>    y_test <span style="color:#f92672">=</span> labelList[test_indices]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    model <span style="color:#f92672">=</span> qda<span style="color:#f92672">.</span>fit(X_train, y_train)           <span style="color:#75715e"># Training the classifier</span>
+</span></span><span style="display:flex;"><span>    preds <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>predict(X_test)                <span style="color:#75715e"># Making predictions</span>
+</span></span><span style="display:flex;"><span>    ac <span style="color:#f92672">=</span> accuracy_score(y_test, preds)          <span style="color:#75715e"># Accuracy for this fold</span>
+</span></span><span style="display:flex;"><span>    cm <span style="color:#f92672">=</span> confusion_matrix(y_test, preds)        <span style="color:#75715e"># Obtaining the confusion matrix</span>
+</span></span><span style="display:flex;"><span>    all_cm<span style="color:#f92672">.</span>append(cm)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Merging all confusion matrices if needed or analyzing a single one</span>
+</span></span><span style="display:flex;"><span>total_cm <span style="color:#f92672">=</span> sum(all_cm)  <span style="color:#75715e"># Note: Ensure correct dimensionality if doing this</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Extracting TP, TN, FP, FN from the confusion matrix</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">calculate_metrics</span>(confusion_mtx):
+</span></span><span style="display:flex;"><span>    TP <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>diag(confusion_mtx)
+</span></span><span style="display:flex;"><span>    FP <span style="color:#f92672">=</span> confusion_mtx<span style="color:#f92672">.</span>sum(axis<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>) <span style="color:#f92672">-</span> TP
+</span></span><span style="display:flex;"><span>    FN <span style="color:#f92672">=</span> confusion_mtx<span style="color:#f92672">.</span>sum(axis<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>) <span style="color:#f92672">-</span> TP
+</span></span><span style="display:flex;"><span>    TN <span style="color:#f92672">=</span> confusion_mtx<span style="color:#f92672">.</span>sum() <span style="color:#f92672">-</span> (FP <span style="color:#f92672">+</span> FN <span style="color:#f92672">+</span> TP)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> TP, TN, FP, FN
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>TP, TN, FP, FN <span style="color:#f92672">=</span> calculate_metrics(total_cm)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Sensitivity, Specificity calculations</span>
+</span></span><span style="display:flex;"><span>TPR <span style="color:#f92672">=</span> TP <span style="color:#f92672">/</span> (TP <span style="color:#f92672">+</span> FN)  <span style="color:#75715e"># True Positive Rate</span>
+</span></span><span style="display:flex;"><span>TNR <span style="color:#f92672">=</span> TN <span style="color:#f92672">/</span> (TN <span style="color:#f92672">+</span> FP)  <span style="color:#75715e"># True Negative Rate</span>
+</span></span><span style="display:flex;"><span>PPV <span style="color:#f92672">=</span> TP <span style="color:#f92672">/</span> (TP <span style="color:#f92672">+</span> FP)  <span style="color:#75715e"># Positive Predictive Value</span>
+</span></span><span style="display:flex;"><span>NPV <span style="color:#f92672">=</span> TN <span style="color:#f92672">/</span> (TN <span style="color:#f92672">+</span> FN)  <span style="color:#75715e"># Negative Predictive Value</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Print out metrics</span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;TPR: </span><span style="color:#e6db74">{</span>TPR<span style="color:#e6db74">}</span><span style="color:#e6db74">, TNR: </span><span style="color:#e6db74">{</span>TNR<span style="color:#e6db74">}</span><span style="color:#e6db74">, PPV: </span><span style="color:#e6db74">{</span>PPV<span style="color:#e6db74">}</span><span style="color:#e6db74">, NPV: </span><span style="color:#e6db74">{</span>NPV<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><h3 id="alternative-approaches">Alternative Approaches</h3>
 <p>While the above example uses Quadratic Discriminant Analysis, various classifiers can be utilized depending on your local context. Consider trying:</p>
 <ul>
 <li>Support Vector Machines (SVM)</li>

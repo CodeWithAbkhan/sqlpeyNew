@@ -10,7 +10,8 @@
   name="description"
   content="
               
-                   ## Why Does Encoding a String Result in a Decoding Error UnicodeDecodeError? Recently, I encountered an issue while attempting to encode a string in …
+                  Why Does Encoding a String Result in a Decoding Error UnicodeDecodeError? Recently, I encountered an issue while attempting to encode a string in Python. I …
+
               
            "
 />
@@ -289,9 +290,10 @@
           <h2>Table of Contents</h2>
           <aside><nav id="TableOfContents">
   <ul>
-    <li>
+    <li><a href="#why-does-encoding-a-string-result-in-a-decoding-error-unicodedecodeerror">Why Does Encoding a String Result in a Decoding Error UnicodeDecodeError?</a>
       <ul>
-        <li></li>
+        <li><a href="#what-causes-this-confusion">What Causes This Confusion?</a></li>
+        <li><a href="#exploring-the-solutions">Exploring the Solutions</a></li>
         <li><a href="#key-takeaways">Key Takeaways</a></li>
         <li><a href="#references">References</a></li>
         <li><a href="#faqs-on-why-does-encoding-a-string-result-in-a-decoding-error-unicodedecodeerror">FAQs on Why Does Encoding a String Result in a Decoding Error UnicodeDecodeError?</a></li>
@@ -340,34 +342,19 @@
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
        prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" 
           itemscope itemtype="https://schema.org/FAQPage" >
-          <pre tabindex="0"><code>
-## Why Does Encoding a String Result in a Decoding Error UnicodeDecodeError?
-
-Recently, I encountered an issue while attempting to encode a string in Python. I was perplexed by the error message indicating a decoding problem when I expected the encoding process to be straightforward. The specific error reported was:
-</code></pre><blockquote>
-<blockquote>
-<blockquote>
-<p>&ldquo;你好&rdquo;.encode(&ldquo;utf8&rdquo;)
+          <h2 id="why-does-encoding-a-string-result-in-a-decoding-error-unicodedecodeerror">Why Does Encoding a String Result in a Decoding Error UnicodeDecodeError?</h2>
+<p>Recently, I encountered an issue while attempting to encode a string in Python. I was perplexed by the error message indicating a decoding problem when I expected the encoding process to be straightforward. The specific error reported was:</p>
+<pre tabindex="0"><code>&gt;&gt;&gt; &#34;你好&#34;.encode(&#34;utf8&#34;)
 Traceback (most recent call last):
-File &ldquo;<!-- raw HTML omitted -->&rdquo;, line 1, in <!-- raw HTML omitted -->
-UnicodeDecodeError: &lsquo;ascii&rsquo; codec can&rsquo;t decode byte 0xe4 in position 0: ordinal not in range(128)</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<pre tabindex="0"><code>
-### What Causes This Confusion?
-
-While I am aware that prefixing the string with &#34;u&#34; helps avoid this problem, I am curious about the underlying mechanics of what Python is doing during encoding operations. Why does it claim it &#34;can&#39;t decode&#34; when the `.encode` method is being called?
-
-### Exploring the Solutions
-
-To unpack this, let&#39;s explore some practical solutions while explaining what happens behind the scenes.
-
-#### Solution 1: Direct Encoding on a String
-
-```python
-&#34;你好&#34;.encode(&#39;utf-8&#39;)
-</code></pre><p>The <code>.encode</code> function is intended to convert a unicode object to a string object. However, in this case, <code>你好</code> is invoked on a non-unicode string (since it lacks the &ldquo;u&rdquo; prefix). Consequently, Python first attempts to transform the string into a unicode object, effectively doing:</p>
+  File &#34;&lt;stdin&gt;&#34;, line 1, in &lt;module&gt;
+UnicodeDecodeError: &#39;ascii&#39; codec can&#39;t decode byte 0xe4 in position 0: ordinal not in range(128)
+</code></pre><h3 id="what-causes-this-confusion">What Causes This Confusion?</h3>
+<p>While I am aware that prefixing the string with &ldquo;u&rdquo; helps avoid this problem, I am curious about the underlying mechanics of what Python is doing during encoding operations. Why does it claim it &ldquo;can&rsquo;t decode&rdquo; when the <code>.encode</code> method is being called?</p>
+<h3 id="exploring-the-solutions">Exploring the Solutions</h3>
+<p>To unpack this, let&rsquo;s explore some practical solutions while explaining what happens behind the scenes.</p>
+<h4 id="solution-1-direct-encoding-on-a-string">Solution 1: Direct Encoding on a String</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#e6db74">&#34;你好&#34;</span><span style="color:#f92672">.</span>encode(<span style="color:#e6db74">&#39;utf-8&#39;</span>)
+</span></span></code></pre></div><p>The <code>.encode</code> function is intended to convert a unicode object to a string object. However, in this case, <code>你好</code> is invoked on a non-unicode string (since it lacks the &ldquo;u&rdquo; prefix). Consequently, Python first attempts to transform the string into a unicode object, effectively doing:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#e6db74">&#34;你好&#34;</span><span style="color:#f92672">.</span>decode()<span style="color:#f92672">.</span>encode(<span style="color:#e6db74">&#39;utf-8&#39;</span>)
 </span></span></code></pre></div><p>The problem arises during the decoding phase, where Python fails because it&rsquo;s attempting to decode a string assuming it&rsquo;s in ASCII format, leading to the <code>UnicodeDecodeError</code>. This error occurs because the string contains characters outside the valid ASCII range.</p>
 <h4 id="solution-2-encode-from-unicode-to-bytes">Solution 2: Encode from Unicode to Bytes</h4>

@@ -10,7 +10,8 @@
   name="description"
   content="
               
-                   ### How to Manage Safe Writing to Files with Python Multiprocessing When tackling complex numerical problems that require dividing tasks into several …
+                  How to Manage Safe Writing to Files with Python Multiprocessing When tackling complex numerical problems that require dividing tasks into several …
+
               
            "
 />
@@ -291,6 +292,8 @@
   <ul>
     <li>
       <ul>
+        <li><a href="#how-to-manage-safe-writing-to-files-with-python-multiprocessing">How to Manage Safe Writing to Files with Python Multiprocessing</a></li>
+        <li><a href="#solution-1-implementing-a-queue-for-file-writing">Solution 1: Implementing a Queue for File Writing</a></li>
         <li><a href="#alternative-approaches">Alternative Approaches</a></li>
         <li><a href="#resources-for-further-reading">Resources for Further Reading</a></li>
         <li><a href="#faqs-on-top-methods-for-safely-writing-to-files-in-python-multiprocessing">FAQs on Top Methods for Safely Writing to Files in Python Multiprocessing</a></li>
@@ -339,74 +342,67 @@
         <article class="mt-6 w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl prose prose-slate dark:prose-invert
        prose-quoteless post-content   prose-img:rounded-lg prose-img:shadow-md prose-img:m-2" 
           itemscope itemtype="https://schema.org/FAQPage" >
-          <pre tabindex="0"><code>
-### How to Manage Safe Writing to Files with Python Multiprocessing
-
-When tackling complex numerical problems that require dividing tasks into several independent subproblems, utilizing Python&#39;s `multiprocessing` module with functions like `Pool.map` can significantly enhance performance by distributing the workload across multiple cores. However, this approach frequently leads to concurrency issues, particularly when multiple processes attempt to read from and write to the same file simultaneously. 
-
-The pressing question here is: **How can we effectively avoid write collisions while utilizing multiprocessing in Python, particularly when it comes to memoizing computational results in a file?** The following solutions can help mitigate these issues and streamline your multiprocessing tasks.
-
-### Solution 1: Implementing a Queue for File Writing
-
-As a recommended approach, consider employing a dedicated process for file writing, which will exclusively handle all write operations while other processes maintain read-only access. This method effectively eliminates the potential for collisions. Below is a practical example using `apply_async` to demonstrate how this can be executed:
-
-```python
-import multiprocessing as mp
-import time
-
-file_path = &#39;c:/temp/temp.txt&#39;
-
-def worker(process_id, queue):
-    &#39;&#39;&#39;Simulates a long-running computation.&#39;&#39;&#39;
-    start_time = time.perf_counter()
-    message = &#39;This is a test message.&#39;
-    result = message * 200000  # Simulating a resource-intensive task
-    elapsed_time = time.perf_counter() - start_time
-    
-    with open(file_path, &#39;rb&#39;) as file:
-        current_size = len(file.read())
-        
-    output = (f&#39;Process {process_id}&#39;, str(current_size), elapsed_time)
-    queue.put(output)
-    return output
-
-def listener(queue):
-    &#39;&#39;&#39;Handles writing messages from the queue to the file.&#39;&#39;&#39;
-    with open(file_path, &#39;w&#39;) as file:
-        while True:
-            message = queue.get()
-            if message == &#39;terminate&#39;:
-                file.write(&#39;Listener terminated\n&#39;)
-                break
-            file.write(f&#39;{message}\n&#39;)
-            file.flush()
-
-def main():
-    manager = mp.Manager()
-    queue = manager.Queue()
-    
-    process_pool = mp.Pool(mp.cpu_count() + 2)
-    
-    # Start the listener process
-    listener_process = process_pool.apply_async(listener, (queue,))
-    
-    jobs = []
-    for process_number in range(80):
-        job = process_pool.apply_async(worker, (process_number, queue))
-        jobs.append(job)
-
-    # Collect results
-    for job in jobs: 
-        job.get()
-
-    # Terminate the listener process
-    queue.put(&#39;terminate&#39;)
-    process_pool.close()
-    process_pool.join()
-
-if __name__ == &#34;__main__&#34;:
-    main()
-</code></pre><p>In this example:</p>
+          <h3 id="how-to-manage-safe-writing-to-files-with-python-multiprocessing">How to Manage Safe Writing to Files with Python Multiprocessing</h3>
+<p>When tackling complex numerical problems that require dividing tasks into several independent subproblems, utilizing Python&rsquo;s <code>multiprocessing</code> module with functions like <code>Pool.map</code> can significantly enhance performance by distributing the workload across multiple cores. However, this approach frequently leads to concurrency issues, particularly when multiple processes attempt to read from and write to the same file simultaneously.</p>
+<p>The pressing question here is: <strong>How can we effectively avoid write collisions while utilizing multiprocessing in Python, particularly when it comes to memoizing computational results in a file?</strong> The following solutions can help mitigate these issues and streamline your multiprocessing tasks.</p>
+<h3 id="solution-1-implementing-a-queue-for-file-writing">Solution 1: Implementing a Queue for File Writing</h3>
+<p>As a recommended approach, consider employing a dedicated process for file writing, which will exclusively handle all write operations while other processes maintain read-only access. This method effectively eliminates the potential for collisions. Below is a practical example using <code>apply_async</code> to demonstrate how this can be executed:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> multiprocessing <span style="color:#66d9ef">as</span> mp
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>file_path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;c:/temp/temp.txt&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">worker</span>(process_id, queue):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;&#39;&#39;Simulates a long-running computation.&#39;&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>    start_time <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>perf_counter()
+</span></span><span style="display:flex;"><span>    message <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;This is a test message.&#39;</span>
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> message <span style="color:#f92672">*</span> <span style="color:#ae81ff">200000</span>  <span style="color:#75715e"># Simulating a resource-intensive task</span>
+</span></span><span style="display:flex;"><span>    elapsed_time <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>perf_counter() <span style="color:#f92672">-</span> start_time
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> open(file_path, <span style="color:#e6db74">&#39;rb&#39;</span>) <span style="color:#66d9ef">as</span> file:
+</span></span><span style="display:flex;"><span>        current_size <span style="color:#f92672">=</span> len(file<span style="color:#f92672">.</span>read())
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>    output <span style="color:#f92672">=</span> (<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;Process </span><span style="color:#e6db74">{</span>process_id<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>, str(current_size), elapsed_time)
+</span></span><span style="display:flex;"><span>    queue<span style="color:#f92672">.</span>put(output)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> output
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">listener</span>(queue):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;&#39;&#39;Handles writing messages from the queue to the file.&#39;&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> open(file_path, <span style="color:#e6db74">&#39;w&#39;</span>) <span style="color:#66d9ef">as</span> file:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>            message <span style="color:#f92672">=</span> queue<span style="color:#f92672">.</span>get()
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> message <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;terminate&#39;</span>:
+</span></span><span style="display:flex;"><span>                file<span style="color:#f92672">.</span>write(<span style="color:#e6db74">&#39;Listener terminated</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>            file<span style="color:#f92672">.</span>write(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">{</span>message<span style="color:#e6db74">}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>            file<span style="color:#f92672">.</span>flush()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+</span></span><span style="display:flex;"><span>    manager <span style="color:#f92672">=</span> mp<span style="color:#f92672">.</span>Manager()
+</span></span><span style="display:flex;"><span>    queue <span style="color:#f92672">=</span> manager<span style="color:#f92672">.</span>Queue()
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    process_pool <span style="color:#f92672">=</span> mp<span style="color:#f92672">.</span>Pool(mp<span style="color:#f92672">.</span>cpu_count() <span style="color:#f92672">+</span> <span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Start the listener process</span>
+</span></span><span style="display:flex;"><span>    listener_process <span style="color:#f92672">=</span> process_pool<span style="color:#f92672">.</span>apply_async(listener, (queue,))
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    jobs <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> process_number <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">80</span>):
+</span></span><span style="display:flex;"><span>        job <span style="color:#f92672">=</span> process_pool<span style="color:#f92672">.</span>apply_async(worker, (process_number, queue))
+</span></span><span style="display:flex;"><span>        jobs<span style="color:#f92672">.</span>append(job)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Collect results</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> job <span style="color:#f92672">in</span> jobs: 
+</span></span><span style="display:flex;"><span>        job<span style="color:#f92672">.</span>get()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Terminate the listener process</span>
+</span></span><span style="display:flex;"><span>    queue<span style="color:#f92672">.</span>put(<span style="color:#e6db74">&#39;terminate&#39;</span>)
+</span></span><span style="display:flex;"><span>    process_pool<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>    process_pool<span style="color:#f92672">.</span>join()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
+</span></span><span style="display:flex;"><span>    main()
+</span></span></code></pre></div><p>In this example:</p>
 <ul>
 <li>The <code>worker</code> function simulates a computationally expensive operation while reporting results back to a listener via a queue.</li>
 <li>The <code>listener</code> function receives messages and writes them to the specified file, ensuring that only one process accesses the file at any given time.</li>
