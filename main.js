@@ -1,5 +1,45 @@
 (() => {
   // <stdin>
+  (function() {
+    const themeToggle = document.querySelector(".darkmode-toggle input");
+    const light = "light";
+    const dark = "dark";
+    if (themeToggle) {
+      let isDark = localStorage.theme === dark || !("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      themeToggle.checked = isDark;
+      themeToggle.addEventListener("change", function() {
+        if (this.checked) {
+          localStorage.theme = dark;
+          document.documentElement.classList.add(dark);
+        } else {
+          localStorage.theme = light;
+          document.documentElement.classList.remove(dark);
+        }
+      });
+    }
+    const navbarMenuToggle = document.getElementById("navbar-menu-toggle");
+    const navbarMenu = document.getElementById("navbar-menu");
+    const navbarLangToggle = document.getElementById("navbar-lang-toggle");
+    const navbarLang = document.getElementById("navbar-lang");
+    if (navbarMenuToggle && navbarMenu) {
+      navbarMenuToggle.addEventListener("click", function(e) {
+        e.stopPropagation();
+        navbarLang && navbarLang.classList.add("hidden");
+        navbarMenu.classList.toggle("hidden");
+      });
+    }
+    if (navbarLangToggle && navbarLang) {
+      navbarLangToggle.addEventListener("click", function(e) {
+        e.stopPropagation();
+        navbarMenu && navbarMenu.classList.add("hidden");
+        navbarLang.classList.toggle("hidden");
+      });
+    }
+    document.addEventListener("click", function() {
+      navbarMenu && navbarMenu.classList.add("hidden");
+      navbarLang && navbarLang.classList.add("hidden");
+    });
+  })();
   function displayResults(results, store) {
     const searchResults = document.getElementById("results");
     console.log("main.js Results:", results);
@@ -10,17 +50,15 @@
         const titleWords = item.title.split(" ");
         if (titleWords.length > 1) {
           resultList += `
-          <li class="flex flex-row items-center gap-y-3 mt-6 mx-2 md:mx-0 rounded-lg shadow-md bg-white dark:bg-gray-700">
-            <div class="flex flex-col w-full  p-6 mt-6 mx-2 md:mx-0">
-              <h2 class="text-3xl font-semibold text-slate-800 dark:text-slate-200">
-                <a href="${item.url}">${item.title}</a>
+          <li class="rounded-xl border border-surface-200 dark:border-white/10 bg-white dark:bg-white/5 overflow-hidden transition-all duration-300 hover:shadow-md hover:border-amber-200 dark:hover:border-amber-500/30 dark:hover:bg-white/[0.08]">
+            <a href="${item.url}" class="block p-6">
+              <h2 class="text-xl font-display font-semibold text-ink dark:text-ink-dark hover:text-amber-700 dark:hover:text-amber-400 transition-colors">
+                ${item.title}
               </h2>
-              <div class="flex flex-wrap gap-2 mt-2">
-              <p class="py-1 text-sm mx-auto  text-gray-800  dark:text-white ">
+              <p class="mt-2 text-sm text-surface-600 dark:text-surface-400 leading-relaxed">
               ${item.description}
               </p>
-              </div>
-            </div>
+            </a>
           </li> `;
         }
       }
