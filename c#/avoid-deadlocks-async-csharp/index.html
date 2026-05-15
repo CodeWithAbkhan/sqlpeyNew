@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Avoid Deadlocks in C# Async Operations: A Practical Deep Dive - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore common C# async deadlock scenarios and practical solutions, focusing on UI and ASP.NET contexts. Learn how to prevent blocking.">
+
+
+
+<meta name="keywords" content="C# async deadlock, async await deadlock, SynchronizationContext, HttpClient GetStringAsync">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Avoid Deadlocks in C# Async Operations: A Practical Deep Dive - sqlpey">
+<meta name="DC.description" content="Explore common C# async deadlock scenarios and practical solutions, focusing on UI and ASP.NET contexts. Learn how to prevent blocking.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-07-22">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Avoid Deadlocks in C# Async Operations: A Practical Deep Dive - sqlpey">
+<meta property="og:description" content="Explore common C# async deadlock scenarios and practical solutions, focusing on UI and ASP.NET contexts. Learn how to prevent blocking.">
+<meta property="og:url" content="https://sqlpey.com/c%23/avoid-deadlocks-async-csharp/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-07-22T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-07-22T00:00:00Z">
+<meta property="article:modified_time" content="2025-07-22T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="C#">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Avoid Deadlocks in C# Async Operations: A Practical Deep Dive">
+<meta name="twitter:description" content="Explore common C# async deadlock scenarios and practical solutions, focusing on UI and ASP.NET contexts. Learn how to prevent blocking.">
+
+
+<link rel="canonical" href="https://sqlpey.com/c%23/avoid-deadlocks-async-csharp/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Avoid Deadlocks in C# Async Operations: A Practical Deep Dive\"",
+  "description": "\"Explore common C# async deadlock scenarios and practical solutions, focusing on UI and ASP.NET contexts. Learn how to prevent blocking.\"",
+  "url": "\"https://sqlpey.com/c%23/avoid-deadlocks-async-csharp/\"",
+  "datePublished": "\"2025-07-22T00:00:00Z\"",
+  "dateModified": "\"2025-07-22T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/c%23/avoid-deadlocks-async-csharp/\""
+  },
+  "articleSection": "\"C#\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Avoid Deadlocks in C# Async Operations: A Practical Deep Dive</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">C#</span>
+              
+              <span class="tag">Async Programming</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              6 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 22, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#avoid-deadlocks-in-c-async-operations-a-practical-deep-dive">&ldquo;Avoid Deadlocks in C# Async Operations: A Practical Deep Dive&rdquo;</a></li>
+    <li><a href="#the-root-cause-of-the-deadlock">The Root Cause of the Deadlock</a></li>
+    <li><a href="#effective-solutions-for-preventing-async-deadlocks">Effective Solutions for Preventing Async Deadlocks</a>
+      <ul>
+        <li><a href="#solution-1-embrace-async-all-the-way">Solution 1: Embrace <code>async</code> All the Way</a></li>
+        <li><a href="#solution-2-altering-continuation-context">Solution 2: Altering Continuation Context</a></li>
+        <li><a href="#solution-3-temporarily-nullify-synchronizationcontext">Solution 3: Temporarily Nullify <code>SynchronizationContext</code></a></li>
+        <li><a href="#solution-4-custom-task-joining-use-with-caution">Solution 4: Custom Task Joining (Use with Caution)</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#faqs-on-avoid-deadlocks-in-c-async-operations">FAQs on Avoid Deadlocks in C# Async Operations</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="avoid-deadlocks-in-c-async-operations-a-practical-deep-dive">&ldquo;Avoid Deadlocks in C# Async Operations: A Practical Deep Dive&rdquo;</h2>
+<p>Encountering deadlocks when mixing synchronous and asynchronous code in C# can be a common but frustrating problem, particularly within UI frameworks or ASP.NET request contexts. This issue often arises when a synchronous method attempts to wait for an asynchronous operation to complete by directly accessing its <code>.Result</code> or <code>.Wait()</code> property, leading to a circular dependency. Let&rsquo;s dissect these scenarios and present effective strategies to circumvent them.</p>
+<h2 id="the-root-cause-of-the-deadlock">The Root Cause of the Deadlock</h2>
+<p>At its core, a deadlock in this context occurs when an asynchronous operation, designed to be non-blocking, is forced to wait on a synchronization context that is itself blocked by a synchronous call waiting for the asynchronous operation.</p>
+<p>Consider a typical flow:</p>
+<ol>
+<li>A top-level synchronous method (e.g., a UI button click handler or an ASP.NET controller action) initiates an asynchronous operation.</li>
+<li>This operation, perhaps using <code>HttpClient.GetStringAsync</code>, begins a network request and returns an incomplete <code>Task</code>.</li>
+<li>The asynchronous method <code>await</code>s this <code>Task</code>. Crucially, <code>await</code> captures the current <code>SynchronizationContext</code> to resume the method&rsquo;s execution later.</li>
+<li>The problem arises when the <em>original</em> synchronous method then synchronously blocks, calling <code>.Result</code> on the <code>Task</code> returned by the asynchronous method.</li>
+<li>This blocks the thread associated with the captured <code>SynchronizationContext</code>.</li>
+<li>When the asynchronous operation completes, it attempts to resume its execution on the captured <code>SynchronizationContext</code>. However, this context is blocked by the synchronous call.</li>
+<li>A deadlock ensues: the synchronous method is waiting for the asynchronous method to finish, and the asynchronous method is waiting for the blocked synchronization context to become available.</li>
+</ol>
+<p>This scenario is well-explained in resources like Stephen Toub&rsquo;s article, &ldquo;Await, and UI, and deadlocks! Oh my!&rdquo;<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>.</p>
+<h2 id="effective-solutions-for-preventing-async-deadlocks">Effective Solutions for Preventing Async Deadlocks</h2>
+<p>Several approaches can break this cycle, focusing on either avoiding synchronous blocking or managing the <code>SynchronizationContext</code> appropriately.</p>
+<h3 id="solution-1-embrace-async-all-the-way">Solution 1: Embrace <code>async</code> All the Way</h3>
+<p>The most idiomatic and recommended solution is to propagate the <code>async</code> nature throughout your call chain. Instead of blocking a thread, allow operations to complete asynchronously.</p>
+<p>If your top-level method can be marked as <code>async</code>, this is the cleanest approach.</p>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">// In a UI context or ASP.NET controller</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task&lt;ActionResult&gt; MyControllerActionAsync()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> data = <span style="color:#66d9ef">await</span> GetDataAsync(); <span style="color:#75715e">// Avoids blocking the thread</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> View(data);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">async</span> Task&lt;<span style="color:#66d9ef">string</span>&gt; GetDataAsync()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Simulate an async operation, like a web service call</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> result = <span style="color:#66d9ef">await</span> SomeWebService.FetchDataFromApiAsync();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> result.ToString();
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This approach ensures that no thread is unnecessarily blocked, allowing the <code>SynchronizationContext</code> to function as intended. For more on asynchronous programming in C#, you might find <a href="https://sqlpey.com/python/what-is-python" target="_blank" rel="noopener">what is python</a>
+ and <a href="https://sqlpey.com/sql/what-is-sql" target="_blank" rel="noopener">what is sql</a>
+ helpful context for related data operations.</p>
+<h3 id="solution-2-altering-continuation-context">Solution 2: Altering Continuation Context</h3>
+<p>When you cannot make the top-level method <code>async</code>, you can alter where the continuation of an <code>await</code> is scheduled.</p>
+<ul>
+<li><strong>Avoid Blocking the UI Thread:</strong> Instead of <code>GetDataAsync().Result</code>, use <code>await GetDataAsync()</code>. This allows the UI thread to remain responsive.</li>
+<li><strong>Schedule Continuation Elsewhere:</strong> If you must retrieve a result synchronously, post the asynchronous operation to a <code>ThreadPool</code> thread using <code>Task.Run</code>.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">// In a synchronous method</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> ActionResult MySyncAction()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Option A: Preferable if possible</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// var data = await GetDataAsync(); // Requires async method signature</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Option B: When synchronous retrieval is necessary</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> data = Task.Run(<span style="color:#66d9ef">async</span> () =&gt; <span style="color:#66d9ef">await</span> GetDataAsync()).Result; <span style="color:#75715e">// Schedules continuation to ThreadPool</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> View(data);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">async</span> Task&lt;<span style="color:#66d9ef">string</span>&gt; GetDataAsync()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Simulate an async operation</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">await</span> Task.Delay(<span style="color:#ae81ff">100</span>); <span style="color:#75715e">// Example async work</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Data retrieved successfully&#34;</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This strategy is clearly illustrated in Stephen Toub&rsquo;s work, particularly his examples involving <code>DelayAsync</code>.</p>
+<h3 id="solution-3-temporarily-nullify-synchronizationcontext">Solution 3: Temporarily Nullify <code>SynchronizationContext</code></h3>
+<p>For scenarios where you need to call an async method from a synchronous method, and you&rsquo;re dealing with contexts like ASP.NET MVC Partial Views where the view itself cannot be async, you can temporarily reset the <code>SynchronizationContext</code>.</p>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> ActionResult DisplayUserInfo(<span style="color:#66d9ef">string</span> userName)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Store the current context</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> currentSyncContext = SynchronizationContext.Current;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Temporarily nullify the context to prevent deadlock</span>
+</span></span><span style="display:flex;"><span>    SynchronizationContext.SetSynchronizationContext(<span style="color:#66d9ef">null</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Execute the async call and block for the result</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> model = _asyncService.GetUserInfo(userName).Result;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> PartialView(<span style="color:#e6db74">&#34;_UserInfo&#34;</span>, model);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">finally</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Restore the original context</span>
+</span></span><span style="display:flex;"><span>        SynchronizationContext.SetSynchronizationContext(currentSyncContext);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This workaround effectively isolates the synchronous blocking from the captured context, preventing the deadlock. This technique is useful in situations where refactoring to <code>async</code> all the way is not immediately feasible. You can find more about <a href="https://www.sqlpey.com/python/solved-how-to-fix-the-filename-whl-is-not-a-supported-wheel-on-this-platform-error/" target="_blank" rel="noopener">how to fix the filename whl is not a supported wheel on this platform error</a>
+ if you encounter related package issues.</p>
+<h3 id="solution-4-custom-task-joining-use-with-caution">Solution 4: Custom Task Joining (Use with Caution)</h3>
+<p>A less common workaround involves a custom <code>Join</code> extension method for <code>Task</code> that manually yields control back to the dispatcher, allowing continuations to execute. This is often seen in WPF or Silverlight contexts.</p>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TaskExtensions</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> Join(<span style="color:#66d9ef">this</span> Task task)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Assuming Dispatcher is available, e.g., in WPF</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> currentDispatcher = Dispatcher.CurrentDispatcher;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> (!task.IsCompleted)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Allow the dispatcher to process messages</span>
+</span></span><span style="display:flex;"><span>            currentDispatcher.Invoke(Delegate.CreateDelegate(<span style="color:#66d9ef">typeof</span>(Action), <span style="color:#66d9ef">null</span>, <span style="color:#e6db74">&#34;Invoke&#34;</span>), DispatcherPriority.SystemIdle);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Usage in a synchronous method</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> ActionResult MyAction()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> task = GetDataAsync();
+</span></span><span style="display:flex;"><span>    task.Join(); <span style="color:#75715e">// Custom method to allow continuation</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> data = task.Result;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> View(data);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>While this can break the deadlock, it&rsquo;s generally less efficient and harder to reason about compared to using <code>async/await</code> properly or <code>Task.Run</code>. Potential drawbacks might include performance implications or complex debugging.</p>
+<h2 id="solutions">Solutions</h2>
+<h3 id="faqs-on-avoid-deadlocks-in-c-async-operations">FAQs on Avoid Deadlocks in C# Async Operations</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What causes a deadlock when calling async methods synchronously</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: A deadlock occurs when a synchronous method blocks waiting for an async method&rsquo;s result, and that async method needs to resume on the same thread that is now blocked, creating a circular dependency. This is often due to the <code>SynchronizationContext</code> captured by <code>await</code>.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is it bad practice to use .Result or .Wait() on a Task</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, using <code>.Result</code> or <code>.Wait()</code> on a <code>Task</code> in a context where the <code>SynchronizationContext</code> is captured (like UI threads or ASP.NET request threads) can easily lead to deadlocks. It&rsquo;s best to use <code>await</code> if the calling method is also async.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How can I call an async method from a synchronous ASP.NET MVC controller action</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: To call an async method from a synchronous controller action without deadlocks, consider making the controller action itself async. If that&rsquo;s not possible, temporarily nullify the <code>SynchronizationContext</code> before the call and restore it afterwards, or use <code>Task.Run</code> to execute the async operation.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the best way to handle async operations in C#</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The recommended approach is &ldquo;async all the way.&rdquo; Propagate <code>async</code> and <code>await</code> through your call stack as much as possible to avoid synchronous blocking and maintain responsiveness.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I use .NET Core&#39;s ConfigureAwait(false) to prevent deadlocks</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: <code>ConfigureAwait(false)</code> prevents the continuation from resuming on the captured context, which can help in library code. However, in application code where you need to interact with the UI or ASP.NET context, you typically <em>want</em> the continuation to run on that context, so <code>ConfigureAwait(false)</code> isn&rsquo;t the primary solution for application-level deadlocks.</div>
+    </div>
+</div>
+<p>We&rsquo;re keen to hear about your experiences with async deadlocks. Did any of these solutions resolve your issues? Share your thoughts or any alternative strategies you&rsquo;ve found effective in the comments below!</p>
+<p>Interested in more C# or .NET topics? Check out these related questions:</p>
+<ul>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">Solved: How to Fix SSL Certificate Verify Failed Error in Python</a>
+</li>
+<li><a href="https://sqlpey.com/dotnet/what-is-dotnet" target="_blank" rel="noopener">What is .NET</a>
+</li>
+<li><a href="https://sqlpey.com/python/top-4-ways-to-resolve-syntaxwarning-invalid-escape-sequence-in-python/" target="_blank" rel="noopener">Top 4 Ways to Resolve SyntaxWarning: Invalid Escape Sequence in Python</a>
+</li>
+</ul>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p><a href="https://blog.stephencleary.com/2012/07/dont-block-on-async-code.html" target="_blank" rel="noopener">Await, and UI, and deadlocks! Oh my!</a>
+&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

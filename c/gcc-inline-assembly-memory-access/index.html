@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>GCC Inline Assembly: Informing the Compiler About Memory Access - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore how to correctly inform the GCC compiler about memory accesses within inline assembly for optimized code generation, especially for loops.">
+
+
+
+<meta name="keywords" content="GCC, inline assembly, memory access, compiler optimization, volatile, clobber, assembly operands">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="GCC Inline Assembly: Informing the Compiler About Memory Access - sqlpey">
+<meta name="DC.description" content="Explore how to correctly inform the GCC compiler about memory accesses within inline assembly for optimized code generation, especially for loops.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-07-25">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="GCC Inline Assembly: Informing the Compiler About Memory Access - sqlpey">
+<meta property="og:description" content="Explore how to correctly inform the GCC compiler about memory accesses within inline assembly for optimized code generation, especially for loops.">
+<meta property="og:url" content="https://sqlpey.com/c/gcc-inline-assembly-memory-access/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-07-25T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-07-25T00:00:00Z">
+<meta property="article:modified_time" content="2025-07-25T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="GCC Inline Assembly">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="GCC Inline Assembly: Informing the Compiler About Memory Access">
+<meta name="twitter:description" content="Explore how to correctly inform the GCC compiler about memory accesses within inline assembly for optimized code generation, especially for loops.">
+
+
+<link rel="canonical" href="https://sqlpey.com/c/gcc-inline-assembly-memory-access/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"GCC Inline Assembly: Informing the Compiler About Memory Access\"",
+  "description": "\"Explore how to correctly inform the GCC compiler about memory accesses within inline assembly for optimized code generation, especially for loops.\"",
+  "url": "\"https://sqlpey.com/c/gcc-inline-assembly-memory-access/\"",
+  "datePublished": "\"2025-07-25T00:00:00Z\"",
+  "dateModified": "\"2025-07-25T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/c/gcc-inline-assembly-memory-access/\""
+  },
+  "articleSection": "\"GCC Inline Assembly\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">GCC Inline Assembly: Informing the Compiler About Memory Access</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">GCC Inline Assembly</span>
+              
+              <span class="tag">C Programming</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              8 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 25, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#gcc-inline-assembly-informing-the-compiler-about-memory-access">&ldquo;GCC Inline Assembly: Informing the Compiler About Memory Access&rdquo;</a>
+      <ul>
+        <li><a href="#faqs-on-gcc-inline-assembly-memory-access">FAQs on GCC Inline Assembly Memory Access</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="gcc-inline-assembly-informing-the-compiler-about-memory-access">&ldquo;GCC Inline Assembly: Informing the Compiler About Memory Access&rdquo;</h2>
+<p>When working with <a href="https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html" target="_blank" rel="noopener">GCC inline assembly</a>
+ in C, correctly communicating memory interactions to the compiler is crucial for enabling optimizations and preventing unexpected behavior. Simply providing a pointer as input to inline assembly doesn&rsquo;t automatically inform the compiler that the memory pointed to is an input, output, or both. Without explicit declarations, the compiler might assume certain memory accesses are irrelevant or can be reordered, leading to incorrect results, especially in loops.</p>
+<p><strong>The Challenge: Unspecified Memory Operations</strong></p>
+<p>Consider a scenario where your inline assembly performs operations on memory pointed to by a register. If you only specify a register input and a register output, the compiler has no information about what happens to the memory itself. It might perceive your assembly as merely manipulating the pointer&rsquo;s value (e.g., masking bits or adding a constant), potentially allowing optimizations like dead-store elimination.</p>
+<p><strong>Solution 1: The <code>asm volatile</code> and &ldquo;memory&rdquo; Clobber</strong></p>
+<p>A straightforward approach to ensure the compiler treats your assembly block with appropriate caution regarding memory is to use <code>asm volatile</code> combined with a <code>&quot;memory&quot;</code> clobber.</p>
+<ul>
+<li><strong><code>asm volatile</code></strong>: This directive prevents the compiler from optimizing away your assembly code, even if its output operands appear unused. It&rsquo;s essential when your assembly has side effects, such as writing to memory, that aren&rsquo;t explicitly captured by output operands.</li>
+<li><strong><code>&quot;memory&quot;</code> Clobber</strong>: This tells the compiler that the assembly block might read from or write to any memory location. It&rsquo;s akin to a function call that could modify any memory. The compiler will then ensure that all memory operations before and after the assembly are properly synchronized and not reordered across the assembly block.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">long</span> <span style="color:#a6e22e">sum_array</span>(<span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>data, <span style="color:#66d9ef">size_t</span> len) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">long</span> sum <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">asm</span> <span style="color:#66d9ef">volatile</span> (
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;movq %2, %%rcx;&#34;</span>       <span style="color:#75715e">// Initialize counter with length
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#e6db74">&#34;movq %1, %%rsi;&#34;</span>       <span style="color:#75715e">// Initialize source pointer
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#e6db74">&#34;movl $0, %%eax;&#34;</span>       <span style="color:#75715e">// Initialize sum register (lower 32 bits)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#e6db74">&#34;loop_start:&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;addl (%%rsi), %%eax;&#34;</span>  <span style="color:#75715e">// Add current element to sum
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#e6db74">&#34;incq %%rsi;&#34;</span>           <span style="color:#75715e">// Increment pointer
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#e6db74">&#34;loop loop_start;&#34;</span>      <span style="color:#75715e">// Decrement rcx and jump if not zero
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;=a&#34;</span> (sum)            <span style="color:#75715e">// Output: sum in eax (extended to long)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;r&#34;</span> (data), <span style="color:#e6db74">&#34;r&#34;</span> (len) <span style="color:#75715e">// Inputs: pointer, length
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;rcx&#34;</span>, <span style="color:#e6db74">&#34;memory&#34;</span>       <span style="color:#75715e">// Clobbered registers and memory
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    );
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> sum;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Important Note on <code>volatile</code>:</strong> While assembly with no output operands is implicitly <code>volatile</code>, it’s best practice to make it explicit for clarity. For assembly with output operands, it&rsquo;s not implicitly <code>volatile</code>. If your assembly is not a pure function of its explicit inputs (i.e., it has side effects on memory), <code>volatile</code> is necessary. For instance, if you have an assembly function that sums an array, and you call it twice, without <code>volatile</code>, the compiler might assume the second call will produce the same result as the first if the input array appears unchanged, potentially optimizing it away.</p>
+<p><strong>Solution 2: Specific Memory Operands (The &ldquo;Dummy&rdquo; Operand)</strong></p>
+<p>For more granular control and to potentially aid the compiler in choosing better addressing modes, you can use specific memory operand constraints. This is particularly useful when you want to explicitly tell the compiler which memory locations your assembly reads, writes, or both.</p>
+<p>You can achieve this by adding a &ldquo;dummy&rdquo; memory operand to your assembly template. This operand isn&rsquo;t directly used by your assembly code but serves as a token to inform the compiler about the memory being accessed.</p>
+<p><strong>Syntax:</strong></p>
+<ul>
+<li><strong>Dummy Input:</strong> <code>&quot;m&quot; (*(const type (*)[]) iptr)</code></li>
+<li><strong>Dummy Output:</strong> <code>&quot;=m&quot; (*(type (*)[]) iptr)</code></li>
+<li><strong>Input/Output:</strong> <code>&quot;+m&quot; (*(type (*)[]) iptr)</code></li>
+</ul>
+<p>Here, <code>iptr</code> is a pointer variable in your C code, and <code>type</code> is the type of the elements being accessed. The <code>[]</code> signifies that the size of the memory accessed is not explicitly known to the compiler, allowing it to treat it as a general memory input.</p>
+<p><strong>Example with Dummy Input:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stddef.h&gt; // For size_t</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Function to sum array elements using inline assembly with a dummy memory operand
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">long</span> <span style="color:#a6e22e">sum_array_specific_memory</span>(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>data_ptr, <span style="color:#66d9ef">size_t</span> data_len) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">long</span> total_sum <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">asm</span> <span style="color:#66d9ef">volatile</span> (
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;movq %2, %%rcx;&#34;</span>        <span style="color:#75715e">// Load length into RCX
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#e6db74">&#34;movq %1, %%rsi;&#34;</span>        <span style="color:#75715e">// Load data pointer into RSI
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#e6db74">&#34;movl $0, %%eax;&#34;</span>        <span style="color:#75715e">// Initialize sum accumulator (EAX) to 0
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#e6db74">&#34;array_loop:&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;addl (%%rsi), %%eax;&#34;</span>   <span style="color:#75715e">// Add the current element to EAX
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#e6db74">&#34;incq %%rsi;&#34;</span>            <span style="color:#75715e">// Move to the next element
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#e6db74">&#34;loop array_loop;&#34;</span>       <span style="color:#75715e">// Decrement RCX and loop if not zero
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;=a&#34;</span> (total_sum)       <span style="color:#75715e">// Output: the sum is stored in total_sum
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;r&#34;</span> (data_ptr), <span style="color:#e6db74">&#34;r&#34;</span> (data_len), <span style="color:#e6db74">&#34;m&#34;</span> (<span style="color:#f92672">*</span>(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> (<span style="color:#f92672">*</span>)[data_len]) data_ptr) <span style="color:#75715e">// Inputs: pointer, length, and dummy memory operand
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;rcx&#34;</span>, <span style="color:#e6db74">&#34;memory&#34;</span>        <span style="color:#75715e">// Clobbered registers and memory
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    );
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> total_sum;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> my_array[] <span style="color:#f92672">=</span> {<span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">20</span>, <span style="color:#ae81ff">30</span>, <span style="color:#ae81ff">40</span>, <span style="color:#ae81ff">50</span>};
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">size_t</span> array_size <span style="color:#f92672">=</span> <span style="color:#66d9ef">sizeof</span>(my_array) <span style="color:#f92672">/</span> <span style="color:#66d9ef">sizeof</span>(my_array[<span style="color:#ae81ff">0</span>]);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">long</span> result <span style="color:#f92672">=</span> <span style="color:#a6e22e">sum_array_specific_memory</span>(my_array, array_size);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">printf</span>(<span style="color:#e6db74">&#34;The sum of the array elements is: %ld</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, result); <span style="color:#75715e">// Expected output: 150
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>In this example, <code>(*(const int (*)[data_len]) data_ptr)</code> informs the compiler that the assembly reads from memory at <code>data_ptr</code> with a length specified by <code>data_len</code>.</p>
+<p><strong>Considerations for Dummy Operands:</strong></p>
+<ul>
+<li><strong>Pointer vs. Array:</strong> If you are directly passing a C array (not a pointer to an array) to your assembly, you might not need the casting and can request it directly as a memory operand.</li>
+<li><strong>Size Specification:</strong> Using <code>[]</code> for an unspecified size tells GCC that any memory accessed relative to that pointer is an input. Specifying a size like <code>[10]</code> or <code>[some_variable]</code> informs the compiler about the specific memory range. However, with runtime-defined sizes, GCC might not always optimize away accesses beyond the specified range.</li>
+<li><strong>Early-Clobber:</strong> If you use an early-clobber on the pointer input operand for strict correctness, a dummy memory operand can help the compiler select a simpler addressing mode using the same register. However, in some cases, a dummy operand might cause GCC to use extra instructions and registers for the base address of the memory operand. Always inspect the generated assembly output.</li>
+<li><strong>Strict Aliasing:</strong> According to the GCC manual, this approach is generally not a strict-aliasing violation if the array element type matches the pointer&rsquo;s type, or if the element type is <code>char</code>.</li>
+</ul>
+<p><strong>The &ldquo;Dead Store&rdquo; Problem</strong></p>
+<p>A common issue with inline assembly, especially in loop examples, is when the assembly is wrapped in a function that doesn&rsquo;t typically inline. This can mask bugs because the surrounding code might not trigger the compiler optimizations (like store reordering or dead-store elimination) that would reveal the assembly&rsquo;s incorrect memory assumptions.</p>
+<p><strong>GCC&rsquo;s Design Philosophy</strong></p>
+<p>GCC&rsquo;s inline assembly syntax is designed around describing individual instructions. The <code>&quot;m&quot;</code> or <code>&quot;=m&quot;</code> operand constraints are intended to let the compiler choose the appropriate addressing mode. For complex operations like entire loops, careful management of compiler knowledge (via <code>asm volatile</code> and clobbers) is essential. Referencing <a href="https://www.sqlpey.com/python/solved-how-to-fix-the-filename-whl-is-not-a-supported-wheel-on-this-platform-error/" target="_blank" rel="noopener">Looping over arrays with inline assembly</a>
+ might offer further insights into structuring loops with assembly.</p>
+<p><strong>Example of <code>repne scasb</code> (x86)</strong></p>
+<p>The GCC manual provides an example for an x86 instruction that reads an unknown length of memory:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">// Assuming &#39;p&#39; is a pointer and &#39;count&#39; is a size_t variable
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">asm</span>(<span style="color:#e6db74">&#34;repne scasb&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;=c&#34;</span> (count), <span style="color:#e6db74">&#34;+D&#34;</span> (p)       <span style="color:#75715e">// Output: count, input/output: pointer p
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;m&#34;</span> (<span style="color:#f92672">*</span>(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> (<span style="color:#f92672">*</span>)[]) p), <span style="color:#75715e">// Input: memory operand of unknown char length
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>      <span style="color:#e6db74">&#34;0&#34;</span> (<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>),                     <span style="color:#75715e">// Input: ECX initialized to -1 (implicit in repne)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>      <span style="color:#e6db74">&#34;a&#34;</span> (<span style="color:#ae81ff">0</span>));                     <span style="color:#75715e">// Input: EAX initialized to 0
+</span></span></span></code></pre></div><p>This demonstrates how to explicitly declare a memory operand of unknown character length using <code>&quot;m&quot; (*(const char (*)[]) p)</code>.</p>
+<p><strong>Addressing Potential Optimizations</strong></p>
+<p>Without proper memory clobbering or explicit memory operands, the compiler might perform optimizations that break your inline assembly. For instance, if your assembly performs calculations based on memory content, and that memory is modified by subsequent C code <em>before</em> the assembly executes, the compiler might cache outdated values or reorder operations incorrectly. The <code>&quot;memory&quot;</code> clobber is vital to prevent common subexpression elimination (CSE) of your assembly block within loops if it relies on external memory states.</p>
+<p><strong>When to Use <code>volatile</code> Explicitly</strong></p>
+<ul>
+<li>Assembly with side effects on memory not covered by output operands.</li>
+<li>Assembly that must execute in a specific order relative to other code, even if its explicit outputs are unused.</li>
+<li>Assembly that needs to re-run if input data changes, which <code>volatile</code> helps ensure.</li>
+</ul>
+<p>Remember that assembly with no output operands is implicitly <code>volatile</code>. However, making it explicit improves code readability and maintainability.</p>
+<hr>
+<h3 id="faqs-on-gcc-inline-assembly-memory-access">FAQs on GCC Inline Assembly Memory Access</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How does GCC know my inline assembly accesses memory</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: You explicitly tell GCC about memory access using operand constraints like &rsquo;m&rsquo; for input memory or &lsquo;=m&rsquo; for output memory. You can also use the &lsquo;memory&rsquo; clobber to indicate general memory modification.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is a dummy memory operand in GCC inline assembly</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: A dummy memory operand is an extra operand in your assembly template that doesn&rsquo;t directly correspond to an assembly instruction but serves to inform the compiler about memory being read, written, or both, helping it optimize or correctly sequence operations.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: When should I use asm volatile</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Use <code>asm volatile</code> when your assembly has side effects on memory that are not captured by output operands, or when you need to ensure the assembly executes exactly as written, preventing the compiler from optimizing it away or reordering it incorrectly, especially in loops.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can inline assembly cause strict aliasing violations</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: While it&rsquo;s possible, using memory operands like <code>&quot;m&quot; (*(const type (*)[]) ptr)</code> is generally considered safe by the GCC manual if the element type matches the pointer&rsquo;s type or is <code>char</code>.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How does the &#39;memory&#39; clobber affect optimization</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The &lsquo;memory&rsquo; clobber forces the compiler to treat the assembly block as if it could access or modify any memory. This prevents optimizations that reorder memory operations across the assembly block and ensures that memory is consistent before and after its execution.</div>
+    </div>
+</div>
+<hr>
+<p>We’d love to hear your feedback! Drop your comments or questions below.</p>
+<p>For more on related topics, explore these resources:</p>
+<ul>
+<li><a href="https://sqlpey.com/postgresql/what-is-postgresql" target="_blank" rel="noopener">What is PostgreSQL</a>
+</li>
+<li><a href="https://sqlpey.com/python/what-is-python" target="_blank" rel="noopener">What is Python</a>
+</li>
+<li><a href="https://sqlpey.com/mysql/introduction-to-mysql" target="_blank" rel="noopener">Introduction to MySQL</a>
+</li>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">Fixing <code>SSL certificate verify failed</code> in Python</a>
+</li>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-could-not-find-a-version-that-satisfies-the-requirement-error-in-python/" target="_blank" rel="noopener">Resolving <code>Could not find a version that satisfies the requirement</code> in Python</a>
+</li>
+</ul>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

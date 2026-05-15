@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>CPU Pipeline Stalls: Diagnosing and Mitigating Self-Modifying Code (SMC) Penalties - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Investigate the performance impact of Self-Modifying Code (SMC) on Intel CPUs, focusing on MACHINE_CLEARS events and mitigation strategies via hardware …">
+
+
+
+<meta name="keywords" content="Self-Modifying Code, MACHINE_CLEARS, Pipeline Stall, Intel Microarchitecture">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="CPU Pipeline Stalls: Diagnosing and Mitigating Self-Modifying Code (SMC) Penalties - sqlpey">
+<meta name="DC.description" content="Investigate the performance impact of Self-Modifying Code (SMC) on Intel CPUs, focusing on MACHINE_CLEARS events and mitigation strategies via hardware snooping.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="CPU Pipeline Stalls: Diagnosing and Mitigating Self-Modifying Code (SMC) Penalties - sqlpey">
+<meta property="og:description" content="Investigate the performance impact of Self-Modifying Code (SMC) on Intel CPUs, focusing on MACHINE_CLEARS events and mitigation strategies via hardware …">
+<meta property="og:url" content="https://sqlpey.com/c/cpu-pipeline-stalls-diagnosing-smc-penalties/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Performance Tuning">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="CPU Pipeline Stalls: Diagnosing and Mitigating Self-Modifying Code (SMC) Penalties">
+<meta name="twitter:description" content="Investigate the performance impact of Self-Modifying Code (SMC) on Intel CPUs, focusing on MACHINE_CLEARS events and mitigation strategies via hardware …">
+
+
+<link rel="canonical" href="https://sqlpey.com/c/cpu-pipeline-stalls-diagnosing-smc-penalties/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"CPU Pipeline Stalls: Diagnosing and Mitigating Self-Modifying Code (SMC) Penalties\"",
+  "description": "\"Investigate the performance impact of Self-Modifying Code (SMC) on Intel CPUs, focusing on MACHINE_CLEARS events and mitigation strategies via hardware snooping.\"",
+  "url": "\"https://sqlpey.com/c/cpu-pipeline-stalls-diagnosing-smc-penalties/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/c/cpu-pipeline-stalls-diagnosing-smc-penalties/\""
+  },
+  "articleSection": "\"Performance Tuning\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">CPU Pipeline Stalls: Diagnosing and Mitigating Self-Modifying Code (SMC) Penalties</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Performance Tuning</span>
+              
+              <span class="tag">CPU Architecture</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              7 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#cpu-pipeline-stalls-diagnosing-and-mitigating-self-modifying-code-smc-penalties">&ldquo;CPU Pipeline Stalls: Diagnosing and Mitigating Self-Modifying Code (SMC) Penalties&rdquo;</a>
+      <ul>
+        <li><a href="#deep-dive-into-smc-detection-and-performance-impact">Deep Dive into SMC Detection and Performance Impact</a></li>
+        <li><a href="#the-performance-penalty-of-self-modification">The Performance Penalty of Self-Modification</a></li>
+        <li><a href="#architectural-evolution-of-smc-detection">Architectural Evolution of SMC Detection</a></li>
+        <li><a href="#mitigation-and-alternative-solutions">Mitigation and Alternative Solutions</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#faqs-on-cpu-pipeline-stalls-diagnosing-smc-penalties">FAQs on CPU Pipeline Stalls Diagnosing SMC Penalties</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="cpu-pipeline-stalls-diagnosing-and-mitigating-self-modifying-code-smc-penalties">&ldquo;CPU Pipeline Stalls: Diagnosing and Mitigating Self-Modifying Code (SMC) Penalties&rdquo;</h2>
+<p>How can one pinpoint performance loss attributed to SMC on modern Intel processors, and what architectural details govern this penalty?</p>
+<h3 id="deep-dive-into-smc-detection-and-performance-impact">Deep Dive into SMC Detection and Performance Impact</h3>
+<p>The accepted approach for identifying this issue involves monitoring specific performance counters exposed by the CPU.</p>
+<p><strong>Primary Diagnostic Metric:</strong>
+You should check the <code>MACHINE_CLEARS.SMC</code> performance counter. This counter is part of the broader <code>MACHINE_CLEARS</code> event, which logs instances where the processor pipeline must be entirely flushed and restarted following the last retired instruction.</p>
+<p>This metric is available across various Intel microarchitectures, including Sandy Bridge (e.g., used in some MacBook Pros) and Nehalem (e.g., used in certain Xeon processors). Tools like <code>oprofile</code>, <code>perf</code>, or Intel&rsquo;s Vtune can be employed to capture this value.</p>
+<p><strong>What MACHINE_CLEARS Indicates:</strong>
+The description of this metric highlights three primary causes for a full pipeline restart:</p>
+<ol>
+<li>Memory ordering violations.</li>
+<li>Self-modifying code (SMC) detection.</li>
+<li>Certain loads targeting illegal address ranges.</li>
+</ol>
+<p>When <code>MACHINE_CLEARS</code> spikes, examining the specific cause is crucial. SMC specifically signals that the CPU detected an operation where code memory was written to.</p>
+<p><strong>Intel Documentation on SMC Event (Example C0/SMC):</strong>
+Intel documents the specific event code for SMC detection. For instance, in some contexts:</p>
+<ul>
+<li><strong>Event Code:</strong> <code>0xC3</code></li>
+<li><strong>SMC Mask:</strong> <code>0x04</code> (Signifying Self-modifying code detected).</li>
+</ul>
+<h3 id="the-performance-penalty-of-self-modification">The Performance Penalty of Self-Modification</h3>
+<p>When SMC is detected, the penalty is severe because the processor must invalidate its speculative work:</p>
+<ol>
+<li><strong>Pipeline Flush:</strong> The entire instruction pipeline is halted and restarted from the instruction <em>after</em> the instruction that caused the modification (usually the <code>MOV</code> or write operation). Any instructions already in the pipeline, like preceding <code>NOP</code>s, are discarded.</li>
+<li><strong>Cache Interaction:</strong> The modified cache line is written back to the L2 and LLC caches, and subsequent instructions must be reloaded, causing significant latency.</li>
+</ol>
+<p>Agner Fog&rsquo;s measurements, detailed in optimization guides (e.g., concerning Core2/Core iX architectures), quantify this penalty:</p>
+<ul>
+<li><strong>P1:</strong> Approx. 19 clocks.</li>
+<li><strong>PMMX:</strong> Approx. 31 clocks.</li>
+<li><strong>PPro, P2, P3, PM:</strong> 150–300 clocks.</li>
+<li><strong>P4:</strong> Purges the entire trace cache.</li>
+</ul>
+<p>This penalty outweighs the minor cost of executing instructions like <code>NOP</code>s unless the modified code is executed far more frequently than the penalty occurs.</p>
+<h3 id="architectural-evolution-of-smc-detection">Architectural Evolution of SMC Detection</h3>
+<p>The precise mechanism for detecting SMC has evolved, moving away from simple linear address checks towards more robust physical address monitoring:</p>
+<ol>
+<li><strong>Older CPUs (P6/Pentium):</strong> Relied partly on checking if a write modified an instruction that had already been prefetched, based on <em>linear addresses</em>. System software (like debuggers) using different linear addresses could serialize execution using instructions like <code>CPUID</code> to ensure synchronization.</li>
+<li><strong>Modern Architectures (Nehalem/Sandy Bridge onwards):</strong> Detection is far stricter. Patents reveal the use of hardware snoops against the instruction cache (i-cache) based on <strong>physical addresses</strong>.</li>
+</ol>
+<p><strong>The Physical Address Snoop Mechanism:</strong>
+Modern Intel designs incorporate logic, sometimes involving the ITLB (Instruction Translation Lookaside Buffer) acting as a Content Addressable Memory (CAM) on physical addresses, to check every store operation&rsquo;s physical address against currently executing instructions in the buffer.</p>
+<ul>
+<li>A store operation forwards its physical address via a snoop mechanism.</li>
+<li>If this physical address conflicts with a cache line stored in the instruction buffer, an SMC condition is signaled, leading to the pipeline flush.</li>
+<li>This mechanism is employed even if the modification happens via a different thread (cross-modifying code) or DMA writes.</li>
+</ul>
+<p>This physical address snooping implies that simply modifying code using different linear addresses, a technique sometimes used to bypass older linear-address-based checks, is ineffective now.</p>
+<h3 id="mitigation-and-alternative-solutions">Mitigation and Alternative Solutions</h3>
+<p>If SMC is necessary (e.g., JIT compilers), careful handling is required:</p>
+<ol>
+<li><strong>Serialization Instructions:</strong> Using instructions like <code>CPUID</code> after a write operation forces the pipeline to retire all previous instructions before proceeding, which can help synchronize caches, although it doesn&rsquo;t prevent the SMC detection itself. <code>MFENCE</code> or <code>LFENCE</code> might also be considered depending on the context, though modern hardware relies heavily on the physical address snoop.</li>
+<li><strong>Avoiding Page Overlap:</strong> The optimization manual advises software to avoid writing to a code page in the same 1-KByte subpage that is currently being executed or fetched.</li>
+<li><strong>Cross-Modifying Code with Synchronization:</strong> If modification must occur from another thread, extremely rigorous thread synchronization, potentially involving <code>CPUID</code> after the synchronization point, is required.</li>
+</ol>
+<h4 id="practical-code-experimentation-for-modern-cpus">Practical Code Experimentation for Modern CPUs</h4>
+<p>To test if modern CPUs observe stale instruction fetches despite writes, one can create two memory mappings of the same executable file region (using <code>MAP_SHARED</code>) and have one pointer modify the instruction bytes accessed by the other pointer. If the stale code executes, the modification was not seen before execution. If the modified code executes, the hardware detected the write and flushed the pipeline.</p>
+<p>Here is an assembly routine that attempts to overwrite a return value via a pointer passed from a different mapping (<code>rdi</code>):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-nasm" data-lang="nasm"><span style="display:flex;"><span><span style="color:#75715e">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">##</span> <span style="color:#a6e22e">Solutions</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">smc</span><span style="color:#f92672">-</span>test<span style="color:#f92672">-</span>function.asm
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">bits</span> <span style="color:#ae81ff">64</span>
+</span></span><span style="display:flex;"><span>entry:   <span style="color:#75715e">; rdi holds the pointer to the alternate mapping</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">; 1. Trigger potential CoW or early cache operations</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">mov</span>  <span style="color:#66d9ef">byte</span> [rdi<span style="color:#f92672">+</span>dummy_marker], <span style="color:#ae81ff">0xCC</span>       
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">; 2. Serialize execution path (optional but helpful for debugging setup)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">mov</span>  r8, rbx    <span style="color:#75715e">; Save caller-preserved RBX</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">cpu</span>id           <span style="color:#75715e">; Serialization instruction</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">mov</span>  rbx, r8    <span style="color:#75715e">; Restore RBX</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">; 3. Overwrite the return value in the instruction stream being executed</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">; We are overwriting &#39;mov eax, 1&#39; (opcode EAX imm32) with &#39;mov eax, 0&#39;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">mov</span>   <span style="color:#66d9ef">dword</span> [rdi <span style="color:#f92672">+</span> ret_val_offset <span style="color:#f92672">-</span> entry],  <span style="color:#ae81ff">0</span>       
+</span></span><span style="display:flex;"><span>ret_val_offset:
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">mov</span>   eax, <span style="color:#ae81ff">1</span>      <span style="color:#75715e">; Original intended return value (1)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ret</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>dummy_marker: <span style="color:#66d9ef">dd</span> <span style="color:#ae81ff">0xcccccccc</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">End</span> of assembly
+</span></span></code></pre></div><p>// smc-stale.c
+#include &lt;sys/mman.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;assert.h&gt;</p>
+<p>typedef int (*intfunc_t)(void *);   // <strong>attribute</strong>((sysv_abi))  // in case you&rsquo;re on Windows.</p>
+<p>int main() {
+int fd = open(&ldquo;smc-func&rdquo;, O_RDWR);</p>
+<pre><code>assert(fd&amp;gt;=0);
+intfunc_t a1 = mmap(NULL, 0x1000, PROT_READ | PROT_WRITE | PROT_EXEC,
+            MAP_FILE | MAP_SHARED, fd, 0);
+intfunc_t a2 = mmap(NULL, 0x1000, PROT_READ | PROT_WRITE | PROT_EXEC,
+            MAP_FILE | MAP_SHARED, fd, 0);
+assert(a1 != a2);
+return a1(a2);
+</code></pre>
+<p>}
+;;build with nasm smc-func.asm     -fbin is the default.
+bits 64
+entry:   ; rdi = another mapping of the same page that&rsquo;s executing
+mov  byte [rdi+dummy-entry], 0xcc       ; trigger any copy-on-write page fault now</p>
+<pre><code>mov  r8, rbx    ; CPUID steps on call-preserved RBX
+cpuid               ; serialize for good measure
+mov  rbx, r8
+</code></pre>
+<p>;    mfence
+;    lfence</p>
+<pre><code>mov   dword [rdi + retmov+1 - entry],  0       ; return 0 for snooping
+</code></pre>
+<p>retmov:
+mov   eax, 1      ; opcode + imm32             ; return 1 for stale
+ret</p>
+<p>dummy:  dd 0xcccccccc
+peter@volta:<del>/src/experiments$ gcc -Og -g smc-stale.c
+peter@volta:</del>/src/experiments$ nasm smc-func.asm &amp;&amp; ./a.out; echo $?
+0</p>
+<h1 id="remember-to-rebuild-smc-func-every-time-because-map_shared-modifies-it">remember to rebuild smc-func every time, because MAP_SHARED modifies it</h1>
+<pre tabindex="0"><code></code></pre><p>A C harness using <code>mmap(MAP_SHARED)</code> to create two pointers (<code>a1</code>, <code>a2</code>) to the same file content can execute <code>a1(a2)</code>. On contemporary Intel hardware (e.g., i7-6700k), execution typically reflects the modification, meaning the stale fetch did not occur—the pipeline was correctly flushed upon detecting the write via physical address snooping.</p>
+<h3 id="faqs-on-cpu-pipeline-stalls-diagnosing-smc-penalties">FAQs on CPU Pipeline Stalls Diagnosing SMC Penalties</h3>
+<p><div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How do I check for Self-Modifying Code performance impact</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Monitor the <code>MACHINE_CLEARS.SMC</code> performance counter using profiling tools like <code>perf</code> or Intel VTune, as this event directly tracks pipeline restarts caused by writing to executable memory regions.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Does using different linear addresses bypass modern SMC detection</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: No, modern Intel microarchitectures (since at least Nehalem/Sandy Bridge) rely heavily on physical address snooping during store operations to detect SMC, rendering linear address tricks ineffective.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the penalty for a machine clear event</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The penalty involves flushing the entire instruction pipeline and reloading instructions, costing significantly more than modern branch mispredictions, ranging from tens to hundreds of CPU cycles depending on the specific processor generation.</div>
+    </div>
+</div></p>
+<p>We encourage you to share your own findings or scenarios where you&rsquo;ve dealt with pipeline stalls related to code modification in the comments below!</p>
+<p>For further exploration into related performance issues:</p>
+<ul>
+<li>Investigating Python SSL verification failures: <a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">Fixing Python SSL Certificate Verify Failed Error</a>
+</li>
+<li>Resolving Python packaging dependency issues: <a href="https://sqlpey.com/python/solved-how-to-fix-could-not-find-a-version-that-satisfies-To-requirement-error-in-python/" target="_blank" rel="noopener">Fixing Could Not Find A Version That Satisfies The Requirement Error in Python</a>
+</li>
+<li>Handling encoding errors in Python: <a href="https://sqlpey.com/python/top-4-ways-to-resolve-syntaxwarning-invalid-escape-sequence-in-python/" target="_blank" rel="noopener">Top 4 Methods to Resolve SyntaxWarning Invalid Escape Sequence in Python</a>
+</li>
+</ul>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

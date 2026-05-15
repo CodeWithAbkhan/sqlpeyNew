@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>SQL Server Techniques for Concatenating Multiple Rows into a Single String - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Exploring effective SQL Server methods, including FOR XML PATH, STRING_AGG, CTEs, and custom functions, to aggregate column values from related rows.">
+
+
+
+<meta name="keywords" content="STRING_AGG, FOR XML PATH, Row Concatenation, SQL Aggregation">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="SQL Server Techniques for Concatenating Multiple Rows into a Single String - sqlpey">
+<meta name="DC.description" content="Exploring effective SQL Server methods, including FOR XML PATH, STRING_AGG, CTEs, and custom functions, to aggregate column values from related rows.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="SQL Server Techniques for Concatenating Multiple Rows into a Single String - sqlpey">
+<meta property="og:description" content="Exploring effective SQL Server methods, including FOR XML PATH, STRING_AGG, CTEs, and custom functions, to aggregate column values from related rows.">
+<meta property="og:url" content="https://sqlpey.com/sql/sql-server-row-concatenation-methods/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="SQL Server">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="SQL Server Techniques for Concatenating Multiple Rows into a Single String">
+<meta name="twitter:description" content="Exploring effective SQL Server methods, including FOR XML PATH, STRING_AGG, CTEs, and custom functions, to aggregate column values from related rows.">
+
+
+<link rel="canonical" href="https://sqlpey.com/sql/sql-server-row-concatenation-methods/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"SQL Server Techniques for Concatenating Multiple Rows into a Single String\"",
+  "description": "\"Exploring effective SQL Server methods, including FOR XML PATH, STRING_AGG, CTEs, and custom functions, to aggregate column values from related rows.\"",
+  "url": "\"https://sqlpey.com/sql/sql-server-row-concatenation-methods/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/sql/sql-server-row-concatenation-methods/\""
+  },
+  "articleSection": "\"SQL Server\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">SQL Server Techniques for Concatenating Multiple Rows into a Single String</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">SQL Server</span>
+              
+              <span class="tag">T-SQL</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              9 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#sql-server-techniques-for-concatenating-multiple-rows-into-a-single-string">&ldquo;SQL Server Techniques for Concatenating Multiple Rows into a Single String&rdquo;</a></li>
+    <li><a href="#primary-concatenation-methods-by-sql-server-version">Primary Concatenation Methods by SQL Server Version</a>
+      <ul>
+        <li><a href="#solution-1-leveraging-for-xml-path-sql-server-2005">Solution 1: Leveraging <code>FOR XML PATH</code> (SQL Server 2005+)</a></li>
+        <li><a href="#solution-2-the-modern-string_agg-function-sql-server-2017">Solution 2: The Modern <code>STRING_AGG</code> Function (SQL Server 2017+)</a></li>
+        <li><a href="#solution-3-handling-list-aggregation-without-for-xml-pre-2017-alternative">Solution 3: Handling List Aggregation without <code>FOR XML</code> (Pre-2017 Alternative)</a></li>
+        <li><a href="#solution-4-recursive-common-table-expression-cte">Solution 4: Recursive Common Table Expression (CTE)</a></li>
+        <li><a href="#solution-5-refining-for-xml-path-with-leading-delimiter-removal">Solution 5: Refining <code>FOR XML PATH</code> with Leading Delimiter Removal</a></li>
+        <li><a href="#solution-6-utilizing-for-json-path-sql-server-2016">Solution 6: Utilizing <code>FOR JSON PATH</code> (SQL Server 2016+)</a></li>
+        <li><a href="#solution-7-creating-a-scalar-user-defined-function-udf">Solution 7: Creating a Scalar User-Defined Function (UDF)</a></li>
+        <li><a href="#solution-8-general-purpose-delimited-string-function">Solution 8: General Purpose Delimited String Function</a></li>
+        <li><a href="#solution-9-using-distinct-with-for-xml-path">Solution 9: Using <code>DISTINCT</code> with <code>FOR XML PATH</code></a></li>
+        <li><a href="#solution-10-custom-clr-aggregate-function">Solution 10: Custom CLR Aggregate Function</a></li>
+        <li><a href="#solution-11-aggregating-metadata-non-data-specific-example">Solution 11: Aggregating Metadata (Non-Data Specific Example)</a></li>
+        <li><a href="#solution-12-complex-replace-manipulation-of-xml-output">Solution 12: Complex <code>REPLACE</code> Manipulation of XML Output</a></li>
+        <li><a href="#solution-13-using-custom-clr-aggregates-reiteration-for-completeness">Solution 13: Using Custom CLR Aggregates (Reiteration for completeness)</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#faqs-on-sql-server-row-concatenation-methods">FAQs on SQL Server Row Concatenation Methods</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="sql-server-techniques-for-concatenating-multiple-rows-into-a-single-string">&ldquo;SQL Server Techniques for Concatenating Multiple Rows into a Single String&rdquo;</h2>
+<p>How can a database professional efficiently aggregate values from multiple related rows into a single delimited string column within a SQL query, avoiding performance pitfalls associated with traditional cursor operations? Several established and modern techniques exist depending on the SQL Server version.</p>
+<h2 id="primary-concatenation-methods-by-sql-server-version">Primary Concatenation Methods by SQL Server Version</h2>
+<p>The approach to string aggregation has evolved significantly across SQL Server releases.</p>
+<h3 id="solution-1-leveraging-for-xml-path-sql-server-2005">Solution 1: Leveraging <code>FOR XML PATH</code> (SQL Server 2005+)</h3>
+<p>For versions preceding SQL Server 2017, the widely accepted non-cursor method involves using <code>FOR XML PATH('')</code> within a subquery, often paired with the <code>STUFF</code> function to remove the initial delimiter.</p>
+<p>Consider relating <code>Vehicle</code> and <code>Location</code> tables where we need a comma-separated list of <code>City</code> values for each <code>VehicleID</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- Aggregation using FOR XML PATH and STUFF to clean the leading separator
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">SELECT</span>
+</span></span><span style="display:flex;"><span>    V.[VehicleID],
+</span></span><span style="display:flex;"><span>    V.[Name],
+</span></span><span style="display:flex;"><span>    (STUFF((<span style="color:#66d9ef">SELECT</span> <span style="color:#66d9ef">CAST</span>(<span style="color:#e6db74">&#39;, &#39;</span> <span style="color:#f92672">+</span> L.[City] <span style="color:#66d9ef">AS</span> VARCHAR(<span style="color:#66d9ef">MAX</span>)) 
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">FROM</span> [<span style="color:#66d9ef">Location</span>] L
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">WHERE</span> (L.VehicleID <span style="color:#f92672">=</span> V.VehicleID) 
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">FOR</span> XML PATH (<span style="color:#e6db74">&#39;&#39;</span>), <span style="color:#66d9ef">TYPE</span>).value(<span style="color:#e6db74">&#39;.&#39;</span>, <span style="color:#e6db74">&#39;NVARCHAR(MAX)&#39;</span>), <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#e6db74">&#39;&#39;</span>)) <span style="color:#66d9ef">AS</span> Locations
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> [Vehicle] V;
+</span></span></code></pre></div><p>If only a leading comma needs removal, an alternative structure avoids the <code>TYPE</code> casting:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- Streamlined FOR XML PATH approach
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">SELECT</span>
+</span></span><span style="display:flex;"><span>    V.[VehicleID],
+</span></span><span style="display:flex;"><span>    V.[Name],
+</span></span><span style="display:flex;"><span>    (STUFF((<span style="color:#66d9ef">SELECT</span> <span style="color:#e6db74">&#39;, &#39;</span> <span style="color:#f92672">+</span> L.[City] 
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">FROM</span> [<span style="color:#66d9ef">Location</span>] L
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">WHERE</span> (L.VehicleID <span style="color:#f92672">=</span> V.VehicleID) 
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">FOR</span> XML PATH (<span style="color:#e6db74">&#39;&#39;</span>)), <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#e6db74">&#39;&#39;</span>)) <span style="color:#66d9ef">AS</span> Locations
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> [Vehicle] V;
+</span></span></code></pre></div><p><em>Self-correction note:</em> Some implementations of this method can result in an extra trailing comma if not carefully managed, often requiring the external use of <code>COALESCE</code> logic (as detailed in Solution 2) or adjusting how <code>STUFF</code> is applied (as shown in Solution 5).</p>
+<h3 id="solution-2-the-modern-string_agg-function-sql-server-2017">Solution 2: The Modern <code>STRING_AGG</code> Function (SQL Server 2017+)</h3>
+<p>For SQL Server 2017 and later, or Azure SQL Database, <code>STRING_AGG</code> offers a simpler, more performant, and direct way to achieve the same result. It inherently handles the separator without needing <code>STUFF</code> or complex XML manipulation.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- Preferred method for modern SQL Server versions
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">SELECT</span>
+</span></span><span style="display:flex;"><span>    V.[VehicleID],
+</span></span><span style="display:flex;"><span>    V.[Name],
+</span></span><span style="display:flex;"><span>    (<span style="color:#66d9ef">SELECT</span> STRING_AGG(L.[City], <span style="color:#e6db74">&#39;, &#39;</span>) <span style="color:#75715e">-- Second parameter defines the separator
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>     <span style="color:#66d9ef">FROM</span> [<span style="color:#66d9ef">Location</span>] L
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">WHERE</span> VehicleID <span style="color:#f92672">=</span> V.VehicleID) <span style="color:#66d9ef">AS</span> Locations
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span>   [Vehicle] V;
+</span></span></code></pre></div><p>The flexibility here is that the separator (e.g., <code>', '</code> or <code>' | '</code>) is explicitly defined as the second argument.</p>
+<h3 id="solution-3-handling-list-aggregation-without-for-xml-pre-2017-alternative">Solution 3: Handling List Aggregation without <code>FOR XML</code> (Pre-2017 Alternative)</h3>
+<p>Before <code>STRING_AGG</code>, one could aggregate strings using a variable within a procedural block, though this is typically limited to a single aggregation result or requires complex session state management if used in a multi-row result set scenario.</p>
+<p>A simple example demonstrating variable accumulation (useful for a single group or script execution):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">DECLARE</span> <span style="color:#f92672">@</span>AllCities VARCHAR(<span style="color:#66d9ef">MAX</span>) <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">@</span>AllCities <span style="color:#f92672">=</span> COALESCE(<span style="color:#f92672">@</span>AllCities <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;, &#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>) <span style="color:#f92672">+</span> City
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> Locations; <span style="color:#75715e">-- Aggregates all cities globally
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">@</span>AllCities <span style="color:#66d9ef">AS</span> GlobalCityList;
+</span></span></code></pre></div><p><em>Caution:</em> This script accumulates all cities across all records, not grouping them per <code>VehicleID</code> like the correlated subqueries above.</p>
+<h3 id="solution-4-recursive-common-table-expression-cte">Solution 4: Recursive Common Table Expression (CTE)</h3>
+<p>A technically intricate way to perform row concatenation without relying on XML functionality involves using recursive CTEs. This method explicitly manages the ordering and incremental joining of strings:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- Setup for recursive CTE (requires ranking of locations per vehicle)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">WITH</span> RankedLocations <span style="color:#66d9ef">AS</span> (
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">SELECT</span>
+</span></span><span style="display:flex;"><span>    VehicleID,
+</span></span><span style="display:flex;"><span>    City,
+</span></span><span style="display:flex;"><span>    ROW_NUMBER() OVER (
+</span></span><span style="display:flex;"><span>        PARTITION <span style="color:#66d9ef">BY</span> VehicleID 
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> City
+</span></span><span style="display:flex;"><span>    ) <span style="color:#66d9ef">AS</span> [Rank]
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">FROM</span>
+</span></span><span style="display:flex;"><span>    Locations
+</span></span><span style="display:flex;"><span>),
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Recursive part to build the strings incrementally
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>Concatenations <span style="color:#66d9ef">AS</span> (
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">-- Anchor member: Select the first ranked location
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">SELECT</span>
+</span></span><span style="display:flex;"><span>    VehicleID,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">CONVERT</span>(nvarchar(<span style="color:#66d9ef">MAX</span>), City) <span style="color:#66d9ef">AS</span> Cities,
+</span></span><span style="display:flex;"><span>    [Rank]
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">FROM</span>
+</span></span><span style="display:flex;"><span>    RankedLocations
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">WHERE</span>
+</span></span><span style="display:flex;"><span>    [Rank] <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">UNION</span> <span style="color:#66d9ef">ALL</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">-- Recursive member: Join to the next ranked item
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">SELECT</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">c</span>.VehicleID,
+</span></span><span style="display:flex;"><span>    (<span style="color:#66d9ef">c</span>.Cities <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;, &#39;</span> <span style="color:#f92672">+</span> l.City) <span style="color:#66d9ef">AS</span> Cities,
+</span></span><span style="display:flex;"><span>    l.[Rank]
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">FROM</span>
+</span></span><span style="display:flex;"><span>    Concatenations <span style="color:#66d9ef">c</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">INNER</span> <span style="color:#66d9ef">JOIN</span> RankedLocations l <span style="color:#66d9ef">ON</span>
+</span></span><span style="display:flex;"><span>        l.VehicleID <span style="color:#f92672">=</span> <span style="color:#66d9ef">c</span>.VehicleID 
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">AND</span> l.[Rank] <span style="color:#f92672">=</span> <span style="color:#66d9ef">c</span>.[Rank] <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>),
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Final ranking to select only the longest (fully concatenated) string
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>RankedConcatenations <span style="color:#66d9ef">AS</span> (
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">SELECT</span>
+</span></span><span style="display:flex;"><span>    VehicleID,
+</span></span><span style="display:flex;"><span>    Cities,
+</span></span><span style="display:flex;"><span>    ROW_NUMBER() OVER (
+</span></span><span style="display:flex;"><span>        PARTITION <span style="color:#66d9ef">BY</span> VehicleID 
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> [Rank] <span style="color:#66d9ef">DESC</span> <span style="color:#75715e">-- Descending rank ensures the longest string (final result) is Rank 1
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    ) <span style="color:#66d9ef">AS</span> [FinalRank]
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">FROM</span> 
+</span></span><span style="display:flex;"><span>    Concatenations
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Final selection joining back to the Vehicle table
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">SELECT</span>
+</span></span><span style="display:flex;"><span>  v.VehicleID,
+</span></span><span style="display:flex;"><span>  v.Name,
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">c</span>.Cities
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span>
+</span></span><span style="display:flex;"><span>  Vehicles v
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">INNER</span> <span style="color:#66d9ef">JOIN</span> RankedConcatenations <span style="color:#66d9ef">c</span> <span style="color:#66d9ef">ON</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">c</span>.VehicleID <span style="color:#f92672">=</span> v.VehicleID 
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">AND</span> <span style="color:#66d9ef">c</span>.[FinalRank] <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span></code></pre></div><h3 id="solution-5-refining-for-xml-path-with-leading-delimiter-removal">Solution 5: Refining <code>FOR XML PATH</code> with Leading Delimiter Removal</h3>
+<p>If the goal is specifically to concatenate values but ensure <em>no</em> leading delimiter exists (addressing the issue where <code>STUFF</code> might miss the first character if the subquery returns an empty set, or simply cleaning up a leading separator), prepending the separator and then removing the first instance works well:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- Example using a leading comma &#39;,&#39; and then stripping the first character
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>stuff(
+</span></span><span style="display:flex;"><span>    (<span style="color:#66d9ef">select</span> <span style="color:#e6db74">&#39;,&#39;</span> <span style="color:#f92672">+</span> <span style="color:#66d9ef">Column</span> <span style="color:#75715e">-- Always prepends a comma before the actual value
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>     <span style="color:#66d9ef">from</span> RelatedTable
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">where</span> RelatedTable.Id <span style="color:#f92672">=</span> OuterTable.Id 
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">for</span> xml path(<span style="color:#e6db74">&#39;&#39;</span>)), 
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#39;&#39;</span> <span style="color:#75715e">-- Start at position 1, remove 1 character, replace with empty string
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>) <span style="color:#66d9ef">AS</span> <span style="color:#66d9ef">Values</span>
+</span></span></code></pre></div><h3 id="solution-6-utilizing-for-json-path-sql-server-2016">Solution 6: Utilizing <code>FOR JSON PATH</code> (SQL Server 2016+)</h3>
+<p>SQL Server 2016 introduced <code>FOR JSON PATH</code>, which offers an XML-free way to serialize related data. While its primary use is JSON output, it can be manipulated back into a string.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- Example for SQL Server 2016 using JSON serialization tricks
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">SELECT</span> per.ID,
+</span></span><span style="display:flex;"><span>       Emails <span style="color:#f92672">=</span> JSON_VALUE(
+</span></span><span style="display:flex;"><span>           <span style="color:#66d9ef">REPLACE</span>(
+</span></span><span style="display:flex;"><span>               (<span style="color:#66d9ef">SELECT</span> _ <span style="color:#f92672">=</span> em.Email <span style="color:#66d9ef">FROM</span> Email em <span style="color:#66d9ef">WHERE</span> em.Person <span style="color:#f92672">=</span> per.ID <span style="color:#66d9ef">FOR</span> JSON PATH),
+</span></span><span style="display:flex;"><span>               <span style="color:#e6db74">&#39;}, {&#34;_&#34;:&#34;&#39;</span>, <span style="color:#e6db74">&#39;, &#39;</span>), <span style="color:#75715e">-- Replace JSON structure break with separator
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>               <span style="color:#e6db74">&#39;$[0]._&#39;</span> <span style="color:#75715e">-- Extract the root element of the resulting array string
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>           )
+</span></span><span style="display:flex;"><span>       )
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> Person per;
+</span></span></code></pre></div><p>This method is robust against invalid XML characters that might trip up the <code>FOR XML</code> approach.</p>
+<h3 id="solution-7-creating-a-scalar-user-defined-function-udf">Solution 7: Creating a Scalar User-Defined Function (UDF)</h3>
+<p>For repeated use across queries, encapsulating the logic inside a scalar UDF is practical, especially in older SQL Server versions (2000/2005/2008) where built-in functions like <code>STRING_AGG</code> are absent. This UDF typically uses the <code>COALESCE</code> technique internally for concatenation per ID.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">FUNCTION</span> dbo.fnConcatCitiesByVehicle(<span style="color:#f92672">@</span>VehicleId SMALLINT)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">RETURNS</span> VARCHAR(<span style="color:#ae81ff">1000</span>) <span style="color:#66d9ef">AS</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">BEGIN</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">DECLARE</span> <span style="color:#f92672">@</span>csvCities VARCHAR(<span style="color:#ae81ff">1000</span>);
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">@</span>csvCities <span style="color:#f92672">=</span> COALESCE(<span style="color:#f92672">@</span>csvCities <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;, &#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>) <span style="color:#f92672">+</span> COALESCE(City, <span style="color:#e6db74">&#39;&#39;</span>)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">FROM</span> Locations 
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">WHERE</span> VehicleId <span style="color:#f92672">=</span> <span style="color:#f92672">@</span>VehicleId; 
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">RETURN</span> <span style="color:#f92672">@</span>csvCities;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">END</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Usage:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">SELECT</span> 
+</span></span><span style="display:flex;"><span>    VehicleID,
+</span></span><span style="display:flex;"><span>    dbo.fnConcatCitiesByVehicle(VehicleId) <span style="color:#66d9ef">AS</span> Locations
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> Vehicles;
+</span></span></code></pre></div><p><em>Note on UDFs:</em> While clean, scalar UDFs can sometimes negatively impact performance due to execution plan compilation overhead if used heavily in large queries. See performance discussions around SQL Server scalar functions.</p>
+<h3 id="solution-8-general-purpose-delimited-string-function">Solution 8: General Purpose Delimited String Function</h3>
+<p>A generalized function accepting the delimiter and a filtering condition allows for reuse across different tables, though it requires careful SQL injection management if the <code>@whereClause</code> is user-provided (here it is simplified).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">FUNCTION</span> [dbo].[JoinTexts]
+</span></span><span style="display:flex;"><span>(
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">@</span><span style="color:#66d9ef">delimiter</span> VARCHAR(<span style="color:#ae81ff">20</span>) ,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">@</span>filterValue VARCHAR(<span style="color:#ae81ff">50</span>) <span style="color:#75715e">-- Simplified filter column value
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">RETURNS</span> VARCHAR(<span style="color:#66d9ef">MAX</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">AS</span> 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">BEGIN</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">DECLARE</span> <span style="color:#f92672">@</span>Texts VARCHAR(<span style="color:#66d9ef">MAX</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">-- Concatenation logic inside the function
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">SELECT</span>  <span style="color:#f92672">@</span>Texts <span style="color:#f92672">=</span> COALESCE(<span style="color:#f92672">@</span>Texts <span style="color:#f92672">+</span> <span style="color:#f92672">@</span><span style="color:#66d9ef">delimiter</span>, <span style="color:#e6db74">&#39;&#39;</span>) <span style="color:#f92672">+</span> T.Texto
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">FROM</span>    SomeTable <span style="color:#66d9ef">AS</span> T
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">WHERE</span>   T.FilterColumn <span style="color:#f92672">=</span> <span style="color:#f92672">@</span>filterValue; <span style="color:#75715e">-- Assumes &#39;FilterColumn&#39; exists and matches @filterValue scope
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">RETURN</span> <span style="color:#f92672">@</span>Texts;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">END</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">GO</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Example Call:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">SELECT</span> dbo.JoinTexts(<span style="color:#e6db74">&#39; | &#39;</span>, <span style="color:#e6db74">&#39;SpecificCategory&#39;</span>) <span style="color:#66d9ef">AS</span> ResultingString;
+</span></span></code></pre></div><h3 id="solution-9-using-distinct-with-for-xml-path">Solution 9: Using <code>DISTINCT</code> with <code>FOR XML PATH</code></h3>
+<p>If duplicate city entries within the <code>Location</code> table for the same vehicle should be ignored, applying <code>DISTINCT</code> inside the correlated subquery using <code>FOR XML PATH</code> is necessary:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> [VehicleID],
+</span></span><span style="display:flex;"><span>       [Name],
+</span></span><span style="display:flex;"><span>       STUFF((<span style="color:#66d9ef">SELECT</span> <span style="color:#66d9ef">DISTINCT</span> <span style="color:#e6db74">&#39;,&#39;</span> <span style="color:#f92672">+</span> <span style="color:#66d9ef">CONVERT</span>(VARCHAR,City) 
+</span></span><span style="display:flex;"><span>         <span style="color:#66d9ef">FROM</span> [<span style="color:#66d9ef">Location</span>] 
+</span></span><span style="display:flex;"><span>         <span style="color:#66d9ef">WHERE</span> (VehicleID <span style="color:#f92672">=</span> Vehicle.VehicleID) 
+</span></span><span style="display:flex;"><span>         <span style="color:#66d9ef">FOR</span> XML PATH (<span style="color:#e6db74">&#39;&#39;</span>)), <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#39;&#39;</span>) <span style="color:#66d9ef">AS</span> Locations <span style="color:#75715e">-- Note: using 1,1 to remove just the leading comma
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">FROM</span> [Vehicle];
+</span></span></code></pre></div><h3 id="solution-10-custom-clr-aggregate-function">Solution 10: Custom CLR Aggregate Function</h3>
+<p>For highly complex aggregation logic, or when targeting SQL Server 2005 compatibility where other methods fail, a .NET Common Language Runtime (CLR) User-Defined Aggregate function can be implemented in C#. This requires enabling CLR integration on the SQL Server instance.</p>
+<p>The key adjustments focus on ensuring the delimiter is <em>not</em> appended automatically in the <code>Accumulate</code> step, allowing custom control (e.g., appending <code>|</code> via <code>dbo.CONCATENATE(column1 + '|')</code>).</p>
+<p><strong>C# Snippet Logic Modification:</strong></p>
+<p>Instead of: <code>this.intermediateResult.Append(value.Value).Append(',');</code>
+Use: <code>this.intermediateResult.Append(value.Value);</code></p>
+<p>And instead of removing the trailing character in <code>Terminate()</code>:
+Use: <code>output = this.intermediateResult.ToString();</code></p>
+<p>This delegates delimiter control to the SQL call site:
+<code>SELECT dbo.CONCATENATE(column1 + '|') from table1</code></p>
+<h3 id="solution-11-aggregating-metadata-non-data-specific-example">Solution 11: Aggregating Metadata (Non-Data Specific Example)</h3>
+<p>This technique demonstrates the power of <code>FOR XML PATH</code> by applying it to system tables (like <code>INFORMATION_SCHEMA.COLUMNS</code>) to produce a comma-separated list of column names per table, proving the method&rsquo;s generality:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span>
+</span></span><span style="display:flex;"><span>    Tables.<span style="color:#66d9ef">Table_Name</span>,
+</span></span><span style="display:flex;"><span>    STUFF((
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">SELECT</span> <span style="color:#e6db74">&#39;,&#39;</span> <span style="color:#f92672">+</span> Columns.<span style="color:#66d9ef">Column_Name</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">FROM</span> INFORMATION_SCHEMA.Columns <span style="color:#66d9ef">AS</span> Columns
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">WHERE</span> Tables.<span style="color:#66d9ef">Table_Name</span> <span style="color:#f92672">=</span> Columns.<span style="color:#66d9ef">Table_Name</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> <span style="color:#66d9ef">Column_Name</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">FOR</span> XML PATH (<span style="color:#e6db74">&#39;&#39;</span>), <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#39;&#39;</span> <span style="color:#75715e">-- Strips leading comma
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    ) <span style="color:#66d9ef">AS</span> ColumnsList
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> INFORMATION_SCHEMA.Columns <span style="color:#66d9ef">AS</span> Tables
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> <span style="color:#66d9ef">TABLE_NAME</span>;
+</span></span></code></pre></div><h3 id="solution-12-complex-replace-manipulation-of-xml-output">Solution 12: Complex <code>REPLACE</code> Manipulation of XML Output</h3>
+<p>This less conventional approach manually cleans the XML tags generated by <code>FOR XML PATH('')</code> using nested <code>REPLACE</code> functions to substitute tag boundaries with the desired separator.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> v.VehicleId, v.Name, ll.LocationList
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> Vehicles v 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">LEFT</span> <span style="color:#66d9ef">JOIN</span> 
+</span></span><span style="display:flex;"><span>    (<span style="color:#66d9ef">SELECT</span> 
+</span></span><span style="display:flex;"><span>        VehicleId,
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">REPLACE</span>(
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">REPLACE</span>(
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">REPLACE</span>(
+</span></span><span style="display:flex;"><span>                    (<span style="color:#66d9ef">SELECT</span> City <span style="color:#66d9ef">AS</span> <span style="color:#66d9ef">c</span> 
+</span></span><span style="display:flex;"><span>                     <span style="color:#66d9ef">FROM</span> Locations x 
+</span></span><span style="display:flex;"><span>                     <span style="color:#66d9ef">WHERE</span> x.VehicleID <span style="color:#f92672">=</span> l.VehicleID <span style="color:#66d9ef">FOR</span> XML PATH(<span style="color:#e6db74">&#39;&#39;</span>)),    
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">&#39;&amp;lt;/c&amp;gt;&amp;lt;c&amp;gt;&#39;</span>,<span style="color:#e6db74">&#39;, &#39;</span> <span style="color:#75715e">-- Replaces closing/opening tag pair
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                 ),
+</span></span><span style="display:flex;"><span>             <span style="color:#e6db74">&#39;&amp;lt;c&amp;gt;&#39;</span>,<span style="color:#e6db74">&#39;&#39;</span> <span style="color:#75715e">-- Removes opening tag artifact
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            ),
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;&amp;lt;/c&amp;gt;&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span> <span style="color:#75715e">-- Removes closing tag artifact
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        ) <span style="color:#66d9ef">AS</span> LocationList
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">FROM</span> Locations l
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> VehicleId <span style="color:#75715e">-- Important for the outer JOIN context
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    ) ll <span style="color:#66d9ef">ON</span> ll.VehicleId <span style="color:#f92672">=</span> v.VehicleId;
+</span></span></code></pre></div><h3 id="solution-13-using-custom-clr-aggregates-reiteration-for-completeness">Solution 13: Using Custom CLR Aggregates (Reiteration for completeness)</h3>
+<p>This confirms the C# CLR route for SQL Server 2005+ environments where granular control over the aggregation buffer is needed.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">// C# Class Structure for SQL Server CLR Aggregate (CSV)</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">[Serializable]</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">[Microsoft.SqlServer.Server.SqlUserDefinedAggregate(Format.UserDefined, MaxByteSize=8000)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CSV</span>: IBinarySerialize
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> StringBuilder Result;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ... Init, Accumulate, Merge, Terminate, Read, Write methods as defined previously ...</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="solutions">Solutions</h2>
+<h3 id="faqs-on-sql-server-row-concatenation-methods">FAQs on SQL Server Row Concatenation Methods</h3>
+<p><div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Which method is best for string aggregation in SQL Server 2019</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The <code>STRING_AGG</code> function (Solution 2) is the most modern, readable, and typically the highest-performing option available in SQL Server 2017 and newer.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How to remove the trailing comma from FOR XML PATH output</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Use the <code>STUFF</code> function to remove characters from the beginning (Solution 1, 5, 9, 11) or ensure the internal logic in a UDF (Solution 7) handles separation using <code>COALESCE</code> correctly.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I use COALESCE logic to join strings across multiple rows in a single query</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, you can use the <code>COALESCE(@variable + @delimiter, '') + value</code> pattern, but this usually requires procedural logic or a variable assignment, making it difficult to correlate results back to other columns in the main query row scope unless encapsulated in a scalar UDF (Solution 7).</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Are there performance differences between STRING_AGG and FOR XML PATH</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Generally, <code>STRING_AGG</code> is designed specifically for string concatenation and often outperforms the XML-based method (<code>FOR XML PATH</code>) due to lower overhead.</div>
+    </div>
+</div></p>
+<p>We welcome your thoughts on which technique you prefer or any scenarios where you encountered issues with these methods. Share your experiences below!</p>
+<p>For more deep dives into complex SQL scenarios, you might examine:</p>
+<ol>
+<li><a href="https://sqlpey.com/question/querying-clob-columns-in-oracle-a-guide/" target="_blank" rel="noopener">Querying CLOB columns in Oracle</a>
+</li>
+<li><a href="https://sqlpey.com/question/selecting-top-100-rows-in-oracle-a-quick-guide/" target="_blank" rel="noopener">Selecting Top 100 Rows in Oracle</a>
+</li>
+<li><a href="https://sqlpey.com/dotnet/resolve-blazor-server-timeout-issues/" target="_blank" rel="noopener">Resolving Blazor Server Timeout Issues</a>
+</li>
+</ol>
+<pre tabindex="0"><code>SELECT [VehicleID]
+     , [Name]
+     , (STUFF((SELECT CAST(&#39;, &#39; + [City] AS VARCHAR(MAX)) 
+         FROM [Location] 
+         WHERE (VehicleID = Vehicle.VehicleID) 
+         FOR XML PATH (&#39;&#39;)), 1, 2, &#39;&#39;)) AS Locations
+FROM [Vehicle]
+SELECT  [VehicleID]
+       ,[Name]
+       ,(SELECT STRING_AGG([City], &#39;, &#39;)
+         FROM [Location]
+         WHERE VehicleID = V.VehicleID) AS Locations
+FROM   [Vehicle] V
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

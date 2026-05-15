@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Rust Iterators: Differentiating iter, iter_mut, and into_iter Behavior - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore the critical distinctions between Rust&#39;s iter(), iter_mut(), and into_iter() methods, focusing on what type of item they yield and when to employ each.">
+
+
+
+<meta name="keywords" content="Rust iter, Rust into_iter, Rust iter_mut, Iterator Trait Rust">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Rust Iterators: Differentiating iter, iter_mut, and into_iter Behavior - sqlpey">
+<meta name="DC.description" content="Explore the critical distinctions between Rust&#39;s iter(), iter_mut(), and into_iter() methods, focusing on what type of item they yield and when to employ each.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Rust Iterators: Differentiating iter, iter_mut, and into_iter Behavior - sqlpey">
+<meta property="og:description" content="Explore the critical distinctions between Rust&#39;s iter(), iter_mut(), and into_iter() methods, focusing on what type of item they yield and when to employ each.">
+<meta property="og:url" content="https://sqlpey.com/rust/rust-iterator-differentiation-guide/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Rust">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Rust Iterators: Differentiating iter, iter_mut, and into_iter Behavior">
+<meta name="twitter:description" content="Explore the critical distinctions between Rust&#39;s iter(), iter_mut(), and into_iter() methods, focusing on what type of item they yield and when to employ each.">
+
+
+<link rel="canonical" href="https://sqlpey.com/rust/rust-iterator-differentiation-guide/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Rust Iterators: Differentiating iter, iter_mut, and into_iter Behavior\"",
+  "description": "\"Explore the critical distinctions between Rust's iter(), iter_mut(), and into_iter() methods, focusing on what type of item they yield and when to employ each.\"",
+  "url": "\"https://sqlpey.com/rust/rust-iterator-differentiation-guide/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/rust/rust-iterator-differentiation-guide/\""
+  },
+  "articleSection": "\"Rust\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Rust Iterators: Differentiating iter, iter_mut, and into_iter Behavior</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Rust</span>
+              
+              <span class="tag">Programming</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              8 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#rust-iterators-differentiating-iter-iter_mut-and-into_iter-behavior">&ldquo;Rust Iterators: Differentiating iter, iter_mut, and into_iter Behavior&rdquo;</a>
+      <ul>
+        <li><a href="#diving-deep-into-intoiterator">Diving Deep into <code>IntoIterator</code></a></li>
+        <li><a href="#iter-vs-into_iter-context-dependency-vs-inherent-methods"><code>iter()</code> vs. <code>into_iter()</code>: Context Dependency vs. Inherent Methods</a></li>
+        <li><a href="#ergonomics-when-to-use-collection-vs-collectioniter">Ergonomics: When to Use <code>&amp;collection</code> vs. <code>collection.iter()</code></a></li>
+        <li><a href="#implementing-iterators-conventions-for-custom-types">Implementing Iterators: Conventions for Custom Types</a></li>
+        <li><a href="#practical-demonstrations-of-yielded-types">Practical Demonstrations of Yielded Types</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#faqs-on-rust-iterators-differentiation">FAQs on Rust Iterators Differentiation</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="rust-iterators-differentiating-iter-iter_mut-and-into_iter-behavior">&ldquo;Rust Iterators: Differentiating iter, iter_mut, and into_iter Behavior&rdquo;</h2>
+<p>In Rust development, particularly when dealing with collections like <code>Vec&lt;T&gt;</code>, correctly choosing how to iterate is paramount for managing ownership and mutation. The methods <code>iter()</code>, <code>iter_mut()</code>, and <code>into_iter()</code> offer distinct ways to traverse data, each impacting the ownership of the elements yielded.</p>
+<p>What is the fundamental difference in the items yielded by the iterators returned by <code>iter()</code>, <code>iter_mut()</code>, and <code>into_iter()</code>?</p>
+<p>The item type yielded depends heavily on the context and the specific implementation of the <code>IntoIterator</code> trait for the object you are calling the method on:</p>
+<ul>
+<li><strong><code>iter()</code></strong>: By convention, this method yields <strong>immutable references</strong> (<code>&amp;T</code>) to the elements. It borrows the collection immutably.</li>
+<li><strong><code>iter_mut()</code></strong>: By convention, this method yields <strong>mutable references</strong> (<code>&amp;mut T</code>) to the elements, allowing in-place modification. It borrows the collection mutably.</li>
+<li><strong><code>into_iter()</code></strong>: This method, derived from the <code>IntoIterator</code> trait, can yield <strong>owned values</strong> (<code>T</code>), immutable references (<code>&amp;T</code>), or mutable references (<code>&amp;mut T</code>), depending on <em>how</em> the collection is passed to it.</li>
+</ul>
+<h3 id="diving-deep-into-intoiterator">Diving Deep into <code>IntoIterator</code></h3>
+<p>The behavior of <code>into_iter()</code> is determined by the <code>IntoIterator</code> trait definition:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">pub</span> <span style="color:#66d9ef">trait</span> IntoIterator 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">where</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span>Self::IntoIter <span style="color:#66d9ef">as</span> Iterator<span style="color:#f92672">&gt;</span>::Item <span style="color:#f92672">==</span> Self::Item, 
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Item</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">type</span> <span style="color:#a6e22e">IntoIter</span>: Iterator;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">into_iter</span>(self) -&gt; <span style="color:#a6e22e">Self</span>::IntoIter;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>If a type implements this trait, it defines how it is converted into an iterator. For a <code>Vec&lt;T&gt;</code>, the <code>Vec</code> type implements <code>IntoIterator</code> three times, corresponding to different ways it can be consumed or borrowed:</p>
+<ol>
+<li>
+<p><strong>Consuming the <code>Vec&lt;T&gt;</code> (by value):</strong>
+When called on <code>Vec&lt;T&gt;</code> directly (taking <code>self</code>), it consumes the vector, and the resulting iterator yields owned items (<code>T</code>).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#75715e">// Example of consuming Vec&lt;T&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">impl</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> IntoIterator <span style="color:#66d9ef">for</span> Vec<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Item</span> <span style="color:#f92672">=</span> T; <span style="color:#75715e">// Yields owned values
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">type</span> <span style="color:#a6e22e">IntoIter</span> <span style="color:#f92672">=</span> IntoIter<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">into_iter</span>(<span style="color:#66d9ef">mut</span> self) -&gt; <span style="color:#a6e22e">IntoIter</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> { <span style="color:#75715e">/* ... */</span> }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div></li>
+<li>
+<p><strong>Borrowing <code>Vec&lt;T&gt;</code> immutably:</strong>
+When called on an immutable reference <code>&amp;'a Vec&lt;T&gt;</code>, the iterator yields immutable references (<code>&amp;'a T</code>).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#75715e">// Example of immutable borrow
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">impl</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span>, T<span style="color:#f92672">&gt;</span> IntoIterator <span style="color:#66d9ef">for</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">&#39;a</span> Vec<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Item</span> <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">&#39;a</span> T; <span style="color:#75715e">// Yields immutable references
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">type</span> <span style="color:#a6e22e">IntoIter</span> <span style="color:#f92672">=</span> slice::Iter<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span>, T<span style="color:#f92672">&gt;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">into_iter</span>(self) -&gt; <span style="color:#a6e22e">slice</span>::Iter<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span>, T<span style="color:#f92672">&gt;</span> { <span style="color:#75715e">/* ... */</span> }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div></li>
+<li>
+<p><strong>Borrowing <code>Vec&lt;T&gt;</code> mutably:</strong>
+When called on a mutable reference <code>&amp;'a mut Vec&lt;T&gt;</code>, the iterator yields mutable references (<code>&amp;'a mut T</code>).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#75715e">// Example of mutable borrow
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">impl</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span>, T<span style="color:#f92672">&gt;</span> IntoIterator <span style="color:#66d9ef">for</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#66d9ef">mut</span> Vec<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Item</span> <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#66d9ef">mut</span> T; <span style="color:#75715e">// Yields mutable references
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">type</span> <span style="color:#a6e22e">IntoIter</span> <span style="color:#f92672">=</span> slice::IterMut<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span>, T<span style="color:#f92672">&gt;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">into_iter</span>(self) -&gt; <span style="color:#a6e22e">slice</span>::IterMut<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span>, T<span style="color:#f92672">&gt;</span> { <span style="color:#75715e">/* ... */</span> }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div></li>
+</ol>
+<h3 id="iter-vs-into_iter-context-dependency-vs-inherent-methods"><code>iter()</code> vs. <code>into_iter()</code>: Context Dependency vs. Inherent Methods</h3>
+<p>What makes <code>into_iter()</code> potentially surprising compared to <code>iter()</code> and <code>iter_mut()</code>?</p>
+<p>The key differentiator lies in convention versus contract:</p>
+<ul>
+<li><strong><code>iter()</code> and <code>iter_mut()</code></strong> are inherent methods on the collection type. Their return type is fixed by definition: <code>iter()</code> always returns something yielding <code>&amp;T</code>, and <code>iter_mut()</code> always returns something yielding <code>&amp;mut T</code>.</li>
+<li><strong><code>into_iter()</code></strong> is defined via the <code>IntoIterator</code> trait, whose <code>Item</code> type is chosen by the implementer. This leads to context dependency. If you use a raw <code>for</code> loop construct (<code>for item in collection { ... }</code>), Rust implicitly calls <code>collection.into_iter()</code>.</li>
+</ul>
+<p>Prior to Rust version 1.53.0, arrays (<code>[T; N]</code>) behaved surprisingly, only implementing <code>IntoIterator</code> for references (<code>&amp;[T; N]</code> and <code>&amp;mut [T; N]</code>), forcing implicit borrowing. Modern Rust handles arrays more consistently, but the core concept remains: <code>into_iter()</code> adapts based on the reference status of <code>self</code>.</p>
+<h3 id="ergonomics-when-to-use-collection-vs-collectioniter">Ergonomics: When to Use <code>&amp;collection</code> vs. <code>collection.iter()</code></h3>
+<p>If <code>&amp;v</code> (which calls <code>v.as_ref().into_iter()</code>) is equivalent to <code>v.iter()</code>, why keep both methods?</p>
+<p>This exists for <strong>ergonomics and clarity</strong>:</p>
+<ol>
+<li>
+<p><strong>For loops:</strong> Using <code>for item in &amp;v</code> is syntactically cleaner than <code>for item in v.iter()</code>. Similarly, <code>for item in &amp;mut v</code> is concise for mutable iteration.</p>
+</li>
+<li>
+<p><strong>Method Chaining:</strong> When chaining iterator adaptors like <code>map</code> or <code>filter</code>, <code>v.iter()</code> is generally clearer than <code>(&amp;v).into_iter()</code>.</p>
+</li>
+</ol>
+<p>Consider this clarity comparison:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> v <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">20</span>, <span style="color:#ae81ff">30</span>];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Clearer use of iter() for chaining
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">let</span> squared_immutable: Vec<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">i32</span><span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> v.iter()
+</span></span><span style="display:flex;"><span>    .map(<span style="color:#f92672">|</span>x<span style="color:#f92672">|</span> x <span style="color:#f92672">*</span> x)
+</span></span><span style="display:flex;"><span>    .collect();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Less idiomatic, though functionally equivalent due to IntoIterator implementation on &amp;Vec&lt;T&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">let</span> squared_alternative: Vec<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">i32</span><span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> (<span style="color:#f92672">&amp;</span>v).into_iter()
+</span></span><span style="display:flex;"><span>    .map(<span style="color:#f92672">|</span>x<span style="color:#f92672">|</span> x <span style="color:#f92672">*</span> x)
+</span></span><span style="display:flex;"><span>    .collect();
+</span></span></code></pre></div><h3 id="implementing-iterators-conventions-for-custom-types">Implementing Iterators: Conventions for Custom Types</h3>
+<p>When creating a custom collection type, how should one decide whether to implement <code>Iterator</code> directly or use the <code>IntoIterator</code> pattern?</p>
+<p>If your type has only a single, obvious way to iterate, implement both the <code>Iterator</code> trait directly on the type and the <code>IntoIterator</code> trait to produce the associated iterator structure.</p>
+<p>However, if multiple distinct iteration patterns exist (e.g., iterating by bytes vs. iterating by characters), it is better practice to provide specific methods for each pattern (like <code>String::bytes()</code> or <code>String::chars()</code>) rather than relying solely on <code>into_iter()</code> or <code>iter()</code>.</p>
+<p>For scenarios where an iteration requires an intermediate structure (like traversing a linked list), you define a separate iterator struct (e.g., <code>ListIter&lt;T&gt;</code>) that implements <code>Iterator</code>, and then implement <code>IntoIterator</code> for your main collection (<code>List&lt;T&gt;</code>) to return an instance of that iterator struct.</p>
+<h4 id="custom-iterator-structure-example">Custom Iterator Structure Example</h4>
+<p>If we define a custom <code>Structure&lt;T&gt;</code> that we want to iterate over immutably:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">CustomList</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> { <span style="color:#75715e">/* ... internal structure ... */</span> }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 1. Define the specific iterator structure
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">CustomListIterator</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span>, T<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Holds a reference to track position
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    cursor: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#a6e22e">CustomList</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span>, 
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">impl</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span>, T<span style="color:#f92672">&gt;</span> Iterator <span style="color:#66d9ef">for</span> CustomListIterator<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span>, T<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Item</span> <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">&#39;a</span> T;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">next</span>(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> self) -&gt; Option<span style="color:#f92672">&lt;</span>Self::Item<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Logic to advance cursor and yield next element reference
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    None <span style="color:#75715e">// Placeholder
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 2. Implement IntoIterator for the container to produce the iterator
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">impl</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span>, T<span style="color:#f92672">&gt;</span> IntoIterator <span style="color:#66d9ef">for</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">&#39;a</span> CustomList<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Item</span> <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">&#39;a</span> T;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">type</span> <span style="color:#a6e22e">IntoIter</span> <span style="color:#f92672">=</span> CustomListIterator<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span>, T<span style="color:#f92672">&gt;</span>;
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">into_iter</span>(self) -&gt; <span style="color:#a6e22e">Self</span>::IntoIter { 
+</span></span><span style="display:flex;"><span>        CustomListIterator { cursor: <span style="color:#a6e22e">self</span> } 
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This pattern allows generic functions to consume any structure implementing <code>IntoIterator</code> via a <code>for</code> loop:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">consume_iterable</span><span style="color:#f92672">&lt;</span>I<span style="color:#f92672">&gt;</span>(container: <span style="color:#a6e22e">I</span>) 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">where</span> 
+</span></span><span style="display:flex;"><span>    I: IntoIterator <span style="color:#75715e">// This trait bound accepts anything usable in a &#39;for&#39; loop
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> element <span style="color:#66d9ef">in</span> container {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;Processing element: </span><span style="color:#e6db74">{:?}</span><span style="color:#e6db74">&#34;</span>, element);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="practical-demonstrations-of-yielded-types">Practical Demonstrations of Yielded Types</h3>
+<p>How do <code>iter()</code>, <code>iter_mut()</code>, and <code>into_iter()</code> behave with concrete values like <code>Vec&lt;i32&gt;</code>?</p>
+<p>| Method | Context (Self Type) | Yields Item Type | Ownership Implication |
+| :</p>
+<h2 id="solutions">Solutions</h2>
+<p>| :</p>
+<pre tabindex="0"><code>pub trait IntoIterator 
+where
+    &amp;lt;Self::IntoIter as Iterator&amp;gt;::Item == Self::Item, 
+{
+    type Item;
+    type IntoIter: Iterator;
+    fn into_iter(self) -&amp;gt; Self::IntoIter;
+}
+impl&amp;lt;T&amp;gt; IntoIterator for Vec&amp;lt;T&amp;gt;
+impl&amp;lt;&#39;a, T&amp;gt; IntoIterator for &amp;amp;&#39;a Vec&amp;lt;T&amp;gt;
+impl&amp;lt;&#39;a, T&amp;gt; IntoIterator for &amp;amp;&#39;a mut Vec&amp;lt;T&amp;gt;
+impl&amp;lt;T&amp;gt; IntoIterator for Vec&amp;lt;T&amp;gt; {
+    type Item = T;
+    type IntoIter = IntoIter&amp;lt;T&amp;gt;;
+
+    fn into_iter(mut self) -&amp;gt; IntoIter&amp;lt;T&amp;gt; { /* ... */ }
+}
+impl&amp;lt;&#39;a, T&amp;gt; IntoIterator for &amp;amp;&#39;a Vec&amp;lt;T&amp;gt; {
+    type Item = &amp;amp;&#39;a T;
+    type IntoIter = slice::Iter&amp;lt;&#39;a, T&amp;gt;;
+
+    fn into_iter(self) -&amp;gt; slice::Iter&amp;lt;&#39;a, T&amp;gt; { /* ... */ }
+}
+impl&amp;lt;&#39;a, T&amp;gt; IntoIterator for &amp;amp;&#39;a mut Vec&amp;lt;T&amp;gt; {
+    type Item = &amp;amp;&#39;a mut T;
+    type IntoIter = slice::IterMut&amp;lt;&#39;a, T&amp;gt;;
+
+    fn into_iter(self) -&amp;gt; slice::IterMut&amp;lt;&#39;a, T&amp;gt; { /* ... */ }
+}
+</code></pre><p>| :</p>
+<p>| :</p>
+<pre tabindex="0"><code>fn process_iterable&amp;lt;I: IntoIterator&amp;gt;(iterable: I) {
+    for item in iterable {
+        // ...
+    }
+}
+let v = vec![1, 2];
+
+// Below is equivalent to: `for item in v.iter() {`
+for item in &amp;amp;v {
+    println!(&amp;quot;{}&amp;quot;, item);
+}
+let v = vec![1, 2];
+
+let a: Vec&amp;lt;i32&amp;gt; = v.iter().map(|x| x * x).collect();
+// Although above and below are equivalent, above is a lot clearer than below.
+let b: Vec&amp;lt;i32&amp;gt; = (&amp;amp;v).into_iter().map(|x| x * x).collect();
+let mut v = vec![1, 2];
+
+// Below is equivalent to: `for item in v.iter_mut() {`
+for item in &amp;amp;mut v {
+    *item *= 2;
+}
+</code></pre><p>|
+| <code>iter()</code> | <code>&amp;Vec&lt;T&gt;</code> | <code>&amp;T</code> (Immutable Ref) | Borrowed data |
+| <code>iter_mut()</code> | <code>&amp;mut Vec&lt;T&gt;</code> | <code>&amp;mut T</code> (Mutable Ref) | Borrowed data, mutation allowed |
+| <code>into_iter()</code> | <code>Vec&lt;T&gt;</code> | <code>T</code> (Owned Value) | Consumes the original collection |</p>
+<p>Here are unit tests illustrating the item types received:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#75715e">#[test]</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">demonstration_iter_behavior</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> source_vector <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">101</span>, <span style="color:#ae81ff">102</span>, <span style="color:#ae81ff">103</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> iterator <span style="color:#f92672">=</span> source_vector.iter();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// iter() yields immutable references
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">assert_eq!</span>(iterator.next(), Some(<span style="color:#f92672">&amp;</span><span style="color:#ae81ff">101</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">assert_eq!</span>(iterator.next(), Some(<span style="color:#f92672">&amp;</span><span style="color:#ae81ff">102</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// source_vector remains valid here
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#[test]</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">demonstration_into_iter_ownership_transfer</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> source_vector <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">201</span>, <span style="color:#ae81ff">202</span>, <span style="color:#ae81ff">203</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> iterator <span style="color:#f92672">=</span> source_vector.into_iter();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// into_iter() yields owned values, consuming the vector
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">assert_eq!</span>(iterator.next(), Some(<span style="color:#ae81ff">201</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">assert_eq!</span>(iterator.next(), Some(<span style="color:#ae81ff">202</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// If we tried to use source_vector here, it would fail compilation due to move
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#[test]</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">demonstration_iter_mut_mutation</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> source_vector <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">301</span>, <span style="color:#ae81ff">302</span>, <span style="color:#ae81ff">303</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> iterator <span style="color:#f92672">=</span> source_vector.iter_mut();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// iter_mut() yields mutable references, allowing modification
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> Some(val) <span style="color:#f92672">=</span> iterator.next() {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">*</span>val <span style="color:#f92672">*=</span> <span style="color:#ae81ff">10</span>; <span style="color:#75715e">// Mutates the element inside the vector
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Check mutation effect
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">assert_eq!</span>(source_vector[<span style="color:#ae81ff">0</span>], <span style="color:#ae81ff">3010</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="faqs-on-rust-iterators-differentiation">FAQs on Rust Iterators Differentiation</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What does iter() return when used on a Vec</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: By convention, <code>iter()</code> on a <code>Vec&lt;T&gt;</code> returns an iterator yielding immutable references, specifically of type <code>&amp;T</code>.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can into_iter() ever return a reference</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, if <code>into_iter()</code> is called on a reference type (like <code>&amp;Vec&lt;T&gt;</code> or <code>&amp;mut Vec&lt;T&gt;</code>), its implementation of <code>IntoIterator</code> is set up to yield references (<code>&amp;T</code> or <code>&amp;mut T</code> respectively).</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why is iter_mut not covered by IntoIterator convention</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: <code>iter_mut()</code> is an inherent method whose contract is always to provide mutable references (<code>&amp;mut T</code>), whereas <code>into_iter()</code> uses the <code>IntoIterator</code> trait which allows flexibility in the yielded item type based on context.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is using &amp;v in a for loop the same as v.iter()</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: For iteration over a reference to a collection like <code>Vec</code>, using <code>for x in &amp;v</code> implicitly calls <code>(&amp;v).into_iter()</code>, which is conventionally equivalent to <code>v.iter()</code>, yielding immutable references.</div>
+    </div>
+</div>
+<p>What are your experiences implementing custom iteration patterns in Rust? Share your thoughts or alternative approaches below!</p>
+<p>For more detailed information on Rust error handling and common pitfalls:</p>
+<ul>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">Fixing common SSL verification issues in Python requests</a>
+</li>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-import-errors-in-pytest-when-python-can-import-modules/" target="_blank" rel="noopener">Resolving Python import errors in testing</a>
+</li>
+<li><a href="https://sqlpey.com/python/top-4-methods-to-solve-syntaxwarning-invalid-escape-sequence-in-python/" target="_blank" rel="noopener">Handling encoding issues in Python data streams</a>
+</li>
+</ul>
+<pre tabindex="0"><code>impl&amp;lt;&#39;a, T&amp;gt; IntoIterator for &amp;amp;&#39;a [T]
+    type Item = &amp;amp;&#39;a T
+impl&amp;lt;T&amp;gt; IntoIterator for Vec&amp;lt;T&amp;gt;
+    type Item = T
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

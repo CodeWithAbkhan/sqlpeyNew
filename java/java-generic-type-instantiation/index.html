@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Java Generic Type Instantiation: Overcoming &#39;new E()&#39; Limitations - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore solutions for creating instances of generic type parameters in Java, addressing the &#39;new E()&#39; compile-time error using reflection and design patterns.">
+
+
+
+<meta name="keywords" content="Java generics, type parameters, reflection, instantiation, new E(), factory pattern">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Java Generic Type Instantiation: Overcoming &#39;new E()&#39; Limitations - sqlpey">
+<meta name="DC.description" content="Explore solutions for creating instances of generic type parameters in Java, addressing the &#39;new E()&#39; compile-time error using reflection and design patterns.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-07-22">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Java Generic Type Instantiation: Overcoming &#39;new E()&#39; Limitations - sqlpey">
+<meta property="og:description" content="Explore solutions for creating instances of generic type parameters in Java, addressing the &#39;new E()&#39; compile-time error using reflection and design patterns.">
+<meta property="og:url" content="https://sqlpey.com/java/java-generic-type-instantiation/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-07-22T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-07-22T00:00:00Z">
+<meta property="article:modified_time" content="2025-07-22T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Java">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Java Generic Type Instantiation: Overcoming &#39;new E()&#39; Limitations">
+<meta name="twitter:description" content="Explore solutions for creating instances of generic type parameters in Java, addressing the &#39;new E()&#39; compile-time error using reflection and design patterns.">
+
+
+<link rel="canonical" href="https://sqlpey.com/java/java-generic-type-instantiation/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Java Generic Type Instantiation: Overcoming 'new E()' Limitations\"",
+  "description": "\"Explore solutions for creating instances of generic type parameters in Java, addressing the 'new E()' compile-time error using reflection and design patterns.\"",
+  "url": "\"https://sqlpey.com/java/java-generic-type-instantiation/\"",
+  "datePublished": "\"2025-07-22T00:00:00Z\"",
+  "dateModified": "\"2025-07-22T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/java/java-generic-type-instantiation/\""
+  },
+  "articleSection": "\"Java\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Java Generic Type Instantiation: Overcoming &rsquo;new E()&rsquo; Limitations</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Java</span>
+              
+              <span class="tag">Generics</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              13 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 22, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#java-generic-type-instantiation-overcoming-new-e-limitations">&ldquo;Java Generic Type Instantiation: Overcoming &rsquo;new E()&rsquo; Limitations&rdquo;</a>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#faqs-on-java-generic-type-instantiation">FAQs on Java Generic Type Instantiation</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="java-generic-type-instantiation-overcoming-new-e-limitations">&ldquo;Java Generic Type Instantiation: Overcoming &rsquo;new E()&rsquo; Limitations&rdquo;</h2>
+<p>In Java, directly instantiating a generic type parameter using <code>new E()</code> is not permitted due to type erasure. This fundamental limitation means the JVM loses the specific type information of <code>E</code> at runtime. However, several robust techniques exist to work around this, enabling you to create instances of generic types. This exploration delves into various approaches, from reflection-based solutions to design pattern implementations, to address this common Java development challenge.</p>
+<h4 id="the-core-problem-type-erasure">The Core Problem: Type Erasure</h4>
+<p>Java&rsquo;s generics are implemented through type erasure. This process removes generic type information after compilation to maintain backward compatibility with older Java versions. Consequently, at runtime, a generic type like <code>List&lt;String&gt;</code> becomes simply <code>List</code>. This erasure prevents the JVM from knowing what specific type <code>E</code> represents when you try to perform <code>new E()</code>.</p>
+<h4 id="solution-1-using-reflection-with-classe">Solution 1: Using Reflection with <code>Class&lt;E&gt;</code></h4>
+<p>A common method involves passing the <code>Class</code> object for the generic type parameter. This allows reflection to create an instance, provided the class has a no-argument constructor.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.ArrayList;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.List;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">GenericReflection</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">     * Appends a new instance of type E to the list.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">     * Requires the Class object for E.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">     */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">appendInstance</span>(List<span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> list, Class<span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> clazz) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Use getDeclaredConstructor().newInstance() for more control over constructors</span>
+</span></span><span style="display:flex;"><span>        E elem <span style="color:#f92672">=</span> clazz.<span style="color:#a6e22e">newInstance</span>(); <span style="color:#75715e">// Assumes a public no-arg constructor</span>
+</span></span><span style="display:flex;"><span>        list.<span style="color:#a6e22e">add</span>(elem);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) {
+</span></span><span style="display:flex;"><span>        List<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;</span> stringList <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;&gt;</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>            appendInstance(stringList, String.<span style="color:#a6e22e">class</span>);
+</span></span><span style="display:flex;"><span>            System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Instance added: &#34;</span> <span style="color:#f92672">+</span> stringList.<span style="color:#a6e22e">get</span>(0));
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">catch</span> (Exception e) {
+</span></span><span style="display:flex;"><span>            e.<span style="color:#a6e22e">printStackTrace</span>();
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Explanation:</strong></p>
+<ul>
+<li>The <code>appendInstance</code> method accepts a <code>Class&lt;E&gt;</code> argument.</li>
+<li><code>clazz.newInstance()</code> is used to create an instance. This method internally calls the no-argument constructor.</li>
+<li>For constructors with arguments, <code>clazz.getDeclaredConstructor(&lt;parameter types&gt;).newInstance(&lt;arguments&gt;)</code> can be used.</li>
+</ul>
+<p><strong>Alternative (more robust) reflection:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.ArrayList;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.List;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">GenericReflectionRobust</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">     * Appends a new instance of type E to the list using getDeclaredConstructor.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">     * Requires the Class object for E.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">     */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">appendInstanceRobust</span>(List<span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> list, Class<span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> clazz) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// This handles cases where a no-arg constructor might not be public,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// but still accessible.</span>
+</span></span><span style="display:flex;"><span>        E elem <span style="color:#f92672">=</span> clazz.<span style="color:#a6e22e">getDeclaredConstructor</span>().<span style="color:#a6e22e">newInstance</span>();
+</span></span><span style="display:flex;"><span>        list.<span style="color:#a6e22e">add</span>(elem);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) {
+</span></span><span style="display:flex;"><span>        List<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> integerList <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;&gt;</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>            appendInstanceRobust(integerList, Integer.<span style="color:#a6e22e">class</span>);
+</span></span><span style="display:flex;"><span>            System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Instance added: &#34;</span> <span style="color:#f92672">+</span> integerList.<span style="color:#a6e22e">get</span>(0));
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">catch</span> (Exception e) {
+</span></span><span style="display:flex;"><span>            e.<span style="color:#a6e22e">printStackTrace</span>();
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-2-using-supplier-functional-interface-java-8">Solution 2: Using <code>Supplier</code> Functional Interface (Java 8+)</h4>
+<p>The <code>Supplier</code> interface provides a functional way to obtain instances. This is cleaner and more idiomatic in modern Java.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.function.Supplier;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.math.BigInteger;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">InstanceContainer</span><span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Supplier<span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> instanceSupplier;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Constructor takes a Supplier that knows how to create an instance of E</span>
+</span></span><span style="display:flex;"><span>    InstanceContainer(Supplier<span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> supplier) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">instanceSupplier</span> <span style="color:#f92672">=</span> supplier;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    E <span style="color:#a6e22e">createContents</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> instanceSupplier.<span style="color:#a6e22e">get</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SupplierExample</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Using a constructor reference for String&#39;s no-arg constructor</span>
+</span></span><span style="display:flex;"><span>        InstanceContainer<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;</span> stringContainer <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> InstanceContainer<span style="color:#f92672">&lt;&gt;</span>(String::<span style="color:#66d9ef">new</span>);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Created String: &#39;&#34;</span> <span style="color:#f92672">+</span> stringContainer.<span style="color:#a6e22e">createContents</span>() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Using a lambda for a constructor with arguments (e.g., BigInteger)</span>
+</span></span><span style="display:flex;"><span>        InstanceContainer<span style="color:#f92672">&lt;</span>BigInteger<span style="color:#f92672">&gt;</span> bigIntContainer <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> InstanceContainer<span style="color:#f92672">&lt;&gt;</span>(() <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">new</span> BigInteger(<span style="color:#e6db74">&#34;12345&#34;</span>));
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Created BigInteger: &#34;</span> <span style="color:#f92672">+</span> bigIntContainer.<span style="color:#a6e22e">createContents</span>());
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Explanation:</strong></p>
+<ul>
+<li>The <code>InstanceContainer</code> class takes a <code>Supplier&lt;E&gt;</code> in its constructor.</li>
+<li>The <code>Supplier</code> is responsible for providing the instance.</li>
+<li><code>String::new</code> is a constructor reference.</li>
+<li><code>() -&gt; new BigInteger(1)</code> is a lambda expression for a constructor that takes arguments.</li>
+</ul>
+<h4 id="solution-3-factory-pattern">Solution 3: Factory Pattern</h4>
+<p>Encapsulating the creation logic within a factory is a robust design approach. This separates the creation process from the generic class itself.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">InstanceFactory</span><span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    E <span style="color:#a6e22e">create</span>();
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">GenericContainer</span><span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> InstanceFactory<span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> factory;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    GenericContainer(InstanceFactory<span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> factory) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">factory</span> <span style="color:#f92672">=</span> factory;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    E <span style="color:#a6e22e">createContents</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> factory.<span style="color:#a6e22e">create</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">FactoryPatternExample</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Example using a lambda for the factory</span>
+</span></span><span style="display:flex;"><span>        GenericContainer<span style="color:#f92672">&lt;</span>StringBuilder<span style="color:#f92672">&gt;</span> sbContainer <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> GenericContainer<span style="color:#f92672">&lt;&gt;</span>(StringBuilder::<span style="color:#66d9ef">new</span>);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Created StringBuilder: &#34;</span> <span style="color:#f92672">+</span> sbContainer.<span style="color:#a6e22e">createContents</span>().<span style="color:#a6e22e">toString</span>());
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Custom factory implementation</span>
+</span></span><span style="display:flex;"><span>        InstanceFactory<span style="color:#f92672">&lt;</span>Double<span style="color:#f92672">&gt;</span> doubleFactory <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> InstanceFactory<span style="color:#f92672">&lt;</span>Double<span style="color:#f92672">&gt;</span>() {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">double</span> value <span style="color:#f92672">=</span> 0.<span style="color:#a6e22e">0</span>;
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">public</span> Double <span style="color:#a6e22e">create</span>() {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> value <span style="color:#f92672">+=</span> 1.<span style="color:#a6e22e">1</span>;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span>        GenericContainer<span style="color:#f92672">&lt;</span>Double<span style="color:#f92672">&gt;</span> doubleContainer <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> GenericContainer<span style="color:#f92672">&lt;&gt;</span>(doubleFactory);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Created Double: &#34;</span> <span style="color:#f92672">+</span> doubleContainer.<span style="color:#a6e22e">createContents</span>());
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Created Double again: &#34;</span> <span style="color:#f92672">+</span> doubleContainer.<span style="color:#a6e22e">createContents</span>());
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Explanation:</strong></p>
+<ul>
+<li>An <code>InstanceFactory</code> interface defines the contract for creating instances.</li>
+<li>The <code>GenericContainer</code> holds an instance of this factory.</li>
+<li>The <code>createContents</code> method delegates the creation to the factory.</li>
+</ul>
+<h4 id="solution-4-abstract-factorysubclassing-for-type-information">Solution 4: Abstract Factory/Subclassing for Type Information</h4>
+<p>When subclassing a generic type, you can leverage reflection to determine the generic type argument at runtime. This involves using <code>ParameterizedType</code> to access the type information.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.lang.reflect.ParameterizedType;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.lang.reflect.Type;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">abstract</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">BaseCreator</span><span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">protected</span> E <span style="color:#a6e22e">createInstance</span>() <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Get the generic superclass</span>
+</span></span><span style="display:flex;"><span>        Type genericSuperclass <span style="color:#f92672">=</span> getClass().<span style="color:#a6e22e">getGenericSuperclass</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (genericSuperclass <span style="color:#66d9ef">instanceof</span> ParameterizedType) {
+</span></span><span style="display:flex;"><span>            ParameterizedType parameterizedType <span style="color:#f92672">=</span> (ParameterizedType) genericSuperclass;
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Get the actual type argument for E</span>
+</span></span><span style="display:flex;"><span>            Type<span style="color:#f92672">[]</span> actualTypeArguments <span style="color:#f92672">=</span> parameterizedType.<span style="color:#a6e22e">getActualTypeArguments</span>();
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (actualTypeArguments.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> 0 <span style="color:#f92672">&amp;&amp;</span> actualTypeArguments<span style="color:#f92672">[</span>0<span style="color:#f92672">]</span> <span style="color:#66d9ef">instanceof</span> Class) {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">@SuppressWarnings</span>(<span style="color:#e6db74">&#34;unchecked&#34;</span>)
+</span></span><span style="display:flex;"><span>                Class<span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> clazz <span style="color:#f92672">=</span> (Class<span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span>) actualTypeArguments<span style="color:#f92672">[</span>0<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> clazz.<span style="color:#a6e22e">newInstance</span>(); <span style="color:#75715e">// Assumes no-arg constructor</span>
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> IllegalStateException(<span style="color:#e6db74">&#34;Could not determine generic type E&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">StringCreator</span> <span style="color:#66d9ef">extends</span> BaseCreator<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;</span> {}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">IntegerCreator</span> <span style="color:#66d9ef">extends</span> BaseCreator<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SubclassReflection</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        String strInstance <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> StringCreator().<span style="color:#a6e22e">createInstance</span>();
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Created String via subclass: [&#34;</span> <span style="color:#f92672">+</span> strInstance <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;]&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        Integer intInstance <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> IntegerCreator().<span style="color:#a6e22e">createInstance</span>();
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Created Integer via subclass: &#34;</span> <span style="color:#f92672">+</span> intInstance);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Explanation:</strong></p>
+<ul>
+<li>The <code>BaseCreator</code> abstract class attempts to discover the generic type <code>E</code> from its own superclass definition.</li>
+<li><code>getClass().getGenericSuperclass()</code> retrieves the generic type information.</li>
+<li><code>ParameterizedType</code> and <code>getActualTypeArguments()</code> are used to extract the specific class.</li>
+<li>This approach requires creating anonymous inner classes or concrete subclasses that specify the generic type.</li>
+</ul>
+<p><strong>Note on Subclassing:</strong>
+When subclassing anonymously, the type information is often captured.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// Example of anonymous subclassing to capture type</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// instance = ((Class)((ParameterizedType)this.getClass().getGenericSuperclass()).getActualTypeArguments()[0]).newInstance();</span>
+</span></span></code></pre></div><h4 id="solution-5-using-libraries-like-guavas-typetoken">Solution 5: Using Libraries like Guava&rsquo;s <code>TypeToken</code></h4>
+<p>Libraries like Guava offer utilities to help with generic type resolution, simplifying the process of capturing type information.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// Requires Guava dependency:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// implementation &#39;com.google.guava:guava:32.1.3-jre&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.google.common.reflect.TypeToken;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.lang.reflect.InvocationTargetException;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">GuavaTypeTokenExample</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> InstantiationException, IllegalAccessException, InvocationTargetException {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Create an anonymous subclass of StrawManParameterizedClass to capture the type</span>
+</span></span><span style="display:flex;"><span>        StrawManParameterizedClass<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;</span> stringContainer <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> StrawManParameterizedClass<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;</span>() {};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// TypeToken captures the generic type information</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// type.getRawType() gives the Class object for the generic type</span>
+</span></span><span style="display:flex;"><span>        String stringInstance <span style="color:#f92672">=</span> (String) stringContainer.<span style="color:#a6e22e">type</span>.<span style="color:#a6e22e">getRawType</span>().<span style="color:#a6e22e">getDeclaredConstructor</span>().<span style="color:#a6e22e">newInstance</span>();
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Guava TypeToken created String: \&#34;&#34;</span> <span style="color:#f92672">+</span> stringInstance <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\&#34;&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// An abstract class designed to capture the generic type parameter</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">abstract</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">StrawManParameterizedClass</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// TypeToken captures the generic type T from the subclass</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">final</span> TypeToken<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> type <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> TypeToken<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span>(getClass()) {};
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Explanation:</strong></p>
+<ul>
+<li><code>TypeToken</code> from Guava is a powerful tool for capturing generic type information at runtime.</li>
+<li>By creating an anonymous subclass of a generic type that uses <code>TypeToken</code>, you can reliably get the <code>Class</code> object for the generic parameter.</li>
+<li>This is often considered a cleaner alternative to manual reflection with <code>ParameterizedType</code>.</li>
+</ul>
+<h4 id="solution-6-enforcing-constructor-requirements">Solution 6: Enforcing Constructor Requirements</h4>
+<p>A straightforward approach is to require the generic type <code>T</code> to have a specific constructor (usually a no-argument one) and pass the <code>Class</code> object.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">final</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TypedInstanceFactory</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> Class<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> typeArgumentClass;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">TypedInstanceFactory</span>(Class<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> typeArgumentClass) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">typeArgumentClass</span> <span style="color:#f92672">=</span> typeArgumentClass;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> T <span style="color:#a6e22e">createNewInstance</span>() <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// newInstance() relies on the no-argument constructor.</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// For other constructors, use getDeclaredConstructor().newInstance(...)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> typeArgumentClass.<span style="color:#a6e22e">newInstance</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Factory method to simplify instantiation</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#f92672">&lt;</span>X<span style="color:#f92672">&gt;</span> TypedInstanceFactory<span style="color:#f92672">&lt;</span>X<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">create</span>(Class<span style="color:#f92672">&lt;</span>X<span style="color:#f92672">&gt;</span> clazz) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> TypedInstanceFactory<span style="color:#f92672">&lt;&gt;</span>(clazz);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ConstructorEnforcement</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Direct instantiation</span>
+</span></span><span style="display:flex;"><span>        TypedInstanceFactory<span style="color:#f92672">&lt;</span>java.<span style="color:#a6e22e">net</span>.<span style="color:#a6e22e">URL</span><span style="color:#f92672">&gt;</span> urlFactory <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> TypedInstanceFactory<span style="color:#f92672">&lt;&gt;</span>(java.<span style="color:#a6e22e">net</span>.<span style="color:#a6e22e">URL</span>.<span style="color:#a6e22e">class</span>);
+</span></span><span style="display:flex;"><span>        java.<span style="color:#a6e22e">net</span>.<span style="color:#a6e22e">URL</span> url <span style="color:#f92672">=</span> urlFactory.<span style="color:#a6e22e">createNewInstance</span>();
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Created URL instance (will likely throw if no-arg constructor is missing): &#34;</span> <span style="color:#f92672">+</span> url);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Using the factory method</span>
+</span></span><span style="display:flex;"><span>        TypedInstanceFactory<span style="color:#f92672">&lt;</span>java.<span style="color:#a6e22e">util</span>.<span style="color:#a6e22e">Date</span><span style="color:#f92672">&gt;</span> dateFactory <span style="color:#f92672">=</span> TypedInstanceFactory.<span style="color:#a6e22e">create</span>(java.<span style="color:#a6e22e">util</span>.<span style="color:#a6e22e">Date</span>.<span style="color:#a6e22e">class</span>);
+</span></span><span style="display:flex;"><span>        java.<span style="color:#a6e22e">util</span>.<span style="color:#a6e22e">Date</span> date <span style="color:#f92672">=</span> dateFactory.<span style="color:#a6e22e">createNewInstance</span>();
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Created Date instance: &#34;</span> <span style="color:#f92672">+</span> date);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Explanation:</strong></p>
+<ul>
+<li>The <code>TypedInstanceFactory</code> explicitly requires the <code>Class&lt;T&gt;</code> during its own instantiation.</li>
+<li>This makes the intention clear and allows the factory to use reflection for creating instances of <code>T</code>.</li>
+<li>A static factory method (<code>create</code>) can reduce boilerplate code.</li>
+</ul>
+<p><strong>Considerations for this approach:</strong></p>
+<ul>
+<li><strong>Constructor Availability:</strong> <code>newInstance()</code> requires a public no-argument constructor. If the type <code>T</code> doesn&rsquo;t have one, this will fail. <code>getDeclaredConstructor().newInstance()</code> offers more flexibility.</li>
+<li><strong>DRY Principle:</strong> While it might seem repetitive to specify <code>SomeType.class</code> when creating <code>new TypedInstanceFactory&lt;SomeType&gt;(SomeType.class)</code>, it&rsquo;s a common trade-off for type safety and clarity.</li>
+</ul>
+<h4 id="solution-7-functional-programming-with-callable">Solution 7: Functional Programming with <code>Callable</code></h4>
+<p>You can pass a <code>Callable</code> (or similar functional interface like <code>Supplier</code>) that knows how to create an instance.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.concurrent.Callable;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">FunctionalContainer</span><span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    E <span style="color:#a6e22e">createContents</span>(Callable<span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> instanceCreator) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// The Callable is responsible for providing the instance</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> instanceCreator.<span style="color:#a6e22e">call</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CallableExample</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        FunctionalContainer<span style="color:#f92672">&lt;</span>Long<span style="color:#f92672">&gt;</span> longContainer <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> FunctionalContainer<span style="color:#f92672">&lt;&gt;</span>();
+</span></span><span style="display:flex;"><span>        Long longValue <span style="color:#f92672">=</span> longContainer.<span style="color:#a6e22e">createContents</span>(Long::<span style="color:#66d9ef">new</span>); <span style="color:#75715e">// Using constructor reference</span>
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Created Long via Callable: &#34;</span> <span style="color:#f92672">+</span> longValue);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        FunctionalContainer<span style="color:#f92672">&lt;</span>StringBuilder<span style="color:#f92672">&gt;</span> sbContainer <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> FunctionalContainer<span style="color:#f92672">&lt;&gt;</span>();
+</span></span><span style="display:flex;"><span>        StringBuilder sb <span style="color:#f92672">=</span> sbContainer.<span style="color:#a6e22e">createContents</span>(() <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">new</span> StringBuilder(<span style="color:#e6db74">&#34;initial&#34;</span>));
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Created StringBuilder via Callable: &#34;</span> <span style="color:#f92672">+</span> sb.<span style="color:#a6e22e">toString</span>());
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Explanation:</strong></p>
+<ul>
+<li>The <code>createContents</code> method accepts a <code>Callable&lt;E&gt;</code>.</li>
+<li>The caller provides the logic to create an instance of <code>E</code> using a lambda or method reference.</li>
+</ul>
+<h4 id="solution-8-using-objenesis-for-types-without-default-constructors">Solution 8: Using Objenesis for Types Without Default Constructors</h4>
+<p>For scenarios where the generic type <code>E</code> might not have a public no-argument constructor, libraries like Objenesis can be used. Objenesis bypasses constructor calls entirely.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// Requires Objenesis dependency:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// implementation &#39;org.objenesis:objenesis:3.3&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.objenesis.Objenesis;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.objenesis.ObjenesisStd;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Assume Foo is a class that might not have a default constructor</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Foo</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> String name;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Foo</span>(String name) { <span style="color:#75715e">// Constructor with argument</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">name</span> <span style="color:#f92672">=</span> name;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">getName</span>() { <span style="color:#66d9ef">return</span> name; }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ObjenesisExample</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) {
+</span></span><span style="display:flex;"><span>        Objenesis objenesis <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ObjenesisStd();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Create an instance of Foo using Objenesis</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Note: This bypasses the constructor, so Foo&#39;s fields will be default initialized (null for String)</span>
+</span></span><span style="display:flex;"><span>        Foo fooInstance <span style="color:#f92672">=</span> objenesis.<span style="color:#a6e22e">newInstance</span>(Foo.<span style="color:#a6e22e">class</span>);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Created Foo instance via Objenesis. Name: &#34;</span> <span style="color:#f92672">+</span> fooInstance.<span style="color:#a6e22e">getName</span>()); <span style="color:#75715e">// Prints null</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Explanation:</strong></p>
+<ul>
+<li><code>ObjenesisStd</code> is a common implementation.</li>
+<li><code>objenesis.newInstance(Class&lt;T&gt;)</code> creates an instance of the specified class without invoking its constructor.</li>
+<li>Be aware that fields will be uninitialized or have default values.</li>
+</ul>
+<h4 id="solution-9-using-reflection-with-classloaders">Solution 9: Using Reflection with ClassLoaders</h4>
+<p>You can load classes by their fully qualified name and then create instances, which is more dynamic but requires knowing the class name string.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.lang.reflect.Constructor;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ClassLoaderInstantiation</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> E <span style="color:#a6e22e">createInstanceFromClassName</span>(String className, Object... constructorArgs) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Load the class</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">final</span> ClassLoader classLoader <span style="color:#f92672">=</span> ClassLoaderInstantiation.<span style="color:#a6e22e">class</span>.<span style="color:#a6e22e">getClassLoader</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">final</span> Class<span style="color:#f92672">&lt;?&gt;</span> aClass <span style="color:#f92672">=</span> classLoader.<span style="color:#a6e22e">loadClass</span>(className);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Determine constructor argument types</span>
+</span></span><span style="display:flex;"><span>        Class<span style="color:#f92672">&lt;?&gt;[]</span> argTypes <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Class<span style="color:#f92672">&lt;?&gt;[</span>constructorArgs.<span style="color:#a6e22e">length</span><span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0; i <span style="color:#f92672">&lt;</span> constructorArgs.<span style="color:#a6e22e">length</span>; i<span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>            argTypes<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> constructorArgs<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span>.<span style="color:#a6e22e">getClass</span>();
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Basic handling for primitive types if needed (e.g., int.class vs Integer.class)</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// This is simplified; robust handling would check primitives more carefully.</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Get the appropriate constructor and create the instance</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">final</span> Constructor<span style="color:#f92672">&lt;?&gt;</span> constructor <span style="color:#f92672">=</span> aClass.<span style="color:#a6e22e">getConstructor</span>(argTypes);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">@SuppressWarnings</span>(<span style="color:#e6db74">&#34;unchecked&#34;</span>)
+</span></span><span style="display:flex;"><span>        E instance <span style="color:#f92672">=</span> (E) constructor.<span style="color:#a6e22e">newInstance</span>(constructorArgs);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> instance;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Example: Creating an Integer instance</span>
+</span></span><span style="display:flex;"><span>        Integer intValue <span style="color:#f92672">=</span> createInstanceFromClassName(<span style="color:#e6db74">&#34;java.lang.Integer&#34;</span>, 123);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Created Integer via ClassLoader: &#34;</span> <span style="color:#f92672">+</span> intValue);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Example: Creating a String instance</span>
+</span></span><span style="display:flex;"><span>        String strValue <span style="color:#f92672">=</span> createInstanceFromClassName(<span style="color:#e6db74">&#34;java.lang.String&#34;</span>, <span style="color:#e6db74">&#34;Hello from ClassLoader&#34;</span>);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Created String via ClassLoader: &#34;</span> <span style="color:#f92672">+</span> strValue);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Explanation:</strong></p>
+<ul>
+<li><code>classLoader.loadClass(className)</code> loads the class dynamically.</li>
+<li><code>aClass.getConstructor(argTypes)</code> finds the constructor matching the provided argument types.</li>
+<li><code>constructor.newInstance(constructorArgs)</code> creates the instance.</li>
+</ul>
+<h4 id="solution-10-subclassing-typereference-pattern-by-noah-and-others">Solution 10: Subclassing <code>TypeReference</code> (Pattern by @noah and others)</h4>
+<p>This pattern involves creating an abstract class that captures generic type information through its own subclassing.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.lang.reflect.ParameterizedType;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.lang.reflect.Type;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">abstract</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TypeReference</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> Class<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">getType</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Get the generic superclass of the anonymous subclass</span>
+</span></span><span style="display:flex;"><span>            ParameterizedType parameterizedType <span style="color:#f92672">=</span> (ParameterizedType) <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">getClass</span>().<span style="color:#a6e22e">getGenericSuperclass</span>();
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Ensure we have at least one type argument</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (parameterizedType.<span style="color:#a6e22e">getActualTypeArguments</span>() <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">||</span> parameterizedType.<span style="color:#a6e22e">getActualTypeArguments</span>().<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> 0) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> IllegalStateException(<span style="color:#e6db74">&#34;Could not determine type parameter.&#34;</span>);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Get the first type argument</span>
+</span></span><span style="display:flex;"><span>            Type type <span style="color:#f92672">=</span> parameterizedType.<span style="color:#a6e22e">getActualTypeArguments</span>()<span style="color:#f92672">[</span>0<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>            String typeAsString <span style="color:#f92672">=</span> type.<span style="color:#a6e22e">getTypeName</span>(); <span style="color:#75715e">// e.g., &#34;java.lang.String&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">@SuppressWarnings</span>(<span style="color:#e6db74">&#34;unchecked&#34;</span>)
+</span></span><span style="display:flex;"><span>            Class<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> clazz <span style="color:#f92672">=</span> (Class<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span>) Class.<span style="color:#a6e22e">forName</span>(typeAsString);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> clazz;
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">catch</span> (Exception e) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> IllegalStateException(<span style="color:#e6db74">&#34;Failed to resolve generic type&#34;</span>, e);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Usage example</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">StringRef</span> <span style="color:#66d9ef">extends</span> TypeReference<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;</span> {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TypeReferencePattern</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        TypeReference<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;</span> stringRef <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> StringRef();
+</span></span><span style="display:flex;"><span>        Class<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;</span> stringClass <span style="color:#f92672">=</span> stringRef.<span style="color:#a6e22e">getType</span>();
+</span></span><span style="display:flex;"><span>        String stringInstance <span style="color:#f92672">=</span> stringClass.<span style="color:#a6e22e">newInstance</span>(); <span style="color:#75715e">// Assumes no-arg constructor</span>
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;TypeReference pattern created String: [&#34;</span> <span style="color:#f92672">+</span> stringInstance <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;]&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Using anonymous subclass</span>
+</span></span><span style="display:flex;"><span>        TypeReference<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> integerRef <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> TypeReference<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span>() {};
+</span></span><span style="display:flex;"><span>        Class<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> integerClass <span style="color:#f92672">=</span> integerRef.<span style="color:#a6e22e">getType</span>();
+</span></span><span style="display:flex;"><span>        Integer integerInstance <span style="color:#f92672">=</span> integerClass.<span style="color:#a6e22e">newInstance</span>();
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;TypeReference pattern created Integer: &#34;</span> <span style="color:#f92672">+</span> integerInstance);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Explanation:</strong></p>
+<ul>
+<li>The <code>TypeReference</code> abstract class provides a <code>getType()</code> method.</li>
+<li>When a subclass (even an anonymous one) is created, <code>TypeReference.class.getGenericSuperclass()</code> captures the actual type argument (<code>&lt;String&gt;</code>, <code>&lt;Integer&gt;</code>).</li>
+<li>This allows retrieval of the <code>Class</code> object for <code>T</code>.</li>
+</ul>
+<h4 id="solution-11-abstract-class-with-abstract-creation-method">Solution 11: Abstract Class with Abstract Creation Method</h4>
+<p>A pattern that relies on subclasses to provide the instance creation logic.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">abstract</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">AbstractInstanceCreator</span><span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Abstract method that subclasses must implement to provide an instance of E</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">abstract</span> E <span style="color:#a6e22e">createInstance</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">performActionWithInstance</span>() {
+</span></span><span style="display:flex;"><span>        E instance <span style="color:#f92672">=</span> createInstance();
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Perform operations with the &#39;instance&#39; of type E</span>
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Performing action with: &#34;</span> <span style="color:#f92672">+</span> instance);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Concrete subclass providing the instance</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ConcreteStringCreator</span> <span style="color:#66d9ef">extends</span> AbstractInstanceCreator<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">protected</span> String <span style="color:#a6e22e">createInstance</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Hello from ConcreteStringCreator&#34;</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Another concrete subclass</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ConcreteIntegerCreator</span> <span style="color:#66d9ef">extends</span> AbstractInstanceCreator<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">protected</span> Integer <span style="color:#a6e22e">createInstance</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> 42;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">AbstractCreatorPattern</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) {
+</span></span><span style="display:flex;"><span>        AbstractInstanceCreator<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;</span> stringCreator <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ConcreteStringCreator();
+</span></span><span style="display:flex;"><span>        stringCreator.<span style="color:#a6e22e">performActionWithInstance</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        AbstractInstanceCreator<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> integerCreator <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ConcreteIntegerCreator();
+</span></span><span style="display:flex;"><span>        integerCreator.<span style="color:#a6e22e">performActionWithInstance</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Explanation:</strong></p>
+<ul>
+<li>The <code>AbstractInstanceCreator</code> defines an abstract <code>createInstance()</code> method.</li>
+<li>Concrete subclasses implement this method to return an instance of their specific generic type.</li>
+<li>The main class then uses the abstract class, and the subclass implementation handles the actual creation.</li>
+</ul>
+<h4 id="final-thoughts-on-approach-selection">Final Thoughts on Approach Selection</h4>
+<p>When deciding which solution to use, consider:</p>
+<ul>
+<li><strong>Java Version:</strong> <code>Supplier</code> is excellent for Java 8+.</li>
+<li><strong>Constructor Requirements:</strong> Reflection (<code>Class.newInstance()</code> or <code>getDeclaredConstructor().newInstance()</code>) works if a suitable constructor exists. Objenesis is for when constructors are missing or inaccessible.</li>
+<li><strong>Code Clarity:</strong> <code>Supplier</code> and the Factory pattern often lead to more readable code than heavy reflection.</li>
+<li><strong>Dependency Management:</strong> Guava&rsquo;s <code>TypeToken</code> adds an external dependency.</li>
+<li><strong>Flexibility:</strong> Passing <code>Class&lt;E&gt;</code> or using a <code>Supplier</code>/<code>Callable</code> provides flexibility in how instances are created (e.g., with or without arguments).</li>
+</ul>
+<p>The inability to directly use <code>new E()</code> is a fundamental aspect of Java&rsquo;s generic design, but these patterns provide effective and practical ways to achieve type-safe instance creation.</p>
+<h2 id="solutions">Solutions</h2>
+<h3 id="faqs-on-java-generic-type-instantiation">FAQs on Java Generic Type Instantiation</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why can&#39;t I simply use new E() in Java with generics</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Java uses type erasure for generics. This means that generic type information is removed during compilation. At runtime, the JVM doesn&rsquo;t know the specific type of E, preventing direct instantiation like <code>new E()</code>. This design choice maintains backward compatibility with older Java versions.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the most common way to create instances of generic types in Java</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The most common and often recommended approaches involve either passing the <code>Class&lt;E&gt;</code> object to the generic class and using reflection (like <code>clazz.newInstance()</code>) or using functional interfaces like <code>java.util.function.Supplier&lt;E&gt;</code> which are available from Java 8 onwards.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: When should I consider using Objenesis</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: You should consider Objenesis when the generic type <code>E</code> might not have a public no-argument constructor, or if you need to create an instance without invoking any constructor at all (e.g., for serialization or mock objects). It&rsquo;s a powerful tool for creating instances of classes with complex or inaccessible constructors.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How does passing Class&lt;E&gt; to a generic class work</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: By passing <code>Class&lt;E&gt;</code> as a parameter, you provide the runtime with the concrete type information needed for reflection. You can then use methods like <code>clazz.newInstance()</code> (for no-arg constructors) or <code>clazz.getDeclaredConstructor().newInstance()</code> to create an instance of that specific type.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I create instances of generic types that don&#39;t have a default constructor</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, you can. Using reflection with <code>getDeclaredConstructor()</code> and passing the necessary arguments to <code>newInstance()</code> will work if you know the constructor signature. Alternatively, Objenesis can create instances bypassing constructors entirely. Passing a <code>Supplier</code> or <code>Callable</code> that encapsulates the construction logic is another flexible approach.</div>
+    </div>
+</div>
+<pre tabindex="0"><code>private static class SomeContainer&amp;lt;E&amp;gt; {
+    E createContents(Class&amp;lt;E&amp;gt; clazz) {
+        return clazz.newInstance();
+    }
+}
+</code></pre><p>We’d love to hear your feedback! Drop your comments or questions below.</p>
+<pre tabindex="0"><code>class SomeContainer&amp;lt;E&amp;gt; {
+  private Supplier&amp;lt;E&amp;gt; supplier;
+
+  SomeContainer(Supplier&amp;lt;E&amp;gt; supplier) {
+    this.supplier = supplier;
+  }
+
+  E createContents() {
+    return supplier.get();
+  }
+}
+SomeContainer&amp;lt;String&amp;gt; stringContainer = new SomeContainer&amp;lt;&amp;gt;(String::new);
+SomeContainer&amp;lt;BigInteger&amp;gt; bigIntegerContainer
+    = new SomeContainer&amp;lt;&amp;gt;(() -&amp;gt; new BigInteger(1));
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

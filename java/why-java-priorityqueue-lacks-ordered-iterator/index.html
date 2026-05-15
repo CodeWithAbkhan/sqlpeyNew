@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Why Java PriorityQueue Lacks Efficient Ordered Traversal Iterators - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Examine why Java&#39;s PriorityQueue, built on a binary heap, does not offer an efficient method for iterating over elements in sorted order, exploring …">
+
+
+
+<meta name="keywords" content="PriorityQueue, Binary Heap, Java Iterator, Partial Ordering">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Why Java PriorityQueue Lacks Efficient Ordered Traversal Iterators - sqlpey">
+<meta name="DC.description" content="Examine why Java&#39;s PriorityQueue, built on a binary heap, does not offer an efficient method for iterating over elements in sorted order, exploring implementation details and alternatives.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-07-29">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Why Java PriorityQueue Lacks Efficient Ordered Traversal Iterators - sqlpey">
+<meta property="og:description" content="Examine why Java&#39;s PriorityQueue, built on a binary heap, does not offer an efficient method for iterating over elements in sorted order, exploring …">
+<meta property="og:url" content="https://sqlpey.com/java/why-java-priorityqueue-lacks-ordered-iterator/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-07-29T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-07-29T00:00:00Z">
+<meta property="article:modified_time" content="2025-07-29T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Data Structures">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Why Java PriorityQueue Lacks Efficient Ordered Traversal Iterators">
+<meta name="twitter:description" content="Examine why Java&#39;s PriorityQueue, built on a binary heap, does not offer an efficient method for iterating over elements in sorted order, exploring …">
+
+
+<link rel="canonical" href="https://sqlpey.com/java/why-java-priorityqueue-lacks-ordered-iterator/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Why Java PriorityQueue Lacks Efficient Ordered Traversal Iterators\"",
+  "description": "\"Examine why Java's PriorityQueue, built on a binary heap, does not offer an efficient method for iterating over elements in sorted order, exploring implementation details and alternatives.\"",
+  "url": "\"https://sqlpey.com/java/why-java-priorityqueue-lacks-ordered-iterator/\"",
+  "datePublished": "\"2025-07-29T00:00:00Z\"",
+  "dateModified": "\"2025-07-29T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/java/why-java-priorityqueue-lacks-ordered-iterator/\""
+  },
+  "articleSection": "\"Data Structures\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Why Java PriorityQueue Lacks Efficient Ordered Traversal Iterators</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Data Structures</span>
+              
+              <span class="tag">Java Programming</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              6 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 29, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#why-java-priorityqueue-lacks-efficient-ordered-traversal-iterators">&ldquo;Why Java PriorityQueue Lacks Efficient Ordered Traversal Iterators&rdquo;</a></li>
+    <li><a href="#core-structural-constraint-the-binary-heap-foundation">Core Structural Constraint: The Binary Heap Foundation</a>
+      <ul>
+        <li><a href="#why-a-heap">Why a Heap?</a></li>
+        <li><a href="#the-issue-of-partial-ordering">The Issue of Partial Ordering</a></li>
+      </ul>
+    </li>
+    <li><a href="#analyzing-traversal-mechanisms">Analyzing Traversal Mechanisms</a>
+      <ul>
+        <li><a href="#the-default-iterator-behavior">The Default Iterator Behavior</a></li>
+        <li><a href="#implementation-philosophy-decoupling-operations-from-presentation">Implementation Philosophy: Decoupling Operations from Presentation</a></li>
+      </ul>
+    </li>
+    <li><a href="#achieving-sorted-iteration-alternative-approaches">Achieving Sorted Iteration: Alternative Approaches</a>
+      <ul>
+        <li><a href="#method-1-repeated-polling-destructive-read">Method 1: Repeated Polling (Destructive Read)</a></li>
+        <li><a href="#method-2-copy-and-sort-non-destructive-read">Method 2: Copy and Sort (Non-Destructive Read)</a></li>
+      </ul>
+    </li>
+    <li><a href="#summary-of-heap-vs-sorted-structures">Summary of Heap vs. Sorted Structures</a></li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#faqs-on-why-java-priorityqueue-lacks-ordered-iterator">FAQs on Why Java PriorityQueue Lacks Ordered Iterator</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="why-java-priorityqueue-lacks-efficient-ordered-traversal-iterators">&ldquo;Why Java PriorityQueue Lacks Efficient Ordered Traversal Iterators&rdquo;</h2>
+<p>When utilizing Java&rsquo;s <code>java.util.PriorityQueue</code>, developers often seek a straightforward way to iterate through its elements in strict sorted order, much like one would expect from a sorted list. However, the default iterator does not provide this guarantee. What drives this design choice, and what mechanisms allow for structured retrieval when necessary?</p>
+<h2 id="core-structural-constraint-the-binary-heap-foundation">Core Structural Constraint: The Binary Heap Foundation</h2>
+<p>The fundamental reason for the absence of an efficient, ordered traversal lies in the underlying data structure chosen for the <code>PriorityQueue</code>: the <strong>binary heap</strong>.</p>
+<h3 id="why-a-heap">Why a Heap?</h3>
+<p>Binary heaps are selected because they offer exceptional performance characteristics for priority-based operations:</p>
+<ul>
+<li><strong>Efficient Insertion:</strong> Adding an element typically takes $O(\log n)$ time.</li>
+<li><strong>Optimal Retrieval of Extremes:</strong> Retrieving (peeking at) the highest or lowest priority item (the root) is an $O(1)$ operation.</li>
+<li><strong>Efficient Removal of Extremes:</strong> Extracting the highest/lowest priority item and rebalancing the heap is $O(\log n)$.</li>
+</ul>
+<h3 id="the-issue-of-partial-ordering">The Issue of Partial Ordering</h3>
+<p>Unlike a fully sorted array or a balanced binary search tree, a heap is only <strong>partially ordered</strong>.</p>
+<ol>
+<li><strong>Root Guarantee:</strong> The only strict ordering guarantee is that the root element possesses the highest (or lowest) priority.</li>
+<li><strong>Sibling and Level Order:</strong> There is <em>no</em> guaranteed order between sibling nodes, or between nodes on the same level, beyond the relationship with their parent.</li>
+</ol>
+<p>If you were to remove the root element, the heap structure is immediately reordered to ensure the <em>new</em> root maintains the heap property, but this reordering does not result in a globally sorted collection in memory.</p>
+<h2 id="analyzing-traversal-mechanisms">Analyzing Traversal Mechanisms</h2>
+<p>If the internal structure is a partially ordered heap, how does the standard iterator function, and why isn&rsquo;t it sorted?</p>
+<h3 id="the-default-iterator-behavior">The Default Iterator Behavior</h3>
+<p>The standard iterator provided by <code>PriorityQueue</code> traverses the elements in the order they are stored internally, which corresponds to a <strong>level-order traversal</strong> of the underlying binary tree representation of the heap.</p>
+<p>Because the order property only dictates that a parent has higher priority than its children, nodes on the same level are not sorted relative to each other. Therefore, iterating over the heap structure yields elements in a sequence that reflects the structure&rsquo;s shape, not their inherent priority or value order.</p>
+<h3 id="implementation-philosophy-decoupling-operations-from-presentation">Implementation Philosophy: Decoupling Operations from Presentation</h3>
+<p>A key design consideration, as noted in implementation discussions, is to <strong>avoid tying the collection&rsquo;s core functionality to a specific traversal order</strong>.</p>
+<p>If the <code>PriorityQueue</code> were forced to maintain a fully sorted sequence for iteration:</p>
+<ul>
+<li><strong>Insertion Penalty:</strong> Inserting a new item would likely degrade from $O(\log n)$ to $O(n)$ to maintain the sorted invariant, defeating the purpose of using a heap for a priority queue.</li>
+<li><strong>Flexibility Loss:</strong> The implementation would become rigid, limiting future optimizations or alternative internal representations.</li>
+</ul>
+<p>The contract of a <code>PriorityQueue</code> is to manage elements based on priority for extraction, not necessarily for sequential presentation.</p>
+<h2 id="achieving-sorted-iteration-alternative-approaches">Achieving Sorted Iteration: Alternative Approaches</h2>
+<p>While the default iterator is unsorted, developers can retrieve elements in precise priority order by leveraging the heap&rsquo;s removal mechanism.</p>
+<h3 id="method-1-repeated-polling-destructive-read">Method 1: Repeated Polling (Destructive Read)</h3>
+<p>The most direct method to read elements in sorted order is to repeatedly call the <code>poll()</code> method. This extracts the highest-priority element sequentially.</p>
+<p><strong>Practical Example (Python Equivalent Concept for Illustration):</strong></p>
+<p>Although the context often implies Java, for demonstrating the concept of ordered extraction versus traversal, consider the Python <code>heapq</code> module, where one extracts elements:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> heapq
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Example data structure (representing priorities)</span>
+</span></span><span style="display:flex;"><span>data_items <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    (<span style="color:#ae81ff">5</span>, <span style="color:#e6db74">&#34;Task E&#34;</span>),
+</span></span><span style="display:flex;"><span>    (<span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#34;Task A&#34;</span>),
+</span></span><span style="display:flex;"><span>    (<span style="color:#ae81ff">3</span>, <span style="color:#e6db74">&#34;Task C&#34;</span>),
+</span></span><span style="display:flex;"><span>    (<span style="color:#ae81ff">2</span>, <span style="color:#e6db74">&#34;Task B&#34;</span>),
+</span></span><span style="display:flex;"><span>    (<span style="color:#ae81ff">4</span>, <span style="color:#e6db74">&#34;Task D&#34;</span>)
+</span></span><span style="display:flex;"><span>]
+</span></span><span style="display:flex;"><span>heapq<span style="color:#f92672">.</span>heapify(data_items) <span style="color:#75715e"># Transforms list into a heap in-place</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sorted_results <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Extracting items in sorted priority order:&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Continuously extract the smallest element (highest priority)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">while</span> data_items:
+</span></span><span style="display:flex;"><span>    priority, task <span style="color:#f92672">=</span> heapq<span style="color:#f92672">.</span>heappop(data_items)
+</span></span><span style="display:flex;"><span>    sorted_results<span style="color:#f92672">.</span>append((priority, task))
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Popped: Priority </span><span style="color:#e6db74">{</span>priority<span style="color:#e6db74">}</span><span style="color:#e6db74">, </span><span style="color:#e6db74">{</span>task<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># sorted_results now contains [(1, &#39;Task A&#39;), (2, &#39;Task B&#39;), ...]</span>
+</span></span></code></pre></div><p>In Java, this translates to:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// Java Pseudo-Code demonstrating destructive read</span>
+</span></span><span style="display:flex;"><span>PriorityQueue<span style="color:#f92672">&lt;</span>Task<span style="color:#f92672">&gt;</span> pq <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> PriorityQueue<span style="color:#f92672">&lt;&gt;</span>(...);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Populate pq...</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>List<span style="color:#f92672">&lt;</span>Task<span style="color:#f92672">&gt;</span> orderedList <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;&gt;</span>();
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">while</span> (<span style="color:#f92672">!</span>pq.<span style="color:#a6e22e">isEmpty</span>()) {
+</span></span><span style="display:flex;"><span>    orderedList.<span style="color:#a6e22e">add</span>(pq.<span style="color:#a6e22e">poll</span>()); <span style="color:#75715e">// Extracts and removes the highest priority element</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// orderedList is now strictly sorted based on the comparator</span>
+</span></span></code></pre></div><p><strong>Limitation:</strong> This approach <em>consumes</em> the queue.</p>
+<h3 id="method-2-copy-and-sort-non-destructive-read">Method 2: Copy and Sort (Non-Destructive Read)</h3>
+<p>To read the contents in sorted order without altering the original queue, one must copy the elements into a structure that supports efficient sorting or sequential traversal, such as an <code>ArrayList</code>.</p>
+<ol>
+<li>Copy all elements from the <code>PriorityQueue</code> into a temporary <code>List</code>.</li>
+<li>Use <code>Collections.sort()</code> or the list&rsquo;s <code>sort()</code> method, supplying the queue&rsquo;s original <code>Comparator</code> (or natural ordering if no comparator was set).</li>
+</ol>
+<p><strong>Java Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>PriorityQueue<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> originalPq <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> PriorityQueue<span style="color:#f92672">&lt;&gt;</span>();
+</span></span><span style="display:flex;"><span>originalPq.<span style="color:#a6e22e">add</span>(40);
+</span></span><span style="display:flex;"><span>originalPq.<span style="color:#a6e22e">add</span>(10);
+</span></span><span style="display:flex;"><span>originalPq.<span style="color:#a6e22e">add</span>(30);
+</span></span><span style="display:flex;"><span>originalPq.<span style="color:#a6e22e">add</span>(20);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 1. Copy elements to a List</span>
+</span></span><span style="display:flex;"><span>List<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> tempStorage <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;&gt;</span>(originalPq);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 2. Sort the List using the same logic as the PQ (if custom comparator exists, use it here)</span>
+</span></span><span style="display:flex;"><span>tempStorage.<span style="color:#a6e22e">sort</span>(<span style="color:#66d9ef">null</span>); <span style="color:#75715e">// If using natural ordering for Integers</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Sorted view (non-destructive): &#34;</span> <span style="color:#f92672">+</span> tempStorage); 
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Output will be [10, 20, 30, 40]</span>
+</span></span></code></pre></div><p><strong>Performance Note:</strong> Copying is $O(n)$. Sorting the list is typically $O(n \log n)$. This is less efficient than the $O(n \log n)$ required to empty the queue via repeated polling, but it preserves the original queue state.</p>
+<h2 id="summary-of-heap-vs-sorted-structures">Summary of Heap vs. Sorted Structures</h2>
+<p>| Feature | Binary Heap (<code>PriorityQueue</code>) | Fully Sorted Structure (e.g., <code>TreeSet</code>) |
+| :</p>
+<h2 id="solutions">Solutions</h2>
+<p>| :</p>
+<p>| :</p>
+<p>|
+| <strong>Insertion Time</strong> | $O(\log n)$ | $O(\log n)$ or $O(n)$ depending on structure |
+| <strong>Max/Min Retrieval</strong> | $O(1)$ (Peek) | $O(1)$ (First/Last Element Access) |
+| <strong>Full Traversal Order</strong> | Level-order, <strong>Unsorted</strong> | <strong>Sorted</strong> |
+| <strong>Use Case</strong> | Efficient priority management | Efficient sorted access/search |</p>
+<p>The implementation relies on the binary heap because its performance profile perfectly matches the primary requirement: fast access and removal of the element with the highest priority. Providing an efficient <em>sorted</em> iterator would necessitate an algorithm far more complex than a simple level-order walk, effectively requiring sorting the entire collection on the fly, which is avoided by design.</p>
+<hr>
+<h3 id="faqs-on-why-java-priorityqueue-lacks-ordered-iterator">FAQs on Why Java PriorityQueue Lacks Ordered Iterator</h3>
+<p><div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why is the PriorityQueue iterator not sorted in Java</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Because the underlying structure is a binary heap, which is only partially ordered. The iterator performs a level-order traversal reflecting the heap&rsquo;s structure, not the sorted priority sequence.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the complexity of iterating over a PriorityQueue</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The default iteration is $O(n)$ because it traverses the $n$ elements in the underlying array representation, but the sequence is not guaranteed to be sorted by priority.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How can I get elements from a PriorityQueue in sorted order without destroying it</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Copy all elements into a temporary List and then sort that list using the same comparison logic that the PriorityQueue uses. This operation costs $O(n \log n)$.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What property defines a binary heap structure</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: A binary heap must satisfy the shape property (a complete binary tree) and the order property (the parent node is greater than or equal to its children, or vice versa, depending on max-heap or min-heap).</div>
+    </div>
+</div></p>
+<p>If you have encountered scenarios where iteration order caused issues or have alternative techniques for snapshotting prioritized data, please share your experiences in the comments below!</p>
+<p>For more deep dives into Python programming concepts and error resolution, explore these resources:</p>
+<ul>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">Solved How to Fix SSL Certificate Verify Failed Error in Python</a>
+</li>
+<li><a href="https://sqlpey.com/python/top-9-ways-to-solve-typeerror-is-not-json-serializable/" target="_blank" rel="noopener">Top 9 Ways to Solve TypeError is Not JSON Serializable</a>
+</li>
+<li><a href="https://sqlpey.com/python/how-to-properly-configure-pythonpath/" target="_blank" rel="noopener">How to Properly Configure PythonPath</a>
+</li>
+</ul>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

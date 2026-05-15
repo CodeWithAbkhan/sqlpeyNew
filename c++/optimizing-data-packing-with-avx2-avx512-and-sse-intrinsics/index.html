@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Optimizing Data Packing with AVX2, AVX-512, and SSE Intrinsics for High-Performance Shuffling - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Exploring high-efficiency methods for variable data shuffling and left-packing using Intel AVX2 (BMI2), AVX-512, and older SSE techniques, complete with …">
+
+
+
+<meta name="keywords" content="AVX2, BMI2, VPERMD, VCOMPRESSPS, Data Packing">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Optimizing Data Packing with AVX2, AVX-512, and SSE Intrinsics for High-Performance Shuffling - sqlpey">
+<meta name="DC.description" content="Exploring high-efficiency methods for variable data shuffling and left-packing using Intel AVX2 (BMI2), AVX-512, and older SSE techniques, complete with performance insights.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Optimizing Data Packing with AVX2, AVX-512, and SSE Intrinsics for High-Performance Shuffling - sqlpey">
+<meta property="og:description" content="Exploring high-efficiency methods for variable data shuffling and left-packing using Intel AVX2 (BMI2), AVX-512, and older SSE techniques, complete with …">
+<meta property="og:url" content="https://sqlpey.com/c&#43;&#43;/optimizing-data-packing-with-avx2-avx512-and-sse-intrinsics/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="SIMD Intrinsics">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Optimizing Data Packing with AVX2, AVX-512, and SSE Intrinsics for High-Performance Shuffling">
+<meta name="twitter:description" content="Exploring high-efficiency methods for variable data shuffling and left-packing using Intel AVX2 (BMI2), AVX-512, and older SSE techniques, complete with …">
+
+
+<link rel="canonical" href="https://sqlpey.com/c&#43;&#43;/optimizing-data-packing-with-avx2-avx512-and-sse-intrinsics/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Optimizing Data Packing with AVX2, AVX-512, and SSE Intrinsics for High-Performance Shuffling\"",
+  "description": "\"Exploring high-efficiency methods for variable data shuffling and left-packing using Intel AVX2 (BMI2), AVX-512, and older SSE techniques, complete with performance insights.\"",
+  "url": "\"https://sqlpey.com/c++/optimizing-data-packing-with-avx2-avx512-and-sse-intrinsics/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/c++/optimizing-data-packing-with-avx2-avx512-and-sse-intrinsics/\""
+  },
+  "articleSection": "\"SIMD Intrinsics\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Optimizing Data Packing with AVX2, AVX-512, and SSE Intrinsics for High-Performance Shuffling</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">SIMD Intrinsics</span>
+              
+              <span class="tag">High-Performance Computing</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              13 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#optimizing-data-packing-with-avx2-avx-512-and-sse-intrinsics-for-high-performance-shuffling">&ldquo;Optimizing Data Packing with AVX2, AVX-512, and SSE Intrinsics for High-Performance Shuffling&rdquo;</a></li>
+    <li><a href="#strategy-1-avx2-with-bmi2-pextpdep-for-3264-bit-elements">Strategy 1: AVX2 with BMI2 (<code>PEXT</code>/<code>PDEP</code>) for 32/64-bit Elements</a>
+      <ul>
+        <li><a href="#core-mechanism-index-extraction-and-permutation">Core Mechanism: Index Extraction and Permutation</a></li>
+        <li><a href="#practical-implementation-example-64-bit-pdeppext">Practical Implementation Example (64-bit PDEP/PEXT)</a></li>
+      </ul>
+    </li>
+    <li><a href="#strategy-2-alternative-for-slow-pdeppext-amd-zen-using-luts">Strategy 2: Alternative for Slow <code>PDEP</code>/<code>PEXT</code> (AMD Zen) using LUTs</a>
+      <ul>
+        <li><a href="#lut-mechanism">LUT Mechanism</a></li>
+      </ul>
+    </li>
+    <li><a href="#strategy-3-avx-512-vector-compression">Strategy 3: AVX-512 Vector Compression</a>
+      <ul>
+        <li><a href="#vcompressps-usage"><code>VCOMPRESSPS</code> Usage</a></li>
+      </ul>
+    </li>
+    <li><a href="#strategy-4-128-bit-sseavx-implementations">Strategy 4: 128-bit SSE/AVX Implementations</a>
+      <ul>
+        <li><a href="#128-bit-mask-generation-with-bmi2-pext">128-bit Mask Generation with BMI2 (<code>PEXT</code>)</a></li>
+        <li><a href="#branchless-avx-simulation-of-pdep-non-bmi2">Branchless AVX Simulation of <code>PDEP</code> (Non-BMI2)</a></li>
+        <li><a href="#sse2-lut-approach">SSE2 LUT Approach</a></li>
+      </ul>
+    </li>
+    <li><a href="#performance-implications-and-best-practices">Performance Implications and Best Practices</a></li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#faqs-on-optimizing-data-packing-with-avx-intrinsics">FAQs on Optimizing Data Packing with AVX Intrinsics</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="optimizing-data-packing-with-avx2-avx-512-and-sse-intrinsics-for-high-performance-shuffling">&ldquo;Optimizing Data Packing with AVX2, AVX-512, and SSE Intrinsics for High-Performance Shuffling&rdquo;</h2>
+<p>How can expert programmers perform efficient lane-crossing variable shuffles, particularly for left-packing filtered data, across different generations of x86 CPU instruction sets like AVX2, AVX-512, and SSE? This involves generating dynamic shuffle masks from input bitmasks while considering hardware-specific performance penalties, such as those associated with BMI2 instructions on older AMD Zen CPUs.</p>
+<p>The goal is to implement operations similar to <code>std::remove</code> for various data types (chars, shorts, ints, doubles) using vectorization.</p>
+<h2 id="strategy-1-avx2-with-bmi2-pextpdep-for-3264-bit-elements">Strategy 1: AVX2 with BMI2 (<code>PEXT</code>/<code>PDEP</code>) for 32/64-bit Elements</h2>
+<p>This method leverages the bit manipulation instructions provided by BMI2, which are generally available alongside AVX2 support.</p>
+<h3 id="core-mechanism-index-extraction-and-permutation">Core Mechanism: Index Extraction and Permutation</h3>
+<p>The process relies on using <code>PEXT</code> (Parallel Bits Extract) to convert a selection bitmask into a contiguous sequence of indices, which then drives a vector shuffle instruction like <code>VPERMPS</code> or <code>VPERMD</code>.</p>
+<ol>
+<li><strong>Index Generation</strong>: Start with a constant representing identity indices (e.g., <code>[7, 6, 5, 4, 3, 2, 1, 0]</code>).</li>
+<li><strong>Mask Expansion</strong>: Use <code>PDEP</code> to extract the desired indices based on the input mask, packing them contiguously at the lower bits of a register.
+<ul>
+<li>Initial bit expansion (<code>PDEP</code>) maps each set bit from the mask into a specific byte position.</li>
+<li>A subsequent multiplication (e.g., by <code>0xFF</code> or <code>0x11</code> depending on the technique) expands these single bits into byte-sized masks.</li>
+</ul>
+</li>
+<li><strong>Index Compaction</strong>: Use <code>PEXT</code> again on the identity indices using the expanded mask to pull the required indices into a packed 3-bit (or byte-sized) format.</li>
+<li><strong>Shuffling</strong>: Convert these indices into a shuffle mask vector and use <code>VPERMPS</code> (for floats) or <code>VPERMD</code> (for integers) to execute the lane-crossing permutation.</li>
+</ol>
+<blockquote>
+<p><strong>Performance Note for AMD CPUs</strong>: Be wary of older AMD Zen 1 and Zen 2 CPUs, where <code>PDEP</code>/<code>PEXT</code> exhibit high latency (up to 18 cycles) and large micro-op counts (6 uops). For these architectures, using 128-bit vectors with <code>PSHUFB</code> or <code>VPERMILPS</code> lookup tables (LUTs) might yield superior performance.</p>
+</blockquote>
+<h3 id="practical-implementation-example-64-bit-pdeppext">Practical Implementation Example (64-bit PDEP/PEXT)</h3>
+<p>This specific implementation uses 64-bit operations to simplify the unpacking step, which works well for 32-bit or 64-bit elements.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdint.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;immintrin.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Uses 64bit pdep / pext to save a step in unpacking.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>__m256 <span style="color:#a6e22e">compress256</span>(__m256 src, <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> mask <span style="color:#75715e">/* from _mm256_movemask_ps */</span>)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 1. Unpack each bit to a byte position (0x0101... mask)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">uint64_t</span> expanded_mask <span style="color:#f92672">=</span> _pdep_u64(mask, <span style="color:#ae81ff">0x0101010101010101ULL</span>); 
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 2. Replicate the bit into the full byte (e.g., 0x01 -&gt; 0xFF)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// Optimization note: GCC/Clang may replace imul with shifts/subs for 0xFF.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  expanded_mask <span style="color:#f92672">*=</span> <span style="color:#ae81ff">0xFFU</span>;    
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">uint64_t</span> identity_indices <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x0706050403020100ULL</span>;    <span style="color:#75715e">// Identity shuffle indices packed per byte
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 3. Extract the desired indices into contiguous low bits
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">uint64_t</span> wanted_indices <span style="color:#f92672">=</span> _pext_u64(identity_indices, expanded_mask);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">__m128i</span> bytevec <span style="color:#f92672">=</span> _mm_cvtsi64_si128(wanted_indices);
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Convert the 8 packed byte indices into 32-bit integer lanes for VPERMPS/VPERMD
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  __m256i shufmask <span style="color:#f92672">=</span> _mm256_cvtepu8_epi32(bytevec);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 4. Execute the shuffle. For float vectors, use VPERMPS.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">return</span> _mm256_permutevar8x32_ps(src, shufmask);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>When compiled on Haswell, the latency for this function is around 16 cycles, with potential throughput limitations due to <code>PDEP</code>/<code>PEXT</code> competing on specific execution ports.</p>
+<h2 id="strategy-2-alternative-for-slow-pdeppext-amd-zen-using-luts">Strategy 2: Alternative for Slow <code>PDEP</code>/<code>PEXT</code> (AMD Zen) using LUTs</h2>
+<p>When <code>PDEP</code>/<code>PEXT</code> are slow, a pre-calculated Look-Up Table (LUT) approach avoids these instructions entirely, replacing them with memory loads, broadcasting, and shifts. This approach is generally preferred for CPUs where BMI2 integer instructions are penalized.</p>
+<h3 id="lut-mechanism">LUT Mechanism</h3>
+<p>This method generates the shuffle mask using a small data LUT (768 bytes total) derived from the input movemask.</p>
+<ol>
+<li><strong>Mask to Address</strong>: Use the 8-bit <code>movemask</code> result to index into a pre-built table (e.g., <code>g_pack_left_table_u8x3</code>).</li>
+<li><strong>Broadcast</strong>: Broadcast the 4-byte LUT entry containing packed 3-bit indices into all lanes of a 256-bit register.</li>
+<li><strong>Shift and Extract</strong>: Use vector shift instructions (<code>_mm256_srlv_epi32</code>) with a constant shift vector to isolate the 3-bit indices at the bottom of each lane, forming the final shuffle mask for <code>VPERMPS</code>.</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// Data preparation (must be done once)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>u8 g_pack_left_table_u8x3[<span style="color:#ae81ff">256</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">3</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>u32 <span style="color:#a6e22e">get_nth_bits</span>(<span style="color:#66d9ef">int</span> a) { <span style="color:#75715e">/* ... implementation to pack indices based on bits ... */</span> <span style="color:#66d9ef">return</span> out; }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">BuildPackMask</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">256</span>; <span style="color:#f92672">++</span>i) {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">*</span><span style="color:#66d9ef">reinterpret_cast</span><span style="color:#f92672">&lt;</span>u32<span style="color:#f92672">*&gt;</span>(<span style="color:#f92672">&amp;</span>g_pack_left_table_u8x3[i <span style="color:#f92672">*</span> <span style="color:#ae81ff">3</span>]) <span style="color:#f92672">=</span> get_nth_bits(i);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Intrinsics for mask generation
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>__m256i <span style="color:#a6e22e">MoveMaskToIndices</span>(u32 moveMask) {
+</span></span><span style="display:flex;"><span>    u8 <span style="color:#f92672">*</span>adr <span style="color:#f92672">=</span> g_pack_left_table_u8x3 <span style="color:#f92672">+</span> moveMask <span style="color:#f92672">*</span> <span style="color:#ae81ff">3</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Load the 4-byte entry and broadcast it
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    __m256i indices <span style="color:#f92672">=</span> _mm256_set1_epi32(<span style="color:#f92672">*</span><span style="color:#66d9ef">reinterpret_cast</span><span style="color:#f92672">&lt;</span>u32<span style="color:#f92672">*&gt;</span>(adr));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Shift to align the 3-bit indices at the bottom of each lane
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    __m256i shufmask <span style="color:#f92672">=</span> _mm256_srlv_epi32 (indices, _mm256_setr_epi32(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">6</span>, <span style="color:#ae81ff">9</span>, <span style="color:#ae81ff">12</span>, <span style="color:#ae81ff">15</span>, <span style="color:#ae81ff">18</span>, <span style="color:#ae81ff">21</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> shufmask;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The assembly output on MSVC shows efficient use of memory indexing and the <code>VPSRLVD</code> instruction.</p>
+<h2 id="strategy-3-avx-512-vector-compression">Strategy 3: AVX-512 Vector Compression</h2>
+<p>For processors supporting AVX-512 Feature (AVX512F), the <code>VCOMPRESSPS</code> instruction is specifically designed for this sparse-to-dense packing operation.</p>
+<h3 id="vcompressps-usage"><code>VCOMPRESSPS</code> Usage</h3>
+<p>This instruction takes a source vector and a mask register (<code>__mmask16</code>), writing only the elements corresponding to set mask bits into a dense (contiguous) location.</p>
+<ul>
+<li><strong>Data Types</strong>: <code>VCOMPRESSPS</code> exists for single-precision floats, and integer variants (<code>VPCOMPRESSQ</code>) exist for 32/64-bit integers in VBMI2 extensions (Ice Lake/Zen 4).</li>
+<li><strong>Memory Destination</strong>: Using a memory destination (<code>_mm512_mask_compressstoreu_ps</code>) can be slow on Zen 4. It is often recommended to compress into a register first (<code>_mm512_maskz_compress_ps</code>) and then perform a standard unaligned store.</li>
+<li><strong>Advancing Pointers</strong>: Use <code>_mm_popcnt_u64</code> on the mask to calculate exactly how many elements were kept, which determines the increment for the destination pointer.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdint.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;immintrin.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>size_t <span style="color:#a6e22e">filter_non_negative</span>(<span style="color:#66d9ef">float</span> <span style="color:#f92672">*</span>__restrict__ dst, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">float</span> <span style="color:#f92672">*</span>__restrict__ src, size_t len) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">float</span> <span style="color:#f92672">*</span>endp <span style="color:#f92672">=</span> src <span style="color:#f92672">+</span> len;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">float</span> <span style="color:#f92672">*</span>dst_start <span style="color:#f92672">=</span> dst;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> __m512 v_zero <span style="color:#f92672">=</span> _mm512_setzero_ps();
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">do</span> {
+</span></span><span style="display:flex;"><span>        __m512 v  <span style="color:#f92672">=</span> _mm512_loadu_ps(src);
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Generate mask: true if src element &gt;= 0.0
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        __mmask16 keep <span style="color:#f92672">=</span> _mm512_cmp_ps_mask(v, v_zero, _CMP_GE_OQ); 
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Compress into a register first (avoids slow Zen 4 memory store behavior)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        __m512 packed <span style="color:#f92672">=</span> _mm512_maskz_compress_ps(keep, v);
+</span></span><span style="display:flex;"><span>        _mm512_storeu_ps(dst, packed);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        src <span style="color:#f92672">+=</span> <span style="color:#ae81ff">16</span>; 
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Calculate elements kept using popcount
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        dst <span style="color:#f92672">+=</span> _mm_popcnt_u64((<span style="color:#66d9ef">unsigned</span>)keep); 
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">while</span> (src <span style="color:#f92672">&lt;</span> endp);
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> dst <span style="color:#f92672">-</span> dst_start;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>On modern Intel CPUs (like Haswell onwards), this can achieve a throughput close to 1 vector per 3 cycles, bottlenecked by port 5 operations (<code>KMOV</code> and the store). Misaligned 512-bit stores can sometimes impact performance negatively if the destination pointer is not cache-line aligned.</p>
+<h2 id="strategy-4-128-bit-sseavx-implementations">Strategy 4: 128-bit SSE/AVX Implementations</h2>
+<p>When 256-bit or 512-bit instructions are unavailable or unnecessary, 128-bit methods apply, often involving the <code>PSHUFB</code> instruction or, for older SSE2/SSE3, complex mask generation based on <code>_mm_shuffle_ps</code>.</p>
+<h3 id="128-bit-mask-generation-with-bmi2-pext">128-bit Mask Generation with BMI2 (<code>PEXT</code>)</h3>
+<p>If using 128-bit registers with data types smaller than 4 bytes (e.g., bytes or shorts), you might need to process data in chunks or adapt the <code>PEXT</code>/<code>PDEP</code> index generation. For 16-bit elements, the BMI2 technique can be adapted by using <code>PSHUFB</code> with byte-level indices.</p>
+<p>The following code block shows complex mask derivation for <code>_mm_shuffle_epi8</code> using <code>PEXT</code>/<code>PDEP</code> adapted for 16-bit elements.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// Helper namespace for 128-bit mask generation
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">namespace</span> _compress_mask {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">inline</span> std<span style="color:#f92672">::</span>pair<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">__m128i</span>, std<span style="color:#f92672">::</span><span style="color:#66d9ef">uint8_t</span><span style="color:#f92672">&gt;</span> mask128(std<span style="color:#f92672">::</span><span style="color:#66d9ef">uint16_t</span> mmask) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Expand 16 bits into 64 bits using 0x11... constant, then multiply by 0xF
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">const</span> std<span style="color:#f92672">::</span><span style="color:#66d9ef">uint64_t</span> mmask_expanded <span style="color:#f92672">=</span> _pdep_u64(mmask, <span style="color:#ae81ff">0x1111111111111111ULL</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">0xF</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> std<span style="color:#f92672">::</span><span style="color:#66d9ef">uint8_t</span> offset <span style="color:#f92672">=</span> <span style="color:#66d9ef">static_cast</span><span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span><span style="color:#66d9ef">uint8_t</span><span style="color:#f92672">&gt;</span>(_mm_popcnt_u32(mmask)); 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Generate byte indices based on Peter Cordes&#39;s technique
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">const</span> std<span style="color:#f92672">::</span><span style="color:#66d9ef">uint64_t</span> compressed_idxes <span style="color:#f92672">=</span> _pext_u64(<span style="color:#ae81ff">0xfedcba9876543210ULL</span>, mmask_expanded); 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">__m128i</span> as_lower_8byte <span style="color:#f92672">=</span> _mm_cvtsi64_si128(compressed_idxes); <span style="color:#75715e">// Low 8 bytes hold compressed indices
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">__m128i</span> as_16bit <span style="color:#f92672">=</span> _mm_cvtepu8_epi16(as_lower_8byte);         <span style="color:#75715e">// Convert 8 bytes to 4 shorts
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Prepare for PSHUFB: Create index mask by spreading and combining bits
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">__m128i</span> shift_by_4 <span style="color:#f92672">=</span> _mm_slli_epi16(as_16bit, <span style="color:#ae81ff">4</span>);             
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">__m128i</span> combined <span style="color:#f92672">=</span> _mm_or_si128(shift_by_4, as_16bit);        
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">__m128i</span> filter <span style="color:#f92672">=</span> _mm_set1_epi16(<span style="color:#ae81ff">0x0f0f</span>);                      
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">__m128i</span> res <span style="color:#f92672">=</span> _mm_and_si128(combined, filter);                
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> {res, offset};
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>}  <span style="color:#75715e">// namespace _compress_mask
+</span></span></span></code></pre></div><h3 id="branchless-avx-simulation-of-pdep-non-bmi2">Branchless AVX Simulation of <code>PDEP</code> (Non-BMI2)</h3>
+<p>If BMI2 is absent but AVX (or SSE4.1) is present, one can simulate the required shifts and merges using a sequence of <code>BLENDV</code> and vector permutations. This technique uses repeated blending operations driven by permute masks to shift and select elements based on the input mask.</p>
+<p>This approach targets floating-point data (<code>__m128</code>) or double-precision data (<code>__m256d</code>).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// AVX simulation for float packing (uses _mm_permute_ps and _mm_blendv_ps)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">inline</span> <span style="color:#66d9ef">__m128</span> <span style="color:#a6e22e">left_pack_avx</span>(<span style="color:#66d9ef">__m128</span> val, <span style="color:#66d9ef">__m128i</span> mask) <span style="color:#66d9ef">noexcept</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Masks derived to select elements for shifting/blending
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">__m128i</span> shiftMask0 <span style="color:#f92672">=</span> _mm_shuffle_epi32(mask, <span style="color:#ae81ff">0xA4</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">__m128i</span> shiftMask1 <span style="color:#f92672">=</span> _mm_shuffle_epi32(mask, <span style="color:#ae81ff">0x54</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">__m128i</span> shiftMask2 <span style="color:#f92672">=</span> _mm_shuffle_epi32(mask, <span style="color:#ae81ff">0x00</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> perm_f9 <span style="color:#f92672">=</span> <span style="color:#ae81ff">0xF9</span>; <span style="color:#75715e">// Constant for permutation
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">__m128</span> v <span style="color:#f92672">=</span> val;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Iteratively blend the current vector with a permuted version based on mask segments
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    v <span style="color:#f92672">=</span> _mm_blendv_ps(_mm_permute_ps(v, perm_f9), v, shiftMask0);
+</span></span><span style="display:flex;"><span>    v <span style="color:#f92672">=</span> _mm_blendv_ps(_mm_permute_ps(v, perm_f9), v, shiftMask1);
+</span></span><span style="display:flex;"><span>    v <span style="color:#f92672">=</span> _mm_blendv_ps(_mm_permute_ps(v, perm_f9), v, shiftMask2);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> v;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="sse2-lut-approach">SSE2 LUT Approach</h3>
+<p>For the most basic compatibility (SSE2), an instruction-based LUT using a <code>switch</code> statement can be employed, although it incurs branching overhead.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">inline</span> <span style="color:#66d9ef">__m128</span> <span style="color:#a6e22e">LeftPack_SSE2</span>(<span style="color:#66d9ef">__m128</span> val, <span style="color:#66d9ef">int</span> mask)  {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">switch</span>(mask) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">case</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">case</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">return</span> val; <span style="color:#75715e">// No change needed for mask 0 or 1
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">case</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">return</span> _mm_shuffle_ps(val,val,<span style="color:#ae81ff">0x01</span>); <span style="color:#75715e">// Select 2nd element
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// ... many other cases require specific _mm_shuffle_ps constants
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">case</span> <span style="color:#ae81ff">15</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">return</span> val;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">default</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">return</span> val; <span style="color:#75715e">// Placeholder for unhandled masks
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="performance-implications-and-best-practices">Performance Implications and Best Practices</h2>
+<p>Benchmarking reveals that SIMD packing offers substantial speedups over non-SIMD implementations, heavily dependent on data distribution and architecture.</p>
+<p>| Data Size | Element Type | Best Speedup (vs. Non-SIMD) | Key Observation |
+| :</p>
+<h2 id="solutions">Solutions</h2>
+<p>| :</p>
+<pre tabindex="0"><code>#include &amp;lt;stdint.h&amp;gt;
+#include &amp;lt;immintrin.h&amp;gt;
+
+// Uses 64bit pdep / pext to save a step in unpacking.
+__m256 compress256(__m256 src, unsigned int mask /* from movmskps */)
+{
+  uint64_t expanded_mask = _pdep_u64(mask, 0x0101010101010101);  // unpack each bit to a byte
+  expanded_mask *= 0xFF;    // mask |= mask&amp;lt;&amp;lt;1 | mask&amp;lt;&amp;lt;2 | ... | mask&amp;lt;&amp;lt;7;
+  // ABC... -&amp;gt; AAAAAAAABBBBBBBBCCCCCCCC...: replicate each bit to fill its byte
+
+  const uint64_t identity_indices = 0x0706050403020100;    // the identity shuffle for vpermps, packed to one index per byte
+  uint64_t wanted_indices = _pext_u64(identity_indices, expanded_mask);
+
+  __m128i bytevec = _mm_cvtsi64_si128(wanted_indices);
+  __m256i shufmask = _mm256_cvtepu8_epi32(bytevec);
+
+  return _mm256_permutevar8x32_ps(src, shufmask);
+}
+# clang 3.7.1 -std=gnu++14 -O3 -march=haswell
+    mov     eax, edi                   # just to zero extend: goes away when inlining
+    movabs  rcx, 72340172838076673     # The constants are hoisted after inlining into a loop
+    pdep    rax, rax, rcx              # ABC       -&amp;gt; 0000000A0000000B....
+    imul    rax, rax, 255              # 0000000A0000000B.. -&amp;gt; AAAAAAAABBBBBBBB..
+    movabs  rcx, 506097522914230528
+    pext    rax, rcx, rax
+    vmovq   xmm1, rax
+    vpmovzxbd       ymm1, xmm1         # 3c latency since this is lane-crossing
+    vpermps ymm0, ymm1, ymm0
+    ret
+</code></pre><p>| :</p>
+<pre tabindex="0"><code>//Generate Move mask via: _mm256_movemask_ps(_mm256_castsi256_ps(mask)); etc
+__m256i MoveMaskToIndices(u32 moveMask) {
+    u8 *adr = g_pack_left_table_u8x3 + moveMask * 3;
+    __m256i indices = _mm256_set1_epi32(*reinterpret_cast&amp;lt;u32*&amp;gt;(adr));//lower 24 bits has our LUT
+
+   // __m256i m = _mm256_sllv_epi32(indices, _mm256_setr_epi32(29, 26, 23, 20, 17, 14, 11, 8));
+
+    //now shift it right to get 3 bits at bottom
+    //__m256i shufmask = _mm256_srli_epi32(m, 29);
+
+    //Simplified version suggested by wim
+    //shift each lane so desired 3 bits are a bottom
+    //There is leftover data in the lane, but _mm256_permutevar8x32_ps  only examines the first 3 bits so this is ok
+    __m256i shufmask = _mm256_srlv_epi32 (indices, _mm256_setr_epi32(0, 3, 6, 9, 12, 15, 18, 21));
+    return shufmask;
+}
+
+u32 get_nth_bits(int a) {
+    u32 out = 0;
+    int c = 0;
+    for (int i = 0; i &amp;lt; 8; ++i) {
+        auto set = (a &amp;gt;&amp;gt; i) &amp;amp; 1;
+        if (set) {
+            out |= (i &amp;lt;&amp;lt; (c * 3));
+            c++;
+        }
+    }
+    return out;
+}
+u8 g_pack_left_table_u8x3[256 * 3 + 1];
+
+void BuildPackMask() {
+    for (int i = 0; i &amp;lt; 256; ++i) {
+        *reinterpret_cast&amp;lt;u32*&amp;gt;(&amp;amp;g_pack_left_table_u8x3[i * 3]) = get_nth_bits(i);
+    }
+}
+lea ecx, DWORD PTR [rcx+rcx*2]
+  lea rax, OFFSET FLAT:unsigned char * g_pack_left_table_u8x3 ; g_pack_left_table_u8x3
+  vpbroadcastd ymm0, DWORD PTR [rcx+rax]
+  vpsrlvd ymm0, ymm0, YMMWORD PTR __ymm@00000015000000120000000f0000000c00000009000000060000000300000000
+</code></pre><p>| :</p>
+<pre tabindex="0"><code>#include &amp;lt;stdint.h&amp;gt;
+#include &amp;lt;immintrin.h&amp;gt;
+
+size_t filter_non_negative(float *__restrict__ dst, const float *__restrict__ src, size_t len) {
+    const float *endp = src+len;
+    float *dst_start = dst;
+    do {
+        __m512      v  = _mm512_loadu_ps(src);
+        __mmask16 keep = _mm512_cmp_ps_mask(v, _mm512_setzero_ps(), _CMP_GE_OQ);  // true for src &amp;gt;= 0.0, false for unordered and src &amp;lt; 0.0
+         //_mm512_mask_compressstoreu_ps(dst, keep, v);  // older clang was missing this intrinsic
+        // update: avoid compressstoreu because it&#39;s very slow on Zen 4, and probably no advantage on Intel since we can safely write full vectors
+        __m512 packed = _mm512_maskz_compress_ps(keep, v);
+        _mm512_storeu_ps(dst, packed);
+
+        src += 16;  // sizeof(v) / sizeof(*src)
+        dst += _mm_popcnt_u64((unsigned)keep);   // popcnt_u64 instead of u32 helps gcc avoid a wasted movsx, but is potentially slower on some CPUs
+    } while (src &amp;lt; endp);
+    return dst - dst_start;
+}
+# gcc13.3 -O3 -march=x86-64-v4
+   # GCC14 does popcnt dx,dx  ; and edx,31
+   # clang is sensible with _popcnt_u32 or u64
+filter_non_negative(float*, float const*, unsigned long):
+    lea     rcx, [rsi+rdx*4]         # endp
+    mov     rax, rdi
+    vxorps  xmm1, xmm1, xmm1
+.L2:                             # do{
+    vmovups zmm2, ZMMWORD PTR [rsi]  # load v
+    add     rsi, 64                  # src += 16
+    vcmpps  k1, zmm2, zmm1, 29       # compare into mask register
+    vcompressps     zmm0{k1}{z}, zmm2  # left-pack using that mask
+    kmovw   edx, k1
+    popcnt  rdx, rdx
+    vmovups ZMMWORD PTR [rax], zmm0  # 64-byte store into dst
+    lea     rax, [rax+rdx*4]         # dst += popcount(mask)
+    cmp     rsi, rcx
+    jb      .L2                   # }while(p&amp;lt;endp)
+
+    sub     rax, rdi
+    sar     rax, 2                # address math for element count
+    vzeroupper
+    ret
+</code></pre><p>|
+| 1000 Bytes | Char (Byte) | Up to 27x | Performance less dependent on branch prediction for SIMD path. |
+| 1000 Bytes | Short (16-bit) | Up to 2x | Larger gains expected for smaller elements, but results vary. |
+| 1000 Bytes | Int (32-bit) | 20-30% to 2x | 256-bit register use shows advantages here. |</p>
+<p><strong>Code Alignment</strong>: SIMD implementations show significantly less sensitivity to code alignment compared to traditional non-SIMD code, largely because the SIMD approach minimizes instruction-level branches, which are sensitive to instruction fetch alignment.</p>
+<p>If sufficient data (e.g., &gt;1000 bytes) is being processed, leveraging AVX2/BMI2 or AVX-512 intrinsics for packing operations is a highly effective optimization on modern processors.</p>
+<p>What specific element size and target architecture are you optimizing for? Share your observed performance metrics if you encounter unexpected bottlenecks!</p>
+<p>For further exploration into Python/networking SSL errors, see <a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">Fixing SSL Certificate Verification Errors in Python</a>
+.</p>
+<h3 id="faqs-on-optimizing-data-packing-with-avx-intrinsics">FAQs on Optimizing Data Packing with AVX Intrinsics</h3>
+<p><div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the primary performance drawback of using the BMI2 PEXT/PDEP approach</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: On older AMD Zen CPUs (Zen 1/Zen 2), PEXT and PDEP instructions suffer from high latency (around 18 cycles) and high micro-op counts, making them inefficient for tight loops.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is VCOMPRESSPS always faster on AVX-512 systems</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: VCOMPRESSPS is generally the dedicated instruction for this, but performance can suffer if the resulting packed vector store causes cache-line splits (misaligned 512-bit stores), particularly on Zen 4 architectures. Compressing to a register first then storing is often safer.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How do I determine the number of elements kept during compression</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: For both VCOMPRESSPS and the BMI2 approach, use the population count instruction (<code>POPCNT</code>) on the source mask generated by the comparison operation (<code>_mm_popcnt_u32</code> or <code>_mm_popcnt_u64</code>).</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can the AVX blend-based solution work without BMI2</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, the iterative blend and permute approach (Solution 6) simulates the logic of bit extraction without needing the BMI2 instructions, relying only on AVX/SSE instruction sets.</div>
+    </div>
+</div></p>
+<pre tabindex="0"><code>// helper namespace
+namespace _compress_mask {
+
+// mmask - result of `_mm_movemask_epi8`, 
+// `uint16_t` - there are at most 16 bits with values for __m128i. 
+inline std::pair&amp;lt;__m128i, std::uint8_t&amp;gt; mask128(std::uint16_t mmask) {
+    const std::uint64_t mmask_expanded = _pdep_u64(mmask, 0x1111111111111111) * 0xf;
+
+    const std::uint8_t offset = 
+        static_cast&amp;lt;std::uint8_t&amp;gt;(_mm_popcnt_u32(mmask));  // To compute how many elements were selected
+
+    const std::uint64_t compressed_idxes = 
+        _pext_u64(0xfedcba9876543210, mmask_expanded); // Do the @PeterCordes answer
+
+    const __m128i as_lower_8byte = _mm_cvtsi64_si128(compressed_idxes); // 0...0|compressed_indexes
+    const __m128i as_16bit = _mm_cvtepu8_epi16(as_lower_8byte);         // From bytes to shorts over the whole register
+    const __m128i shift_by_4 = _mm_slli_epi16(as_16bit, 4);             // x &amp;lt;&amp;lt; 4
+    const __m128i combined = _mm_or_si128(shift_by_4, as_16bit);        // | x
+    const __m128i filter = _mm_set1_epi16(0x0f0f);                      // 0x0f0f
+    const __m128i res = _mm_and_si128(combined, filter);                // &amp;amp; 0x0f0f
+
+    return {res, offset};
+}
+
+}  // namespace _compress_mask
+
+template &amp;lt;typename T&amp;gt;
+std::pair&amp;lt;__m128i, std::uint8_t&amp;gt; compress_mask_for_shuffle_epi8(std::uint32_t mmask) {
+     auto res = _compress_mask::mask128(mmask);
+     res.second /= sizeof(T);  // bit count to element count
+     return res;
+}
+// helper namespace
+namespace _compress_mask {
+
+// mmask - result of _mm256_movemask_epi8
+inline std::pair&amp;lt;__m256i, std::uint8_t&amp;gt; mask256_epi32(std::uint32_t mmask) {
+    const std::uint64_t mmask_expanded = _pdep_u64(mmask, 0x5555&#39;5555&#39;5555&#39;5555) * 3;
+
+    const std::uint8_t offset = static_cast&amp;lt;std::uint8_t(_mm_popcnt_u32(mmask));  // To compute how many elements were selected
+
+    const std::uint64_t compressed_idxes = _pext_u64(0x0706050403020100, mmask_expanded);  // Do the @PeterCordes answer
+
+    // Every index was one byte =&amp;gt; we need to make them into 4 bytes
+    const __m128i as_lower_8byte = _mm_cvtsi64_si128(compressed_idxes);  // 0000|compressed indexes
+    const __m256i expanded = _mm256_cvtepu8_epi32(as_lower_8byte);  // spread them out
+    return {expanded, offset};
+}
+
+}  // namespace _compress_mask
+
+template &amp;lt;typename T&amp;gt;
+std::pair&amp;lt;__m256i, std::uint8_t&amp;gt; compress_mask_for_permutevar8x32(std::uint32_t mmask) {
+    static_assert(sizeof(T) &amp;gt;= 4);  // You cannot permute shorts/chars with this.
+    auto res = _compress_mask::mask256_epi32(mmask);
+    res.second /= sizeof(T);  // bit count to element count
+    return res;
+}
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

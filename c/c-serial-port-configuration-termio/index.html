@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>C/C&#43;&#43; Serial Port Configuration: Avoiding Intermittent Failures with tcgetattr/tcsetattr - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Examine robust C/C&#43;&#43; techniques for configuring serial communication attributes using termios, focusing on proper handling of tcgetattr and avoiding structural …">
+
+
+
+<meta name="keywords" content="termios, tcgetattr, tcsetattr, serial port c, non-blocking read">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="C/C&#43;&#43; Serial Port Configuration: Avoiding Intermittent Failures with tcgetattr/tcsetattr - sqlpey">
+<meta name="DC.description" content="Examine robust C/C&#43;&#43; techniques for configuring serial communication attributes using termios, focusing on proper handling of tcgetattr and avoiding structural initialization pitfalls.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="C/C&#43;&#43; Serial Port Configuration: Avoiding Intermittent Failures with tcgetattr/tcsetattr - sqlpey">
+<meta property="og:description" content="Examine robust C/C&#43;&#43; techniques for configuring serial communication attributes using termios, focusing on proper handling of tcgetattr and avoiding structural …">
+<meta property="og:url" content="https://sqlpey.com/c/c-serial-port-configuration-termio/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="C Programming">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="C/C&#43;&#43; Serial Port Configuration: Avoiding Intermittent Failures with tcgetattr/tcsetattr">
+<meta name="twitter:description" content="Examine robust C/C&#43;&#43; techniques for configuring serial communication attributes using termios, focusing on proper handling of tcgetattr and avoiding structural …">
+
+
+<link rel="canonical" href="https://sqlpey.com/c/c-serial-port-configuration-termio/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"C/C++ Serial Port Configuration: Avoiding Intermittent Failures with tcgetattr/tcsetattr\"",
+  "description": "\"Examine robust C/C++ techniques for configuring serial communication attributes using termios, focusing on proper handling of tcgetattr and avoiding structural initialization pitfalls.\"",
+  "url": "\"https://sqlpey.com/c/c-serial-port-configuration-termio/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/c/c-serial-port-configuration-termio/\""
+  },
+  "articleSection": "\"C Programming\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">C/C++ Serial Port Configuration: Avoiding Intermittent Failures with tcgetattr/tcsetattr</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">C Programming</span>
+              
+              <span class="tag">Serial Communication</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              10 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#cc-serial-port-configuration-avoiding-intermittent-failures-with-tcgetattrtcsetattr">&ldquo;C/C++ Serial Port Configuration: Avoiding Intermittent Failures with tcgetattr/tcsetattr&rdquo;</a></li>
+    <li><a href="#the-critical-pitfall-why-zeroing-the-termios-struct-causes-issues">The Critical Pitfall: Why Zeroing the <code>termios</code> Struct Causes Issues</a></li>
+    <li><a href="#establishing-serial-interface-attributes-speed-data-size-and-parity">Establishing Serial Interface Attributes: Speed, Data Size, and Parity</a>
+      <ul>
+        <li><a href="#available-baud-rate-and-parity-constants">Available Baud Rate and Parity Constants</a></li>
+      </ul>
+    </li>
+    <li><a href="#controlling-read-blocking-behavior">Controlling Read Blocking Behavior</a>
+      <ul>
+        <li><a href="#practical-example-sending-data-and-reading-non-blockingly">Practical Example: Sending Data and Reading Non-Blockingly</a></li>
+      </ul>
+    </li>
+    <li><a href="#alternative-approach-streamlined-initialization-if-portability-is-less-critical">Alternative Approach: Streamlined Initialization (If Portability is Less Critical)</a>
+      <ul>
+        <li><a href="#faqs-on-c-serial-port-configuration-termio">FAQs on C Serial Port Configuration Termio</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="cc-serial-port-configuration-avoiding-intermittent-failures-with-tcgetattrtcsetattr">&ldquo;C/C++ Serial Port Configuration: Avoiding Intermittent Failures with tcgetattr/tcsetattr&rdquo;</h2>
+<p>When working with serial ports in POSIX environments using C/C++, careful management of the <code>termios</code> structure is paramount to ensure reliable, non-intermittent communication. The accepted methods emphasize retrieving existing attributes before modification, rather than zero-initializing the structure and applying settings blindly. Why does this matter, and what are the correct procedures for setting interface attributes and controlling read blocking behavior?</p>
+<h2 id="the-critical-pitfall-why-zeroing-the-termios-struct-causes-issues">The Critical Pitfall: Why Zeroing the <code>termios</code> Struct Causes Issues</h2>
+<p>A commonly encountered issue, especially on BSD-derived systems like macOS or older Unix variants, stems from completely zeroing out the <code>struct termios</code> before setting desired configuration parameters and then applying them with <code>tcsetattr</code>.</p>
+<p><strong>Incorrect Approach (Leads to failures):</strong>
+If you zero the structure (<code>memset(&amp;tty, 0, sizeof(tty))</code>), you discard crucial system-specific settings retained by <code>tcgetattr</code>. This can lead to unexplained transient failures, such as hangs during <code>read(3)</code> operations, particularly when dealing with line disciplines or flow control mechanisms that rely on default state values.</p>
+<p><strong>Correct Procedure:</strong>
+Always invoke <code>tcgetattr(fd, &amp;tty)</code> first. This populates the <code>tty</code> structure with the current, active settings for the file descriptor (<code>fd</code>). You then modify only the specific flags you need to change (e.g., baud rate, character size, blocking mode) before writing back using <code>tcsetattr(fd, TCSANOW, &amp;tty)</code>.</p>
+<h2 id="establishing-serial-interface-attributes-speed-data-size-and-parity">Establishing Serial Interface Attributes: Speed, Data Size, and Parity</h2>
+<p>To configure essential serial communication parameters like baud rate, character size, and parity, the following function, derived from established practices, demonstrates the necessary steps:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;errno.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;fcntl.h&gt; </span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;string.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;termios.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;unistd.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Note: error_message is a placeholder for actual logging/printing in a real application.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">error_message</span>(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> format, ...) { <span style="color:#75715e">/* Implementation omitted */</span> }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Sets essential serial port attributes (speed, 8N1, non-canonical mode).
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param fd File descriptor of the serial port.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param speed Desired baud rate constant (e.g., B115200).
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param parity Parity setting (0 for none, PARENB|PARODD for odd, etc.).
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @return 0 on success, -1 on failure.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">setup_serial_attributes</span>(<span style="color:#66d9ef">int</span> fd, <span style="color:#66d9ef">speed_t</span> speed, <span style="color:#66d9ef">int</span> parity)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">struct</span> termios tty;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">tcgetattr</span>(fd, <span style="color:#f92672">&amp;</span>tty) <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">error_message</span>(<span style="color:#e6db74">&#34;error %d from tcgetattr&#34;</span>, errno);
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Set Baud Rate
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">cfsetospeed</span>(<span style="color:#f92672">&amp;</span>tty, speed);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">cfsetispeed</span>(<span style="color:#f92672">&amp;</span>tty, speed);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Character Size (8-bit chars)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        tty.c_cflag <span style="color:#f92672">=</span> (tty.c_cflag <span style="color:#f92672">&amp;</span> <span style="color:#f92672">~</span>CSIZE) <span style="color:#f92672">|</span> CS8;     
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Input Flags: Disable break processing (important for speed mismatch tests)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        tty.c_iflag <span style="color:#f92672">&amp;=</span> <span style="color:#f92672">~</span>IGNBRK;         
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Local Flags: Disable echo, signaling, canonical processing
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        tty.c_lflag <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;                
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Output Flags: No remapping or delays
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        tty.c_oflag <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;                
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Set timeout settings (non-blocking read configuration)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        tty.c_cc[VMIN]  <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;            <span style="color:#75715e">// No minimum characters required (non-blocking)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        tty.c_cc[VTIME] <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>;            <span style="color:#75715e">// 0.5 seconds read timeout
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Shut off software flow control (XON/XOFF)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        tty.c_iflag <span style="color:#f92672">&amp;=</span> <span style="color:#f92672">~</span>(IXON <span style="color:#f92672">|</span> IXOFF <span style="color:#f92672">|</span> IXANY); 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Enable Reading and Ignore Modem Controls
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        tty.c_cflag <span style="color:#f92672">|=</span> (CLOCAL <span style="color:#f92672">|</span> CREAD);
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Parity Control (User sets the desired parity via the &#39;parity&#39; argument)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        tty.c_cflag <span style="color:#f92672">&amp;=</span> <span style="color:#f92672">~</span>(PARENB <span style="color:#f92672">|</span> PARODD);      <span style="color:#75715e">// Clear existing parity settings first
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        tty.c_cflag <span style="color:#f92672">|=</span> parity;
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Stop bits and hardware flow control
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        tty.c_cflag <span style="color:#f92672">&amp;=</span> <span style="color:#f92672">~</span>CSTOPB; <span style="color:#75715e">// 1 stop bit
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        tty.c_cflag <span style="color:#f92672">&amp;=</span> <span style="color:#f92672">~</span>CRTSCTS; <span style="color:#75715e">// Disable RTS/CTS flow control
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">tcsetattr</span>(fd, TCSANOW, <span style="color:#f92672">&amp;</span>tty) <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">error_message</span>(<span style="color:#e6db74">&#34;error %d from tcsetattr&#34;</span>, errno);
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="available-baud-rate-and-parity-constants">Available Baud Rate and Parity Constants</h3>
+<p>The <code>speed</code> parameter accepts constants defined in <code>&lt;termios.h&gt;</code>: <code>B115200</code>, <code>B230400</code>, <code>B9600</code>, <code>B19200</code>, <code>B38400</code>, <code>B57600</code>, <code>B1200</code>, <code>B2400</code>, <code>B4800</code>, among others.</p>
+<p>The <code>parity</code> parameter uses combinations of:</p>
+<ul>
+<li><code>0</code>: No parity.</li>
+<li><code>PARENB</code>: Enable parity generation/checking.</li>
+<li><code>PARODD</code>: Use odd parity (when <code>PARENB</code> is set). Use <code>PARENB</code> alone for even parity.</li>
+<li><code>CMSPAR</code>: Used with <code>PARENB</code> for mark parity, or with <code>PARENB|PARODD</code> for space parity. This flag requires specific environment definitions (like <code>_BSD_SOURCE</code> or <code>_SVID_SOURCE</code> being defined when compiling) for maximum portability across older systems.</li>
+</ul>
+<h2 id="controlling-read-blocking-behavior">Controlling Read Blocking Behavior</h2>
+<p>The read operation&rsquo;s behavior—whether it waits for data or returns immediately—is governed by <code>VMIN</code> and <code>VTIME</code> in the <code>c_cc</code> array of the <code>termios</code> structure.</p>
+<p>To toggle between blocking and non-blocking reads without altering other configuration details, one modifies only these two elements:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Adjusts VMIN/VTIME to switch between blocking and non-blocking reads.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param fd File descriptor.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param should_block If true (non-zero), read blocks until VMIN characters are read. If false (zero), read returns immediately with available data.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">adjust_read_blocking</span>(<span style="color:#66d9ef">int</span> fd, <span style="color:#66d9ef">int</span> should_block)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">struct</span> termios tty;
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Retrieve current settings
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">tcgetattr</span>(fd, <span style="color:#f92672">&amp;</span>tty) <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">error_message</span> (<span style="color:#e6db74">&#34;error %d from tcgetattr&#34;</span>, errno);
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// VMIN=0 and VTIME&gt;0 implies a timeout read. VMIN=0 and VTIME=0 implies a pure non-blocking read (return immediately).
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#75715e">// VMIN&gt;0 and VTIME=0 implies a blocking read until VMIN bytes are received.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        tty.c_cc[VMIN]  <span style="color:#f92672">=</span> should_block <span style="color:#f92672">?</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>        tty.c_cc[VTIME] <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>; <span style="color:#75715e">// Maintain a 0.5 second timer for timeout scenarios
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">tcsetattr</span>(fd, TCSANOW, <span style="color:#f92672">&amp;</span>tty) <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">error_message</span> (<span style="color:#e6db74">&#34;error %d setting term attributes&#34;</span>, errno);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="practical-example-sending-data-and-reading-non-blockingly">Practical Example: Sending Data and Reading Non-Blockingly</h3>
+<p>This example shows opening <code>/dev/ttyUSB1</code>, setting speed to 115200bps (8N1, no parity), and performing a write followed by a non-blocking read attempt.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">//
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Solutions
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>Main Application Snippet
+</span></span></code></pre></div><p>#include &lt;errno.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;string.h&gt;
+#include &lt;termios.h&gt;
+#include &lt;unistd.h&gt;</p>
+<p>int
+set_interface_attribs (int fd, int speed, int parity)
+{
+struct termios tty;
+if (tcgetattr (fd, &amp;tty) != 0)
+{
+error_message (&ldquo;error %d from tcgetattr&rdquo;, errno);
+return -1;
+}</p>
+<pre><code>    cfsetospeed (&amp;amp;tty, speed);
+    cfsetispeed (&amp;amp;tty, speed);
+
+    tty.c_cflag = (tty.c_cflag &amp;amp; ~CSIZE) | CS8;     // 8-bit chars
+    // disable IGNBRK for mismatched speed tests; otherwise receive break
+    // as \000 chars
+    tty.c_iflag &amp;amp;= ~IGNBRK;         // disable break processing
+    tty.c_lflag = 0;                // no signaling chars, no echo,
+                                    // no canonical processing
+    tty.c_oflag = 0;                // no remapping, no delays
+    tty.c_cc[VMIN]  = 0;            // read doesn't block
+    tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
+
+    tty.c_iflag &amp;amp;= ~(IXON | IXOFF | IXANY); // shut off xon/xoff ctrl
+
+    tty.c_cflag |= (CLOCAL | CREAD);// ignore modem controls,
+                                    // enable reading
+    tty.c_cflag &amp;amp;= ~(PARENB | PARODD);      // shut off parity
+    tty.c_cflag |= parity;
+    tty.c_cflag &amp;amp;= ~CSTOPB;
+    tty.c_cflag &amp;amp;= ~CRTSCTS;
+
+    if (tcsetattr (fd, TCSANOW, &amp;amp;tty) != 0)
+    {
+            error_message (&quot;error %d from tcsetattr&quot;, errno);
+            return -1;
+    }
+    return 0;
+</code></pre>
+<p>}</p>
+<p>void
+set_blocking (int fd, int should_block)
+{
+struct termios tty;
+memset (&amp;tty, 0, sizeof tty);
+if (tcgetattr (fd, &amp;tty) != 0)
+{
+error_message (&ldquo;error %d from tggetattr&rdquo;, errno);
+return;
+}</p>
+<pre><code>    tty.c_cc[VMIN]  = should_block ? 1 : 0;
+    tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
+
+    if (tcsetattr (fd, TCSANOW, &amp;amp;tty) != 0)
+            error_message (&quot;error %d setting term attributes&quot;, errno);
+</code></pre>
+<p>}</p>
+<p>&hellip;
+char *portname = &ldquo;/dev/ttyUSB1&rdquo;
+&hellip;
+int fd = open (portname, O_RDWR | O_NOCTTY | O_SYNC);
+if (fd &lt; 0)
+{
+error_message (&ldquo;error %d opening %s: %s&rdquo;, errno, portname, strerror (errno));
+return;
+}</p>
+<p>set_interface_attribs (fd, B115200, 0);  // set speed to 115,200 bps, 8n1 (no parity)
+set_blocking (fd, 0);                // set no blocking</p>
+<p>write (fd, &ldquo;hello!\n&rdquo;, 7);           // send 7 character greeting</p>
+<p>usleep ((7 + 25) * 100);             // sleep enough to transmit the 7 plus
+// receive 25:  approx 100 uS per char transmit
+char buf [100];
+int n = read (fd, buf, sizeof buf);  // read up to 100 characters if ready to read
+#if defined _BSD_SOURCE || defined _SVID_SOURCE
+#define __USE_MISC     1
+#endif
+/* These are defined by the user (or the compiler)
+to specify the desired environment:</p>
+<p>&hellip;
+_BSD_SOURCE          ISO C, POSIX, and 4.3BSD things.
+_SVID_SOURCE         ISO C, POSIX, and SVID things.
+&hellip;
+*/</p>
+<pre tabindex="0"><code>
+char *port_path = &#34;/dev/ttyUSB1&#34;; 
+int serial_fd = open(port_path, O_RDWR | O_NOCTTY | O_SYNC);
+
+if (serial_fd &lt; 0)
+{
+        error_message (&#34;error %d opening %s: %s&#34;, errno, port_path, strerror(errno));
+        return 1;
+}
+
+// Configuration: 115200 baud, 8 data bits, No parity, 1 stop bit (8N1)
+setup_serial_attributes(serial_fd, B115200, 0); 
+adjust_read_blocking(serial_fd, 0); // Set to non-blocking mode (VMIN=0)
+
+const char *data_to_send = &#34;INIT_CMD\n&#34;;
+write(serial_fd, data_to_send, strlen(data_to_send));
+
+// Wait briefly to allow transmission and remote device response time
+usleep(10000); // 10 ms delay
+
+char response_buffer[256];
+// Attempt to read immediately if data is available
+ssize_t bytes_read = read(serial_fd, response_buffer, sizeof(response_buffer) - 1); 
+
+if (bytes_read &gt; 0) {
+    response_buffer[bytes_read] = &#39;\0&#39;;
+    printf(&#34;Received data: %s\n&#34;, response_buffer);
+} else if (bytes_read == 0) {
+    printf(&#34;No data immediately available (Timeout or Non-blocking check).\n&#34;);
+} else {
+    perror(&#34;Read error&#34;);
+}
+// close(serial_fd);
+</code></pre><h2 id="alternative-approach-streamlined-initialization-if-portability-is-less-critical">Alternative Approach: Streamlined Initialization (If Portability is Less Critical)</h2>
+<p>While retrieving existing settings via <code>tcgetattr</code> is the most robust technique, for highly controlled, dedicated applications where you know the starting state is irrelevant or where maximum standardization across known hardware is needed, a heavily customized, often POSIX-compliant initialization can be used. This alternative approach often sets nearly every flag explicitly to zero or a known state, differing from the primary solution by minimizing reliance on pre-existing settings, though this risks non-portability warnings on some systems.</p>
+<p>For routines that prioritize processing input byte-by-byte or line-by-line, refer to dedicated serial programming guides for precise handling of <code>VMIN</code> and <code>VTIME</code> interactions beyond simple timeout checks. <a href="https://www.modernserial.com/serial-programming-guide/" target="_blank" rel="noopener">Serial Programming Guide for POSIX Operating Systems</a>
+ offers deeper insight into these interactions.</p>
+<h3 id="faqs-on-c-serial-port-configuration-termio">FAQs on C Serial Port Configuration Termio</h3>
+<p><div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the primary danger of initializing termios by zeroing the structure</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Zeroing the structure before calling tcsetattr discards essential existing terminal settings managed by the OS, which can lead to intermittent failures like hangs in read operations, especially on BSD/OS X systems.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What are the standard values for Baud Rate constants</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Standard constants include B9600, B19200, B57600, B115200, and B230400, used with cfsetospeed and cfsetispeed.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How do I set 8 data bits, no parity, 1 stop bit in termios</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Set character size with <code>(tty.c_cflag &amp; ~CSIZE) | CS8</code>, clear parity flags with <code>tty.c_cflag &amp;= ~(PARENB | PARODD)</code>, and ensure stop bits are set to one with <code>tty.c_cflag &amp;= ~CSTOPB</code>.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How does VMIN control blocking behavior</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: If VMIN is set to 0 and VTIME is greater than 0, read will block for the VTIME duration (tenths of seconds) and return whatever data is available. If VMIN is 0 and VTIME is 0, the read is purely non-blocking and returns immediately.</div>
+    </div>
+</div></p>
+<p>We value your input on these low-level system interactions! If you have refined these techniques or encountered unique challenges with specific hardware, please share your experiences in the comments below.</p>
+<p>For further reading on related Python issues that sometimes surface when dealing with low-level I/O dependencies, check out fixes for <a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">SSL Certificate Verification Failures in Python</a>
+ or techniques for <a href="https://sqlpey.com/python/solved-how-to-get-python-requests-to-trust-a-self-signed-ssl-certificate/" target="_blank" rel="noopener">Trusting Self-Signed Certificates in Python Requests</a>
+.</p>
+<pre tabindex="0"><code>cc -DDISPLAY_STRING demo.c
+#define TERMINAL    &amp;quot;/dev/ttyUSB0&amp;quot;
+
+#include &amp;lt;errno.h&amp;gt;
+#include &amp;lt;fcntl.h&amp;gt; 
+#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+#include &amp;lt;string.h&amp;gt;
+#include &amp;lt;termios.h&amp;gt;
+#include &amp;lt;unistd.h&amp;gt;
+
+int set_interface_attribs(int fd, int speed)
+{
+    struct termios tty;
+
+    if (tcgetattr(fd, &amp;amp;tty) &amp;lt; 0) {
+        printf(&amp;quot;Error from tcgetattr: %s\n&amp;quot;, strerror(errno));
+        return -1;
+    }
+
+    cfsetospeed(&amp;amp;tty, (speed_t)speed);
+    cfsetispeed(&amp;amp;tty, (speed_t)speed);
+
+    tty.c_cflag |= (CLOCAL | CREAD);    /* ignore modem controls */
+    tty.c_cflag &amp;amp;= ~CSIZE;
+    tty.c_cflag |= CS8;         /* 8-bit characters */
+    tty.c_cflag &amp;amp;= ~PARENB;     /* no parity bit */
+    tty.c_cflag &amp;amp;= ~CSTOPB;     /* only need 1 stop bit */
+    tty.c_cflag &amp;amp;= ~CRTSCTS;    /* no hardware flowcontrol */
+
+    /* setup for non-canonical mode */
+    tty.c_iflag &amp;amp;= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
+    tty.c_lflag &amp;amp;= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
+    tty.c_oflag &amp;amp;= ~OPOST;
+
+    /* fetch bytes as they become available */
+    tty.c_cc[VMIN] = 1;
+    tty.c_cc[VTIME] = 1;
+
+    if (tcsetattr(fd, TCSANOW, &amp;amp;tty) != 0) {
+        printf(&amp;quot;Error from tcsetattr: %s\n&amp;quot;, strerror(errno));
+        return -1;
+    }
+    return 0;
+}
+
+void set_mincount(int fd, int mcount)
+{
+    struct termios tty;
+
+    if (tcgetattr(fd, &amp;amp;tty) &amp;lt; 0) {
+        printf(&amp;quot;Error tcgetattr: %s\n&amp;quot;, strerror(errno));
+        return;
+    }
+
+    tty.c_cc[VMIN] = mcount ? 1 : 0;
+    tty.c_cc[VTIME] = 5;        /* half second timer */
+
+    if (tcsetattr(fd, TCSANOW, &amp;amp;tty) &amp;lt; 0)
+        printf(&amp;quot;Error tcsetattr: %s\n&amp;quot;, strerror(errno));
+}
+
+
+int main()
+{
+    char *portname = TERMINAL;
+    int fd;
+    int wlen;
+    char *xstr = &amp;quot;Hello!\n&amp;quot;;
+    int xlen = strlen(xstr);
+
+    fd = open(portname, O_RDWR | O_NOCTTY | O_SYNC);
+    if (fd &amp;lt; 0) {
+        printf(&amp;quot;Error opening %s: %s\n&amp;quot;, portname, strerror(errno));
+        return -1;
+    }
+    /*baudrate 115200, 8 bits, no parity, 1 stop bit */
+    set_interface_attribs(fd, B115200);
+    //set_mincount(fd, 0);                /* set to pure timed read */
+
+    /* simple output */
+    wlen = write(fd, xstr, xlen);
+    if (wlen != xlen) {
+        printf(&amp;quot;Error from write: %d, %d\n&amp;quot;, wlen, errno);
+    }
+    tcdrain(fd);    /* delay for output */
+
+
+    /* simple noncanonical input */
+    do {
+        unsigned char buf[80];
+        int rdlen;
+
+        rdlen = read(fd, buf, sizeof(buf) - 1);
+        if (rdlen &amp;gt; 0) {
+#ifdef DISPLAY_STRING
+            buf[rdlen] = 0;
+            printf(&amp;quot;Read %d: \&amp;quot;%s\&amp;quot;\n&amp;quot;, rdlen, buf);
+#else /* display hex */
+            unsigned char   *p;
+            printf(&amp;quot;Read %d:&amp;quot;, rdlen);
+            for (p = buf; rdlen-- &amp;gt; 0; p++)
+                printf(&amp;quot; 0x%x&amp;quot;, *p);
+            printf(&amp;quot;\n&amp;quot;);
+#endif
+        } else if (rdlen &amp;lt; 0) {
+            printf(&amp;quot;Error from read: %d: %s\n&amp;quot;, rdlen, strerror(errno));
+        } else {  /* rdlen == 0 */
+            printf(&amp;quot;Timeout from read\n&amp;quot;);
+        }               
+        /* repeat read to get full message */
+    } while (1);
+}
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Solved: Why is `while(!feof(file))` Wrong for Robust File I/O in C/C&#43;&#43;? - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Discover why `while(!feof(file))` is a common pitfall in C/C&#43;&#43; file I/O and learn robust, idiomatic methods for handling end-of-file conditions and read errors.">
+
+
+
+<meta name="keywords" content="feof incorrect usage, C file I/O errors, EOF handling C&#43;&#43;, fread correct usage, scanf loop condition, fgetc infinite loop, stream status checking, C&#43;&#43; iostreams best practices, POSIX file operations, input/output concurrency, detecting end of file, robust file reading, file stream errors">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Solved: Why is `while(!feof(file))` Wrong for Robust File I/O in C/C&#43;&#43;? - sqlpey">
+<meta name="DC.description" content="Discover why `while(!feof(file))` is a common pitfall in C/C&#43;&#43; file I/O and learn robust, idiomatic methods for handling end-of-file conditions and read errors.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-07-23">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Solved: Why is `while(!feof(file))` Wrong for Robust File I/O in C/C&#43;&#43;? - sqlpey">
+<meta property="og:description" content="Discover why `while(!feof(file))` is a common pitfall in C/C&#43;&#43; file I/O and learn robust, idiomatic methods for handling end-of-file conditions and read errors.">
+<meta property="og:url" content="https://sqlpey.com/c/why-feof-file-wrong/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-07-23T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-07-23T00:00:00Z">
+<meta property="article:modified_time" content="2025-07-23T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="C Programming">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Solved: Why is `while(!feof(file))` Wrong for Robust File I/O in C/C&#43;&#43;?">
+<meta name="twitter:description" content="Discover why `while(!feof(file))` is a common pitfall in C/C&#43;&#43; file I/O and learn robust, idiomatic methods for handling end-of-file conditions and read errors.">
+
+
+<link rel="canonical" href="https://sqlpey.com/c/why-feof-file-wrong/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Solved: Why is `while(!feof(file))` Wrong for Robust File I/O in C/C++?\"",
+  "description": "\"Discover why `while(!feof(file))` is a common pitfall in C/C++ file I/O and learn robust, idiomatic methods for handling end-of-file conditions and read errors.\"",
+  "url": "\"https://sqlpey.com/c/why-feof-file-wrong/\"",
+  "datePublished": "\"2025-07-23T00:00:00Z\"",
+  "dateModified": "\"2025-07-23T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/c/why-feof-file-wrong/\""
+  },
+  "articleSection": "\"C Programming\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Solved: Why is <code>while(!feof(file))</code> Wrong for Robust File I/O in C/C++?</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">C Programming</span>
+              
+              <span class="tag">File I/O</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              18 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 23, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#solved-why-is-whilefeoffile-wrong-for-robust-file-io-in-cc">“Solved: Why is <code>while(!feof(file))</code> Wrong for Robust File I/O in C/C++?”</a>
+      <ul>
+        <li><a href="#why-is-whilefeoffile-inherently-flawed-a-deep-dive-into-io-concurrency">Why Is <code>while(!feof(file))</code> Inherently Flawed? A Deep Dive into I/O Concurrency</a></li>
+        <li><a href="#the-true-meaning-of-eof-a-post-operation-indicator">The True Meaning of EOF: A Post-Operation Indicator</a></li>
+        <li><a href="#practical-examples-the-correct-way-to-handle-io">Practical Examples: The Correct Way to Handle I/O</a></li>
+        <li><a href="#the-pitfalls-of-whilefeofin-one-last-loop-and-infinite-error-states">The Pitfalls of <code>while(!feof(in))</code>: One Last Loop and Infinite Error States</a></li>
+        <li><a href="#is-whilefeoff-absolutely-always-wrong">Is <code>while(!feof(f))</code> Absolutely Always Wrong?</a></li>
+        <li><a href="#alternative--best-practice-looping-on-operation-success">Alternative &amp; Best Practice: Looping on Operation Success</a></li>
+        <li><a href="#the-misleading-nature-of-feof-a-tldr">The Misleading Nature of <code>feof()</code>: A TL;DR</a></li>
+        <li><a href="#addressing-the-intuitive-misconception-a-different-fgetc-loop">Addressing the Intuitive Misconception: A Different <code>fgetc()</code> Loop</a></li>
+        <li><a href="#faqs-on-why-whilefeoffile-is-wrong">FAQs on Why <code>while(!feof(file))</code> is Wrong</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="solved-why-is-whilefeoffile-wrong-for-robust-file-io-in-cc">&ldquo;Solved: Why is <code>while(!feof(file))</code> Wrong for Robust File I/O in C/C++?&rdquo;</h2>
+<h3 id="why-is-whilefeoffile-inherently-flawed-a-deep-dive-into-io-concurrency">Why Is <code>while(!feof(file))</code> Inherently Flawed? A Deep Dive into I/O Concurrency</h3>
+<p>The fundamental issue with <code>while(!feof(file))</code> stems from a crucial misconception about how I/O operations and end-of-file (EOF) indicators function. To grasp this, consider the nature of concurrency.</p>
+<p>I/O operations interact with the external environment—your disk, network, or console. This environment exists concurrently with your program and is not directly under its control. When dealing with concurrent systems, asking questions about the &ldquo;current state&rdquo; (like &ldquo;does the file have more data?&rdquo;) often doesn&rsquo;t yield actionable answers.</p>
+<p>Think of it this way: if a file system says &ldquo;yes, more data,&rdquo; by the time your program attempts to read it, the data might be gone. Conversely, if it says &ldquo;no,&rdquo; data might have arrived in the interim. There&rsquo;s no true &ldquo;simultaneity&rdquo; across these concurrent events. This means properties like &ldquo;I have data&rdquo; don&rsquo;t meaningfully exist in a way you can reliably query <em>before</em> an operation.</p>
+<p>The only reliable way to interact with an I/O system is to <strong>attempt the operation</strong> and then <strong>check whether it succeeded or failed</strong>. At that precise moment of interaction, you can determine if the operation was possible and act upon its outcome. This point of interaction acts as a synchronization point, revealing the true state of the I/O.</p>
+<h3 id="the-true-meaning-of-eof-a-post-operation-indicator">The True Meaning of EOF: A Post-Operation Indicator</h3>
+<p>The <code>EOF</code> (End-of-File) condition is a <em>response</em> you receive after an attempted I/O operation. It indicates that you tried to read or write data, but no data was transferred, and the end of the input or output stream was encountered instead. This applies across various I/O APIs, from the C standard library to C++ iostreams and POSIX functions.</p>
+<p>As long as I/O operations succeed, you cannot predict whether future operations will succeed. You must always <em>first attempt the operation</em> and then <em>respond to its success or failure</em>.</p>
+<h3 id="practical-examples-the-correct-way-to-handle-io">Practical Examples: The Correct Way to Handle I/O</h3>
+<p>Let&rsquo;s explore practical examples demonstrating the correct pattern: attempting the I/O operation and then consuming or checking its result. Notice how we rarely explicitly spell out &ldquo;EOF&rdquo;; rather, we check the operation&rsquo;s outcome.</p>
+<h4 id="c-standard-io-reading-from-a-file-fread">C Standard I/O: Reading from a File (<code>fread</code>)</h4>
+<p>When using <code>fread</code>, the return value <code>n</code> (the number of elements read) is crucial. If <code>n</code> is <code>0</code>, it indicates that no data was read, implying either EOF or an error.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt; // For standard input/output functions</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdlib.h&gt; // For size_t, dynamic memory if needed</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Placeholder for actual data consumption
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">process_data_chunk</span>(<span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> data_chunk, <span style="color:#66d9ef">size_t</span> chunk_size) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Implement your data processing logic here
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// Example: printf(&#34;Processed %zu bytes.\n&#34;, chunk_size);
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    FILE <span style="color:#f92672">*</span>source_file <span style="color:#f92672">=</span> <span style="color:#a6e22e">fopen</span>(<span style="color:#e6db74">&#34;example_input.txt&#34;</span>, <span style="color:#e6db74">&#34;rb&#34;</span>); <span style="color:#75715e">// Open file in binary read mode
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>source_file) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">perror</span>(<span style="color:#e6db74">&#34;Error opening source_file&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> EXIT_FAILURE;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">char</span> data_buffer[<span style="color:#ae81ff">1024</span>]; <span style="color:#75715e">// Buffer to hold read data
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">size_t</span> buffer_capacity <span style="color:#f92672">=</span> <span style="color:#66d9ef">sizeof</span>(data_buffer);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Loop to read data chunks until no more data is available
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">while</span> (<span style="color:#ae81ff">1</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">size_t</span> bytes_read <span style="color:#f92672">=</span> <span style="color:#a6e22e">fread</span>(data_buffer, <span style="color:#ae81ff">1</span>, buffer_capacity, source_file);
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Process the data that was successfully read
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> (bytes_read <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">process_data_chunk</span>(data_buffer, bytes_read);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// If zero bytes were read, it means EOF or an error
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> (bytes_read <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) { 
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Check if it&#39;s genuinely EOF or an error
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">feof</span>(source_file)) {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">fprintf</span>(stderr, <span style="color:#e6db74">&#34;End of file reached.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+</span></span><span style="display:flex;"><span>            } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">ferror</span>(source_file)) {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">perror</span>(<span style="color:#e6db74">&#34;Error reading from source_file&#34;</span>);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">break</span>; <span style="color:#75715e">// Exit the loop
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fclose</span>(source_file); <span style="color:#75715e">// Close the file
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> EXIT_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>In this example, the result we leverage is <code>bytes_read</code>, which indicates the count of elements successfully read.</p>
+<h4 id="c-standard-io-formatted-input-scanf">C Standard I/O: Formatted Input (<code>scanf</code>)</h4>
+<p>For <code>scanf</code>, its return value, representing the number of items successfully converted and assigned, serves as the loop condition.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt; // For scanf and standard I/O</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdlib.h&gt; // For EXIT_SUCCESS</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Placeholder for data consumption
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">process_parsed_values</span>(<span style="color:#66d9ef">int</span> first_val, <span style="color:#66d9ef">int</span> second_val, <span style="color:#66d9ef">int</span> third_val) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">printf</span>(<span style="color:#e6db74">&#34;Parsed values: %d, %d, %d</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, first_val, second_val, third_val);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> val_a, val_b, val_c; <span style="color:#75715e">// Variables to store parsed integers
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Loop continues as long as 3 integers are successfully read and converted
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// scanf returns the number of items successfully assigned
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">scanf</span>(<span style="color:#e6db74">&#34;%d %d %d&#34;</span>, <span style="color:#f92672">&amp;</span>val_a, <span style="color:#f92672">&amp;</span>val_b, <span style="color:#f92672">&amp;</span>val_c) <span style="color:#f92672">==</span> <span style="color:#ae81ff">3</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">process_parsed_values</span>(val_a, val_b, val_c);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// After the loop, check for errors or EOF
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">ferror</span>(stdin)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">perror</span>(<span style="color:#e6db74">&#34;Error reading from standard input&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> EXIT_FAILURE;
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">feof</span>(stdin)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">fprintf</span>(stderr, <span style="color:#e6db74">&#34;End of input stream reached.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">fprintf</span>(stderr, <span style="color:#e6db74">&#34;Input format mismatch or incomplete input.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> EXIT_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Here, the return value of <code>scanf</code> (expected to be 3) is the result used.</p>
+<h4 id="c-iostreams-formatted-extraction-stdcin--n">C++ Iostreams: Formatted Extraction (<code>std::cin &gt;&gt; n</code>)</h4>
+<p>C++ streams can be evaluated in a boolean context, indicating if the stream is still in a &ldquo;good&rdquo; state after an operation.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For std::cin, std::cout, std::ios_base
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;limits&gt;</span><span style="color:#75715e">   </span><span style="color:#75715e">// For std::numeric_limits
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Placeholder for data consumption
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">process_extracted_value</span>(<span style="color:#66d9ef">int</span> extracted_num) {
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Extracted number: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> extracted_num <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> extracted_value; <span style="color:#75715e">// Variable to store the extracted integer
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Enter integers (non-numeric input to stop):</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Loop continues as long as extraction is successful
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">while</span> (std<span style="color:#f92672">::</span>cin <span style="color:#f92672">&gt;&gt;</span> extracted_value) {
+</span></span><span style="display:flex;"><span>        process_extracted_value(extracted_value);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// After the loop, check the stream state
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (std<span style="color:#f92672">::</span>cin.eof()) {
+</span></span><span style="display:flex;"><span>        std<span style="color:#f92672">::</span>cerr <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;End of input stream reached.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (std<span style="color:#f92672">::</span>cin.fail()) {
+</span></span><span style="display:flex;"><span>        std<span style="color:#f92672">::</span>cerr <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Invalid input (non-numeric data encountered).</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Clear error flags and ignore remaining input in the current line
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        std<span style="color:#f92672">::</span>cin.clear();
+</span></span><span style="display:flex;"><span>        std<span style="color:#f92672">::</span>cin.ignore(std<span style="color:#f92672">::</span>numeric_limits<span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>streamsize<span style="color:#f92672">&gt;::</span>max(), <span style="color:#e6db74">&#39;\n&#39;</span>);
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        std<span style="color:#f92672">::</span>cerr <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Unexpected stream state.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The result used here is <code>std::cin</code> itself, evaluated for its <code>good()</code> state.</p>
+<h4 id="c-iostreams-line-by-line-reading-stdgetline">C++ Iostreams: Line-by-Line Reading (<code>std::getline</code>)</h4>
+<p>Similar to formatted extraction, <code>std::getline</code> also returns the stream object, which can be checked for validity.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For std::cin, std::cout, std::string
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;string&gt;</span><span style="color:#75715e">   </span><span style="color:#75715e">// For std::string and std::getline
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Placeholder for data consumption
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">process_input_line</span>(<span style="color:#66d9ef">const</span> std<span style="color:#f92672">::</span>string<span style="color:#f92672">&amp;</span> current_line) {
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Read line: </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">&lt;&lt;</span> current_line <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\&#34;\n</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>string input_line_text; <span style="color:#75715e">// Variable to store each line
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Enter lines of text (EOF to stop, e.g., Ctrl+D on Linux/macOS, Ctrl+Z then Enter on Windows):</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Loop continues as long as getline successfully reads a line
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">while</span> (std<span style="color:#f92672">::</span>getline(std<span style="color:#f92672">::</span>cin, input_line_text)) {
+</span></span><span style="display:flex;"><span>        process_input_line(input_line_text);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// After the loop, check the stream state
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (std<span style="color:#f92672">::</span>cin.eof()) {
+</span></span><span style="display:flex;"><span>        std<span style="color:#f92672">::</span>cerr <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;End of input stream reached.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (std<span style="color:#f92672">::</span>cin.fail()) {
+</span></span><span style="display:flex;"><span>        std<span style="color:#f92672">::</span>cerr <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;An error occurred during input.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        std<span style="color:#f92672">::</span>cerr <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Unexpected stream state.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Again, the <code>std::cin</code> stream object itself is the key indicator.</p>
+<h4 id="posix-system-calls-flushing-a-buffer-write2">POSIX System Calls: Flushing a Buffer (<code>write(2)</code>)</h4>
+<p>Even for output, you only know how much was written <em>after</em> the operation.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;unistd.h&gt; // For write function</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;string.h&gt; // For strlen</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdlib.h&gt; // For EXIT_SUCCESS, EXIT_FAILURE</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;  // For perror</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// A simple function to simulate a file descriptor (e.g., stdout)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// In a real scenario, this would be an open file descriptor
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">simulate_file_descriptor</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>; <span style="color:#75715e">// Standard output file descriptor
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> message_data <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Hello, world! This is a test buffer to write.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">char</span> <span style="color:#66d9ef">const</span> <span style="color:#f92672">*</span> current_ptr <span style="color:#f92672">=</span> message_data;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">ssize_t</span> bytes_remaining <span style="color:#f92672">=</span> <span style="color:#a6e22e">strlen</span>(message_data); <span style="color:#75715e">// Number of bytes to write
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> file_descriptor <span style="color:#f92672">=</span> <span style="color:#a6e22e">simulate_file_descriptor</span>(); <span style="color:#75715e">// Get a file descriptor
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">ssize_t</span> bytes_processed; <span style="color:#75715e">// Bytes written in current call
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// Loop until all bytes are written or an error occurs
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">for</span> (bytes_processed <span style="color:#f92672">=</span> bytes_remaining; 
+</span></span><span style="display:flex;"><span>         (bytes_processed <span style="color:#f92672">=</span> <span style="color:#a6e22e">write</span>(file_descriptor, current_ptr, bytes_remaining)) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>; 
+</span></span><span style="display:flex;"><span>         current_ptr <span style="color:#f92672">+=</span> bytes_processed, bytes_remaining <span style="color:#f92672">-=</span> bytes_processed) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Loop body intentionally empty, work done in loop condition
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#75715e">// In a real scenario, you might add logging or progress updates here
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Check if all bytes were written
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (bytes_remaining <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">perror</span>(<span style="color:#e6db74">&#34;Error: Failed to write complete buffer&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> EXIT_FAILURE;
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">printf</span>(<span style="color:#e6db74">&#34;Successfully wrote %ld bytes to the simulated descriptor.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, <span style="color:#a6e22e">strlen</span>(message_data));
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> EXIT_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Here, <code>bytes_processed</code> (return value of <code>write</code>) tells us how many bytes were transferred.</p>
+<h4 id="posix-line-input-getline">POSIX Line Input (<code>getline()</code>)</h4>
+<p>The <code>getline()</code> function returns the number of bytes read or -1 on error/EOF.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">#define _GNU_SOURCE </span><span style="color:#75715e">// Required for getline() on some systems
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;  // For getline, FILE, etc.</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdlib.h&gt; // For malloc, free, EXIT_SUCCESS, EXIT_FAILURE</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    FILE <span style="color:#f92672">*</span>file_pointer_stream <span style="color:#f92672">=</span> stdin; <span style="color:#75715e">// Use standard input for example
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>dynamic_buffer <span style="color:#f92672">=</span> NULL;       <span style="color:#75715e">// Pointer to the dynamically allocated buffer
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">size_t</span> buffer_size_allocated <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;  <span style="color:#75715e">// Size of the allocated buffer
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">ssize_t</span> bytes_read_count;          <span style="color:#75715e">// Number of bytes read by getline
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fprintf</span>(stderr, <span style="color:#e6db74">&#34;Enter text lines (Ctrl+D to signal EOF):</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Loop until getline encounters an error or EOF
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">while</span> ((bytes_read_count <span style="color:#f92672">=</span> <span style="color:#a6e22e">getline</span>(<span style="color:#f92672">&amp;</span>dynamic_buffer, <span style="color:#f92672">&amp;</span>buffer_size_allocated, file_pointer_stream)) <span style="color:#f92672">!=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Process the read data (dynamic_buffer contains the line, bytes_read_count is its length)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#75715e">// dynamic_buffer is null-terminated by getline()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">printf</span>(<span style="color:#e6db74">&#34;Read %zd bytes: &#39;%s&#39;&#34;</span>, bytes_read_count, dynamic_buffer);
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Note: getline includes the newline character if present
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// After the loop, check for the reason of termination
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">feof</span>(file_pointer_stream)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">fprintf</span>(stderr, <span style="color:#e6db74">&#34;End of input detected by getline.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">ferror</span>(file_pointer_stream)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">perror</span>(<span style="color:#e6db74">&#34;Error reading from stream with getline&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> EXIT_FAILURE;
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">fprintf</span>(stderr, <span style="color:#e6db74">&#34;getline terminated due to an unknown condition.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">free</span>(dynamic_buffer); <span style="color:#75715e">// Free the buffer allocated by getline
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> EXIT_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The <code>bytes_read_count</code> value is critical for determining success or failure.</p>
+<h4 id="advanced-eof-query-string-parsing-with-stdistringstream">Advanced EOF Query: String Parsing with <code>std::istringstream</code></h4>
+<p>In rare cases, you might explicitly check for EOF to confirm that <em>all</em> input has been consumed, like when parsing an integer from a string and ensuring no extra characters remain.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For std::cout, std::cerr
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;sstream&gt;</span><span style="color:#75715e">  </span><span style="color:#75715e">// For std::istringstream
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;string&gt;</span><span style="color:#75715e">   </span><span style="color:#75715e">// For std::string
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;limits&gt;</span><span style="color:#75715e">   </span><span style="color:#75715e">// For std::numeric_limits
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Placeholder for data consumption
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">process_parsed_integer</span>(<span style="color:#66d9ef">int</span> value_result) {
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Successfully parsed integer: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> value_result <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>string test_input_one <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;   123   &#34;</span>;   <span style="color:#75715e">// Example: clean integer with whitespace
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    std<span style="color:#f92672">::</span>string test_input_two <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;   456abc&#34;</span>;   <span style="color:#75715e">// Example: integer followed by non-whitespace
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    std<span style="color:#f92672">::</span>string test_input_three <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;  789 &#34;</span>;    <span style="color:#75715e">// Example: integer with trailing whitespace only
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Test Case 1
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    std<span style="color:#f92672">::</span>istringstream stream_one(test_input_one);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> parsed_integer_value_one;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Attempting to parse: </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">&lt;&lt;</span> test_input_one <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\&#34;\n</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// First, try to extract the integer, then consume any trailing whitespace,
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// and finally check if the next character would be EOF.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (stream_one <span style="color:#f92672">&gt;&gt;</span> parsed_integer_value_one <span style="color:#f92672">&gt;&gt;</span> std<span style="color:#f92672">::</span>ws <span style="color:#f92672">&amp;&amp;</span> stream_one.get() <span style="color:#f92672">==</span> EOF) {
+</span></span><span style="display:flex;"><span>        process_parsed_integer(parsed_integer_value_one);
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        std<span style="color:#f92672">::</span>cerr <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Error: </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">&lt;&lt;</span> test_input_one <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74"> is not parsable as a complete integer.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (stream_one.fail()) {
+</span></span><span style="display:flex;"><span>            std<span style="color:#f92672">::</span>cerr <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;  (Reason: Failed integer extraction or bad input)</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>stream_one.eof()) {
+</span></span><span style="display:flex;"><span>            std<span style="color:#f92672">::</span>cerr <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;  (Reason: Extra characters after integer and whitespace)</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Solutions
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">\</span>n<span style="color:#e6db74">&#34;;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Test Case 2
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    std<span style="color:#f92672">::</span>istringstream stream_two(test_input_two);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> parsed_integer_value_two;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Attempting to parse: </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">&lt;&lt;</span> test_input_two <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\&#34;\n</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (stream_two <span style="color:#f92672">&gt;&gt;</span> parsed_integer_value_two <span style="color:#f92672">&gt;&gt;</span> std<span style="color:#f92672">::</span>ws <span style="color:#f92672">&amp;&amp;</span> stream_two.get() <span style="color:#f92672">==</span> EOF) {
+</span></span><span style="display:flex;"><span>        process_parsed_integer(parsed_integer_value_two);
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        std<span style="color:#f92672">::</span>cerr <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Error: </span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">&lt;&lt;</span> test_input_two <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74"> is not parsable as a complete integer.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (stream_two.fail()) {
+</span></span><span style="display:flex;"><span>            std<span style="color:#f92672">::</span>cerr <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;  (Reason: Failed integer extraction or bad input)</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> <span style="color:#a6e22e">if</span> (<span style="color:#f92672">!</span>stream_two.eof()) {
+</span></span><span style="display:flex;"><span>            std<span style="color:#f92672">::</span>cerr <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;  (Reason: Extra characters after integer and whitespace)</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;</span>
+</span></span></code></pre></div><p>for (;;) {
+size_t n = fread(buf, 1, bufsize, infile);
+consume(buf, n);
+if (n == 0) { break; }
+}
+for (int a, b, c; scanf(&quot;%d %d %d&quot;, &amp;a, &amp;b, &amp;c) == 3; ) {
+consume(a, b, c);
+}
+for (int n; std::cin &gt;&gt; n; ) {
+consume(n);
+}
+for (std::string line; std::getline(std::cin, line); ) {
+consume(line);
+}
+char const * p = buf;
+ssize_t n = bufsize;
+for (ssize_t k = bufsize; (k = write(fd, p, n)) &gt; 0; p += k, n -= k) {}
+if (n != 0) { /* error, failed to write complete buffer */ }
+char <em>buffer = NULL;
+size_t bufsiz = 0;
+ssize_t nbytes;
+while ((nbytes = getline(&amp;buffer, &amp;bufsiz, fp)) != -1)
+{
+/</em> Use nbytes of data in buffer */
+}
+free(buffer);
+std::string input = &quot;   123   &quot;;   // example</p>
+<p>std::istringstream iss(input);
+int value;
+if (iss &gt;&gt; value &gt;&gt; std::ws &amp;&amp; iss.get() == EOF) {
+consume(value);
+} else {
+// error, &quot;input&quot; is not parsable as an integer
+}</p>
+<pre tabindex="0"><code>
+--\n&#34;;
+
+    // Test Case 3
+    std::istringstream stream_three(test_input_three);
+    int parsed_integer_value_three;
+
+    std::cout &lt;&lt; &#34;Attempting to parse: \&#34;&#34; &lt;&lt; test_input_three &lt;&lt; &#34;\&#34;\n&#34;;
+    if (stream_three &gt;&gt; parsed_integer_value_three &gt;&gt; std::ws &amp;&amp; stream_three.get() == EOF) {
+        process_parsed_integer(parsed_integer_value_three);
+    } else {
+        std::cerr &lt;&lt; &#34;Error: \&#34;&#34; &lt;&lt; test_input_three &lt;&lt; &#34;\&#34; is not parsable as a complete integer.\n&#34;;
+        if (stream_three.fail()) {
+            std::cerr &lt;&lt; &#34;  (Reason: Failed integer extraction or bad input)\n&#34;;
+        } else if (!stream_three.eof()) {
+            std::cerr &lt;&lt; &#34;  (Reason: Extra characters after integer and whitespace)\n&#34;;
+        }
+    }
+    std::cout &lt;&lt; &#34;
+</code></pre><p>/* WARNING: demonstration of bad coding technique!! */</p>
+<p>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;</p>
+<p>FILE *Fopen(const char *path, const char *mode);</p>
+<p>int
+main(int argc, char **argv)
+{
+FILE *in = argc &gt; 1 ? Fopen(argv[1], &quot;r&quot;) : stdin;
+unsigned count = 0;</p>
+<pre><code>/* WARNING: this is a bug */
+while( !feof(in) ) {  /* This is WRONG! */
+    fgetc(in);
+    count++;
+}
+printf(&amp;quot;Number of characters read: %u\n&amp;quot;, count);
+return EXIT_SUCCESS;
+</code></pre>
+<p>}</p>
+<p>FILE *
+Fopen(const char *path, const char *mode)
+{
+FILE *f = fopen(path, mode);
+if( f == NULL ) {
+perror(path);
+exit(EXIT_FAILURE);
+}
+return f;
+}
+$ ./a.out &lt; /dev/null
+Number of characters read: 1
+#include &lt;assert.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;</p>
+<p>int
+main(int argc, char **argv)
+{
+FILE *in = stdin;
+unsigned count = 0;</p>
+<pre><code>while( getc(in) != EOF ){
+    count++;
+}
+if( feof(in) ){
+    printf(&amp;quot;Number of characters read: %u\n&amp;quot;, count);
+} else if( ferror(in) ){
+    perror(&amp;quot;stdin&amp;quot;);
+} else {
+    assert(0);
+}
+return EXIT_SUCCESS;
+</code></pre>
+<p>}</p>
+<pre tabindex="0"><code>
+--\n&#34;;
+
+    return 0;
+}
+</code></pre><p>Here, two results are used: the stream object&rsquo;s boolean state and the explicit <code>iss.get() == EOF</code> check to confirm complete consumption. Similar checks can be done in C using <code>strto*l</code> functions and checking the end pointer.</p>
+<h3 id="the-pitfalls-of-whilefeofin-one-last-loop-and-infinite-error-states">The Pitfalls of <code>while(!feof(in))</code>: One Last Loop and Infinite Error States</h3>
+<p>The main reason <code>while(!feof(in))</code> is considered a &ldquo;bad coding technique&rdquo; for general file reading loops is its behavior:</p>
+<ol>
+<li>
+<p><strong>Extra Loop Execution:</strong> Without a read error, it will typically execute the loop body one more time than expected. <code>feof()</code> only returns true <em>after</em> a read operation <em>attempts</em> to read past the end of the file. Consider reading an empty file: <code>feof()</code> is initially false, the loop enters, an <code>fgetc()</code> call fails (returns <code>EOF</code>), <code>count</code> increments, then <code>feof()</code> is called again and finally returns true, causing the loop to terminate. This results in an incorrect character count (e.g., 1 for an empty file).</p>
+</li>
+<li>
+<p><strong>Infinite Loop on Read Errors:</strong> Even worse, if a read error occurs (e.g., disk failure, corrupted file), <code>fgetc()</code> will return <code>EOF</code>, but <code>feof()</code> might remain <code>false</code> (as it&rsquo;s an error, not an end-of-file condition). This leads to an unending loop, potentially processing invalid data. To mitigate this, an <code>ferror()</code> check would be required inside the loop, transforming <code>while(!feof(p))</code> into something like <code>while(!feof(p) &amp;&amp; !ferror(p))</code>, which still isn&rsquo;t the most idiomatic.</p>
+</li>
+</ol>
+<p><code>feof()</code>&rsquo;s purpose is not to predict the next read, but to explain the <em>status of a previous read function</em> – specifically, to distinguish between an actual end-of-data condition and a general read error (<code>ferror</code>). It&rsquo;s only useful <em>after</em> a read function has returned an indicator of failure (like 0 for <code>fread</code> or <code>EOF</code> for <code>fgetc</code>). Before that, <code>feof()</code> will always return 0.</p>
+<h3 id="is-whilefeoff-absolutely-always-wrong">Is <code>while(!feof(f))</code> Absolutely Always Wrong?</h3>
+<p>While widely discouraged for typical read loops, it&rsquo;s not semantically &ldquo;always wrong&rdquo; in every conceivable niche scenario. However, for the common pattern of &ldquo;read data until no more is available,&rdquo; it is idiomatically incorrect and prone to subtle bugs. The problem isn&rsquo;t that <code>while(!feof(f))</code> is invalid C, but that it tests for a condition that is irrelevant for controlling a read loop and fails to test for the condition that <em>is</em> relevant: the success of the most recent read.</p>
+<p>The phrase <code>while (!feof(f))</code> means &ldquo;while we haven&rsquo;t yet tried to read past the end of the file.&rdquo; This is usually not the condition you want. Instead, you typically want &ldquo;while I can successfully read more data.&rdquo;</p>
+<h3 id="alternative--best-practice-looping-on-operation-success">Alternative &amp; Best Practice: Looping on Operation Success</h3>
+<p>The most robust and idiomatic approach in C/C++ is to make the I/O operation&rsquo;s success itself the loop condition. Then, after the loop terminates, check the stream&rsquo;s final state to determine <em>why</em> it stopped (EOF, error, or format mismatch).</p>
+<p>For instance, with C standard library functions like <code>fgets</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt; // For fgets, FILE, etc.</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdlib.h&gt; // For EXIT_SUCCESS, EXIT_FAILURE</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Placeholder for line processing
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">process_input_line_fgets</span>(<span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> current_line) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">printf</span>(<span style="color:#e6db74">&#34;Processed line: %s&#34;</span>, current_line); <span style="color:#75715e">// fgets includes newline
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    FILE <span style="color:#f92672">*</span>input_stream_source <span style="color:#f92672">=</span> <span style="color:#a6e22e">fopen</span>(<span style="color:#e6db74">&#34;another_example.txt&#34;</span>, <span style="color:#e6db74">&#34;r&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>input_stream_source) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">perror</span>(<span style="color:#e6db74">&#34;Failed to open another_example.txt&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> EXIT_FAILURE;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">char</span> read_buffer_fgets[<span style="color:#ae81ff">256</span>]; <span style="color:#75715e">// Buffer for reading lines
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Loop directly on the success of fgets
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// fgets returns NULL on failure (EOF or error)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">fgets</span>(read_buffer_fgets, <span style="color:#66d9ef">sizeof</span>(read_buffer_fgets), input_stream_source) <span style="color:#f92672">!=</span> NULL) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Successfully read a line. Process it.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#75715e">// Note: fgets does not strip the terminating \n;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#75715e">// checking its presence allows handling lines longer than sizeof(read_buffer_fgets)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">process_input_line_fgets</span>(read_buffer_fgets);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// After the loop, determine the reason for termination
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">ferror</span>(input_stream_source)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// An I/O error occurred
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">perror</span>(<span style="color:#e6db74">&#34;I/O error during file reading&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">fclose</span>(input_stream_source);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> EXIT_FAILURE;
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">feof</span>(input_stream_source)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// End of file was reached
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">fprintf</span>(stderr, <span style="color:#e6db74">&#34;End of file reached successfully.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// This &#39;else&#39; block might catch unexpected non-EOF/non-error terminations
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#75715e">// (less common with fgets, but possible with fscanf for format errors)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">fprintf</span>(stderr, <span style="color:#e6db74">&#34;Loop terminated for an unknown reason (not EOF and no ferror).</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fclose</span>(input_stream_source);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> EXIT_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>In this pattern, the conditional statement itself (<code>fgets(...)</code>) performs the read and evaluates its success. Post-loop, <code>ferror()</code> and <code>feof()</code> serve their intended purpose: to diagnose the specific type of failure that terminated the loop.</p>
+<h3 id="the-misleading-nature-of-feof-a-tldr">The Misleading Nature of <code>feof()</code>: A TL;DR</h3>
+<p><code>feof(F)</code> is poorly named. It doesn&rsquo;t mean &ldquo;check whether <code>F</code> is at end of file <em>now</em>&rdquo;; rather, it tells you <em>why the previous attempt failed to get any data from F</em>.</p>
+<p>The end-of-file state can easily change (e.g., a file growing, or a terminal reporting <code>EOF</code> on <code>Ctrl+D</code>). Unless you explicitly need to distinguish between an I/O error and reaching the end of the file <em>after</em> a read operation has already failed, you are better off controlling your read loops by checking the return value of the read function itself. For most common reading tasks, simply check the result of your read function; if it indicates failure, the loop should terminate.</p>
+<h3 id="addressing-the-intuitive-misconception-a-different-fgetc-loop">Addressing the Intuitive Misconception: A Different <code>fgetc()</code> Loop</h3>
+<p>Many developers intuitively expect <code>feof()</code> to be predictive. They envision a loop like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">// THIS IS WRONG for predictive use and often leads to bugs
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>argv[]) {
+</span></span><span style="display:flex;"><span>  FILE <span style="color:#f92672">*</span>input_file_stream <span style="color:#f92672">=</span> <span style="color:#a6e22e">fopen</span>(<span style="color:#e6db74">&#34;testfile_bad.txt&#34;</span>, <span style="color:#e6db74">&#34;r&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>input_file_stream) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">perror</span>(<span style="color:#e6db74">&#34;Error opening testfile_bad.txt&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Warning: This loop structure is problematic!
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">while</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">feof</span>(input_file_stream)) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">char</span> ch_read <span style="color:#f92672">=</span> <span style="color:#a6e22e">fgetc</span>(input_file_stream);
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// This prints the character, including the last one that was EOF
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// or an error character, leading to unexpected output.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">printf</span>(<span style="color:#e6db74">&#34;%c&#34;</span>, ch_read); 
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">fclose</span>(input_file_stream);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The correct approach for <code>fgetc()</code> involves checking its return value (<code>EOF</code>) directly within the loop:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt; // For fgetc, feof, ferror</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdlib.h&gt; // For EXIT_SUCCESS, EXIT_FAILURE</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>argv[]) {
+</span></span><span style="display:flex;"><span>  FILE <span style="color:#f92672">*</span>good_input_file <span style="color:#f92672">=</span> <span style="color:#a6e22e">fopen</span>(<span style="color:#e6db74">&#34;testfile_good.txt&#34;</span>, <span style="color:#e6db74">&#34;r&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>good_input_file) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">perror</span>(<span style="color:#e6db74">&#34;Error opening testfile_good.txt&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> EXIT_FAILURE;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">int</span> character_value; <span style="color:#75715e">// Use int for fgetc&#39;s return value to accommodate EOF
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Loop reads characters until EOF is returned
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">while</span> ((character_value <span style="color:#f92672">=</span> <span style="color:#a6e22e">fgetc</span>(good_input_file)) <span style="color:#f92672">!=</span> EOF) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">printf</span>(<span style="color:#e6db74">&#34;%c&#34;</span>, (<span style="color:#66d9ef">char</span>)character_value); <span style="color:#75715e">// Cast back to char for printing
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// After loop, determine why it stopped
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">ferror</span>(good_input_file)) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">perror</span>(<span style="color:#e6db74">&#34;Error reading from good_input_file&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">fclose</span>(good_input_file);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> EXIT_FAILURE;
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">feof</span>(good_input_file)) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">fprintf</span>(stderr, <span style="color:#e6db74">&#34;End of file reached correctly.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">fprintf</span>(stderr, <span style="color:#e6db74">&#34;Loop terminated due to an unexpected condition.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">fclose</span>(good_input_file);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> EXIT_SUCCESS;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This demonstrates the expected behavior by checking the <em>result</em> of <code>fgetc()</code> directly, rather than relying on a lagging status flag.</p>
+<p>For more on general Python I/O troubleshooting, check out:</p>
+<ul>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">Solved: How to Fix SSL Certificate Verify Failed Error in Python</a>
+</li>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-unicodeencodeerror-charmap-codec-cant-encode-characters/" target="_blank" rel="noopener">Solved: How to Fix UnicodeEncodeError: &lsquo;charmap&rsquo; codec can&rsquo;t encode characters</a>
+</li>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-pip-install-access-denied-on-windows/" target="_blank" rel="noopener">Solved: How to Fix Pip Install Access Denied on Windows</a>
+</li>
+</ul>
+<p>For C++ stream documentation, refer to <a href="https://en.cppreference.com/w/cpp/io" target="_blank" rel="noopener">cppreference.com</a>
+. For POSIX functions, the <a href="https://pubs.opengroup.org/onlinepubs/9699919799/" target="_blank" rel="noopener">Open Group Base Specifications</a>
+ are invaluable.</p>
+<h3 id="faqs-on-why-whilefeoffile-is-wrong">FAQs on Why <code>while(!feof(file))</code> is Wrong</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why does `while(!feof(file))` read one extra character/line at the end of the file?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">A: <code>feof(file)</code> only becomes true <em>after</em> a read operation has attempted to read past the actual end of the file. This means that when the loop condition <code>!feof(file)</code> is evaluated, even if the previous read was the very last piece of data, <code>feof</code> is still false. The loop body executes one more time, attempts another read (which fails and sets the EOF flag), and only then does <code>feof</code> become true, causing the loop to terminate.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can `while(!feof(file))` lead to an infinite loop?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">A: Yes, it can. If an I/O error occurs (e.g., disk error, corrupted file) while reading, the <code>fgetc()</code> or <code>fread()</code> function might return <code>EOF</code> (or 0 for <code>fread</code>), but the <code>feof()</code> flag might not be set. Instead, the <code>ferror()</code> flag would be set. Since <code>!feof(file)</code> remains true, the loop continues indefinitely, repeatedly attempting to read from the erroneous stream.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the correct way to loop when reading character by character using `fgetc()`?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">A: The correct idiom is to check the return value of <code>fgetc()</code> directly within the loop condition. <code>fgetc()</code> returns <code>EOF</code> (an integer constant) when it reaches the end of the file or encounters an error. Your loop should be structured like <code>while ((character_read = fgetc(input_stream)) != EOF) { /* process character_read */ }</code>. After the loop, you can then use <code>feof()</code> or <code>ferror()</code> to determine why the loop terminated.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How do C&#43;&#43; iostreams handle EOF and errors differently from C stdio functions?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">A: C++ iostreams (like <code>std::cin</code>, <code>std::ifstream</code>) use stream state flags (good, eof, fail, bad) and can be evaluated in a boolean context. When you use <code>if (stream &gt;&gt; variable)</code> or <code>while (std::getline(stream, line))</code>, the stream itself is checked. If extraction/reading fails (due to EOF, format error, or a general I/O error), the stream object evaluates to <code>false</code>. After the loop, you can explicitly check <code>stream.eof()</code> to see if it was due to EOF, or <code>stream.fail()</code>/<code>stream.bad()</code> for other error types. This is generally more robust and idiomatic in C++.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why is it important to distinguish between EOF and other read errors after a loop terminates?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">A: Distinguishing between EOF and other read errors (<code>ferror</code> in C, <code>failbit</code>/<code>badbit</code> in C++) allows your program to react appropriately. Reaching EOF is usually an expected, non-erroneous condition signaling successful consumption of all data. A read error, however, indicates a problem with the underlying I/O system (e.g., disk failure, permission issue), which might require different error handling, logging, or user notification.</div>
+    </div>
+</div>
+<p>We’d love to hear your feedback! Drop your comments or questions below.</p>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

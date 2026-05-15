@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>TensorFlow Model Save &amp; Restore: A Deep Dive into Best Practices - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore effective strategies for saving and restoring TensorFlow models, covering various versions and common scenarios with practical code examples.">
+
+
+
+<meta name="keywords" content="TensorFlow save model, TensorFlow restore model, checkpointing, SavedModel, Keras save model, model persistence">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="TensorFlow Model Save &amp; Restore: A Deep Dive into Best Practices - sqlpey">
+<meta name="DC.description" content="Explore effective strategies for saving and restoring TensorFlow models, covering various versions and common scenarios with practical code examples.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-07-25">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="TensorFlow Model Save &amp; Restore: A Deep Dive into Best Practices - sqlpey">
+<meta property="og:description" content="Explore effective strategies for saving and restoring TensorFlow models, covering various versions and common scenarios with practical code examples.">
+<meta property="og:url" content="https://sqlpey.com/python/tensorflow-model-save-restore/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-07-25T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-07-25T00:00:00Z">
+<meta property="article:modified_time" content="2025-07-25T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="TensorFlow">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="TensorFlow Model Save &amp; Restore: A Deep Dive into Best Practices">
+<meta name="twitter:description" content="Explore effective strategies for saving and restoring TensorFlow models, covering various versions and common scenarios with practical code examples.">
+
+
+<link rel="canonical" href="https://sqlpey.com/python/tensorflow-model-save-restore/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"TensorFlow Model Save \\u0026 Restore: A Deep Dive into Best Practices\"",
+  "description": "\"Explore effective strategies for saving and restoring TensorFlow models, covering various versions and common scenarios with practical code examples.\"",
+  "url": "\"https://sqlpey.com/python/tensorflow-model-save-restore/\"",
+  "datePublished": "\"2025-07-25T00:00:00Z\"",
+  "dateModified": "\"2025-07-25T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/python/tensorflow-model-save-restore/\""
+  },
+  "articleSection": "\"TensorFlow\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">TensorFlow Model Save &amp; Restore: A Deep Dive into Best Practices</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">TensorFlow</span>
+              
+              <span class="tag">Machine Learning</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              17 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 25, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#how-can-i-effectively-save-and-restore-tensorflow-models">How Can I Effectively Save and Restore TensorFlow Models?</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li>
+      <ul>
+        <li></li>
+        <li><a href="#faqs-on-tensorflow-model-save--restore">FAQs on TensorFlow Model Save &amp; Restore</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h3 id="how-can-i-effectively-save-and-restore-tensorflow-models">How Can I Effectively Save and Restore TensorFlow Models?</h3>
+<p>Saving and restoring TensorFlow models is a crucial aspect of the machine learning workflow, allowing you to preserve trained weights, graph structures, and configurations for later use, deployment, or further training. TensorFlow offers several mechanisms to achieve this, each with its own advantages and use cases, especially when considering different TensorFlow versions.</p>
+<h4 id="tensorflow-versions--saving-mechanisms">TensorFlow Versions &amp; Saving Mechanisms</h4>
+<p>The approach to saving and restoring models has evolved, particularly with the transition from TensorFlow 1.x to TensorFlow 2.x.</p>
+<ul>
+<li><strong>TensorFlow 1.x:</strong> Primarily relied on <code>tf.train.Saver</code> for managing checkpoints, which stored variable values. The <code>tf.saved_model</code> API emerged to provide a more comprehensive format including the graph definition, making models portable across different environments and languages.</li>
+<li><strong>TensorFlow 2.x:</strong> Emphasizes the Keras API for model building and management. Saving and restoring are often simplified through <code>model.save()</code> and <code>tf.keras.models.load_model()</code>, which support formats like HDF5 and the SavedModel directory. <code>tf.train.Checkpoint</code> is also a robust object-oriented way to manage state.</li>
+</ul>
+<h4 id="solution-1-using-tftrainsaver-tensorflow-1x-and-earlier">Solution 1: Using <code>tf.train.Saver</code> (TensorFlow 1.x and earlier)</h4>
+<p>This method focuses on saving and restoring the values of <code>tf.Variable</code> objects. The graph structure needs to be defined identically when restoring.</p>
+<p><strong>Saving a Model:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> tensorflow <span style="color:#66d9ef">as</span> tf
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Define placeholders and variables</span>
+</span></span><span style="display:flex;"><span>w1 <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>placeholder(<span style="color:#e6db74">&#34;float&#34;</span>, name<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;w1&#34;</span>)
+</span></span><span style="display:flex;"><span>w2 <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>placeholder(<span style="color:#e6db74">&#34;float&#34;</span>, name<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;w2&#34;</span>)
+</span></span><span style="display:flex;"><span>b1 <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>Variable(<span style="color:#ae81ff">2.0</span>, name<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;bias&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Define an operation to be restored</span>
+</span></span><span style="display:flex;"><span>w3 <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>add(w1, w2)
+</span></span><span style="display:flex;"><span>w4 <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>multiply(w3, b1, name<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;op_to_restore&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sess <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>Session()
+</span></span><span style="display:flex;"><span>sess<span style="color:#f92672">.</span>run(tf<span style="color:#f92672">.</span>global_variables_initializer())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create a saver object</span>
+</span></span><span style="display:flex;"><span>saver <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>train<span style="color:#f92672">.</span>Saver()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Run an operation with input</span>
+</span></span><span style="display:flex;"><span>feed_dict <span style="color:#f92672">=</span> {w1: <span style="color:#ae81ff">4</span>, w2: <span style="color:#ae81ff">8</span>}
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Initial calculation: </span><span style="color:#e6db74">{</span>sess<span style="color:#f92672">.</span>run(w4, feed_dict)<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>) <span style="color:#75715e"># Prints 24</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Save the graph and variables</span>
+</span></span><span style="display:flex;"><span>save_path <span style="color:#f92672">=</span> saver<span style="color:#f92672">.</span>save(sess, <span style="color:#e6db74">&#39;my_test_model&#39;</span>, global_step<span style="color:#f92672">=</span><span style="color:#ae81ff">1000</span>)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Model saved in: </span><span style="color:#e6db74">{</span>save_path<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><p><strong>Restoring a Model:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> tensorflow <span style="color:#66d9ef">as</span> tf
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sess <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>Session()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Load the meta graph and restore weights</span>
+</span></span><span style="display:flex;"><span>saver <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>train<span style="color:#f92672">.</span>import_meta_graph(<span style="color:#e6db74">&#39;my_test_model-1000.meta&#39;</span>)
+</span></span><span style="display:flex;"><span>saver<span style="color:#f92672">.</span>restore(sess, tf<span style="color:#f92672">.</span>train<span style="color:#f92672">.</span>latest_checkpoint(<span style="color:#e6db74">&#39;./&#39;</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Access saved variables directly</span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Restored bias value: </span><span style="color:#e6db74">{</span>sess<span style="color:#f92672">.</span>run(<span style="color:#e6db74">&#39;bias:0&#39;</span>)<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>) <span style="color:#75715e"># Prints 2</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Access placeholders and create a new feed_dict</span>
+</span></span><span style="display:flex;"><span>graph <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>get_default_graph()
+</span></span><span style="display:flex;"><span>w1 <span style="color:#f92672">=</span> graph<span style="color:#f92672">.</span>get_tensor_by_name(<span style="color:#e6db74">&#34;w1:0&#34;</span>)
+</span></span><span style="display:flex;"><span>w2 <span style="color:#f92672">=</span> graph<span style="color:#f92672">.</span>get_tensor_by_name(<span style="color:#e6db74">&#34;w2:0&#34;</span>)
+</span></span><span style="display:flex;"><span>new_feed_dict <span style="color:#f92672">=</span> {w1: <span style="color:#ae81ff">13.0</span>, w2: <span style="color:#ae81ff">17.0</span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Access and run the operation to restore</span>
+</span></span><span style="display:flex;"><span>op_to_restore <span style="color:#f92672">=</span> graph<span style="color:#f92672">.</span>get_tensor_by_name(<span style="color:#e6db74">&#34;op_to_restore:0&#34;</span>)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Restored calculation: </span><span style="color:#e6db74">{</span>sess<span style="color:#f92672">.</span>run(op_to_restore, new_feed_dict)<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>) <span style="color:#75715e"># Prints 60</span>
+</span></span></code></pre></div><p>This method is well-explained in TensorFlow&rsquo;s documentation on meta graphs: <a href="https://www.tensorflow.org/programmers_guide/meta_graph" target="_blank" rel="noopener">https://www.tensorflow.org/programmers_guide/meta_graph</a>
+.</p>
+<h4 id="solution-2-using-tftrainexport_meta_graph-and-tftrainimport_meta_graph-tensorflow-1x">Solution 2: Using <code>tf.train.export_meta_graph</code> and <code>tf.train.import_meta_graph</code> (TensorFlow 1.x)</h4>
+<p>This approach allows saving the entire graph structure along with variables, making it more self-contained.</p>
+<p><strong>Saving the Model:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> tensorflow <span style="color:#66d9ef">as</span> tf
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Define variables</span>
+</span></span><span style="display:flex;"><span>w1 <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>Variable(tf<span style="color:#f92672">.</span>truncated_normal(shape<span style="color:#f92672">=</span>[<span style="color:#ae81ff">10</span>]), name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;w1&#39;</span>)
+</span></span><span style="display:flex;"><span>w2 <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>Variable(tf<span style="color:#f92672">.</span>truncated_normal(shape<span style="color:#f92672">=</span>[<span style="color:#ae81ff">20</span>]), name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;w2&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Add variables to a collection</span>
+</span></span><span style="display:flex;"><span>tf<span style="color:#f92672">.</span>add_to_collection(<span style="color:#e6db74">&#39;vars&#39;</span>, w1)
+</span></span><span style="display:flex;"><span>tf<span style="color:#f92672">.</span>add_to_collection(<span style="color:#e6db74">&#39;vars&#39;</span>, w2)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>saver <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>train<span style="color:#f92672">.</span>Saver()
+</span></span><span style="display:flex;"><span>sess <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>Session()
+</span></span><span style="display:flex;"><span>sess<span style="color:#f92672">.</span>run(tf<span style="color:#f92672">.</span>global_variables_initializer())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Save the model; export_meta_graph is called implicitly</span>
+</span></span><span style="display:flex;"><span>saver<span style="color:#f92672">.</span>save(sess, <span style="color:#e6db74">&#39;my-model&#39;</span>) <span style="color:#75715e"># Generates my-model.meta</span>
+</span></span></code></pre></div><p><strong>Restoring the Model:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> tensorflow <span style="color:#66d9ef">as</span> tf
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sess <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>Session()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Import the meta graph and restore variables</span>
+</span></span><span style="display:flex;"><span>new_saver <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>train<span style="color:#f92672">.</span>import_meta_graph(<span style="color:#e6db74">&#39;my-model.meta&#39;</span>)
+</span></span><span style="display:flex;"><span>new_saver<span style="color:#f92672">.</span>restore(sess, tf<span style="color:#f92672">.</span>train<span style="color:#f92672">.</span>latest_checkpoint(<span style="color:#e6db74">&#39;./&#39;</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Access variables from the collection</span>
+</span></span><span style="display:flex;"><span>all_vars <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>get_collection(<span style="color:#e6db74">&#39;vars&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> v <span style="color:#f92672">in</span> all_vars:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Restored variable value: </span><span style="color:#e6db74">{</span>sess<span style="color:#f92672">.</span>run(v)<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><h4 id="solution-3-using-tfkerasmodelsave-and-tfkerasmodelsload_model-tensorflow-2x-and-keras">Solution 3: Using <code>tf.keras.Model.save</code> and <code>tf.keras.models.load_model</code> (TensorFlow 2.x and Keras)</h4>
+<p>This is the modern and recommended approach for Keras models. It saves the model&rsquo;s architecture, weights, and optimizer state.</p>
+<p><strong>Saving the Entire Model (including weights and optimizer):</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> tensorflow <span style="color:#66d9ef">as</span> tf
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> tensorflow <span style="color:#f92672">import</span> keras
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Load and preprocess data (e.g., MNIST)</span>
+</span></span><span style="display:flex;"><span>mnist <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>datasets<span style="color:#f92672">.</span>mnist
+</span></span><span style="display:flex;"><span>(x_train, y_train), (x_test, y_test) <span style="color:#f92672">=</span> mnist<span style="color:#f92672">.</span>load_data()
+</span></span><span style="display:flex;"><span>x_train, x_test <span style="color:#f92672">=</span> x_train <span style="color:#f92672">/</span> <span style="color:#ae81ff">255.0</span>, x_test <span style="color:#f92672">/</span> <span style="color:#ae81ff">255.0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Define and compile a Keras model</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">create_model</span>():
+</span></span><span style="display:flex;"><span>    model <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>models<span style="color:#f92672">.</span>Sequential([
+</span></span><span style="display:flex;"><span>        tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>layers<span style="color:#f92672">.</span>Flatten(input_shape<span style="color:#f92672">=</span>(<span style="color:#ae81ff">28</span>, <span style="color:#ae81ff">28</span>)),
+</span></span><span style="display:flex;"><span>        tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>layers<span style="color:#f92672">.</span>Dense(<span style="color:#ae81ff">512</span>, activation<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;relu&#39;</span>),
+</span></span><span style="display:flex;"><span>        tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>layers<span style="color:#f92672">.</span>Dropout(<span style="color:#ae81ff">0.2</span>),
+</span></span><span style="display:flex;"><span>        tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>layers<span style="color:#f92672">.</span>Dense(<span style="color:#ae81ff">10</span>, activation<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;softmax&#39;</span>)
+</span></span><span style="display:flex;"><span>    ])
+</span></span><span style="display:flex;"><span>    model<span style="color:#f92672">.</span>compile(optimizer<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;adam&#39;</span>,
+</span></span><span style="display:flex;"><span>                  loss<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;sparse_categorical_crossentropy&#39;</span>,
+</span></span><span style="display:flex;"><span>                  metrics<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;accuracy&#39;</span>])
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> model
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model <span style="color:#f92672">=</span> create_model()
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>fit(x_train, y_train, epochs<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Save the entire model to an HDF5 file</span>
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>save(<span style="color:#e6db74">&#39;./model_path/my_model.h5&#39;</span>)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Model saved to ./model_path/my_model.h5&#34;</span>)
+</span></span></code></pre></div><p><strong>Restoring the Entire Model:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> tensorflow <span style="color:#66d9ef">as</span> tf
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Load the entire model</span>
+</span></span><span style="display:flex;"><span>new_model <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>models<span style="color:#f92672">.</span>load_model(<span style="color:#e6db74">&#39;./model_path/my_model.h5&#39;</span>)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Model loaded from ./model_path/my_model.h5&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Evaluate the restored model</span>
+</span></span><span style="display:flex;"><span>loss, acc <span style="color:#f92672">=</span> new_model<span style="color:#f92672">.</span>evaluate(x_test, y_test, verbose<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Restored model accuracy: </span><span style="color:#e6db74">{</span><span style="color:#ae81ff">100</span> <span style="color:#f92672">*</span> acc<span style="color:#e6db74">:</span><span style="color:#e6db74">.2f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">%&#34;</span>)
+</span></span></code></pre></div><p><strong>Saving and Loading Model Weights Only:</strong></p>
+<p>If you only need to save the learned weights, you can use <code>model.save_weights()</code> and <code>model.load_weights()</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Assuming &#39;model&#39; is a trained Keras model instance</span>
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>fit(x_train, y_train, epochs<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>) <span style="color:#75715e"># Further training</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Save only the weights</span>
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>save_weights(<span style="color:#e6db74">&#39;./checkpoints/my_checkpoint&#39;</span>)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Model weights saved to ./checkpoints/my_checkpoint&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Restore weights to a new model instance</span>
+</span></span><span style="display:flex;"><span>model_for_restore <span style="color:#f92672">=</span> create_model() <span style="color:#75715e"># Need to recreate model architecture</span>
+</span></span><span style="display:flex;"><span>model_for_restore<span style="color:#f92672">.</span>load_weights(<span style="color:#e6db74">&#39;./checkpoints/my_checkpoint&#39;</span>)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Model weights restored from ./checkpoints/my_checkpoint&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Evaluate the restored model</span>
+</span></span><span style="display:flex;"><span>loss, acc <span style="color:#f92672">=</span> model_for_restore<span style="color:#f92672">.</span>evaluate(x_test, y_test)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Restored model (weights only) accuracy: </span><span style="color:#e6db74">{</span><span style="color:#ae81ff">100</span> <span style="color:#f92672">*</span> acc<span style="color:#e6db74">:</span><span style="color:#e6db74">.2f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">%&#34;</span>)
+</span></span></code></pre></div><p><strong>Saving/Restoring with Keras Checkpoint Callback:</strong></p>
+<p>The <code>tf.keras.callbacks.ModelCheckpoint</code> provides a convenient way to automatically save weights during training.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ... (model definition and data loading as above)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>checkpoint_path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;training_checkpoints/cp-</span><span style="color:#e6db74">{epoch:04d}</span><span style="color:#e6db74">.ckpt&#34;</span>
+</span></span><span style="display:flex;"><span>checkpoint_dir <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>dirname(checkpoint_path)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create checkpoint callback</span>
+</span></span><span style="display:flex;"><span>cp_callback <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>callbacks<span style="color:#f92672">.</span>ModelCheckpoint(
+</span></span><span style="display:flex;"><span>    checkpoint_path, verbose<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, save_weights_only<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, period<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model <span style="color:#f92672">=</span> create_model()
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Initial save of weights</span>
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>save_weights(checkpoint_path<span style="color:#f92672">.</span>format(epoch<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Train with checkpoint callback</span>
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>fit(x_train, y_train,
+</span></span><span style="display:flex;"><span>          epochs<span style="color:#f92672">=</span><span style="color:#ae81ff">50</span>, callbacks<span style="color:#f92672">=</span>[cp_callback],
+</span></span><span style="display:flex;"><span>          validation_data<span style="color:#f92672">=</span>(x_test, y_test),
+</span></span><span style="display:flex;"><span>          verbose<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Restore from the latest checkpoint</span>
+</span></span><span style="display:flex;"><span>latest <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>train<span style="color:#f92672">.</span>latest_checkpoint(checkpoint_dir)
+</span></span><span style="display:flex;"><span>new_model_for_restore <span style="color:#f92672">=</span> create_model()
+</span></span><span style="display:flex;"><span>new_model_for_restore<span style="color:#f92672">.</span>load_weights(latest)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Restored model from latest checkpoint: </span><span style="color:#e6db74">{</span>latest<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Evaluate the restored model</span>
+</span></span><span style="display:flex;"><span>loss, acc <span style="color:#f92672">=</span> new_model_for_restore<span style="color:#f92672">.</span>evaluate(x_test, y_test)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Restored model (checkpoint callback) accuracy: </span><span style="color:#e6db74">{</span><span style="color:#ae81ff">100</span> <span style="color:#f92672">*</span> acc<span style="color:#e6db74">:</span><span style="color:#e6db74">.2f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">%&#34;</span>)
+</span></span></code></pre></div><p><strong>Saving Models with Custom Objects:</strong></p>
+<p>When using custom losses, metrics, or layers, you need to provide them during loading.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> tensorflow <span style="color:#66d9ef">as</span> tf
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> tensorflow.keras.layers <span style="color:#f92672">import</span> Layer
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> tensorflow.keras.utils.generic_utils <span style="color:#f92672">import</span> get_custom_objects
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Example custom loss function</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@tf.function</span>()
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">custom_loss</span>(y_true, y_pred):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> tf<span style="color:#f92672">.</span>reduce_mean(y_true <span style="color:#f92672">-</span> y_pred)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Register custom objects</span>
+</span></span><span style="display:flex;"><span>get_custom_objects()<span style="color:#f92672">.</span>update({<span style="color:#e6db74">&#39;custom_loss&#39;</span>: custom_loss})
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Define model with custom loss</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">create_model_with_custom_loss</span>():
+</span></span><span style="display:flex;"><span>    model <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>models<span style="color:#f92672">.</span>Sequential([
+</span></span><span style="display:flex;"><span>        tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>layers<span style="color:#f92672">.</span>Flatten(input_shape<span style="color:#f92672">=</span>(<span style="color:#ae81ff">28</span>, <span style="color:#ae81ff">28</span>)),
+</span></span><span style="display:flex;"><span>        tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>layers<span style="color:#f92672">.</span>Dense(<span style="color:#ae81ff">128</span>, activation<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;relu&#39;</span>),
+</span></span><span style="display:flex;"><span>        tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>layers<span style="color:#f92672">.</span>Dense(<span style="color:#ae81ff">10</span>, activation<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;softmax&#39;</span>)
+</span></span><span style="display:flex;"><span>    ])
+</span></span><span style="display:flex;"><span>    model<span style="color:#f92672">.</span>compile(optimizer<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;adam&#39;</span>,
+</span></span><span style="display:flex;"><span>                  loss<span style="color:#f92672">=</span>custom_loss, <span style="color:#75715e"># Use custom loss</span>
+</span></span><span style="display:flex;"><span>                  metrics<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;accuracy&#39;</span>])
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> model
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model_with_custom <span style="color:#f92672">=</span> create_model_with_custom_loss()
+</span></span><span style="display:flex;"><span>model_with_custom<span style="color:#f92672">.</span>fit(x_train, y_train, epochs<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Save the model</span>
+</span></span><span style="display:flex;"><span>model_with_custom<span style="color:#f92672">.</span>save(<span style="color:#e6db74">&#34;./model_with_custom_loss.h5&#34;</span>)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Model with custom loss saved.&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Load the model, providing custom objects</span>
+</span></span><span style="display:flex;"><span>loaded_model_with_custom <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>models<span style="color:#f92672">.</span>load_model(
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;./model_with_custom_loss.h5&#34;</span>, custom_objects<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;custom_loss&#39;</span>: custom_loss}
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Model with custom loss loaded.&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Evaluate to ensure custom loss is recognized</span>
+</span></span><span style="display:flex;"><span>loss, acc <span style="color:#f92672">=</span> loaded_model_with_custom<span style="color:#f92672">.</span>evaluate(x_test, y_test)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Restored model with custom loss accuracy: </span><span style="color:#e6db74">{</span><span style="color:#ae81ff">100</span> <span style="color:#f92672">*</span> acc<span style="color:#e6db74">:</span><span style="color:#e6db74">.2f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">%&#34;</span>)
+</span></span></code></pre></div><p>For custom layers, you would register them similarly using <code>get_custom_objects().update({'CustomLayerName': CustomLayerClass})</code>.</p>
+<h4 id="solution-4-using-tftraincheckpoint-tensorflow-2x-eager-execution">Solution 4: Using <code>tf.train.Checkpoint</code> (TensorFlow 2.x Eager Execution)</h4>
+<p>This object-oriented approach is robust and recommended for TF 2.x, especially with eager execution. It tracks dependencies between Python objects.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> tensorflow <span style="color:#66d9ef">as</span> tf
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Ensure eager execution is enabled (default in TF 2.x)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># tf.compat.v1.enable_eager_execution() # For TF 1.x compatibility if needed</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>checkpoint_directory <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;./tf_ckpts&#34;</span>
+</span></span><span style="display:flex;"><span>checkpoint_prefix <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(checkpoint_directory, <span style="color:#e6db74">&#34;ckpt&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Assume &#39;model&#39; and &#39;optimizer&#39; are defined Keras objects or tf.Module instances</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Example:</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SimpleModel</span>(tf<span style="color:#f92672">.</span>Module):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__init__</span>(self):
+</span></span><span style="display:flex;"><span>        super()<span style="color:#f92672">.</span><span style="color:#a6e22e">__init__</span>()
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>dense <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>layers<span style="color:#f92672">.</span>Dense(<span style="color:#ae81ff">10</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@tf.function</span>(input_signature<span style="color:#f92672">=</span>[tf<span style="color:#f92672">.</span>TensorSpec(shape<span style="color:#f92672">=</span>[<span style="color:#66d9ef">None</span>, <span style="color:#ae81ff">28</span><span style="color:#f92672">*</span><span style="color:#ae81ff">28</span>], dtype<span style="color:#f92672">=</span>tf<span style="color:#f92672">.</span>float32)])
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__call__</span>(self, x):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>dense(x)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model_instance <span style="color:#f92672">=</span> SimpleModel()
+</span></span><span style="display:flex;"><span>optimizer_instance <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>optimizers<span style="color:#f92672">.</span>Adam(learning_rate<span style="color:#f92672">=</span><span style="color:#ae81ff">0.001</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create a Checkpoint object that tracks the model and optimizer</span>
+</span></span><span style="display:flex;"><span>checkpoint <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>train<span style="color:#f92672">.</span>Checkpoint(
+</span></span><span style="display:flex;"><span>    optimizer<span style="color:#f92672">=</span>optimizer_instance, model<span style="color:#f92672">=</span>model_instance, optimizer_step<span style="color:#f92672">=</span>tf<span style="color:#f92672">.</span>Variable(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create a CheckpointManager to manage saving (e.g., keep last 3 checkpoints)</span>
+</span></span><span style="display:flex;"><span>manager <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>train<span style="color:#f92672">.</span>CheckpointManager(checkpoint, checkpoint_directory, max_to_keep<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">---</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## &#34;TensorFlow Model Save &amp; Restore: A Deep Dive into Best Practices&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Solutions</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># (Simulated training step)</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@tf.function</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">train_step</span>(data, target):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> tf<span style="color:#f92672">.</span>GradientTape() <span style="color:#66d9ef">as</span> tape:
+</span></span><span style="display:flex;"><span>        predictions <span style="color:#f92672">=</span> model_instance(data)
+</span></span><span style="display:flex;"><span>        loss <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>reduce_mean(tf<span style="color:#f92672">.</span>square(predictions <span style="color:#f92672">-</span> target))
+</span></span><span style="display:flex;"><span>    gradients <span style="color:#f92672">=</span> tape<span style="color:#f92672">.</span>gradient(loss, model_instance<span style="color:#f92672">.</span>trainable_variables)
+</span></span><span style="display:flex;"><span>    optimizer_instance<span style="color:#f92672">.</span>apply_gradients(zip(gradients, model_instance<span style="color:#f92672">.</span>trainable_variables))
+</span></span><span style="display:flex;"><span>    checkpoint<span style="color:#f92672">.</span>optimizer_step<span style="color:#f92672">.</span>assign_add(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> loss
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Simulate some training and saving</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">10</span>):
+</span></span><span style="display:flex;"><span>    sample_data <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>normal([<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">784</span>]) <span style="color:#75715e"># Batch size 2</span>
+</span></span><span style="display:flex;"><span>    sample_target <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>normal([<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">10</span>])
+</span></span><span style="display:flex;"><span>    loss_val <span style="color:#f92672">=</span> train_step(sample_data, sample_target)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%</span> <span style="color:#ae81ff">3</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>        save_path <span style="color:#f92672">=</span> manager<span style="color:#f92672">.</span>save()
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Saved checkpoint for step </span><span style="color:#e6db74">{</span>int(checkpoint<span style="color:#f92672">.</span>optimizer_step)<span style="color:#e6db74">}</span><span style="color:#e6db74">: </span><span style="color:#e6db74">{</span>save_path<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#</span>
+</span></span></code></pre></div><p>import tensorflow as tf</p>
+<p>#Prepare to feed input, i.e. feed_dict and placeholders
+w1 = tf.placeholder(&quot;float&quot;, name=&quot;w1&quot;)
+w2 = tf.placeholder(&quot;float&quot;, name=&quot;w2&quot;)
+b1= tf.Variable(2.0,name=&quot;bias&quot;)
+feed_dict ={w1:4,w2:8}</p>
+<p>#Define a test operation that we will restore
+w3 = tf.add(w1,w2)
+w4 = tf.multiply(w3,b1,name=&quot;op_to_restore&quot;)
+sess = tf.Session()
+sess.run(tf.global_variables_initializer())</p>
+<p>#Create a saver object which will save all the variables
+saver = tf.train.Saver()</p>
+<p>#Run the operation by feeding input
+print sess.run(w4,feed_dict)
+#Prints 24 which is sum of (w1+w2)*b1</p>
+<p>#Now, save the graph
+saver.save(sess, &lsquo;my_test_model&rsquo;,global_step=1000)
+import tensorflow as tf</p>
+<p>sess=tf.Session() <br>
+#First let&rsquo;s load meta graph and restore weights
+saver = tf.train.import_meta_graph(&lsquo;my_test_model-1000.meta&rsquo;)
+saver.restore(sess,tf.train.latest_checkpoint(&rsquo;./&rsquo;))</p>
+<h1 id="access-saved-variables-directly">Access saved Variables directly</h1>
+<p>print(sess.run(&lsquo;bias:0&rsquo;))</p>
+<h1 id="this-will-print-2-which-is-the-value-of-bias-that-we-saved">This will print 2, which is the value of bias that we saved</h1>
+<h1 id="now-lets-access-and-create-placeholders-variables-and">Now, let&rsquo;s access and create placeholders variables and</h1>
+<h1 id="create-feed-dict-to-feed-new-data">create feed-dict to feed new data</h1>
+<p>graph = tf.get_default_graph()
+w1 = graph.get_tensor_by_name(&quot;w1:0&quot;)
+w2 = graph.get_tensor_by_name(&quot;w2:0&quot;)
+feed_dict ={w1:13.0,w2:17.0}</p>
+<p>#Now, access the op that you want to run.
+op_to_restore = graph.get_tensor_by_name(&quot;op_to_restore:0&quot;)</p>
+<p>print sess.run(op_to_restore,feed_dict)
+#This will print 60 which is calculated</p>
+<pre tabindex="0"><code>
+Restoring
+</code></pre><p>w1 = tf.Variable(tf.truncated_normal(shape=[10]), name=&lsquo;w1&rsquo;)
+w2 = tf.Variable(tf.truncated_normal(shape=[20]), name=&lsquo;w2&rsquo;)
+tf.add_to_collection(&lsquo;vars&rsquo;, w1)
+tf.add_to_collection(&lsquo;vars&rsquo;, w2)
+saver = tf.train.Saver()
+sess = tf.Session()
+sess.run(tf.global_variables_initializer())
+saver.save(sess, &lsquo;my-model&rsquo;)</p>
+<h1 id="save-method-will-call-export_meta_graph-implicitly"><code>save</code> method will call <code>export_meta_graph</code> implicitly.</h1>
+<h1 id="you-will-get-saved-graph-filesmy-modelmeta">you will get saved graph files:my-model.meta</h1>
+<p>sess = tf.Session()
+new_saver = tf.train.import_meta_graph(&lsquo;my-model.meta&rsquo;)
+new_saver.restore(sess, tf.train.latest_checkpoint(&rsquo;./&rsquo;))
+all_vars = tf.get_collection(&lsquo;vars&rsquo;)
+for v in all_vars:
+v_ = sess.run(v)
+print(v_)</p>
+<pre tabindex="0"><code>
+# Restore the latest checkpoint
+latest_checkpoint = tf.train.latest_checkpoint(checkpoint_directory)
+if latest_checkpoint:
+    print(f&#34;Restoring from checkpoint: {latest_checkpoint}&#34;)
+    checkpoint.restore(latest_checkpoint)
+    print(f&#34;Restored model state. Current step: {int(checkpoint.optimizer_step)}&#34;)
+else:
+    print(&#34;No checkpoint found, initializing from scratch.&#34;)
+
+# Now you can use model_instance for predictions or further training
+# Example prediction (using the restored model)
+sample_input_for_restore = tf.random.normal([1, 784])
+prediction_after_restore = model_instance(sample_input_for_restore)
+print(f&#34;Prediction after restore: {prediction_after_restore.numpy()[0, :5]}&#34;)
+</code></pre><h4 id="solution-5-using-tfsaved_modelsave-tensorflow-2x-savedmodel-format">Solution 5: Using <code>tf.saved_model.save</code> (TensorFlow 2.x SavedModel Format)</h4>
+<p>This is the standard format for TensorFlow serving and deployment, containing the graph, variables, and signatures.</p>
+<p><strong>Saving a Model:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> tensorflow <span style="color:#66d9ef">as</span> tf
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> tensorflow.keras.layers <span style="color:#f92672">import</span> Input, Dense, Flatten
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> tensorflow.keras.models <span style="color:#f92672">import</span> Model
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Load and preprocess data</span>
+</span></span><span style="display:flex;"><span>mnist <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>datasets<span style="color:#f92672">.</span>mnist
+</span></span><span style="display:flex;"><span>(x_train, y_train), (x_test, y_test) <span style="color:#f92672">=</span> mnist<span style="color:#f92672">.</span>load_data()
+</span></span><span style="display:flex;"><span>x_train <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>utils<span style="color:#f92672">.</span>normalize(x_train, axis<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>x_test <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>utils<span style="color:#f92672">.</span>normalize(x_test, axis<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create a Keras Functional API model</span>
+</span></span><span style="display:flex;"><span>input_layer <span style="color:#f92672">=</span> Input(shape<span style="color:#f92672">=</span>(<span style="color:#ae81ff">28</span>, <span style="color:#ae81ff">28</span>), name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;input_image&#39;</span>)
+</span></span><span style="display:flex;"><span>x <span style="color:#f92672">=</span> Flatten()(input_layer)
+</span></span><span style="display:flex;"><span>x <span style="color:#f92672">=</span> Dense(<span style="color:#ae81ff">128</span>, activation<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;relu&#39;</span>)(x)
+</span></span><span style="display:flex;"><span>x <span style="color:#f92672">=</span> Dense(<span style="color:#ae81ff">128</span>, activation<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;relu&#39;</span>)(x)
+</span></span><span style="display:flex;"><span>output_layer <span style="color:#f92672">=</span> Dense(<span style="color:#ae81ff">10</span>, activation<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;softmax&#39;</span>, name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;output_probabilities&#39;</span>)(x)
+</span></span><span style="display:flex;"><span>model <span style="color:#f92672">=</span> Model(inputs<span style="color:#f92672">=</span>input_layer, outputs<span style="color:#f92672">=</span>output_layer)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>compile(optimizer<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;adam&#39;</span>,
+</span></span><span style="display:flex;"><span>              loss<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;sparse_categorical_crossentropy&#39;</span>,
+</span></span><span style="display:flex;"><span>              metrics<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;accuracy&#39;</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Train the model</span>
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>fit(x_train, y_train, epochs<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Save the model in SavedModel format</span>
+</span></span><span style="display:flex;"><span>export_path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;tf_saved_model/mnist_classifier&#39;</span>
+</span></span><span style="display:flex;"><span>tf<span style="color:#f92672">.</span>saved_model<span style="color:#f92672">.</span>save(model, export_path)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Model saved in SavedModel format to: </span><span style="color:#e6db74">{</span>export_path<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><p><strong>Restoring and Using the SavedModel:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> tensorflow <span style="color:#66d9ef">as</span> tf
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Load the model from the SavedModel directory</span>
+</span></span><span style="display:flex;"><span>loaded_model <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>models<span style="color:#f92672">.</span>load_model(export_path)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Model loaded from: </span><span style="color:#e6db74">{</span>export_path<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get an example image for prediction</span>
+</span></span><span style="display:flex;"><span>index <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>img <span style="color:#f92672">=</span> x_test[index]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Use the serving signature for prediction</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># The default serving signature is often named &#34;serving_default&#34;</span>
+</span></span><span style="display:flex;"><span>predict_fn <span style="color:#f92672">=</span> loaded_model<span style="color:#f92672">.</span>signatures[<span style="color:#e6db74">&#34;serving_default&#34;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># The input tensor name might vary, often it&#39;s the name of the input layer.</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Inspect the model or signature if unsure.</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># For this model, the input layer name is &#39;input_image&#39;.</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># We need to wrap the input image in a tensor and potentially adjust its shape.</span>
+</span></span><span style="display:flex;"><span>input_tensor <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>constant(img<span style="color:#f92672">.</span>reshape(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">28</span>, <span style="color:#ae81ff">28</span>), dtype<span style="color:#f92672">=</span>tf<span style="color:#f92672">.</span>float32)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Execute the prediction</span>
+</span></span><span style="display:flex;"><span>predictions <span style="color:#f92672">=</span> predict_fn(input_image<span style="color:#f92672">=</span>input_tensor) <span style="color:#75715e"># Use the input layer&#39;s name</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># The output name is typically the name of the output layer.</span>
+</span></span><span style="display:flex;"><span>predicted_probabilities <span style="color:#f92672">=</span> predictions[<span style="color:#e6db74">&#39;output_probabilities&#39;</span>]
+</span></span><span style="display:flex;"><span>predicted_class <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>argmax(predicted_probabilities<span style="color:#f92672">.</span>numpy())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Predicted class for image </span><span style="color:#e6db74">{</span>index<span style="color:#e6db74">}</span><span style="color:#e6db74">: </span><span style="color:#e6db74">{</span>predicted_class<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># You can also evaluate the loaded model</span>
+</span></span><span style="display:flex;"><span>loss, acc <span style="color:#f92672">=</span> loaded_model<span style="color:#f92672">.</span>evaluate(x_test, y_test, verbose<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Restored model evaluation accuracy: </span><span style="color:#e6db74">{</span><span style="color:#ae81ff">100</span> <span style="color:#f92672">*</span> acc<span style="color:#e6db74">:</span><span style="color:#e6db74">.2f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">%&#34;</span>)
+</span></span></code></pre></div><h4 id="important-considerations">Important Considerations:</h4>
+<ul>
+<li><strong><code>./</code> Prefix:</strong> When restoring checkpoints, sometimes prepending <code>&quot;./&quot;</code> to the file path (<code>saver.restore(sess, './model.ckpt')</code>) can resolve issues related to relative pathing.</li>
+<li><strong><code>tf.global_variables_initializer()</code>:</strong> It&rsquo;s often necessary to run <code>sess.run(tf.global_variables_initializer())</code> <em>before</em> restoring a session if the graph was built from scratch, to ensure all variables are properly initialized before loading saved states. However, if the graph structure is identical and variables were already initialized during saving, this step might be redundant or even cause errors if done incorrectly.</li>
+<li><strong><code>tf.train.Saver(tf.all_variables())</code> or <code>tf.trainable_variables()</code>:</strong> When saving, you can explicitly specify which variables to save using <code>var_list</code>. This can be useful for reducing checkpoint size.</li>
+<li><strong><code>tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)</code>:</strong> Used in TF 1.x to get all global variables in the current graph, which <code>tf.train.Saver</code> can then use.</li>
+<li><strong><code>tf.import_graph_def</code>:</strong> Useful in TF 1.x for restoring only the graph structure, often used in conjunction with manually creating variables and then using a <code>Saver</code>. This can be complex to manage correctly.</li>
+<li><strong><code>tf.train.MonitoredTrainingSession</code>:</strong> In TF 1.x, this high-level API can automatically manage checkpoint saving and restoring, simplifying the process.</li>
+<li><strong>TensorFlow Serving Compatibility:</strong> The SavedModel format is the preferred choice for deploying models with TensorFlow Serving, TensorFlow Lite, or TensorFlow.js, as it&rsquo;s language-agnostic and self-contained.</li>
+</ul>
+<p>Choosing the right method depends on your TensorFlow version, the complexity of your model, and your deployment needs. For new projects, <code>tf.keras</code> APIs and <code>tf.train.Checkpoint</code> are generally the most straightforward and robust.</p>
+<hr>
+<h3 id="faqs-on-tensorflow-model-save--restore">FAQs on TensorFlow Model Save &amp; Restore</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the difference between saving checkpoints and saving a SavedModel in TensorFlow</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Checkpoints primarily save the values of model variables (<code>tf.Variable</code>). They are useful when you have the source code to define the model&rsquo;s structure and need to restore only the learned parameters. A SavedModel, on the other hand, is a more complete format that includes the graph definition (computation structure), variables, and serving signatures. This makes SavedModels portable and suitable for deployment environments like TensorFlow Serving, where the original Python code might not be available.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I save a TensorFlow model trained in TensorFlow 1.x and load it in TensorFlow 2.x</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Generally, yes, but it often requires using the <code>tf.compat.v1</code> module to run TensorFlow 1.x code within a TensorFlow 2.x environment, or migrating the model to TensorFlow 2.x&rsquo;s Keras or SavedModel APIs. Direct loading of <code>tf.train.Saver</code> checkpoints into a TF 2.x graph can be complex if the graph structure isn&rsquo;t explicitly managed. The SavedModel format is more likely to be compatible across versions.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How do I save custom layers or metrics in Keras models</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: When saving a Keras model that uses custom layers, metrics, or losses, you must register these custom components with TensorFlow&rsquo;s serialization system. This is typically done using <code>tf.keras.utils.generic_utils.get_custom_objects().update({'custom_name': custom_object})</code> before saving. When loading the model, you pass this dictionary of custom objects to <code>tf.keras.models.load_model()</code>.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What happens if my TensorFlow graph structure changes between saving and restoring</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: If you are using <code>tf.train.Saver</code> and the graph structure (variable names, operations, etc.) changes significantly between saving and restoring, loading will likely fail with errors related to missing or mismatched variables. The SavedModel format is more resilient as it packages the graph definition, but changes to the input/output signatures might still cause issues. <code>tf.train.Checkpoint</code> is designed to be more robust to code changes due to its object-based tracking.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the purpose of the &#39;.meta&#39; file when saving with tf.train.Saver</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The <code>.meta</code> file, generated alongside checkpoint files by <code>tf.train.Saver</code>, stores the TensorFlow graph definition. This includes information about all operations, variables, and their connections. When restoring, <code>tf.train.import_meta_graph</code> uses this file to reconstruct the graph structure before applying the variable values from the checkpoint files.</div>
+    </div>
+</div>
+<p>We’d love to hear your feedback! Drop your comments or questions below.
+For more on Python, check out <a href="https://sqlpey.com/python/what-is-python" target="_blank" rel="noopener">what is Python</a>
+.
+To explore SQL concepts, see <a href="https://sqlpey.com/sql/what-is-sql" target="_blank" rel="noopener">what is SQL</a>
+.
+If you&rsquo;re interested in data manipulation, learn about <a href="https://sqlpey.com/python/what-is-pandas" target="_blank" rel="noopener">what is Pandas</a>
+.</p>
+<pre tabindex="0"><code></code></pre><h1 id="-">&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;-</h1>
+<h1 id="--toy-context--">&mdash;&ndash;  Toy Context  &mdash;&ndash;</h1>
+<h1 id="--1">&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;-</h1>
+<p>import tensorflow as tf</p>
+<p>class Net(tf.keras.Model):
+&quot;&quot;&quot;A simple linear model.&quot;&quot;&quot;</p>
+<pre><code>def __init__(self):
+    super(Net, self).__init__()
+    self.l1 = tf.keras.layers.Dense(5)
+
+def call(self, x):
+    return self.l1(x)
+</code></pre>
+<p>def toy_dataset():
+inputs = tf.range(10.0)[:, None]
+labels = inputs * 5.0 + tf.range(5.0)[None, :]
+return (
+tf.data.Dataset.from_tensor_slices(dict(x=inputs, y=labels)).repeat().batch(2)
+)</p>
+<p>def train_step(net, example, optimizer):
+&quot;&quot;&quot;Trains <code>net</code> on <code>example</code> using <code>optimizer</code>.&quot;&quot;&quot;
+with tf.GradientTape() as tape:
+output = net(example[&quot;x&quot;])
+loss = tf.reduce_mean(tf.abs(output - example[&quot;y&quot;]))
+variables = net.trainable_variables
+gradients = tape.gradient(loss, variables)
+optimizer.apply_gradients(zip(gradients, variables))
+return loss</p>
+<h1 id="--2">&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;-</h1>
+<h1 id="--create-objects--">&mdash;&ndash;  Create Objects  &mdash;&ndash;</h1>
+<h1 id="--3">&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;-</h1>
+<p>net = Net()
+opt = tf.keras.optimizers.Adam(0.1)
+dataset = toy_dataset()
+iterator = iter(dataset)
+ckpt = tf.train.Checkpoint(
+step=tf.Variable(1), optimizer=opt, net=net, iterator=iterator
+)
+manager = tf.train.CheckpointManager(ckpt, &quot;./tf_ckpts&quot;, max_to_keep=3)</p>
+<h1 id="--4">&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;-</h1>
+<h1 id="--train-and-save--">&mdash;&ndash;  Train and Save  &mdash;&ndash;</h1>
+<h1 id="--5">&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;-</h1>
+<p>ckpt.restore(manager.latest_checkpoint)
+if manager.latest_checkpoint:
+print(&quot;Restored from {}&quot;.format(manager.latest_checkpoint))
+else:
+print(&quot;Initializing from scratch.&quot;)</p>
+<p>for _ in range(50):
+example = next(iterator)
+loss = train_step(net, example, opt)
+ckpt.step.assign_add(1)
+if int(ckpt.step) % 10 == 0:
+save_path = manager.save()
+print(&quot;Saved checkpoint for step {}: {}&quot;.format(int(ckpt.step), save_path))
+print(&quot;loss {:1.2f}&quot;.format(loss.numpy()))</p>
+<h1 id="heading">&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;</h1>
+<h1 id="--restore--">&mdash;&ndash;  Restore  &mdash;&ndash;</h1>
+<h1 id="heading-1">&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;</h1>
+<h1 id="in-another-script-re-initialize-objects">In another script, re-initialize objects</h1>
+<p>opt = tf.keras.optimizers.Adam(0.1)
+net = Net()
+dataset = toy_dataset()
+iterator = iter(dataset)
+ckpt = tf.train.Checkpoint(
+step=tf.Variable(1), optimizer=opt, net=net, iterator=iterator
+)
+manager = tf.train.CheckpointManager(ckpt, &quot;./tf_ckpts&quot;, max_to_keep=3)</p>
+<h1 id="re-use-the-manager-code-above-">Re-use the manager code above ^</h1>
+<p>ckpt.restore(manager.latest_checkpoint)
+if manager.latest_checkpoint:
+print(&quot;Restored from {}&quot;.format(manager.latest_checkpoint))
+else:
+print(&quot;Initializing from scratch.&quot;)</p>
+<p>for _ in range(50):
+example = next(iterator)
+# Continue training or evaluate etc.</p>
+<h1 id="create-some-variables">Create some variables.</h1>
+<p>v1 = tf.get_variable(&quot;v1&quot;, shape=[3], initializer = tf.zeros_initializer)
+v2 = tf.get_variable(&quot;v2&quot;, shape=[5], initializer = tf.zeros_initializer)</p>
+<p>inc_v1 = v1.assign(v1+1)
+dec_v2 = v2.assign(v2-1)</p>
+<h1 id="add-an-op-to-initialize-the-variables">Add an op to initialize the variables.</h1>
+<p>init_op = tf.global_variables_initializer()</p>
+<h1 id="add-ops-to-save-and-restore-all-the-variables">Add ops to save and restore all the variables.</h1>
+<p>saver = tf.train.Saver()</p>
+<h1 id="later-launch-the-model-initialize-the-variables-do-some-work-and-save-the">Later, launch the model, initialize the variables, do some work, and save the</h1>
+<h1 id="variables-to-disk">variables to disk.</h1>
+<p>with tf.Session() as sess:
+sess.run(init_op)</p>
+<h1 id="do-some-work-with-the-model">Do some work with the model.</h1>
+<p>inc_v1.op.run()
+dec_v2.op.run()</p>
+<h1 id="save-the-variables-to-disk">Save the variables to disk.</h1>
+<p>save_path = saver.save(sess, &quot;/tmp/model.ckpt&quot;)
+print(&quot;Model saved in path: %s&quot; % save_path)
+tf.reset_default_graph()</p>
+<h1 id="create-some-variables-1">Create some variables.</h1>
+<p>v1 = tf.get_variable(&quot;v1&quot;, shape=[3])
+v2 = tf.get_variable(&quot;v2&quot;, shape=[5])</p>
+<h1 id="add-ops-to-save-and-restore-all-the-variables-1">Add ops to save and restore all the variables.</h1>
+<p>saver = tf.train.Saver()</p>
+<h1 id="later-launch-the-model-use-the-saver-to-restore-variables-from-disk-and">Later, launch the model, use the saver to restore variables from disk, and</h1>
+<h1 id="do-some-work-with-the-model-1">do some work with the model.</h1>
+<p>with tf.Session() as sess:</p>
+<h1 id="restore-variables-from-disk">Restore variables from disk.</h1>
+<p>saver.restore(sess, &quot;/tmp/model.ckpt&quot;)
+print(&quot;Model restored.&quot;)</p>
+<h1 id="check-the-values-of-the-variables">Check the values of the variables</h1>
+<p>print(&quot;v1 : %s&quot; % v1.eval())
+print(&quot;v2 : %s&quot; % v2.eval())
+import tensorflow as tf
+from tensorflow.saved_model import tag_constants</p>
+<p>with tf.Graph().as_default():
+with tf.Session() as sess:
+&hellip;</p>
+<pre><code>    # Saving
+    inputs = {
+        &amp;quot;batch_size_placeholder&amp;quot;: batch_size_placeholder,
+        &amp;quot;features_placeholder&amp;quot;: features_placeholder,
+        &amp;quot;labels_placeholder&amp;quot;: labels_placeholder,
+    }
+    outputs = {&amp;quot;prediction&amp;quot;: model_output}
+    tf.saved_model.simple_save(
+        sess, 'path/to/your/location/', inputs, outputs
+    )
+</code></pre>
+<p>graph = tf.Graph()
+with restored_graph.as_default():
+with tf.Session() as sess:
+tf.saved_model.loader.load(
+sess,
+[tag_constants.SERVING],
+&lsquo;path/to/your/location/&rsquo;,
+)
+batch_size_placeholder = graph.get_tensor_by_name(&lsquo;batch_size_placeholder:0&rsquo;)
+features_placeholder = graph.get_tensor_by_name(&lsquo;features_placeholder:0&rsquo;)
+labels_placeholder = graph.get_tensor_by_name(&rsquo;labels_placeholder:0&rsquo;)
+prediction = restored_graph.get_tensor_by_name(&lsquo;dense/BiasAdd:0&rsquo;)</p>
+<pre><code>    sess.run(prediction, feed_dict={
+        batch_size_placeholder: some_value,
+        features_placeholder: some_other_value,
+        labels_placeholder: another_value
+    })
+</code></pre>
+<p>import os
+import shutil
+import numpy as np
+import tensorflow as tf
+from tensorflow.python.saved_model import tag_constants</p>
+<p>def model(graph, input_tensor):
+&quot;&quot;&quot;Create the model which consists of
+a bidirectional rnn (GRU(10)) followed by a dense classifier</p>
+<pre><code>Args:
+    graph (tf.Graph): Tensors' graph
+    input_tensor (tf.Tensor): Tensor fed as input to the model
+
+Returns:
+    tf.Tensor: the model's output layer Tensor
+&amp;quot;&amp;quot;&amp;quot;
+cell = tf.nn.rnn_cell.GRUCell(10)
+with graph.as_default():
+    ((fw_outputs, bw_outputs), (fw_state, bw_state)) = tf.nn.bidirectional_dynamic_rnn(
+        cell_fw=cell,
+        cell_bw=cell,
+        inputs=input_tensor,
+        sequence_length=[10] * 32,
+        dtype=tf.float32,
+        swap_memory=True,
+        scope=None)
+    outputs = tf.concat((fw_outputs, bw_outputs), 2)
+    mean = tf.reduce_mean(outputs, axis=1)
+    dense = tf.layers.dense(mean, 5, activation=None)
+
+    return dense
+</code></pre>
+<p>def get_opt_op(graph, logits, labels_tensor):
+&quot;&quot;&quot;Create optimization operation from model&rsquo;s logits and labels</p>
+<pre><code>Args:
+    graph (tf.Graph): Tensors' graph
+    logits (tf.Tensor): The model's output without activation
+    labels_tensor (tf.Tensor): Target labels
+
+Returns:
+    tf.Operation: the operation performing a stem of Adam optimizer
+&amp;quot;&amp;quot;&amp;quot;
+with graph.as_default():
+    with tf.variable_scope('loss'):
+        loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
+                logits=logits, labels=labels_tensor, name='xent'),
+                name=&amp;quot;mean-xent&amp;quot;
+                )
+    with tf.variable_scope('optimizer'):
+        opt_op = tf.train.AdamOptimizer(1e-2).minimize(loss)
+    return opt_op
+</code></pre>
+<p>if <strong>name</strong> == &lsquo;<strong>main</strong>&rsquo;:
+# Set random seed for reproducibility
+# and create synthetic data
+np.random.seed(0)
+features = np.random.randn(64, 10, 30)
+labels = np.eye(5)[np.random.randint(0, 5, (64,))]</p>
+<pre><code>graph1 = tf.Graph()
+with graph1.as_default():
+    # Random seed for reproducibility
+    tf.set_random_seed(0)
+    # Placeholders
+    batch_size_ph = tf.placeholder(tf.int64, name='batch_size_ph')
+    features_data_ph = tf.placeholder(tf.float32, [None, None, 30], 'features_data_ph')
+    labels_data_ph = tf.placeholder(tf.int32, [None, 5], 'labels_data_ph')
+    # Dataset
+    dataset = tf.data.Dataset.from_tensor_slices((features_data_ph, labels_data_ph))
+    dataset = dataset.batch(batch_size_ph)
+    iterator = tf.data.Iterator.from_structure(dataset.output_types, dataset.output_shapes)
+    dataset_init_op = iterator.make_initializer(dataset, name='dataset_init')
+    input_tensor, labels_tensor = iterator.get_next()
+
+    # Model
+    logits = model(graph1, input_tensor)
+    # Optimization
+    opt_op = get_opt_op(graph1, logits, labels_tensor)
+
+    with tf.Session(graph=graph1) as sess:
+        # Initialize variables
+        tf.global_variables_initializer().run(session=sess)
+        for epoch in range(3):
+            batch = 0
+            # Initialize dataset (could feed epochs in Dataset.repeat(epochs))
+            sess.run(
+                dataset_init_op,
+                feed_dict={
+                    features_data_ph: features,
+                    labels_data_ph: labels,
+                    batch_size_ph: 32
+                })
+            values = []
+            while True:
+                try:
+                    if epoch &amp;lt; 2:
+                        # Training
+                        _, value = sess.run([opt_op, logits])
+                        print('Epoch {}, batch {} | Sample value: {}'.format(epoch, batch, value[0]))
+                        batch += 1
+                    else:
+                        # Final inference
+                        values.append(sess.run(logits))
+                        print('Epoch {}, batch {} | Final inference | Sample value: {}'.format(epoch, batch, values[-1][0]))
+                        batch += 1
+                except tf.errors.OutOfRangeError:
+                    break
+        # Save model state
+        print('\nSaving...')
+        cwd = os.getcwd()
+        path = os.path.join(cwd, 'simple')
+        shutil.rmtree(path, ignore_errors=True)
+        inputs_dict = {
+            &amp;quot;batch_size_ph&amp;quot;: batch_size_ph,
+            &amp;quot;features_data_ph&amp;quot;: features_data_ph,
+            &amp;quot;labels_data_ph&amp;quot;: labels_data_ph
+        }
+        outputs_dict = {
+            &amp;quot;logits&amp;quot;: logits
+        }
+        tf.saved_model.simple_save(
+            sess, path, inputs_dict, outputs_dict
+        )
+        print('Ok')
+# Restoring
+graph2 = tf.Graph()
+with graph2.as_default():
+    with tf.Session(graph=graph2) as sess:
+        # Restore saved values
+        print('\nRestoring...')
+        tf.saved_model.loader.load(
+            sess,
+            [tag_constants.SERVING],
+            path
+        )
+        print('Ok')
+        # Get restored placeholders
+        labels_data_ph = graph2.get_tensor_by_name('labels_data_ph:0')
+        features_data_ph = graph2.get_tensor_by_name('features_data_ph:0')
+        batch_size_ph = graph2.get_tensor_by_name('batch_size_ph:0')
+        # Get restored model output
+        restored_logits = graph2.get_tensor_by_name('dense/BiasAdd:0')
+        # Get dataset initializing operation
+        dataset_init_op = graph2.get_operation_by_name('dataset_init')
+
+        # Initialize restored dataset
+        sess.run(
+            dataset_init_op,
+            feed_dict={
+                features_data_ph: features,
+                labels_data_ph: labels,
+                batch_size_ph: 32
+            }
+
+        )
+        # Compute inference for both batches in dataset
+        restored_values = []
+        for i in range(2):
+            restored_values.append(sess.run(restored_logits))
+            print('Restored values: ', restored_values[i][0])
+
+# Check if original inference and restored inference are equal
+valid = all((v == rv).all() for v, rv in zip(values, restored_values))
+print('\nInferences match: ', valid)
+</code></pre>
+<p>$ python3 save_and_restore.py</p>
+<p>Epoch 0, batch 0 | Sample value: [-0.13851789 -0.3087595   0.12804556  0.20013677 -0.08229901]
+Epoch 0, batch 1 | Sample value: [-0.00555491 -0.04339041 -0.05111827 -0.2480045  -0.00107776]
+Epoch 1, batch 0 | Sample value: [-0.19321944 -0.2104792  -0.00602257  0.07465433  0.11674127]
+Epoch 1, batch 1 | Sample value: [-0.05275984  0.05981954 -0.15913513 -0.3244143   0.10673307]
+Epoch 2, batch 0 | Final inference | Sample value: [-0.26331693 -0.13013336 -0.12553    -0.04276478  0.2933622 ]
+Epoch 2, batch 1 | Final inference | Sample value: [-0.07730117  0.11119192 -0.20817074 -0.35660955  0.16990358]</p>
+<p>Saving&hellip;
+INFO:tensorflow:Assets added to graph.
+INFO:tensorflow:No assets to write.
+INFO:tensorflow:SavedModel written to: b&rsquo;/some/path/simple/saved_model.pb&rsquo;
+Ok</p>
+<p>Restoring&hellip;
+INFO:tensorflow:Restoring parameters from b&rsquo;/some/path/simple/variables/variables&rsquo;
+Ok
+Restored values:  [-0.26331693 -0.13013336 -0.12553    -0.04276478  0.2933622 ]
+Restored values:  [-0.07730117  0.11119192 -0.20817074 -0.35660955  0.16990358]</p>
+<p>Inferences match:  True</p>
+<pre tabindex="0"><code></code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

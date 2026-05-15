@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Django ORM Group By Strategies: Aggregation vs. Alternatives - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Exploring effective methods for implementing GROUP BY functionality in Django ORM queries, moving beyond standard aggregation.">
+
+
+
+<meta name="keywords" content="Django group by, ORM aggregation, QuerySet manipulation">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Django ORM Group By Strategies: Aggregation vs. Alternatives - sqlpey">
+<meta name="DC.description" content="Exploring effective methods for implementing GROUP BY functionality in Django ORM queries, moving beyond standard aggregation.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Django ORM Group By Strategies: Aggregation vs. Alternatives - sqlpey">
+<meta property="og:description" content="Exploring effective methods for implementing GROUP BY functionality in Django ORM queries, moving beyond standard aggregation.">
+<meta property="og:url" content="https://sqlpey.com/python/django-orm-group-by-strategies/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Django">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Django ORM Group By Strategies: Aggregation vs. Alternatives">
+<meta name="twitter:description" content="Exploring effective methods for implementing GROUP BY functionality in Django ORM queries, moving beyond standard aggregation.">
+
+
+<link rel="canonical" href="https://sqlpey.com/python/django-orm-group-by-strategies/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Django ORM Group By Strategies: Aggregation vs. Alternatives\"",
+  "description": "\"Exploring effective methods for implementing GROUP BY functionality in Django ORM queries, moving beyond standard aggregation.\"",
+  "url": "\"https://sqlpey.com/python/django-orm-group-by-strategies/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/python/django-orm-group-by-strategies/\""
+  },
+  "articleSection": "\"Django\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Django ORM Group By Strategies: Aggregation vs. Alternatives</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Django</span>
+              
+              <span class="tag">ORM</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              6 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#django-orm-group-by-strategies-aggregation-vs-alternatives">&ldquo;Django ORM Group By Strategies: Aggregation vs. Alternatives&rdquo;</a></li>
+    <li><a href="#strategy-1-leveraging-built-in-orm-aggregation-functions-the-standard-approach">Strategy 1: Leveraging Built-in ORM Aggregation Functions (The Standard Approach)</a></li>
+    <li><a href="#strategy-2-direct-sql-or-internal-query-manipulation-use-with-caution">Strategy 2: Direct SQL or Internal Query Manipulation (Use With Caution)</a>
+      <ul>
+        <li><a href="#raw-sql-execution">Raw SQL Execution</a></li>
+        <li><a href="#modifying-the-query-object-internal-api">Modifying the Query Object (Internal API)</a></li>
+      </ul>
+    </li>
+    <li><a href="#strategy-3-utilizing-template-tags-for-presentation-grouping">Strategy 3: Utilizing Template Tags for Presentation Grouping</a></li>
+    <li><a href="#strategy-4-third-party-packages-for-advanced-orm-grouping">Strategy 4: Third-Party Packages for Advanced ORM Grouping</a></li>
+    <li><a href="#strategy-5-python-side-grouping-with-itertoolsgroupby">Strategy 5: Python-Side Grouping with <code>itertools.groupby</code></a></li>
+    <li><a href="#strategy-6-de-duplication-using-subqueries-or-exists">Strategy 6: De-duplication Using Subqueries or <code>Exists</code></a>
+      <ul>
+        <li><a href="#using-subquery-to-fetch-the-first-pk-per-group">Using <code>Subquery</code> to fetch the first PK per group:</a></li>
+        <li><a href="#using-exists-to-filter-out-subsequent-duplicates-based-on-id">Using <code>Exists</code> to filter out subsequent duplicates based on ID:</a></li>
+        <li><a href="#strategy-7-targeting-specific-model-instances-via-related-lookups">Strategy 7: Targeting Specific Model Instances via Related Lookups</a></li>
+      </ul>
+    </li>
+    <li><a href="#strategy-8-identifying-duplicates-by-count">Strategy 8: Identifying Duplicates by Count</a></li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#faqs-on-django-orm-group-by-strategies">FAQs on Django ORM Group By Strategies</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="django-orm-group-by-strategies-aggregation-vs-alternatives">&ldquo;Django ORM Group By Strategies: Aggregation vs. Alternatives&rdquo;</h2>
+<p>When working with the Django Object-Relational Mapper (ORM), achieving the functionality of a SQL <code>GROUP BY</code> clause—especially when aggregation is involved or when you need distinct records based on a subset of fields—requires specific techniques. Relying solely on default ORM behavior often necessitates delving into advanced features or alternative approaches.</p>
+<p>What are the idiomatic and robust ways to execute grouping logic within a Django <code>QuerySet</code>?</p>
+<h2 id="strategy-1-leveraging-built-in-orm-aggregation-functions-the-standard-approach">Strategy 1: Leveraging Built-in ORM Aggregation Functions (The Standard Approach)</h2>
+<p>The most conventional and database-supported method is to use the ORM&rsquo;s aggregation capabilities via <code>values()</code> combined with <code>annotate()</code> and an aggregate function like <code>Count</code>.</p>
+<p>If the goal is to count records per distinct value of a field (e.g., counting members per designation), you structure the query like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> django.db.models <span style="color:#f92672">import</span> Count
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Assuming &#39;Members&#39; model</span>
+</span></span><span style="display:flex;"><span>grouped_counts <span style="color:#f92672">=</span> (
+</span></span><span style="display:flex;"><span>    Members<span style="color:#f92672">.</span>objects<span style="color:#f92672">.</span>values(<span style="color:#e6db74">&#39;designation&#39;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">.</span>annotate(dcount<span style="color:#f92672">=</span>Count(<span style="color:#e6db74">&#39;designation&#39;</span>))
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">.</span>order_by()  <span style="color:#75715e"># Important: Use order_by() to suppress default ordering if necessary</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># SQL generated resembles:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># SELECT designation, COUNT(designation) AS dcount FROM members GROUP BY designation</span>
+</span></span></code></pre></div><p>The resulting structure is a list of dictionaries: <code>[{'designation': 'Salesman', 'dcount': 2}, {'designation': 'Manager', 'dcount': 2}]</code>.</p>
+<p>If you need to include other non-aggregated fields, list them in <code>values()</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Including multiple fields in the grouping result</span>
+</span></span><span style="display:flex;"><span>multivalue_group <span style="color:#f92672">=</span> Members<span style="color:#f92672">.</span>objects<span style="color:#f92672">.</span>values(<span style="color:#e6db74">&#39;designation&#39;</span>, <span style="color:#e6db74">&#39;first_name&#39;</span>, <span style="color:#e6db74">&#39;last_name&#39;</span>)<span style="color:#f92672">.</span>annotate(dcount<span style="color:#f92672">=</span>Count(<span style="color:#e6db74">&#39;designation&#39;</span>))
+</span></span></code></pre></div><p>Consult the official Django documentation on <a href="https://docs.djangoproject.com/en/stable/topics/db/aggregation/" target="_blank" rel="noopener">Aggregation</a>
+ for deeper insight into <code>values()</code>, <code>annotate()</code>, and handling default ordering with <code>order_by()</code>.</p>
+<h2 id="strategy-2-direct-sql-or-internal-query-manipulation-use-with-caution">Strategy 2: Direct SQL or Internal Query Manipulation (Use With Caution)</h2>
+<p>For cases where the ORM&rsquo;s aggregation flow doesn&rsquo;t precisely match a complex <code>GROUP BY</code> requirement, you can resort to raw SQL or modify the internal <code>Query</code> object.</p>
+<h3 id="raw-sql-execution">Raw SQL Execution</h3>
+<p>A straightforward, though less portable, solution involves using <code>Manager.raw()</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># WARNING: Raw SQL is database-specific</span>
+</span></span><span style="display:flex;"><span>raw_results <span style="color:#f92672">=</span> Members<span style="color:#f92672">.</span>objects<span style="color:#f92672">.</span>raw(<span style="color:#e6db74">&#39;SELECT designation, COUNT(*) as total_count FROM members GROUP BY designation&#39;</span>)
+</span></span></code></pre></div><h3 id="modifying-the-query-object-internal-api">Modifying the Query Object (Internal API)</h3>
+<p>You can manually set the <code>group_by</code> attribute on the underlying query object.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>query <span style="color:#f92672">=</span> Members<span style="color:#f92672">.</span>objects<span style="color:#f92672">.</span>all()<span style="color:#f92672">.</span>query
+</span></span><span style="display:flex;"><span>query<span style="color:#f92672">.</span>group_by <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;designation&#39;</span>]
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Recreate the QuerySet using the modified query structure</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> django.db.models <span style="color:#f92672">import</span> QuerySet
+</span></span><span style="display:flex;"><span>results_via_internal <span style="color:#f92672">=</span> QuerySet(query<span style="color:#f92672">=</span>query, model<span style="color:#f92672">=</span>Members)
+</span></span></code></pre></div><p><strong>Note:</strong> Directly setting <code>query.group_by</code> utilizes an undocumented feature. This path carries the risk of breakage in future Django releases, as noted in official discussions regarding free <code>GROUP BY</code> limitations.</p>
+<h2 id="strategy-3-utilizing-template-tags-for-presentation-grouping">Strategy 3: Utilizing Template Tags for Presentation Grouping</h2>
+<p>If the grouping is primarily for presentation in templates rather than database retrieval of aggregated counts, the built-in <code>{% regroup %}</code> template tag offers a Pythonic way to structure data on the client side or after fetching.</p>
+<p>The <code>regroup</code> tag iterates over a list of dictionaries or objects and groups them based on a specified attribute. <strong>Crucially, the input list must be sorted by the grouping key beforehand for <code>regroup</code> to function correctly.</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># In your view context setup:</span>
+</span></span><span style="display:flex;"><span>cities <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    {<span style="color:#e6db74">&#39;name&#39;</span>: <span style="color:#e6db74">&#39;Mumbai&#39;</span>, <span style="color:#e6db74">&#39;country&#39;</span>: <span style="color:#e6db74">&#39;India&#39;</span>},
+</span></span><span style="display:flex;"><span>    {<span style="color:#e6db74">&#39;name&#39;</span>: <span style="color:#e6db74">&#39;Calcutta&#39;</span>, <span style="color:#e6db74">&#39;country&#39;</span>: <span style="color:#e6db74">&#39;India&#39;</span>},
+</span></span><span style="display:flex;"><span>    {<span style="color:#e6db74">&#39;name&#39;</span>: <span style="color:#e6db74">&#39;New York&#39;</span>, <span style="color:#e6db74">&#39;country&#39;</span>: <span style="color:#e6db74">&#39;USA&#39;</span>},
+</span></span><span style="display:flex;"><span>]
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Ensure &#39;cities&#39; is sorted by &#39;country&#39; before rendering if necessary</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># In your template (assuming cities is passed as context):</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">{</span><span style="color:#e6db74">% r</span><span style="color:#e6db74">egroup cities by country as countries_list %}
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;ul&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    {</span><span style="color:#e6db74">% f</span><span style="color:#e6db74">or country in countries_list %}
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &lt;li&gt;{{ country.grouper }}
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            &lt;ul&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            {</span><span style="color:#e6db74">% f</span><span style="color:#e6db74">or city in country.list %}
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">                &lt;li&gt;{{ city.name }}&lt;/li&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            {</span><span style="color:#e6db74">% e</span><span style="color:#e6db74">ndfor %}
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            &lt;/ul&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        &lt;/li&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    {</span><span style="color:#e6db74">% e</span><span style="color:#e6db74">ndfor %}
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;/ul&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+</span></span></code></pre></div><h2 id="strategy-4-third-party-packages-for-advanced-orm-grouping">Strategy 4: Third-Party Packages for Advanced ORM Grouping</h2>
+<p>For developers needing SQL-level <code>GROUP BY</code> support that includes related fields and richer annotations while maintaining <code>QuerySet</code> compatibility, external libraries can bridge the gap.</p>
+<p>The <code>django-group-by</code> package provides mixins to enable cleaner syntax for complex groupings:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> django_group_by <span style="color:#f92672">import</span> GroupByMixin
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> django.db.models <span style="color:#f92672">import</span> Count, Avg
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">BookQuerySet</span>(QuerySet, GroupByMixin):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">GroupedBookListView</span>(ListView):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># ... setup ...</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_queryset</span>(self):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> Book<span style="color:#f92672">.</span>objects<span style="color:#f92672">.</span>group_by(<span style="color:#e6db74">&#39;title&#39;</span>, <span style="color:#e6db74">&#39;author&#39;</span>)<span style="color:#f92672">.</span>annotate(
+</span></span><span style="display:flex;"><span>            shop_count<span style="color:#f92672">=</span>Count(<span style="color:#e6db74">&#39;shop&#39;</span>), 
+</span></span><span style="display:flex;"><span>            price_avg<span style="color:#f92672">=</span>Avg(<span style="color:#e6db74">&#39;price&#39;</span>)
+</span></span><span style="display:flex;"><span>        )<span style="color:#f92672">.</span>order_by(<span style="color:#e6db74">&#39;name&#39;</span>, <span style="color:#e6db74">&#39;author&#39;</span>)<span style="color:#f92672">.</span>distinct()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># To retrieve primary keys of grouped instances (Postgres specific):</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># .annotate(pks=ArrayAgg(&#39;id&#39;))</span>
+</span></span></code></pre></div><p>This allows referencing fields from related models within the annotations, such as <code>book.author.last_name</code>.</p>
+<h2 id="strategy-5-python-side-grouping-with-itertoolsgroupby">Strategy 5: Python-Side Grouping with <code>itertools.groupby</code></h2>
+<p>If the dataset size is manageable and you prefer a pure Python solution without altering the SQL structure significantly, <code>itertools.groupby</code> is an explicit and efficient alternative <em>after</em> fetching the data. This requires the queryset to be sorted beforehand on the grouping key.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> itertools <span style="color:#f92672">import</span> groupby
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Fetch all necessary objects and sort them by the field you want to group by</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Using select_related for efficient fetching if foreign keys are accessed later</span>
+</span></span><span style="display:flex;"><span>sorted_queryset <span style="color:#f92672">=</span> Members<span style="color:#f92672">.</span>objects<span style="color:#f92672">.</span>all()<span style="color:#f92672">.</span>select_related(<span style="color:#e6db74">&#34;designation&#34;</span>)<span style="color:#f92672">.</span>order_by(<span style="color:#e6db74">&#39;designation&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>designation_key_func <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> member: member<span style="color:#f92672">.</span>designation
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> designation, member_group <span style="color:#f92672">in</span> groupby(sorted_queryset, designation_key_func):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># member_group is an iterable of Member objects in that group</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>designation<span style="color:#e6db74">}</span><span style="color:#e6db74"> : </span><span style="color:#e6db74">{</span>[m<span style="color:#f92672">.</span>id <span style="color:#66d9ef">for</span> m <span style="color:#f92672">in</span> list(member_group)]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><p>This approach avoids raw SQL or reliance on undocumented ORM features, often seen as highly pythonic.</p>
+<h2 id="strategy-6-de-duplication-using-subqueries-or-exists">Strategy 6: De-duplication Using Subqueries or <code>Exists</code></h2>
+<p>If the objective is simply to fetch <em>one</em> representative object for each distinct group (i.e., removing duplicates based on a field without explicit aggregation), advanced filtering techniques are necessary.</p>
+<h3 id="using-subquery-to-fetch-the-first-pk-per-group">Using <code>Subquery</code> to fetch the first PK per group:</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> django.db.models <span style="color:#f92672">import</span> Subquery, OuterRef
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>representative_members <span style="color:#f92672">=</span> Members<span style="color:#f92672">.</span>objects<span style="color:#f92672">.</span>filter(
+</span></span><span style="display:flex;"><span>    pk__in<span style="color:#f92672">=</span>Members<span style="color:#f92672">.</span>objects<span style="color:#f92672">.</span>values(<span style="color:#e6db74">&#39;designation&#39;</span>)<span style="color:#f92672">.</span>distinct()<span style="color:#f92672">.</span>annotate(
+</span></span><span style="display:flex;"><span>        pk<span style="color:#f92672">=</span>Subquery(
+</span></span><span style="display:flex;"><span>            Members<span style="color:#f92672">.</span>objects<span style="color:#f92672">.</span>filter(
+</span></span><span style="display:flex;"><span>                designation<span style="color:#f92672">=</span>OuterRef(<span style="color:#e6db74">&#34;designation&#34;</span>)
+</span></span><span style="display:flex;"><span>            )<span style="color:#f92672">.</span>order_by(<span style="color:#e6db74">&#34;pk&#34;</span>)[:<span style="color:#ae81ff">1</span>]<span style="color:#f92672">.</span>values(<span style="color:#e6db74">&#34;pk&#34;</span>)
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>    )<span style="color:#f92672">.</span>values_list(<span style="color:#e6db74">&#34;pk&#34;</span>, flat<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><h3 id="using-exists-to-filter-out-subsequent-duplicates-based-on-id">Using <code>Exists</code> to filter out subsequent duplicates based on ID:</h3>
+<p>This method annotates a boolean flag (<code>is_duplicate</code>) by checking if another record with the same grouping field but a smaller primary key exists.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> django.db.models <span style="color:#f92672">import</span> OuterRef, Exists
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>qs_with_flag <span style="color:#f92672">=</span> Members<span style="color:#f92672">.</span>objects<span style="color:#f92672">.</span>all()<span style="color:#f92672">.</span>annotate(
+</span></span><span style="display:flex;"><span>    is_duplicate<span style="color:#f92672">=</span>Exists(
+</span></span><span style="display:flex;"><span>        Members<span style="color:#f92672">.</span>objects<span style="color:#f92672">.</span>filter(
+</span></span><span style="display:flex;"><span>            id__lt<span style="color:#f92672">=</span>OuterRef(<span style="color:#e6db74">&#39;id&#39;</span>),
+</span></span><span style="display:flex;"><span>            designation<span style="color:#f92672">=</span>OuterRef(<span style="color:#e6db74">&#39;designation&#39;</span>)))
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>final_qs <span style="color:#f92672">=</span> qs_with_flag<span style="color:#f92672">.</span>filter(is_duplicate<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)
+</span></span></code></pre></div><h3 id="strategy-7-targeting-specific-model-instances-via-related-lookups">Strategy 7: Targeting Specific Model Instances via Related Lookups</h3>
+<p>If you want distinct instances of a related model (<code>Designation</code> in this example) based on the existence of matching records in the primary model (<code>Member</code>), you can use reverse relationships and apply <code>distinct()</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Fetch distinct Designations that have associated Members meeting a criteria</span>
+</span></span><span style="display:flex;"><span>members_filtered <span style="color:#f92672">=</span> Member<span style="color:#f92672">.</span>objects<span style="color:#f92672">.</span>filter(foobar<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>) 
+</span></span><span style="display:flex;"><span>distinct_designations <span style="color:#f92672">=</span> Designation<span style="color:#f92672">.</span>objects<span style="color:#f92672">.</span>filter(
+</span></span><span style="display:flex;"><span>    member__in<span style="color:#f92672">=</span>members_filtered
+</span></span><span style="display:flex;"><span>)<span style="color:#f92672">.</span>order_by(<span style="color:#e6db74">&#39;pk&#39;</span>)<span style="color:#f92672">.</span>distinct()
+</span></span></code></pre></div><h2 id="strategy-8-identifying-duplicates-by-count">Strategy 8: Identifying Duplicates by Count</h2>
+<p>If the intent is to find which fields have duplicates and how many instances belong to that group:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Find fields where count is greater than 1</span>
+</span></span><span style="display:flex;"><span>dupes_query <span style="color:#f92672">=</span> MyModel<span style="color:#f92672">.</span>objects<span style="color:#f92672">.</span>all()<span style="color:#f92672">.</span>values(<span style="color:#e6db74">&#39;my_field&#39;</span>)<span style="color:#f92672">.</span>annotate(
+</span></span><span style="display:flex;"><span>    count<span style="color:#f92672">=</span>Count(<span style="color:#e6db74">&#39;id&#39;</span>)
+</span></span><span style="display:flex;"><span>)<span style="color:#f92672">.</span>order_by(<span style="color:#e6db74">&#39;-count&#39;</span>)<span style="color:#f92672">.</span>filter(count__gt<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span></code></pre></div><h2 id="solutions">Solutions</h2>
+<h3 id="faqs-on-django-orm-group-by-strategies">FAQs on Django ORM Group By Strategies</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the safest way to group data in Django ORM</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The safest and most supported way is using <code>.values().annotate(Count(...)).order_by()</code> as it leverages standard SQL aggregation features fully supported by the ORM.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I use group_by directly on a QuerySet</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: You can set <code>query.group_by</code> on the internal query object, but this method uses undocumented APIs and might cause compatibility issues in future Django versions.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Does the regroup template tag require sorting</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, the <code>{% regroup %}</code> template tag requires the iterable (list or QuerySet) to be sorted by the grouping key <em>before</em> it is passed to the tag for correct iterative grouping.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How to get model instances instead of just dictionary values</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Achieving distinct model instances often requires using subqueries (Strategy 9) or filtering based on existence checks (<code>Exists</code>, Strategy 10), as standard aggregation returns dictionaries or values.</div>
+    </div>
+</div>
+<pre tabindex="0"><code>from django.db.models import Count
+result = (Members.objects
+    .values(&#39;designation&#39;)
+    .annotate(dcount=Count(&#39;designation&#39;))
+    .order_by()
+)
+SELECT designation, COUNT(designation) AS dcount
+FROM members GROUP BY designation
+[{&#39;designation&#39;: &#39;Salesman&#39;, &#39;dcount&#39;: 2}, 
+ {&#39;designation&#39;: &#39;Manager&#39;, &#39;dcount&#39;: 2}]
+.values(&#39;designation&#39;, &#39;first_name&#39;, &#39;last_name&#39;)
+</code></pre><p>What specific grouping scenario are you currently facing? Share your data structure or desired SQL output in the comments below so we can refine the most suitable ORM strategy for your needs!</p>
+<p>For related Django challenges, you might look into resolving common issues like <a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">fixing SSL certificate verification errors in Python requests</a>
+ if external data interaction is involved, or exploring solutions for <a href="https://sqlpey.com/dotnet/resolve-blazor-server-timeout-issues/" target="_blank" rel="noopener">handling Blazor Server timeout issues</a>
+ if you are working across different tech stacks.</p>
+<pre tabindex="0"><code>results = Members.objects.raw(&#39;SELECT * FROM myapp_members GROUP BY designation&#39;)
+query = Members.objects.all().query
+query.group_by = [&#39;designation&#39;]
+results = QuerySet(query=query, model=Members)
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

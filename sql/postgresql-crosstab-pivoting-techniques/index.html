@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>PostgreSQL Crosstab Pivoting: Solutions Beyond Basic Tablefunc - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore advanced PostgreSQL techniques for data pivoting using crosstab, JSON aggregation, and array manipulation when transforming row data to columns.">
+
+
+
+<meta name="keywords" content="crosstab, PostgreSQL pivot, jsonb_object_agg, tablefunc">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="PostgreSQL Crosstab Pivoting: Solutions Beyond Basic Tablefunc - sqlpey">
+<meta name="DC.description" content="Explore advanced PostgreSQL techniques for data pivoting using crosstab, JSON aggregation, and array manipulation when transforming row data to columns.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="PostgreSQL Crosstab Pivoting: Solutions Beyond Basic Tablefunc - sqlpey">
+<meta property="og:description" content="Explore advanced PostgreSQL techniques for data pivoting using crosstab, JSON aggregation, and array manipulation when transforming row data to columns.">
+<meta property="og:url" content="https://sqlpey.com/sql/postgresql-crosstab-pivoting-techniques/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="PostgreSQL">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="PostgreSQL Crosstab Pivoting: Solutions Beyond Basic Tablefunc">
+<meta name="twitter:description" content="Explore advanced PostgreSQL techniques for data pivoting using crosstab, JSON aggregation, and array manipulation when transforming row data to columns.">
+
+
+<link rel="canonical" href="https://sqlpey.com/sql/postgresql-crosstab-pivoting-techniques/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"PostgreSQL Crosstab Pivoting: Solutions Beyond Basic Tablefunc\"",
+  "description": "\"Explore advanced PostgreSQL techniques for data pivoting using crosstab, JSON aggregation, and array manipulation when transforming row data to columns.\"",
+  "url": "\"https://sqlpey.com/sql/postgresql-crosstab-pivoting-techniques/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/sql/postgresql-crosstab-pivoting-techniques/\""
+  },
+  "articleSection": "\"PostgreSQL\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">PostgreSQL Crosstab Pivoting: Solutions Beyond Basic Tablefunc</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">PostgreSQL</span>
+              
+              <span class="tag">SQL Pivoting</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              8 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#postgresql-crosstab-pivoting-solutions-beyond-basic-tablefunc">&ldquo;PostgreSQL Crosstab Pivoting: Solutions Beyond Basic Tablefunc&rdquo;</a></li>
+    <li><a href="#prerequisites-enabling-the-tablefunc-module">Prerequisites: Enabling the <code>tablefunc</code> Module</a></li>
+    <li><a href="#solution-path-1-basic-crosstab-usage-implicit-category">Solution Path 1: Basic <code>crosstab</code> Usage (Implicit Category)</a></li>
+    <li><a href="#solution-path-2-advanced-crosstab-with-explicit-category-ordering">Solution Path 2: Advanced <code>crosstab</code> with Explicit Category Ordering</a></li>
+    <li><a href="#solution-path-3-utilizing-pre-defined-crosstabn-functions">Solution Path 3: Utilizing Pre-defined <code>crosstabN()</code> Functions</a></li>
+    <li><a href="#solution-path-4-creating-custom-c-based-crosstab-functions">Solution Path 4: Creating Custom C-based <code>crosstab</code> Functions</a></li>
+    <li><a href="#solution-path-5-polymorphic-and-near-dynamic-function">Solution Path 5: Polymorphic and Near-Dynamic Function</a></li>
+    <li><a href="#alternative-approach-pivoting-with-jsonb_object_agg-postgresql-94">Alternative Approach: Pivoting with <code>jsonb_object_agg</code> (PostgreSQL 9.4+)</a></li>
+    <li><a href="#alternative-approach-2-using-arrays-for-dynamic-columns">Alternative Approach 2: Using Arrays for Dynamic Columns</a></li>
+    <li><a href="#addressing-crosstab-issues-missing-values-and-alignment">Addressing <code>crosstab</code> Issues: Missing Values and Alignment</a>
+      <ul>
+        <li><a href="#faqs-on-postgresql-crosstab-pivoting-techniques">FAQs on PostgreSQL Crosstab Pivoting Techniques</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a></li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="postgresql-crosstab-pivoting-solutions-beyond-basic-tablefunc">&ldquo;PostgreSQL Crosstab Pivoting: Solutions Beyond Basic Tablefunc&rdquo;</h2>
+<p>How does one effectively transpose rows into columns in PostgreSQL, especially when dealing with dynamic or complex source data structures? The traditional reliance on the <code>crosstab</code> function from the <code>tablefunc</code> module presents several scenarios and potential issues, leading to exploration of alternative, sometimes more modern, solutions.</p>
+<h2 id="prerequisites-enabling-the-tablefunc-module">Prerequisites: Enabling the <code>tablefunc</code> Module</h2>
+<p>Before employing the standard <code>crosstab</code> approach, the necessary extension must be active for the current database:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> EXTENSION tablefunc;
+</span></span></code></pre></div><h2 id="solution-path-1-basic-crosstab-usage-implicit-category">Solution Path 1: Basic <code>crosstab</code> Usage (Implicit Category)</h2>
+<p>When the source data lacks an explicit category column to drive the pivot, a simplified, single-parameter form of <code>crosstab</code> can be used. This requires synthesizing a dummy category column in the query input:</p>
+<p>Consider the initial data setup:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> TEMP <span style="color:#66d9ef">TABLE</span> tbl_org (id int, feh int, bar text);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> tbl_org (id, feh, bar) <span style="color:#66d9ef">VALUES</span>
+</span></span><span style="display:flex;"><span>  (<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">10</span>, <span style="color:#e6db74">&#39;A&#39;</span>), (<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">20</span>, <span style="color:#e6db74">&#39;A&#39;</span>),
+</span></span><span style="display:flex;"><span>  (<span style="color:#ae81ff">3</span>,  <span style="color:#ae81ff">3</span>, <span style="color:#e6db74">&#39;B&#39;</span>), (<span style="color:#ae81ff">4</span>,  <span style="color:#ae81ff">4</span>, <span style="color:#e6db74">&#39;B&#39;</span>),
+</span></span><span style="display:flex;"><span>  (<span style="color:#ae81ff">5</span>,  <span style="color:#ae81ff">5</span>, <span style="color:#e6db74">&#39;C&#39;</span>),
+</span></span><span style="display:flex;"><span>  (<span style="color:#ae81ff">6</span>,  <span style="color:#ae81ff">6</span>, <span style="color:#e6db74">&#39;D&#39;</span>), (<span style="color:#ae81ff">7</span>,  <span style="color:#ae81ff">7</span>, <span style="color:#e6db74">&#39;D&#39;</span>), (<span style="color:#ae81ff">8</span>,  <span style="color:#ae81ff">8</span>, <span style="color:#e6db74">&#39;D&#39;</span>);
+</span></span></code></pre></div><p>A basic crosstab application where the category is synthetic (the &lsquo;1 AS cat&rsquo; placeholder):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> crosstab(
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#39;SELECT bar, 1 AS cat, feh
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">   FROM   tbl_org
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">   ORDER  BY bar, feh&#39;</span>)
+</span></span><span style="display:flex;"><span> <span style="color:#66d9ef">AS</span> ct (bar text, val1 int, val2 int, val3 int); <span style="color:#75715e">-- Define expected output columns
+</span></span></span></code></pre></div><h2 id="solution-path-2-advanced-crosstab-with-explicit-category-ordering">Solution Path 2: Advanced <code>crosstab</code> with Explicit Category Ordering</h2>
+<p>If the resulting column order (<code>val1</code>, <code>val2</code>, <code>val3</code>) must correspond precisely to an order derived from the input data (e.g., sorted by <code>feh</code>), the two-parameter form of <code>crosstab</code> is necessary. This involves generating an explicit category identifier based on row sequencing within each primary grouping (<code>bar</code>):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> crosstab(
+</span></span><span style="display:flex;"><span>   <span style="color:#960050;background-color:#1e0010">$$</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">SELECT</span> bar, val, feh
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">FROM</span>  (
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span>, <span style="color:#e6db74">&#39;val&#39;</span> <span style="color:#f92672">||</span> row_number() OVER (PARTITION <span style="color:#66d9ef">BY</span> bar <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> feh) <span style="color:#66d9ef">AS</span> val
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">FROM</span> tbl_org
+</span></span><span style="display:flex;"><span>      ) x
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#960050;background-color:#1e0010">$$</span>, 
+</span></span><span style="display:flex;"><span>   <span style="color:#960050;background-color:#1e0010">$$</span><span style="color:#66d9ef">VALUES</span> (<span style="color:#e6db74">&#39;val1&#39;</span>), (<span style="color:#e6db74">&#39;val2&#39;</span>), (<span style="color:#e6db74">&#39;val3&#39;</span>)<span style="color:#960050;background-color:#1e0010">$$</span> <span style="color:#75715e">-- Defines the explicit columns expected
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>) <span style="color:#66d9ef">AS</span> ct (bar text, val1 int, val2 int, val3 int);
+</span></span></code></pre></div><p>This handles cases where input values might skip categories, preventing misalignment within the pivoted columns.</p>
+<h2 id="solution-path-3-utilizing-pre-defined-crosstabn-functions">Solution Path 3: Utilizing Pre-defined <code>crosstabN()</code> Functions</h2>
+<p>For simplicity, if data types are consistent, the <code>tablefunc</code> module offers pre-built functions like <code>crosstab4()</code>. A notable constraint is that these functions typically operate on <code>text</code> data types, requiring explicit casting of numeric results:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> TEMP <span style="color:#66d9ef">TABLE</span> tbl (row_name text, attrib text, val int);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> tbl (row_name, attrib, val) <span style="color:#66d9ef">VALUES</span>
+</span></span><span style="display:flex;"><span>  (<span style="color:#e6db74">&#39;A&#39;</span>, <span style="color:#e6db74">&#39;val1&#39;</span>, <span style="color:#ae81ff">10</span>), (<span style="color:#e6db74">&#39;A&#39;</span>, <span style="color:#e6db74">&#39;val2&#39;</span>, <span style="color:#ae81ff">20</span>),
+</span></span><span style="display:flex;"><span>  (<span style="color:#e6db74">&#39;B&#39;</span>, <span style="color:#e6db74">&#39;val1&#39;</span>, <span style="color:#ae81ff">3</span>),  (<span style="color:#e6db74">&#39;B&#39;</span>, <span style="color:#e6db74">&#39;val2&#39;</span>, <span style="color:#ae81ff">4</span>),
+</span></span><span style="display:flex;"><span>  (<span style="color:#e6db74">&#39;C&#39;</span>, <span style="color:#e6db74">&#39;val1&#39;</span>, <span style="color:#ae81ff">5</span>),
+</span></span><span style="display:flex;"><span>  (<span style="color:#e6db74">&#39;D&#39;</span>, <span style="color:#e6db74">&#39;val3&#39;</span>, <span style="color:#ae81ff">8</span>), (<span style="color:#e6db74">&#39;D&#39;</span>, <span style="color:#e6db74">&#39;val1&#39;</span>, <span style="color:#ae81ff">6</span>), (<span style="color:#e6db74">&#39;D&#39;</span>, <span style="color:#e6db74">&#39;val2&#39;</span>, <span style="color:#ae81ff">7</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Example using crosstab4, requiring explicit text casting:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> crosstab4(<span style="color:#e6db74">&#39;SELECT row_name, attrib, val::text
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">                         FROM tbl ORDER BY 1,2&#39;</span>);
+</span></span></code></pre></div><h2 id="solution-path-4-creating-custom-c-based-crosstab-functions">Solution Path 4: Creating Custom C-based <code>crosstab</code> Functions</h2>
+<p>To avoid repetitive casting or to support a fixed number of columns with native types, a user-defined composite type and a corresponding wrapper function referencing the C library logic can be defined once. For five output columns of type <code>int</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 1. Define the return type structure
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TYPE</span> tablefunc_crosstab_int_5 <span style="color:#66d9ef">AS</span> (
+</span></span><span style="display:flex;"><span>  row_name text, val1 int, val2 int, val3 int, val4 int, val5 int);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 2. Create a wrapper function (must be defined once)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">OR</span> <span style="color:#66d9ef">REPLACE</span> <span style="color:#66d9ef">FUNCTION</span> crosstab_int_5(text)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">RETURNS</span> <span style="color:#66d9ef">SETOF</span> tablefunc_crosstab_int_5
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">AS</span> <span style="color:#e6db74">&#39;$libdir/tablefunc&#39;</span>, <span style="color:#e6db74">&#39;crosstab&#39;</span> <span style="color:#66d9ef">LANGUAGE</span> <span style="color:#66d9ef">c</span> <span style="color:#66d9ef">STABLE</span> <span style="color:#66d9ef">STRICT</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 3. Call the function (no explicit type casting needed in the input query)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> crosstab_int_5(<span style="color:#e6db74">&#39;SELECT row_name, attrib, val   
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">                              FROM tbl ORDER BY 1,2&#39;</span>);
+</span></span></code></pre></div><h2 id="solution-path-5-polymorphic-and-near-dynamic-function">Solution Path 5: Polymorphic and Near-Dynamic Function</h2>
+<p>To overcome the limitation where a separate function wrapper is needed for every column count, a polymorphic PL/pgSQL function (<code>crosstab_n</code>) can be created that dynamically constructs the final <code>SELECT</code> statement based on the provided return type hint (<code>_rowtype</code>). This uses <code>pg_attribute</code> to inspect the required structure:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- For 1-parameter form (no category query provided)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">OR</span> <span style="color:#66d9ef">REPLACE</span> <span style="color:#66d9ef">FUNCTION</span> crosstab_n(_qry text, _rowtype anyelement)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">RETURNS</span> <span style="color:#66d9ef">SETOF</span> anyelement
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">LANGUAGE</span> plpgsql <span style="color:#66d9ef">AS</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">$</span>func$
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">BEGIN</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">RETURN</span> QUERY <span style="color:#66d9ef">EXECUTE</span> 
+</span></span><span style="display:flex;"><span>   (<span style="color:#66d9ef">SELECT</span> format(<span style="color:#e6db74">&#39;SELECT * FROM crosstab(%L) t(%s)&#39;</span>
+</span></span><span style="display:flex;"><span>                , _qry
+</span></span><span style="display:flex;"><span>                , string_agg(quote_ident(attname) <span style="color:#f92672">||</span> <span style="color:#e6db74">&#39; &#39;</span> <span style="color:#f92672">||</span> atttypid::regtype
+</span></span><span style="display:flex;"><span>                           , <span style="color:#e6db74">&#39;, &#39;</span> <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> attnum))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">FROM</span>   pg_attribute
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">WHERE</span>  attrelid <span style="color:#f92672">=</span> pg_typeof(_rowtype)::text::regclass
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">AND</span>    attnum <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">AND</span>    <span style="color:#66d9ef">NOT</span> attisdropped);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">END</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">$</span>func$;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Define the necessary return types once (e.g., for 3 columns)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TYPE</span> tablefunc_crosstab_int_3 <span style="color:#66d9ef">AS</span> (
+</span></span><span style="display:flex;"><span>    row_name text, val1 int, val2 int, val3 int);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Call example using the polymorphic function:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> crosstab_n(
+</span></span><span style="display:flex;"><span>   <span style="color:#e6db74">&#39;SELECT row_name, attrib, val FROM tbl ORDER BY 1,2&#39;</span>
+</span></span><span style="display:flex;"><span> , <span style="color:#66d9ef">NULL</span>::tablefunc_crosstab_int_3);
+</span></span></code></pre></div><p><em>Security Note: Exercise extreme caution with dynamic SQL constructed via user input to prevent SQL injection vulnerabilities.</em></p>
+<h2 id="alternative-approach-pivoting-with-jsonb_object_agg-postgresql-94">Alternative Approach: Pivoting with <code>jsonb_object_agg</code> (PostgreSQL 9.4+)</h2>
+<p>A modern alternative bypasses <code>crosstab</code> entirely, shifting the transformation logic to JSON aggregation, which is highly dynamic and avoids fixed column counts. This is especially useful when the number of attributes (<code>attrib</code>) is unknown or very large.</p>
+<p>This technique yields a result where pivoted values are stored within a single <code>jsonb</code> object keyed by the attribute name:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- Using the same &#39;tbl&#39; setup from Solution Path 3
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">SELECT</span>
+</span></span><span style="display:flex;"><span>  row_name <span style="color:#66d9ef">AS</span> bar,
+</span></span><span style="display:flex;"><span>  json_object_agg(attrib, val <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> attrib) <span style="color:#66d9ef">AS</span> <span style="color:#66d9ef">data</span> <span style="color:#75715e">-- ORDER BY preserves key sequence if desired
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">FROM</span> tbl
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> row_name
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> row_name;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Result structure (example for &#39;D&#39;):
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- D | { &#34;val1&#34; : 6, &#34;val2&#34; : 7, &#34;val3&#34; : 8 }
+</span></span></span></code></pre></div><p><strong>Benefits of the JSON Approach:</strong></p>
+<ol>
+<li><strong>Dynamic Structure:</strong> No prior knowledge of column names or quantity is required.</li>
+<li><strong>Simpler Syntax:</strong> The query structure is generally clearer than complex <code>crosstab</code> setups.</li>
+<li><strong>Handles Volume:</strong> Avoids hitting PostgreSQL&rsquo;s hard limit on the number of physical columns.</li>
+</ol>
+<p><strong>Drawbacks:</strong></p>
+<ol>
+<li><strong>Output Format:</strong> Result is JSON, not standard relational table columns, which may require transformation in the consuming application.</li>
+<li><strong>Null Handling:</strong> Missing values result in missing keys in the JSON object, unlike <code>crosstab</code> which produces <code>NULL</code> for defined columns.</li>
+</ol>
+<h2 id="alternative-approach-2-using-arrays-for-dynamic-columns">Alternative Approach 2: Using Arrays for Dynamic Columns</h2>
+<p>For cases where the result consumer is amenable to array data, aggregate functions combined with array manipulation can achieve a pivot effect. This method determines the maximum required width and pads shorter rows with <code>NULL</code> values:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- Assuming &#39;foo&#39; is the table being pivoted (similar to tbl_org but using &#39;feh&#39; as the value)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">SELECT</span>
+</span></span><span style="display:flex;"><span>    bar,
+</span></span><span style="display:flex;"><span>    feh <span style="color:#f92672">||</span> array_fill(<span style="color:#66d9ef">null</span>::int, array[<span style="color:#66d9ef">c</span> <span style="color:#f92672">-</span> array_length(feh, <span style="color:#ae81ff">1</span>)]) feh_padded
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span>
+</span></span><span style="display:flex;"><span>    (
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">-- Aggregates values into an array per row group
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">SELECT</span> bar, array_agg(feh) feh
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">FROM</span> foo 
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> bar
+</span></span><span style="display:flex;"><span>    ) s
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">CROSS</span> <span style="color:#66d9ef">JOIN</span> (
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">-- Finds the maximum number of elements needed across all groups
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">SELECT</span> <span style="color:#66d9ef">count</span>(<span style="color:#f92672">*</span>)::int <span style="color:#66d9ef">c</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">FROM</span> foo
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> bar
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> <span style="color:#66d9ef">c</span> <span style="color:#66d9ef">DESC</span> <span style="color:#66d9ef">LIMIT</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    ) <span style="color:#66d9ef">c</span>(<span style="color:#66d9ef">c</span>);
+</span></span></code></pre></div><h2 id="addressing-crosstab-issues-missing-values-and-alignment">Addressing <code>crosstab</code> Issues: Missing Values and Alignment</h2>
+<p>A known sensitivity with the single-parameter <code>crosstab</code> form is value alignment when input data has &ldquo;holes&rdquo; (missing intermediate categories). If categories are not present for a row in the order expected by the query, the values may shift to the next available output column, causing misalignment:</p>
+<p>If <code>tbl</code> had <code>('C', 'val1', 5)</code> and <code>('C', 'val3', 7)</code>, but no <code>val2</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- Incorrect result without the second parameter query:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> crosstab(<span style="color:#e6db74">&#39;SELECT row_name, attrib, val FROM tbl 
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">ORDER BY 1,2&#39;</span>) <span style="color:#66d9ef">AS</span> ct (row_name text, val1 int, val2 int, val3 int);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Row C might incorrectly show val2=7 instead of val3=7
+</span></span></span></code></pre></div><p>To enforce correct alignment when categories are sparse, the two-parameter form is mandatory, ensuring the second argument explicitly defines all expected category labels:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- Correct alignment requires defining the category set:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> crosstab(
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;SELECT row_name, attrib, val FROM tbl ORDER BY 1,2&#39;</span>, 
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;SELECT DISTINCT attrib FROM tbl ORDER BY 1&#39;</span> <span style="color:#75715e">-- Explicit category set definition
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>) <span style="color:#66d9ef">AS</span> ct (row_name text, val1 int, val2 int, val3 int);
+</span></span></code></pre></div><p>If the JSON approach is used but explicit <code>NULL</code> padding for missing keys is required, a cross join to generate all expected <code>(row_name, attrib)</code> combinations before aggregation is the necessary step:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">select</span>
+</span></span><span style="display:flex;"><span>    row_name <span style="color:#66d9ef">as</span> bar,
+</span></span><span style="display:flex;"><span>    json_object_agg(attrib, val <span style="color:#66d9ef">order</span> <span style="color:#66d9ef">by</span> attrib) <span style="color:#66d9ef">as</span> <span style="color:#66d9ef">data</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">from</span>
+</span></span><span style="display:flex;"><span>    tbl
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">right</span> <span style="color:#66d9ef">join</span>
+</span></span><span style="display:flex;"><span>    (
+</span></span><span style="display:flex;"><span>        (<span style="color:#66d9ef">select</span> <span style="color:#66d9ef">distinct</span> row_name <span style="color:#66d9ef">from</span> tbl) a
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">cross</span> <span style="color:#66d9ef">join</span>
+</span></span><span style="display:flex;"><span>        (<span style="color:#66d9ef">select</span> <span style="color:#66d9ef">distinct</span> attrib <span style="color:#66d9ef">from</span> tbl) b
+</span></span><span style="display:flex;"><span>    ) <span style="color:#66d9ef">c</span> <span style="color:#66d9ef">using</span> (row_name, attrib)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">group</span> <span style="color:#66d9ef">by</span> row_name
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">order</span> <span style="color:#66d9ef">by</span> row_name;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- This forces all combinations, filling missing attribs with NULL values in the JSON output.
+</span></span></span></code></pre></div><p>What are your primary constraints—fixed structure, speed, or dynamism—when deciding between <code>crosstab</code> and JSON pivoting in PostgreSQL? Share your experiences below!</p>
+<h3 id="faqs-on-postgresql-crosstab-pivoting-techniques">FAQs on PostgreSQL Crosstab Pivoting Techniques</h3>
+<p><div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the first step required to use the crosstab function</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: You must execute the command <code>CREATE EXTENSION tablefunc;</code> in your database session if the module is not already enabled.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why does my crosstab output show misaligned values when categories are missing</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: This often happens when using the 1-parameter <code>crosstab</code> form. You must use the 2-parameter form and provide the second query argument listing all expected category values in the correct order to guarantee cell alignment.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can jsonb_object_agg handle dynamic column numbers</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, <code>jsonb_object_agg</code> is inherently dynamic as the output structure is contained within a single <code>jsonb</code> column, supporting any number of key/value pairs derived from the source data attributes.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is there a performance difference between crosstab and jsonb_object_agg for pivoting</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The C-based functions in <code>tablefunc</code> (like <code>crosstab</code>) are typically faster for fixed, known structures. The <code>jsonb_object_agg</code> method offers flexibility at the potential cost of slight performance overhead compared to the optimized C functions.</div>
+    </div>
+</div></p>
+<p>Check out related topics for further PostgreSQL explorations:
+<a href="https://sqlpey.com/question/querying-clob-columns-in-oracle-a-guide/" target="_blank" rel="noopener">Querying CLOB columns in Oracle</a>
+
+<a href="https://sqlpey.com/python/top-4-methods-to-solve-utf-8-encoding-issues-in-python/" target="_blank" rel="noopener">Top 4 methods to solve UTF-8 encoding issues in Python</a>
+
+<a href="https://sqlpey.com/python/how-to-properly-configure-pythonpath/" target="_blank" rel="noopener">How to properly configure PYTHONPATH</a>
+</p>
+<h2 id="solutions">Solutions</h2>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

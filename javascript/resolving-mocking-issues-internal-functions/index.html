@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Resolving Mocking Issues for Functions Called Within the Same Module in JavaScript/TypeScript - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore multiple effective strategies for spying on or mocking internal function dependencies when testing modules using ES Modules or CommonJS exports.">
+
+
+
+<meta name="keywords" content="jest spyOn internal function, mock function dependency same module, ES6 cyclic imports testing, function expression vs declaration spying">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Resolving Mocking Issues for Functions Called Within the Same Module in JavaScript/TypeScript - sqlpey">
+<meta name="DC.description" content="Explore multiple effective strategies for spying on or mocking internal function dependencies when testing modules using ES Modules or CommonJS exports.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Resolving Mocking Issues for Functions Called Within the Same Module in JavaScript/TypeScript - sqlpey">
+<meta property="og:description" content="Explore multiple effective strategies for spying on or mocking internal function dependencies when testing modules using ES Modules or CommonJS exports.">
+<meta property="og:url" content="https://sqlpey.com/javascript/resolving-mocking-issues-internal-functions/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="JavaScript Testing">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Resolving Mocking Issues for Functions Called Within the Same Module in JavaScript/TypeScript">
+<meta name="twitter:description" content="Explore multiple effective strategies for spying on or mocking internal function dependencies when testing modules using ES Modules or CommonJS exports.">
+
+
+<link rel="canonical" href="https://sqlpey.com/javascript/resolving-mocking-issues-internal-functions/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Resolving Mocking Issues for Functions Called Within the Same Module in JavaScript/TypeScript\"",
+  "description": "\"Explore multiple effective strategies for spying on or mocking internal function dependencies when testing modules using ES Modules or CommonJS exports.\"",
+  "url": "\"https://sqlpey.com/javascript/resolving-mocking-issues-internal-functions/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/javascript/resolving-mocking-issues-internal-functions/\""
+  },
+  "articleSection": "\"JavaScript Testing\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Resolving Mocking Issues for Functions Called Within the Same Module in JavaScript/TypeScript</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">JavaScript Testing</span>
+              
+              <span class="tag">ES Modules</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              9 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#resolving-mocking-issues-for-functions-called-within-the-same-module-in-javascripttypescript">&ldquo;Resolving Mocking Issues for Functions Called Within the Same Module in JavaScript/TypeScript&rdquo;</a></li>
+    <li><a href="#effective-solutions-for-internal-function-mocking">Effective Solutions for Internal Function Mocking</a>
+      <ul>
+        <li><a href="#technique-1-leveraging-es6-cyclic-imports-for-self-referencing">Technique 1: Leveraging ES6 Cyclic Imports for Self-Referencing</a></li>
+        <li><a href="#technique-2-encapsulation-via-class-or-instance-export">Technique 2: Encapsulation via Class or Instance Export</a></li>
+        <li><a href="#technique-3-utilizing-function-expressions-vs-declarations">Technique 3: Utilizing Function Expressions vs. Declarations</a></li>
+        <li><a href="#technique-4-dependency-injection-via-default-parameter-recommended-for-flexibility">Technique 4: Dependency Injection via Default Parameter (Recommended for Flexibility)</a></li>
+        <li><a href="#technique-5-using-rewiring-plugins-babel">Technique 5: Using Rewiring Plugins (Babel)</a></li>
+        <li><a href="#technique-6-adjusting-commonjs-exports-structure">Technique 6: Adjusting CommonJS Exports Structure</a></li>
+        <li><a href="#technique-7-testing-behavior-over-implementation-details-the-purest-approach">Technique 7: Testing Behavior Over Implementation Details (The Purest Approach)</a></li>
+        <li><a href="#technique-8-using-babel-plugin-for-automatic-rewiring">Technique 8: Using Babel Plugin for Automatic Rewiring</a></li>
+        <li><a href="#technique-9-revisit-function-expression-for-interception">Technique 9: Revisit Function Expression for Interception</a></li>
+        <li><a href="#technique-10-explicitly-using-exported-object-properties-commonjs-style">Technique 10: Explicitly Using Exported Object Properties (CommonJS Style)</a></li>
+        <li><a href="#technique-11-commonjs-self-reference-rewrite">Technique 11: CommonJS Self-Reference Rewrite</a></li>
+        <li><a href="#technique-12-testing-via-requireactual-and-overwriting-exports">Technique 12: Testing via <code>requireActual</code> and Overwriting Exports</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#faqs-on-resolving-mocking-issues-internal-functions">FAQs on Resolving Mocking Issues Internal Functions</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="resolving-mocking-issues-for-functions-called-within-the-same-module-in-javascripttypescript">&ldquo;Resolving Mocking Issues for Functions Called Within the Same Module in JavaScript/TypeScript&rdquo;</h2>
+<p>When testing functions that rely on other functions exported from the <em>same</em> module in JavaScript environments like Jest, standard mocking techniques often fail. This failure arises because the internal call inside <code>foo()</code> binds to the original, unmocked version of <code>bar()</code> at the time of module evaluation, even if you successfully spy on the exported <code>module.bar</code> reference later.</p>
+<p>What approaches exist to inject a mock or spy into a dependency function that resides within the very module being tested?</p>
+<h2 id="effective-solutions-for-internal-function-mocking">Effective Solutions for Internal Function Mocking</h2>
+<p>Several distinct patterns offer paths around this module-level binding issue, ranging from structural code changes to leveraging specific module system features.</p>
+<h3 id="technique-1-leveraging-es6-cyclic-imports-for-self-referencing">Technique 1: Leveraging ES6 Cyclic Imports for Self-Referencing</h3>
+<p>ES6 module resolution supports cyclic dependencies gracefully. By importing the module itself into its own scope, the internal function (<code>foo</code>) can reference the exported entities via the imported namespace (<code>thisModule</code>), allowing the test environment to replace the exported function reference successfully.</p>
+<p><strong>Module File (<code>./module.js</code> or <code>.ts</code>):</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">as</span> <span style="color:#a6e22e">thisModule</span> <span style="color:#a6e22e">from</span> <span style="color:#e6db74">&#39;./module&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">bar</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;bar&#39;</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">foo</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Calls the version available in the imported namespace
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">`I am foo. bar is </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">thisModule</span>.<span style="color:#a6e22e">bar</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Test File Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">as</span> <span style="color:#a6e22e">module</span> <span style="color:#a6e22e">from</span> <span style="color:#e6db74">&#39;../src/module&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">describe</span>(<span style="color:#e6db74">&#39;module with self-reference&#39;</span>, () =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">it</span>(<span style="color:#e6db74">&#39;foo uses the spied bar&#39;</span>, () =&gt; {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Spy on the exported reference available via the module import
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">jest</span>.<span style="color:#a6e22e">spyOn</span>(<span style="color:#a6e22e">module</span>, <span style="color:#e6db74">&#39;bar&#39;</span>).<span style="color:#a6e22e">mockReturnValue</span>(<span style="color:#e6db74">&#39;fake bar&#39;</span>);
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">module</span>.<span style="color:#a6e22e">foo</span>();
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">expect</span>(<span style="color:#a6e22e">result</span>).<span style="color:#a6e22e">toEqual</span>(<span style="color:#e6db74">&#39;I am foo. bar is fake bar&#39;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">expect</span>(<span style="color:#a6e22e">module</span>.<span style="color:#a6e22e">bar</span>).<span style="color:#a6e22e">toHaveBeenCalled</span>();
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><p>This technique makes importing the module into its own definition appear unconventional but resolves testing challenges smoothly due to ES6 module specification behavior.</p>
+<h3 id="technique-2-encapsulation-via-class-or-instance-export">Technique 2: Encapsulation via Class or Instance Export</h3>
+<p>If functions are tightly coupled, bundling them into a class instance makes mocking straightforward. The dependent function (<code>foo</code>) references its dependency (<code>this.bar()</code>) via the instance context (<code>this</code>), which is easily spied upon in tests.</p>
+<p><strong>Module File (<code>Module.js</code> or <code>.ts</code>):</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyModule</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">bar</span>()<span style="color:#f92672">:</span> <span style="color:#66d9ef">string</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;bar&#39;</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">foo</span>()<span style="color:#f92672">:</span> <span style="color:#66d9ef">string</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Uses &#39;this&#39; context for dependency resolution
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">`I am foo. bar is </span><span style="color:#e6db74">${</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">bar</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Test File Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> { <span style="color:#a6e22e">MyModule</span> } <span style="color:#66d9ef">from</span> <span style="color:#e6db74">&#39;../src/module&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">describe</span>(<span style="color:#e6db74">&#39;MyModule Class Test&#39;</span>, () <span style="color:#f92672">=&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sut</span>: <span style="color:#66d9ef">MyModule</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">MyModule</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">barSpy</span>: <span style="color:#66d9ef">jest.SpyInstance</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">beforeEach</span>(() <span style="color:#f92672">=&gt;</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Spy directly on the instance method
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">barSpy</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">jest</span>.<span style="color:#a6e22e">spyOn</span>(<span style="color:#a6e22e">sut</span>, <span style="color:#e6db74">&#39;bar&#39;</span>).<span style="color:#a6e22e">mockImplementation</span>(<span style="color:#a6e22e">jest</span>.<span style="color:#a6e22e">fn</span>());
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">afterEach</span>(() <span style="color:#f92672">=&gt;</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">barSpy</span>.<span style="color:#a6e22e">mockRestore</span>();
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">it</span>(<span style="color:#e6db74">&#39;foo resolves with mocked bar value&#39;</span>, () <span style="color:#f92672">=&gt;</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">sut</span>.<span style="color:#a6e22e">bar</span>.<span style="color:#a6e22e">mockReturnValue</span>(<span style="color:#e6db74">&#39;fake bar&#39;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sut</span>.<span style="color:#a6e22e">foo</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">expect</span>(<span style="color:#a6e22e">result</span>).<span style="color:#a6e22e">toEqual</span>(<span style="color:#e6db74">&#39;I am foo. bar is fake bar&#39;</span>);
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><p>This approach requires modifying the module structure to export a class or an instance rather than standalone functions.</p>
+<h3 id="technique-3-utilizing-function-expressions-vs-declarations">Technique 3: Utilizing Function Expressions vs. Declarations</h3>
+<p>Function declarations are hoisted, which can interfere with mocking tools trying to intercept the reference during module loading. Converting the function to a <strong>function expression</strong> (especially an arrow function assigned to a <code>const</code>) prevents hoisting, making it readily interceptable by testing frameworks like Jest.</p>
+<p><strong>Original (Problematic Declaration):</strong>
+<code>export function bar() { return 'bar'; }</code></p>
+<p><strong>Revised (Testable Expression):</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">bar</span> <span style="color:#f92672">=</span> () =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;bar&#34;</span>;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">foo</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">`I am foo. bar is </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">bar</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>; <span style="color:#75715e">// This call may still reference the original
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p>While this helps in some testing setups, Solution 1 or 4 often provides more reliable interception for functions used internally via direct name resolution.</p>
+<h3 id="technique-4-dependency-injection-via-default-parameter-recommended-for-flexibility">Technique 4: Dependency Injection via Default Parameter (Recommended for Flexibility)</h3>
+<p>This non-breaking approach allows the consumer (the test suite) to supply the dependency (<code>_bar</code>) explicitly, while keeping the original function (<code>bar</code>) as the default for standard use cases.</p>
+<p><strong>Module File (<code>./module.js</code> or <code>.ts</code>):</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">bar</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;bar&#39;</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Default parameter injects &#39;bar&#39; if not provided, otherwise uses the passed dependency
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">foo</span>(<span style="color:#a6e22e">_bar</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">bar</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">`I am foo. bar is </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">_bar</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Test File Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> { <span style="color:#a6e22e">foo</span> } <span style="color:#a6e22e">from</span> <span style="color:#e6db74">&#39;../src/module&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">describe</span>(<span style="color:#e6db74">&#39;module with dependency injection&#39;</span>, () =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">it</span>(<span style="color:#e6db74">&#39;foo uses the injected mock bar&#39;</span>, () =&gt; {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">dummyBarMock</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">jest</span>.<span style="color:#a6e22e">fn</span>().<span style="color:#a6e22e">mockReturnValue</span>(<span style="color:#e6db74">&#39;fake bar&#39;</span>);
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Pass the mock directly as the first argument
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">foo</span>(<span style="color:#a6e22e">dummyBarMock</span>);
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">expect</span>(<span style="color:#a6e22e">result</span>).<span style="color:#a6e22e">toEqual</span>(<span style="color:#e6db74">&#39;I am foo. bar is fake bar&#39;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">expect</span>(<span style="color:#a6e22e">dummyBarMock</span>).<span style="color:#a6e22e">toHaveBeenCalledTimes</span>(<span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><p>This method keeps the API clean while providing the easiest path for test isolation. See related discussions on dependency injection patterns here: <a href="https://sqlpey.com/python/top-5-methods-to-ping-servers-in-python/" target="_blank" rel="noopener">Top 5 Methods to Ping Servers in Python</a>
+.</p>
+<h3 id="technique-5-using-rewiring-plugins-babel">Technique 5: Using Rewiring Plugins (Babel)</h3>
+<p>If your project utilizes Babel, tools like <code>babel-plugin-rewire-plugin</code> or <code>babel-plugin-explicit-exports-references</code> can transparently rewrite module exports during transpilation, making the internal references point to a modifiable object, which Jest can then intercept.</p>
+<p>Using a rewire plugin, you might use an API like this in tests:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> <span style="color:#a6e22e">__RewireAPI__</span>, <span style="color:#f92672">*</span> <span style="color:#a6e22e">as</span> <span style="color:#a6e22e">module</span> <span style="color:#a6e22e">from</span> <span style="color:#e6db74">&#39;../module&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">describe</span>(<span style="color:#e6db74">&#39;foo using rewire plugin&#39;</span>, () =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">it</span>(<span style="color:#e6db74">&#39;calls bar internally&#39;</span>, () =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">barMock</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">jest</span>.<span style="color:#a6e22e">fn</span>();
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Rewire makes &#39;bar&#39; within the module point to barMock
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">__RewireAPI__</span>.<span style="color:#a6e22e">__Rewire__</span>(<span style="color:#e6db74">&#39;bar&#39;</span>, <span style="color:#a6e22e">barMock</span>);
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">module</span>.<span style="color:#a6e22e">foo</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">expect</span>(<span style="color:#a6e22e">barMock</span>).<span style="color:#a6e22e">toHaveBeenCalledTimes</span>(<span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><p>This is clean syntactically but adds a build-time dependency. For more on environment setup, check resolving pip SSL issues, relevant for tooling dependencies: <a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">Solved How to Fix SSL Certificate Verify Failed Error in Python</a>
+.</p>
+<h3 id="technique-6-adjusting-commonjs-exports-structure">Technique 6: Adjusting CommonJS Exports Structure</h3>
+<p>For legacy CommonJS environments, if <code>foo</code> references the bare function name <code>bar()</code> instead of the imported container reference (e.g., <code>module.bar()</code>), the binding is direct. By changing the internal call to explicitly use the module reference (<code>myModule.bar()</code>), you can intercept the property on the exported object.</p>
+<p><strong>Modified CommonJS Module (<code>myModule.js</code>):</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">bar</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;bar&#34;</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">foo</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Crucially change from bar() to myModule.bar()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">return</span> <span style="color:#e6db74">`I am foo. bar is </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">myModule</span>.<span style="color:#a6e22e">bar</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">myModule</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">bar</span>, <span style="color:#a6e22e">foo</span> };
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">module</span>.<span style="color:#a6e22e">exports</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">myModule</span>;
+</span></span></code></pre></div><p><strong>Test:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">myModule</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;./myModule&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">describe</span>(<span style="color:#e6db74">&#34;myModule CJS Test&#34;</span>, () =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">test</span>(<span style="color:#e6db74">&#34;foo uses mocked bar&#34;</span>, () =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Spy on the exported property
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">jest</span>.<span style="color:#a6e22e">spyOn</span>(<span style="color:#a6e22e">myModule</span>, <span style="color:#e6db74">&#34;bar&#34;</span>).<span style="color:#a6e22e">mockReturnValueOnce</span>(<span style="color:#e6db74">&#34;bar-mock&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">myModule</span>.<span style="color:#a6e22e">foo</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">expect</span>(<span style="color:#a6e22e">result</span>).<span style="color:#a6e22e">toBe</span>(<span style="color:#e6db74">&#34;I am foo. bar is bar-mock&#34;</span>);
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><p>This requires ensuring the module structure maintains a self-reference to the export object internally.</p>
+<h3 id="technique-7-testing-behavior-over-implementation-details-the-purest-approach">Technique 7: Testing Behavior Over Implementation Details (The Purest Approach)</h3>
+<p>Often, the need to spy on an internal function suggests testing implementation details rather than external behavior. If <code>foo</code> and <code>bar</code> operate together to produce a defined output via the public API (<code>foo()</code>), test that final output directly.</p>
+<p><strong>Module Code:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">bar</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;bar&#39;</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">foo</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">`I am foo. bar is </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">bar</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Test Focus:</strong></p>
+<p>Test the contract: what does <code>foo()</code> return when <code>bar()</code> returns its standard value?</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> { <span style="color:#a6e22e">bar</span>, <span style="color:#a6e22e">foo</span> } <span style="color:#a6e22e">from</span> <span style="color:#e6db74">&#34;path/to/module&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">describe</span>(<span style="color:#e6db74">&#34;module behavior contract&#34;</span>, () =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">it</span>(<span style="color:#e6db74">&#34;foo returns expected string based on bar&#39;s default output&#34;</span>, () =&gt; {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Test the combined result directly
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">expect</span>(<span style="color:#a6e22e">foo</span>()).<span style="color:#a6e22e">toBe</span>(<span style="color:#e6db74">&#39;I am foo. bar is bar&#39;</span>);
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// If refactoring bar doesn&#39;t change the output of foo, the tests remain valid.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>});
+</span></span></code></pre></div><p>If a dependency <em>must</em> be mocked because it performs side effects (like API calls), extract that dependency into its own separate module and mock the module import (a technique better supported by ES Modules).</p>
+<h3 id="technique-8-using-babel-plugin-for-automatic-rewiring">Technique 8: Using Babel Plugin for Automatic Rewiring</h3>
+<p>For Babel users, the <code>babel-plugin-explicit-exports-references</code> package can transparently address the issue by ensuring exported references are rewritten to point to the main export object during compilation. This provides an elegant solution at the build step.</p>
+<h3 id="technique-9-revisit-function-expression-for-interception">Technique 9: Revisit Function Expression for Interception</h3>
+<p>Reinforcing Technique 3: If you strictly use arrow functions assigned to <code>const</code> exports, Jest often finds it easier to intercept the binding compared to traditional declarations due to differences in how they are processed relative to hoisting.</p>
+<h3 id="technique-10-explicitly-using-exported-object-properties-commonjs-style">Technique 10: Explicitly Using Exported Object Properties (CommonJS Style)</h3>
+<p>If you structure your CommonJS module to explicitly assign functions to the <code>exports</code> object, tests can more reliably overwrite these properties.</p>
+<p><strong>Module (<code>module.js</code>):</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#a6e22e">exports</span>.<span style="color:#a6e22e">bar</span> <span style="color:#f92672">=</span> () =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;bar&#39;</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">exports</span>.<span style="color:#a6e22e">foo</span> <span style="color:#f92672">=</span> () =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">`I am foo. bar is </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">exports</span>.<span style="color:#a6e22e">bar</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Test:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#a6e22e">describe</span>(<span style="color:#e6db74">&#39;MyModule CJS Property Test&#39;</span>, () =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">it</span>(<span style="color:#e6db74">&#39;foo calls overwritten bar property&#39;</span>, () =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">module</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;./module&#39;</span>);
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Overwrite the property directly on the required object reference
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">module</span>.<span style="color:#a6e22e">bar</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">jest</span>.<span style="color:#a6e22e">fn</span>(() =&gt; { <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;fake bar&#39;</span>; });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">expect</span>(<span style="color:#a6e22e">module</span>.<span style="color:#a6e22e">foo</span>()).<span style="color:#a6e22e">toEqual</span>(<span style="color:#e6db74">&#39;I am foo. bar is fake bar&#39;</span>);
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><h3 id="technique-11-commonjs-self-reference-rewrite">Technique 11: CommonJS Self-Reference Rewrite</h3>
+<p>Similar to Technique 6, this involves altering the internal call site to reference the externally exported object in CommonJS.</p>
+<h3 id="technique-12-testing-via-requireactual-and-overwriting-exports">Technique 12: Testing via <code>requireActual</code> and Overwriting Exports</h3>
+<p>If you import the module using the structure that brings all exports into the current scope, you can use <code>jest.requireActual</code> to get the real module object and then mock its properties directly on that object before calling the function under test.</p>
+<p><strong>Module Structure:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">A</span> <span style="color:#f92672">=</span> () =&gt; <span style="color:#e6db74">&#39;A&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">B</span> <span style="color:#f92672">=</span> () =&gt; <span style="color:#e6db74">&#39;B&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">C</span> <span style="color:#f92672">=</span> () =&gt; <span style="color:#a6e22e">A</span>() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39; &#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">B</span>();
+</span></span></code></pre></div><p><strong>Test Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> { <span style="color:#a6e22e">A</span>, <span style="color:#a6e22e">B</span>, <span style="color:#a6e22e">C</span> } <span style="color:#a6e22e">from</span> <span style="color:#e6db74">&#39;./module&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">describe</span>(<span style="color:#e6db74">&#39;module exports testing&#39;</span>, () =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">it</span>(<span style="color:#e6db74">&#39;C returns combined mocked A and B&#39;</span>, () =&gt; {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Get the actual module object resolved by the runtime
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">module</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">jest</span>.<span style="color:#a6e22e">requireActual</span>(<span style="color:#e6db74">&#39;./module&#39;</span>);
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Directly mock the functions on the actual module object
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">module</span>.<span style="color:#a6e22e">A</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">jest</span>.<span style="color:#a6e22e">fn</span>().<span style="color:#a6e22e">mockReturnValue</span>(<span style="color:#e6db74">&#39;AA&#39;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">module</span>.<span style="color:#a6e22e">B</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">jest</span>.<span style="color:#a6e22e">fn</span>().<span style="color:#a6e22e">mockReturnValue</span>(<span style="color:#e6db74">&#39;BB&#39;</span>);
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Calling C will now use the mocked properties on the module object
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">expect</span>(<span style="color:#a6e22e">module</span>.<span style="color:#a6e22e">C</span>()).<span style="color:#a6e22e">toEqual</span>(<span style="color:#e6db74">&#39;AA BB&#39;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">expect</span>(<span style="color:#a6e22e">module</span>.<span style="color:#a6e22e">B</span>).<span style="color:#a6e22e">toHaveBeenCalledExactlyOnceWith</span>();
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><h2 id="solutions">Solutions</h2>
+<h3 id="faqs-on-resolving-mocking-issues-internal-functions">FAQs on Resolving Mocking Issues Internal Functions</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why does spying on an exported function fail when called internally in the same module</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Standard imports often create a copy or bind to the original function reference when the module is first loaded. Subsequent spying on the exported name doesn&rsquo;t update the internal reference already established during module initialization.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is using ES6 cyclic imports (Solution 1) considered standard practice</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: While it looks strange, it adheres to ES6 module specifications for handling mutual dependencies and is a reliable method to ensure internal calls resolve to the dynamic mock set in the test scope.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Which solution minimizes required code changes</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Solution 4 (Dependency Injection via Default Parameter) usually requires the least invasive change to the source code while offering excellent testability.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Should I always prefer testing external behavior over internal mocks</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, Solution 7 suggests prioritizing testing the external API&rsquo;s behavior. Mocking internal functions should generally be reserved for dependencies that cause side effects (like network I/O) or are extremely complex, preferably by extracting them to separate modules.</div>
+    </div>
+</div>
+<pre tabindex="0"><code>import * as thisModule from &#39;./module&#39;;
+
+export function bar () {
+    return &#39;bar&#39;;
+}
+
+export function foo () {
+    return `I am foo. bar is ${thisModule.bar()}`;
+}
+import * as module from &#39;../src/module&#39;;
+
+describe(&#39;module&#39;, () =&amp;gt; {
+    it(&#39;foo&#39;, () =&amp;gt; {
+        spyOn(module, &#39;bar&#39;).and.returnValue(&#39;fake bar&#39;);
+        expect(module.foo()).toEqual(&#39;I am foo. bar is fake bar&#39;);
+    });
+});
+</code></pre><p>We are keen to hear which technique proves most effective in your current environment! Share your preferred method or any alternative patterns you&rsquo;ve encountered in the comments below.</p>
+<p>For more complex debugging scenarios related to environment setup or dependencies, explore related articles:</p>
+<ul>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-could-not-find-a-version-that-satisfies-the-requirement-error-in-python/" target="_blank" rel="noopener">Solved How to Fix Could Not Find a Version That Satisfies the Requirement Error in Python</a>
+</li>
+<li><a href="https://sqlpey.com/python/top-4-ways-to-resolve-syntaxwarning-invalid-escape-sequence-in-python/" target="_blank" rel="noopener">Top 4 Methods to Solve SyntaxWarning Invalid Escape Sequence in Python</a>
+</li>
+<li><a href="https://sqlpey.com/python/how-to-properly-configure-pythonpath/" target="_blank" rel="noopener">How to Properly Configure PythonPath</a>
+</li>
+</ul>
+<pre tabindex="0"><code>export class MyModule {
+  function bar () {
+    return &#39;bar&#39;;
+  }
+
+  function foo () {
+    return `I am foo. bar is ${this.bar()}`;
+  }
+}
+import { MyModule } from &#39;../src/module&#39;
+
+describe(&#39;MyModule&#39;, () =&amp;gt; {
+  //System under test :
+  const sut:MyModule = new MyModule();
+
+  let barSpy;
+
+  beforeEach(() =&amp;gt; {
+      barSpy = jest.spyOn(
+          sut,
+          &#39;bar&#39;
+      ).mockImplementation(jest.fn());
+  });
+
+
+  afterEach(() =&amp;gt; {
+      barSpy.mockRestore();
+  });
+
+  it(&#39;foo&#39;, () =&amp;gt; {
+      sut.bar.mockReturnValue(&#39;fake bar&#39;);
+      expect(sut.foo()).toEqual(&#39;I am foo. bar is fake bar&#39;);
+  });
+});
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

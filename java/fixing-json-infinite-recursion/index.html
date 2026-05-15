@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Fixing JSON Infinite Recursion with Jackson: A Deep Dive - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore various strategies and code examples to resolve JSON infinite recursion (StackOverflowError) issues when using Jackson with bidirectional relationships …">
+
+
+
+<meta name="keywords" content="Jackson, JSON, infinite recursion, StackOverflowError, bidirectional relationships, Java, serialization, deserialization, JsonManagedReference, JsonBackReference, JsonIgnoreProperties, JsonIdentityInfo">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Fixing JSON Infinite Recursion with Jackson: A Deep Dive - sqlpey">
+<meta name="DC.description" content="Explore various strategies and code examples to resolve JSON infinite recursion (StackOverflowError) issues when using Jackson with bidirectional relationships in Java.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-07-22">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Fixing JSON Infinite Recursion with Jackson: A Deep Dive - sqlpey">
+<meta property="og:description" content="Explore various strategies and code examples to resolve JSON infinite recursion (StackOverflowError) issues when using Jackson with bidirectional relationships …">
+<meta property="og:url" content="https://sqlpey.com/java/fixing-json-infinite-recursion/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-07-22T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-07-22T00:00:00Z">
+<meta property="article:modified_time" content="2025-07-22T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Java">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Fixing JSON Infinite Recursion with Jackson: A Deep Dive">
+<meta name="twitter:description" content="Explore various strategies and code examples to resolve JSON infinite recursion (StackOverflowError) issues when using Jackson with bidirectional relationships …">
+
+
+<link rel="canonical" href="https://sqlpey.com/java/fixing-json-infinite-recursion/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Fixing JSON Infinite Recursion with Jackson: A Deep Dive\"",
+  "description": "\"Explore various strategies and code examples to resolve JSON infinite recursion (StackOverflowError) issues when using Jackson with bidirectional relationships in Java.\"",
+  "url": "\"https://sqlpey.com/java/fixing-json-infinite-recursion/\"",
+  "datePublished": "\"2025-07-22T00:00:00Z\"",
+  "dateModified": "\"2025-07-22T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/java/fixing-json-infinite-recursion/\""
+  },
+  "articleSection": "\"Java\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Fixing JSON Infinite Recursion with Jackson: A Deep Dive</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Java</span>
+              
+              <span class="tag">Jackson</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              12 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 22, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#fixing-json-infinite-recursion-with-jackson-a-deep-dive">&ldquo;Fixing JSON Infinite Recursion with Jackson: A Deep Dive&rdquo;</a>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#faqs-on-json-infinite-recursion-with-jackson">FAQs on JSON Infinite Recursion with Jackson</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="fixing-json-infinite-recursion-with-jackson-a-deep-dive">&ldquo;Fixing JSON Infinite Recursion with Jackson: A Deep Dive&rdquo;</h2>
+<p>Encountering a <code>StackOverflowError</code> due to infinite recursion during JSON serialization or deserialization is a common challenge when working with bidirectional relationships in Java, particularly with libraries like Jackson. This occurs when two objects mutually reference each other, leading Jackson&rsquo;s serializer to endlessly traverse the object graph. This post explores a variety of proven techniques to address and prevent this persistent issue, providing practical code examples and explanations for each.</p>
+<h4 id="solution-1-leveraging-jsonignoreproperties">Solution 1: Leveraging <code>@JsonIgnoreProperties</code></h4>
+<p>Introduced in a 2017 update, <code>@JsonIgnoreProperties</code> offers a flexible way to manage serialization and deserialization. You can use it to suppress the serialization of specific properties or ignore them during deserialization.</p>
+<p>Consider a scenario with <code>Trainee</code> and <code>BodyStat</code> entities:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// Business Object 1: Trainee</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Entity</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Table</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ta_trainee&#34;</span>, uniqueConstraints <span style="color:#f92672">=</span> {<span style="color:#a6e22e">@UniqueConstraint</span>(columnNames <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;id&#34;</span>})})
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Trainee</span> <span style="color:#66d9ef">extends</span> BusinessObject {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@OneToMany</span>(mappedBy <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;trainee&#34;</span>, fetch <span style="color:#f92672">=</span> FetchType.<span style="color:#a6e22e">EAGER</span>, cascade <span style="color:#f92672">=</span> CascadeType.<span style="color:#a6e22e">ALL</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Use JsonIgnoreProperties to prevent infinite loop by ignoring &#39;trainee&#39; in BodyStat during serialization</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@JsonIgnoreProperties</span>(<span style="color:#e6db74">&#34;trainee&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Set<span style="color:#f92672">&lt;</span>BodyStat<span style="color:#f92672">&gt;</span> bodyStats;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ... other properties and methods</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Business Object 2: BodyStat</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Entity</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Table</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ta_bodystat&#34;</span>, uniqueConstraints <span style="color:#f92672">=</span> {<span style="color:#a6e22e">@UniqueConstraint</span>(columnNames <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;id&#34;</span>})})
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">BodyStat</span> <span style="color:#66d9ef">extends</span> BusinessObject {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@ManyToOne</span>(fetch <span style="color:#f92672">=</span> FetchType.<span style="color:#a6e22e">EAGER</span>, cascade <span style="color:#f92672">=</span> CascadeType.<span style="color:#a6e22e">ALL</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@JoinColumn</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;trainee_fk&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Trainee trainee;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ... other properties and methods</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This approach prevents the <code>trainee</code> object within <code>BodyStat</code> from being serialized, thus breaking the cycle.</p>
+<h4 id="solution-2-employing-jsonmanagedreference-and-jsonbackreference">Solution 2: Employing <code>@JsonManagedReference</code> and <code>@JsonBackReference</code></h4>
+<p>Available since Jackson 1.6, these annotations provide a declarative way to manage bidirectional relationships. The idea is to designate one side of the relationship as the &ldquo;managed&rdquo; side (which will be serialized) and the other as the &ldquo;back&rdquo; reference (which will be ignored during serialization but re-established during deserialization).</p>
+<p>Here&rsquo;s how you&rsquo;d apply them:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// Business Object 1: Trainee</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Entity</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Table</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ta_trainee&#34;</span>, uniqueConstraints <span style="color:#f92672">=</span> {<span style="color:#a6e22e">@UniqueConstraint</span>(columnNames <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;id&#34;</span>})})
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Trainee</span> <span style="color:#66d9ef">extends</span> BusinessObject {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@OneToMany</span>(mappedBy <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;trainee&#34;</span>, fetch <span style="color:#f92672">=</span> FetchType.<span style="color:#a6e22e">EAGER</span>, cascade <span style="color:#f92672">=</span> CascadeType.<span style="color:#a6e22e">ALL</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Column</span>(nullable <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// This is the &#34;managed&#34; side, it will be serialized</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@JsonManagedReference</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Set<span style="color:#f92672">&lt;</span>BodyStat<span style="color:#f92672">&gt;</span> bodyStats;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ... other properties and methods</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Business Object 2: BodyStat</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Entity</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Table</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ta_bodystat&#34;</span>, uniqueConstraints <span style="color:#f92672">=</span> {<span style="color:#a6e22e">@UniqueConstraint</span>(columnNames <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;id&#34;</span>})})
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">BodyStat</span> <span style="color:#66d9ef">extends</span> BusinessObject {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@ManyToOne</span>(fetch <span style="color:#f92672">=</span> FetchType.<span style="color:#a6e22e">EAGER</span>, cascade <span style="color:#f92672">=</span> CascadeType.<span style="color:#a6e22e">ALL</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@JoinColumn</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;trainee_fk&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// This is the &#34;back&#34; reference, it will be ignored during serialization</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@JsonBackReference</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Trainee trainee;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ... other properties and methods</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This method effectively handles the infinite loop by ensuring that only one side of the relationship is serialized. For more insights, refer to articles on <a href="https://www.sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">Jackson Stackoverflow issues</a>
+.</p>
+<h4 id="solution-3-using-jsonignore">Solution 3: Using <code>@JsonIgnore</code></h4>
+<p>A simpler approach, <code>@JsonIgnore</code>, can be applied to the getter or field that causes the recursion. This annotation tells Jackson to omit that specific property during serialization.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// Example using @JsonIgnore on the getter</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@ManyToOne</span>(fetch <span style="color:#f92672">=</span> FetchType.<span style="color:#a6e22e">EAGER</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@JoinColumn</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ID&#34;</span>, nullable <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>, updatable <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@JsonIgnore</span> <span style="color:#75715e">// This annotation prevents serialization of the &#39;member&#39; field</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> Member member;
+</span></span></code></pre></div><p><strong>Caution</strong>: While effective, <code>@JsonIgnore</code> can prevent necessary data from being serialized. If the foreign key data is crucial, this might not be the optimal solution.</p>
+<h4 id="solution-4-leveraging-jsonidentityinfo">Solution 4: Leveraging <code>@JsonIdentityInfo</code></h4>
+<p>For Jackson 2.0 and later, <code>@JsonIdentityInfo</code> provides another robust way to handle cyclical references. It assigns a unique identifier to each object during serialization, preventing Jackson from re-processing already serialized objects.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// Trainee Entity with @JsonIdentityInfo</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Entity</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Table</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ta_trainee&#34;</span>, uniqueConstraints <span style="color:#f92672">=</span> {<span style="color:#a6e22e">@UniqueConstraint</span>(columnNames <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;id&#34;</span>})})
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@JsonIdentityInfo</span>(generator <span style="color:#f92672">=</span> ObjectIdGenerators.<span style="color:#a6e22e">IntSequenceGenerator</span>.<span style="color:#a6e22e">class</span>, property <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;@traineeId&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Trainee</span> <span style="color:#66d9ef">extends</span> BusinessObject {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ...</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// BodyStat Entity with @JsonIdentityInfo</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Entity</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Table</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ta_bodystat&#34;</span>, uniqueConstraints <span style="color:#f92672">=</span> {<span style="color:#a6e22e">@UniqueConstraint</span>(columnNames <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;id&#34;</span>})})
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@JsonIdentityInfo</span>(generator <span style="color:#f92672">=</span> ObjectIdGenerators.<span style="color:#a6e22e">IntSequenceGenerator</span>.<span style="color:#a6e22e">class</span>, property <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;@bodyStatId&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">BodyStat</span> <span style="color:#66d9ef">extends</span> BusinessObject {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ...</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This is particularly useful for complex object graphs with multiple interdependencies. You can also use <code>ObjectIdGenerators.PropertyGenerator.class</code> with a specific property like &ldquo;id&rdquo; if your entities have a unique identifier field.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@Entity</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Table</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ta_trainee&#34;</span>, uniqueConstraints <span style="color:#f92672">=</span> {<span style="color:#a6e22e">@UniqueConstraint</span>(columnNames <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;id&#34;</span>})})
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@JsonIdentityInfo</span>(generator <span style="color:#f92672">=</span> ObjectIdGenerators.<span style="color:#a6e22e">PropertyGenerator</span>.<span style="color:#a6e22e">class</span>, property <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;id&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Trainee</span> <span style="color:#66d9ef">extends</span> BusinessObject {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ...</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-5-integrating-jackson-module-hibernate">Solution 5: Integrating <code>jackson-module-hibernate</code></h4>
+<p>For projects heavily utilizing Hibernate, the <code>jackson-datatype-hibernate</code> module can simplify handling Hibernate-specific issues, including lazy initialization and cyclical references.</p>
+<p>First, add the dependency to your <code>pom.xml</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;dependency&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;groupId&gt;</span>com.fasterxml.jackson.datatype<span style="color:#f92672">&lt;/groupId&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;artifactId&gt;</span>jackson-datatype-hibernate4<span style="color:#f92672">&lt;/artifactId&gt;</span> <span style="color:#75715e">&lt;!-- Or hibernate5 --&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;version&gt;</span>2.4.0<span style="color:#f92672">&lt;/version&gt;</span> <span style="color:#75715e">&lt;!-- Use a compatible Jackson version --&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/dependency&gt;</span>
+</span></span></code></pre></div><p>Then, register the <code>Hibernate4Module</code> (or <code>Hibernate5Module</code>) with your <code>ObjectMapper</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> com.fasterxml.jackson.databind.ObjectMapper;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module; <span style="color:#75715e">// or Hibernate5Module</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ObjectMapper mapper <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ObjectMapper();
+</span></span><span style="display:flex;"><span>mapper.<span style="color:#a6e22e">registerModule</span>(<span style="color:#66d9ef">new</span> Hibernate4Module());
+</span></span></code></pre></div><p>This module is designed to manage common serialization pitfalls with Hibernate entities.</p>
+<h4 id="solution-6-explicitly-ignoring-fields-with-jsonignoreproperties-on-collections">Solution 6: Explicitly Ignoring Fields with <code>@JsonIgnoreProperties</code> on Collections</h4>
+<p>When dealing with collections like <code>Set</code> or <code>List</code> in relationships, using <code>@JsonIgnoreProperties</code> on the collection field itself can be highly effective.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@Entity</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Material</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ...</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@OneToMany</span>(mappedBy <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;material&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@JsonIgnoreProperties</span>(<span style="color:#e6db74">&#34;material&#34;</span>) <span style="color:#75715e">// Ignores the &#39;material&#39; property in Supplier</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> List<span style="color:#f92672">&lt;</span>Supplier<span style="color:#f92672">&gt;</span> costSuppliers <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;&gt;</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ...</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Entity</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Supplier</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ...</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@ManyToOne</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@JoinColumn</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;material_id&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@JsonIgnoreProperties</span>(<span style="color:#e6db74">&#34;costSuppliers&#34;</span>) <span style="color:#75715e">// Ignores the &#39;costSuppliers&#39; property in Material</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Material material;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ...</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This example from a blog post <a href="http://springquay.blogspot.com/2016/01/new-approach-to-solve-json-recursive.html" target="_blank" rel="noopener">http://springquay.blogspot.com/2016/01/new-approach-to-solve-json-recursive.html</a>
+ demonstrates how to break the cycle by ignoring the back-reference.</p>
+<h4 id="solution-7-using-jsonview-for-selective-serialization">Solution 7: Using <code>@JsonView</code> for Selective Serialization</h4>
+<p><code>@JsonView</code> offers fine-grained control over which fields are serialized, making it a powerful tool for managing complex object graphs and preventing recursion. You define interfaces to act as &ldquo;views&rdquo; and annotate fields with the relevant view.</p>
+<p>Consider <code>Company</code> and <code>Employee</code> with a circular dependency:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// Company Class</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Company</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@JsonView</span>(Filter.<span style="color:#a6e22e">CompanyData</span>.<span style="color:#a6e22e">class</span>) <span style="color:#75715e">// Only serialize if CompanyData view is active</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Employee employee;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// constructor, getters, setters</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Employee Class</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Employee</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Company company; <span style="color:#75715e">// No @JsonView, so it won&#39;t be serialized when EmployeeData view is active</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// constructor, getters, setters</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Filter Interfaces</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Filter</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">EmployeeData</span> {};
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">CompanyData</span> <span style="color:#66d9ef">extends</span> EmployeeData {};
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>When serializing, you specify the view:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// In your test or controller</span>
+</span></span><span style="display:flex;"><span>ObjectMapper mapper <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ObjectMapper();
+</span></span><span style="display:flex;"><span>ObjectWriter writer <span style="color:#f92672">=</span> mapper.<span style="color:#a6e22e">writerWithView</span>(Filter.<span style="color:#a6e22e">CompanyData</span>.<span style="color:#a6e22e">class</span>);
+</span></span><span style="display:flex;"><span>String jsonCompany <span style="color:#f92672">=</span> writer.<span style="color:#a6e22e">writeValueAsString</span>(company);
+</span></span></code></pre></div><p>This approach allows you to tailor the JSON output precisely, excluding fields that would cause recursion. This aligns with best practices for REST APIs where specific views are often needed. For related issues, see <a href="https://www.sqlpey.com/python/solved-how-to-fix-unicodeencodeerror-charmap-codec-cant-encode-characters/" target="_blank" rel="noopener">how to fix UnicodeEncodeError in Python</a>
+.</p>
+<h4 id="solution-8-modifying-field-visibility-with-jsonpropertyaccess--jsonpropertyaccesswrite_only">Solution 8: Modifying Field Visibility with <code>@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)</code></h4>
+<p>This annotation makes a property write-only, meaning it will be ignored during serialization but still processed during deserialization.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@JsonProperty</span>(access <span style="color:#f92672">=</span> JsonProperty.<span style="color:#a6e22e">Access</span>.<span style="color:#a6e22e">WRITE_ONLY</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> Trainee trainee;
+</span></span></code></pre></div><p>This is useful when you need to set the relationship during deserialization but do not want it included in the JSON output.</p>
+<h4 id="solution-9-adjusting-collections-from-set-to-list-with-jsonignore-and-tostringexclude">Solution 9: Adjusting Collections from <code>Set</code> to <code>List</code> with <code>@JsonIgnore</code> and <code>@ToString.Exclude</code></h4>
+<p>In some scenarios, particularly when using Lombok, changing the collection type from <code>Set</code> to <code>List</code> and applying both <code>@JsonIgnore</code> and <code>@ToString.Exclude</code> can resolve recursion issues.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// Before (using Set)</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@OneToMany</span>(mappedBy <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;client&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> Set<span style="color:#f92672">&lt;</span>Address<span style="color:#f92672">&gt;</span> addresses;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// After (using List and annotations)</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@OneToMany</span>(mappedBy <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;client&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@JsonIgnore</span> <span style="color:#75715e">// Prevents JSON serialization</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@ToString.Exclude</span> <span style="color:#75715e">// Prevents Lombok&#39;s toString from causing recursion</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> List<span style="color:#f92672">&lt;</span>Address<span style="color:#f92672">&gt;</span> addresses;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@ManyToOne</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@JoinColumn</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;client_id&#34;</span>, nullable <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@JsonIgnore</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@ToString.Exclude</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> Client client;
+</span></span></code></pre></div><p>This combination addresses both Jackson serialization and Lombok&rsquo;s <code>toString()</code> method, which can also contribute to stack overflows.</p>
+<h4 id="solution-10-using-json-object-graph-format-jsog">Solution 10: Using <code>JSON Object Graph Format (JSOG)</code></h4>
+<p>For advanced use cases involving complex graphs and deep circular references, consider the <code>jsog-jackson</code> library. It implements the JSON Object Graph Format, capable of handling arbitrary graphs, including those with circular references.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// Add the JSOG Jackson dependency</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// ...</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Use JSOG&#39;s serializer</span>
+</span></span></code></pre></div><p>This library provides a robust solution for highly interconnected data structures.</p>
+<h4 id="solution-11-dto-pattern-for-controlled-serialization">Solution 11: DTO Pattern for Controlled Serialization</h4>
+<p>A common and robust solution is to use Data Transfer Objects (DTOs). Instead of serializing your JPA entities directly, you map them to DTOs that contain only the necessary fields for the current serialization context. This inherently avoids serializing the back-references that cause recursion.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// Example: TraineeDTO without bidirectional reference</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TraineeDTO</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Integer id;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> String name;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Potentially a list of BodyStatDTOs, but not the Trainee object itself</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// In your service or repository:</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> TraineeDTO <span style="color:#a6e22e">convertToTraineeDTO</span>(Trainee trainee) {
+</span></span><span style="display:flex;"><span>    TraineeDTO dto <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> TraineeDTO();
+</span></span><span style="display:flex;"><span>    dto.<span style="color:#a6e22e">setId</span>(trainee.<span style="color:#a6e22e">getId</span>());
+</span></span><span style="display:flex;"><span>    dto.<span style="color:#a6e22e">setName</span>(trainee.<span style="color:#a6e22e">getName</span>());
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ... map other fields ...</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> dto;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This approach provides a clean separation between your domain model and your API representation. For more on Java, explore <a href="https://www.sqlpey.com/java/what-is-java" target="_blank" rel="noopener">what is Java</a>
+.</p>
+<h4 id="solution-12-excluding-properties-in-equalsandhashcode-lombok">Solution 12: Excluding Properties in <code>@EqualsAndHashCode</code> (Lombok)</h4>
+<p>When using Lombok&rsquo;s <code>@EqualsAndHashCode</code>, be mindful of how it handles collections. To prevent <code>StackOverflowError</code> in <code>hashCode()</code> and <code>equals()</code> methods due to bidirectional relationships, exclude the collection properties:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@Entity</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Data</span> <span style="color:#75715e">// Lombok annotation</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@EqualsAndHashCode</span>(exclude <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;attributeOfTypeList&#34;</span>, <span style="color:#e6db74">&#34;attributeOfTypeSet&#34;</span>}) <span style="color:#75715e">// Exclude problematic collections</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyEntity</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> List<span style="color:#f92672">&lt;</span>AnotherEntity<span style="color:#f92672">&gt;</span> attributeOfTypeList;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Set<span style="color:#f92672">&lt;</span>AnotherEntity<span style="color:#f92672">&gt;</span> attributeOfTypeSet;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ...</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This ensures that Lombok doesn&rsquo;t get caught in an infinite loop when generating these methods. See also <a href="https://www.sqlpey.com/python/solved-how-to-fix-the-attributeerror-related-to-pkgutil/" target="_blank" rel="noopener">how to fix StackOverflowError in Python</a>
+.</p>
+<h4 id="solution-13-entity-relationship-adjustments">Solution 13: Entity Relationship Adjustments</h4>
+<p>Sometimes, a subtle change in the entity relationship mapping can resolve the issue. For instance, removing the <code>mappedBy</code> attribute or adjusting the <code>fetch</code> type might impact how Jackson traverses the graph.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// Original</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@OneToMany</span>(mappedBy <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;county&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> List<span style="color:#f92672">&lt;</span>Town<span style="color:#f92672">&gt;</span> towns;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Potentially adjusted</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@OneToMany</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> List<span style="color:#f92672">&lt;</span>Town<span style="color:#f92672">&gt;</span> towns;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@ManyToOne</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@JoinColumn</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;county_id&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> County county;
+</span></span></code></pre></div><p>Experimentation with these annotations might be necessary for specific scenarios.</p>
+<h4 id="solution-14-jsonignoreproperties-with-lombok-and-fetchmodesubselect">Solution 14: <code>@JsonIgnoreProperties</code> with Lombok and <code>FetchMode.SUBSELECT</code></h4>
+<p>Combining <code>@JsonIgnoreProperties</code> with Lombok and ensuring proper handling of collections like <code>Set</code> can be crucial. If you encounter <code>MultipleBagFetchException</code>, switching from <code>Set</code> to <code>List</code> or using <code>@Fetch(value = FetchMode.SUBSELECT)</code> might help.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@Entity</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Data</span> <span style="color:#75715e">// Lombok</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Foo</span> <span style="color:#66d9ef">extends</span> BaseEntity {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@OneToMany</span>(fetch <span style="color:#f92672">=</span> FetchType.<span style="color:#a6e22e">EAGER</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@JoinColumn</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;foo_id&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@JsonIgnoreProperties</span>(<span style="color:#e6db74">&#34;parentFoo&#34;</span>) <span style="color:#75715e">// Prevents recursion</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@EqualsAndHashCode.Exclude</span> <span style="color:#75715e">// Lombok exclusion</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Set<span style="color:#f92672">&lt;</span>Bar<span style="color:#f92672">&gt;</span> linkedBars;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Entity</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Data</span> <span style="color:#75715e">// Lombok</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Bar</span> <span style="color:#66d9ef">extends</span> BaseEntity {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Column</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;foo_id&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Long parentFooId;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@ManyToOne</span>(fetch <span style="color:#f92672">=</span> FetchType.<span style="color:#a6e22e">EAGER</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@JoinColumn</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;foo_id&#34;</span>, insertable <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>, updatable <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@JsonIgnoreProperties</span>({<span style="color:#e6db74">&#34;linkedBars&#34;</span>}) <span style="color:#75715e">// Prevents recursion</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Foo parentFoo;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The explicit <code>parentFooId</code> in <code>Bar</code> aids in mapping. For solutions to common Python errors, check out <a href="https://www.sqlpey.com/python/solved-how-to-fix-pip-install-access-denied-on-windows/" target="_blank" rel="noopener">fixing pip install access denied</a>
+.</p>
+<h4 id="solution-15-constructor-based-serialization-control">Solution 15: Constructor-Based Serialization Control</h4>
+<p>Without using annotations directly on entities, you can create constructors that deliberately omit the back-referencing fields. You can then use JPQL queries to select these specific constructors.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">A</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> id;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> String code;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> String name;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> List<span style="color:#f92672">&lt;</span>B<span style="color:#f92672">&gt;</span> bs; <span style="color:#75715e">// This list might be omitted in the DTO-like constructor</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">A</span>() {} <span style="color:#75715e">// Default constructor</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Constructor excluding the List&lt;B&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">A</span>(<span style="color:#66d9ef">int</span> id, String code, String name) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> id;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">code</span> <span style="color:#f92672">=</span> code;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">name</span> <span style="color:#f92672">=</span> name;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Query example: &#34;select new A(id, code, name) from A&#34;</span>
+</span></span></code></pre></div><p>This approach requires manual updates to constructors and queries if entity fields change, making it less dynamic. However, it&rsquo;s a valid annotation-free alternative. Learn more about <a href="https://www.sqlpey.com/sql/what-is-sql" target="_blank" rel="noopener">what is SQL</a>
+.</p>
+<h4 id="solution-16-spring-data-rest-repository-approach">Solution 16: Spring Data Rest Repository Approach</h4>
+<p>If you&rsquo;re using Spring Data Rest, creating specific repositories for each entity involved in cyclical references can help manage the serialization context and resolve issues.</p>
+<h4 id="solution-17-removing-xmlrootelement-annotation">Solution 17: Removing <code>@XmlRootElement</code> Annotation</h4>
+<p>In some instances, particularly with auto-generated JPA entities (e.g., from NetBeans), the presence of <code>@XmlRootElement</code> can interfere with Jackson&rsquo;s processing. Removing this annotation can resolve unexpected serialization problems.</p>
+<h4 id="solution-18-placing-jsonignore-on-setter-methods">Solution 18: Placing <code>@JsonIgnore</code> on Setter Methods</h4>
+<p>Applying <code>@JsonIgnore</code> to the setter method of a collection can also break the serialization cycle.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// In Township.java</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Access</span>(AccessType.<span style="color:#a6e22e">PROPERTY</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@OneToMany</span>(fetch <span style="color:#f92672">=</span> FetchType.<span style="color:#a6e22e">LAZY</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@JoinColumn</span>(name<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;townshipId&#34;</span>, nullable<span style="color:#f92672">=</span><span style="color:#66d9ef">false</span> ,insertable<span style="color:#f92672">=</span><span style="color:#66d9ef">false</span>, updatable<span style="color:#f92672">=</span><span style="color:#66d9ef">false</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> List<span style="color:#f92672">&lt;</span>Village<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">getVillages</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> villages;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@JsonIgnore</span> <span style="color:#75715e">// Applied to the setter</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Access</span>(AccessType.<span style="color:#a6e22e">PROPERTY</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setVillages</span>(List<span style="color:#f92672">&lt;</span>Village<span style="color:#f92672">&gt;</span> villages) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">villages</span> <span style="color:#f92672">=</span> villages;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// In Village.java</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@ManyToOne</span>(fetch <span style="color:#f92672">=</span> FetchType.<span style="color:#a6e22e">EAGER</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@JoinColumn</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;townshipId&#34;</span>, insertable<span style="color:#f92672">=</span><span style="color:#66d9ef">false</span>, updatable<span style="color:#f92672">=</span><span style="color:#66d9ef">false</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> Township township;
+</span></span></code></pre></div><h4 id="solution-19-combining-jsonbackreference-and-tostringexclude-with-overridden-equals-and-hashcode">Solution 19: Combining <code>@JsonBackReference</code> and <code>@ToString.Exclude</code> with Overridden <code>equals</code> and <code>hashCode</code></h4>
+<p>Ensure that if you override <code>equals</code> and <code>hashCode</code> methods, they correctly handle collections, potentially by using <code>@ToString.Exclude</code> (from Lombok) or by explicitly excluding collection fields. This, combined with <code>@JsonBackReference</code>, can effectively resolve infinite recursion.</p>
+<h2 id="solutions">Solutions</h2>
+<h3 id="faqs-on-json-infinite-recursion-with-jackson">FAQs on JSON Infinite Recursion with Jackson</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What causes JSON infinite recursion in Java with Jackson</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Infinite recursion occurs when you have bidirectional relationships between Java objects (e.g., a parent object referencing child objects, and child objects referencing the parent back), and Jackson&rsquo;s serializer attempts to serialize both sides of the relationship, leading to an endless loop and a <code>StackOverflowError</code>.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Which annotations can help prevent JSON infinite recursion</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Key annotations include <code>@JsonIgnore</code>, <code>@JsonManagedReference</code>, <code>@JsonBackReference</code>, <code>@JsonIgnoreProperties</code>, and <code>@JsonIdentityInfo</code>. Each offers a different strategy to control how Jackson traverses and serializes object relationships.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is @JsonIgnoreProperties better than @JsonIgnore</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: <code>@JsonIgnoreProperties</code> is generally more flexible as it can ignore multiple properties or entire classes during serialization/deserialization. <code>@JsonIgnore</code> is applied to a specific field or getter/setter. The choice depends on the scope of the problem you&rsquo;re trying to solve.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: When should I use @JsonIdentityInfo</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: <code>@JsonIdentityInfo</code> is particularly useful for complex object graphs where multiple objects might reference the same object. It assigns a unique ID to each object, preventing Jackson from re-serializing already processed objects, thus avoiding recursion and maintaining object graph integrity.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can Lombok annotations interfere with Jackson serialization</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, Lombok&rsquo;s <code>@ToString</code> and <code>@EqualsAndHashCode</code> can cause recursion if not configured correctly. Using <code>@ToString.Exclude</code> or <code>@EqualsAndHashCode(exclude = {...})</code> on collection fields that participate in bidirectional relationships is recommended.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the DTO pattern and how does it help</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The DTO (Data Transfer Object) pattern involves creating separate classes that represent the data structure you want to expose, rather than serializing your domain entities directly. This allows you to exclude bidirectional references that would cause recursion, providing a cleaner API.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How does @JsonManagedReference and @JsonBackReference work</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: <code>@JsonManagedReference</code> marks the &ldquo;forward&rdquo; side of a bidirectional relationship that should be serialized. <code>@JsonBackReference</code> marks the &ldquo;back&rdquo; side, which is ignored during serialization but restored during deserialization. This ensures only one direction of the relationship is serialized.</div>
+    </div>
+</div>
+<pre tabindex="0"><code>@Entity
+@Table(name = &amp;quot;ta_trainee&amp;quot;, uniqueConstraints = {@UniqueConstraint(columnNames = {&amp;quot;id&amp;quot;})})
+public class Trainee extends BusinessObject {
+
+    @OneToMany(mappedBy = &amp;quot;trainee&amp;quot;, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Column(nullable = true)
+    @JsonManagedReference
+    private Set&amp;lt;BodyStat&amp;gt; bodyStats;
+@Entity
+@Table(name = &amp;quot;ta_bodystat&amp;quot;, uniqueConstraints = {@UniqueConstraint(columnNames = {&amp;quot;id&amp;quot;})})
+public class BodyStat extends BusinessObject {
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name=&amp;quot;trainee_fk&amp;quot;)
+    @JsonBackReference
+    private Trainee trainee;
+</code></pre><p>We hope this detailed exploration provides clear solutions to your JSON infinite recursion challenges with Jackson. Your experiences and any further insights you can share are invaluable to the community.</p>
+<p>What are your go-to strategies for handling these serialization issues? Share your thoughts and questions in the comments below!</p>
+<p>For more on Java development and common issues, explore our articles on <a href="https://www.sqlpey.com/python/what-is-python" target="_blank" rel="noopener">what is Python</a>
+ and <a href="https://www.sqlpey.com/dotnet/what-is-dotnet" target="_blank" rel="noopener">what is .NET</a>
+.</p>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

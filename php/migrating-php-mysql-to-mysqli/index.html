@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Migrating PHP mysql_* to mysqli_* : Best Practices &amp; Code Examples - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore effective strategies and practical code examples for migrating PHP applications from the deprecated mysql_* extension to the modern mysqli_* API, …">
+
+
+
+<meta name="keywords" content="PHP migration, mysql to mysqli, PHP database, mysqli extension, web development, legacy code, SQL injection prevention">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Migrating PHP mysql_* to mysqli_* : Best Practices &amp; Code Examples - sqlpey">
+<meta name="DC.description" content="Explore effective strategies and practical code examples for migrating PHP applications from the deprecated mysql_* extension to the modern mysqli_* API, ensuring security and performance.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-07-22">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Migrating PHP mysql_* to mysqli_* : Best Practices &amp; Code Examples - sqlpey">
+<meta property="og:description" content="Explore effective strategies and practical code examples for migrating PHP applications from the deprecated mysql_* extension to the modern mysqli_* API, …">
+<meta property="og:url" content="https://sqlpey.com/php/migrating-php-mysql-to-mysqli/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-07-22T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-07-22T00:00:00Z">
+<meta property="article:modified_time" content="2025-07-22T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="PHP">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Migrating PHP mysql_* to mysqli_* : Best Practices &amp; Code Examples">
+<meta name="twitter:description" content="Explore effective strategies and practical code examples for migrating PHP applications from the deprecated mysql_* extension to the modern mysqli_* API, …">
+
+
+<link rel="canonical" href="https://sqlpey.com/php/migrating-php-mysql-to-mysqli/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Migrating PHP mysql_* to mysqli_* : Best Practices \\u0026 Code Examples\"",
+  "description": "\"Explore effective strategies and practical code examples for migrating PHP applications from the deprecated mysql_* extension to the modern mysqli_* API, ensuring security and performance.\"",
+  "url": "\"https://sqlpey.com/php/migrating-php-mysql-to-mysqli/\"",
+  "datePublished": "\"2025-07-22T00:00:00Z\"",
+  "dateModified": "\"2025-07-22T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/php/migrating-php-mysql-to-mysqli/\""
+  },
+  "articleSection": "\"PHP\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Migrating PHP mysql_* to mysqli_* : Best Practices &amp; Code Examples</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">PHP</span>
+              
+              <span class="tag">MySQL</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              12 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 22, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#migrating-php-mysql_-to-mysqli_--best-practices--code-examples">&ldquo;Migrating PHP mysql_* to mysqli_* : Best Practices &amp; Code Examples&rdquo;</a>
+      <ul>
+        <li></li>
+        <li><a href="#faqs-on-migrating-php-mysql_-to-mysqli_">FAQs on Migrating PHP mysql_* to mysqli_*</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="migrating-php-mysql_-to-mysqli_--best-practices--code-examples">&ldquo;Migrating PHP mysql_* to mysqli_* : Best Practices &amp; Code Examples&rdquo;</h2>
+<p>When working with PHP and databases, transitioning from the older <code>mysql_*</code> functions to the more robust <code>mysqli_*</code> extension is a critical step for security, performance, and compatibility with modern PHP versions. This post delves into various approaches and provides practical code examples to facilitate this migration.</p>
+<h4 id="why-migrate-from-mysql_-to-mysqli_">Why Migrate from <code>mysql_*</code> to <code>mysqli_*</code>?</h4>
+<p>The <code>mysql_*</code> extension has been deprecated since PHP 5.5 and removed in PHP 7.0. Its use is strongly discouraged due to security vulnerabilities and lack of support for newer MySQL features. The <code>mysqli_*</code> (MySQL Improved) extension offers significant advantages, including:</p>
+<ul>
+<li><strong>Object-Oriented Interface:</strong> A cleaner, more readable, and less error-prone way to interact with the database.</li>
+<li><strong>Prepared Statements:</strong> Essential for preventing SQL injection attacks, a common security flaw.</li>
+<li><strong>Enhanced Debugging:</strong> Better error reporting mechanisms.</li>
+<li><strong>Support for Newer MySQL Features:</strong> Access to advanced functionalities available in recent MySQL versions.</li>
+</ul>
+<h4 id="solution-approaches-for-migration">Solution Approaches for Migration</h4>
+<p>Several strategies can be employed to transition your codebase from <code>mysql_*</code> to <code>mysqli_*</code>.</p>
+<h5 id="solution-1-direct-function-replacement-procedural-style">Solution 1: Direct Function Replacement (Procedural Style)</h5>
+<p>The most straightforward approach involves systematically replacing <code>mysql_*</code> function calls with their <code>mysqli_*</code> equivalents. The <code>mysqli</code> extension provides a procedural API that closely mirrors the old <code>mysql_*</code> functions, making the transition smoother for those familiar with the older style.</p>
+<p><strong>Key Replacements:</strong></p>
+<ul>
+<li><code>mysql_connect()</code> becomes <code>mysqli_connect()</code></li>
+<li><code>mysql_error()</code> becomes <code>mysqli_connect_error()</code> or <code>mysqli_error($link)</code></li>
+<li><code>mysql_query()</code> becomes <code>mysqli_query($link, $query)</code></li>
+<li><code>mysql_select_db()</code> can be integrated into <code>mysqli_connect()</code> as a fourth parameter or used as <code>mysqli_select_db($link, $dbName)</code></li>
+</ul>
+<p><strong>Example:</strong></p>
+<p>Consider this old <code>mysql_*</code> code:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Old mysql_* connection
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$link <span style="color:#f92672">=</span> <span style="color:#a6e22e">mysql_connect</span>(<span style="color:#e6db74">&#34;localhost&#34;</span>, <span style="color:#e6db74">&#34;user&#34;</span>, <span style="color:#e6db74">&#34;password&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">mysql_select_db</span>(<span style="color:#e6db74">&#34;mydatabase&#34;</span>, $link);
+</span></span><span style="display:flex;"><span>$result <span style="color:#f92672">=</span> <span style="color:#a6e22e">mysql_query</span>(<span style="color:#e6db74">&#34;SELECT * FROM users&#34;</span>, $link);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// ... process $result
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">mysql_close</span>($link);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>Here&rsquo;s how you would rewrite it using the procedural <code>mysqli_*</code> API:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// New mysqli_* connection (procedural)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$link <span style="color:#f92672">=</span> <span style="color:#a6e22e">mysqli_connect</span>(<span style="color:#e6db74">&#34;localhost&#34;</span>, <span style="color:#e6db74">&#34;user&#34;</span>, <span style="color:#e6db74">&#34;password&#34;</span>, <span style="color:#e6db74">&#34;mydatabase&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">mysqli_connect_errno</span>()) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">die</span>(<span style="color:#e6db74">&#34;Connect failed: &#34;</span> <span style="color:#f92672">.</span> <span style="color:#a6e22e">mysqli_connect_error</span>());
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$result <span style="color:#f92672">=</span> <span style="color:#a6e22e">mysqli_query</span>($link, <span style="color:#e6db74">&#34;SELECT * FROM users&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>$result) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">die</span>(<span style="color:#e6db74">&#39;Invalid query: &#39;</span> <span style="color:#f92672">.</span> <span style="color:#a6e22e">mysqli_error</span>($link));
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// ... process $result
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">mysqli_close</span>($link);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p><strong>Important Note:</strong> Many <code>mysqli_*</code> functions require the database connection link as the first argument, unlike their <code>mysql_*</code> predecessors. For instance, <code>mysql_query($query)</code> becomes <code>mysqli_query($link, $query)</code>.</p>
+<h5 id="solution-2-object-oriented-approach-with-mysqli">Solution 2: Object-Oriented Approach with <code>mysqli</code></h5>
+<p>The <code>mysqli</code> extension also offers a powerful object-oriented interface, which is generally recommended for new development and for refactoring existing code to improve clarity and maintainability.</p>
+<p><strong>Example Connection:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// New mysqli_* connection (Object-Oriented)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$mysqli <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">mysqli</span>(<span style="color:#e6db74">&#34;localhost&#34;</span>, <span style="color:#e6db74">&#34;user&#34;</span>, <span style="color:#e6db74">&#34;password&#34;</span>, <span style="color:#e6db74">&#34;mydatabase&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> ($mysqli<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">connect_errno</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">die</span>(<span style="color:#e6db74">&#34;Connect failed: (&#34;</span> <span style="color:#f92672">.</span> $mysqli<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">connect_errno</span> <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;) &#34;</span> <span style="color:#f92672">.</span> $mysqli<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">connect_error</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Set character set for better compatibility
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>$mysqli<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">set_charset</span>(<span style="color:#e6db74">&#34;utf8mb4&#34;</span>)) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">printf</span>(<span style="color:#e6db74">&#34;Error loading character set utf8mb4: %s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, $mysqli<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">error</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">exit</span>();
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$result <span style="color:#f92672">=</span> $mysqli<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">query</span>(<span style="color:#e6db74">&#34;SELECT * FROM users&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>$result) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">die</span>(<span style="color:#e6db74">&#39;Invalid query: (&#39;</span> <span style="color:#f92672">.</span> $mysqli<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">errno</span> <span style="color:#f92672">.</span> <span style="color:#e6db74">&#39;) &#39;</span> <span style="color:#f92672">.</span> $mysqli<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">error</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// ... process $result
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$mysqli<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">close</span>();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><h5 id="solution-3-leveraging-prepared-statements-for-security">Solution 3: Leveraging Prepared Statements for Security</h5>
+<p>Prepared statements are crucial for preventing SQL injection. The <code>mysqli</code> extension supports them natively.</p>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>$mysqli <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">mysqli</span>(<span style="color:#e6db74">&#34;localhost&#34;</span>, <span style="color:#e6db74">&#34;user&#34;</span>, <span style="color:#e6db74">&#34;password&#34;</span>, <span style="color:#e6db74">&#34;mydatabase&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> ($mysqli<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">connect_errno</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">die</span>(<span style="color:#e6db74">&#34;Connect failed: &#34;</span> <span style="color:#f92672">.</span> $mysqli<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">connect_error</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Get user input
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$user_input <span style="color:#f92672">=</span> $_POST[<span style="color:#e6db74">&#39;username&#39;</span>];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Prepare the statement
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$stmt <span style="color:#f92672">=</span> $mysqli<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">prepare</span>(<span style="color:#e6db74">&#34;SELECT * FROM users WHERE username = ?&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Bind parameters (s = string, i = integer, d = double, b = blob)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$stmt<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">bind_param</span>(<span style="color:#e6db74">&#39;s&#39;</span>, $user_input);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Execute the statement
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$stmt<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">execute</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Get the result
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$result <span style="color:#f92672">=</span> $stmt<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">get_result</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Fetch data
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">while</span> ($row <span style="color:#f92672">=</span> $result<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">fetch_assoc</span>()) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">print_r</span>($row);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$stmt<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">close</span>();
+</span></span><span style="display:flex;"><span>$mysqli<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">close</span>();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p><strong>Comparison to <code>mysql_real_escape_string</code>:</strong></p>
+<p>While <code>mysql_real_escape_string</code> was used in the old <code>mysql_*</code> extension for escaping strings, it was not a foolproof solution against SQL injection. Prepared statements are the recommended and secure method.</p>
+<h5 id="solution-4-automated-migration-with-tools">Solution 4: Automated Migration with Tools</h5>
+<p>For large projects with numerous files, manual replacement can be time-consuming. Tools like Rector can automate the migration process.</p>
+<p><strong>Using Rector:</strong></p>
+<ol>
+<li>
+<p><strong>Install Rector:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>composer require rector/rector --dev
+</span></span></code></pre></div></li>
+<li>
+<p><strong>Create <code>rector.php</code> in your project root:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">use</span> <span style="color:#a6e22e">Rector\Set\ValueObject\SetList</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">use</span> <span style="color:#a6e22e">Rector\Config\RectorConfig</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">return</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">function</span> (<span style="color:#a6e22e">RectorConfig</span> $rectorConfig)<span style="color:#f92672">:</span> <span style="color:#a6e22e">void</span> {
+</span></span><span style="display:flex;"><span>    $rectorConfig<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">sets</span>([
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">SetList</span><span style="color:#f92672">::</span><span style="color:#a6e22e">MYSQL_TO_MYSQLI</span>,
+</span></span><span style="display:flex;"><span>    ]);
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div></li>
+<li>
+<p><strong>Run Rector:</strong></p>
+<ul>
+<li>To see the proposed changes:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>vendor/bin/rector process src --dry-run
+</span></span></code></pre></div></li>
+<li>To apply the changes:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>vendor/bin/rector process src
+</span></span></code></pre></div></li>
+</ul>
+<p>Replace <code>src</code> with the directory containing your PHP files.</p>
+</li>
+</ol>
+<h5 id="solution-5-emulating-mysql_-functions-with-mysqli_">Solution 5: Emulating <code>mysql_*</code> Functions with <code>mysqli_*</code></h5>
+<p>If you need a quick workaround for legacy applications, especially during PHP version upgrades, you can create wrapper functions that mimic the <code>mysql_*</code> API but use <code>mysqli_*</code> internally. This is a temporary measure, and a full refactor is always preferred.</p>
+<p><strong>Example Wrapper File (<code>mysql_shim.php</code>):</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Solutions
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">MySQL</span> <span style="color:#a6e22e">Shim</span> <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">mysqli</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Global connection variable
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$g_mysqli_conn <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Connect to a MySQL database.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Emulates mysql_connect().
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">mysql_connect</span>($host <span style="color:#f92672">=</span> <span style="color:#a6e22e">ini_get</span>(<span style="color:#e6db74">&#34;mysql.default_host&#34;</span>),
+</span></span><span style="display:flex;"><span>                         $username <span style="color:#f92672">=</span> <span style="color:#a6e22e">ini_get</span>(<span style="color:#e6db74">&#34;mysql.default_user&#34;</span>),
+</span></span><span style="display:flex;"><span>                         $password <span style="color:#f92672">=</span> <span style="color:#a6e22e">ini_get</span>(<span style="color:#e6db74">&#34;mysql.default_password&#34;</span>)) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">global</span> $g_mysqli_conn;
+</span></span><span style="display:flex;"><span>    $g_mysqli_conn <span style="color:#f92672">=</span> <span style="color:#a6e22e">mysqli_connect</span>($host, $username, $password);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>$g_mysqli_conn) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Emulate mysql_connect error behavior if needed
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> $g_mysqli_conn; <span style="color:#75715e">// Return resource handle like mysql_connect
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Select a MySQL database.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Emulates mysql_select_db().
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">mysql_select_db</span>($database_name, $link_identifier <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">global</span> $g_mysqli_conn;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> ($link_identifier <span style="color:#f92672">===</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>        $link_identifier <span style="color:#f92672">=</span> $g_mysqli_conn;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>$link_identifier) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">mysqli_select_db</span>($link_identifier, $database_name);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Execute a MySQL query.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Emulates mysql_query().
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">mysql_query</span>($query, $link_identifier <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">global</span> $g_mysqli_conn;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> ($link_identifier <span style="color:#f92672">===</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>        $link_identifier <span style="color:#f92672">=</span> $g_mysqli_conn;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>$link_identifier) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">mysqli_query</span>($link_identifier, $query);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Fetch a result row as an associative array.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Emulates mysql_fetch_assoc().
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">mysql_fetch_assoc</span>($result) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> ($result <span style="color:#a6e22e">instanceof</span> <span style="color:#a6e22e">mysqli_result</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">mysqli_fetch_assoc</span>($result);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Fetch a result row as an array.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Emulates mysql_fetch_array().
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">mysql_fetch_array</span>($result, $result_type <span style="color:#f92672">=</span> <span style="color:#a6e22e">MYSQLI_BOTH</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> ($result <span style="color:#a6e22e">instanceof</span> <span style="color:#a6e22e">mysqli_result</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">mysqli_fetch_array</span>($result, $result_type);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Get number of rows in result.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Emulates mysql_num_rows().
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">mysql_num_rows</span>($result) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> ($result <span style="color:#a6e22e">instanceof</span> <span style="color:#a6e22e">mysqli_result</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">mysqli_num_rows</span>($result);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Get the insert id for the last query.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Emulates mysql_insert_id().
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">mysql_insert_id</span>($link_identifier <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">global</span> $g_mysqli_conn;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> ($link_identifier <span style="color:#f92672">===</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>        $link_identifier <span style="color:#f92672">=</span> $g_mysqli_conn;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>$link_identifier) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">mysqli_insert_id</span>($link_identifier);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Escapes special characters in a string for a MySQL query.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Emulates mysql_real_escape_string().
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">mysql_real_escape_string</span>($string_to_escape, $link_identifier <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">global</span> $g_mysqli_conn;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> ($link_identifier <span style="color:#f92672">===</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>        $link_identifier <span style="color:#f92672">=</span> $g_mysqli_conn;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>$link_identifier) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>; <span style="color:#75715e">// Or trigger error
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">mysqli_real_escape_string</span>($link_identifier, $string_to_escape);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Frees result memory.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Emulates mysql_free_result().
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">mysql_free_result</span>($result) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> ($result <span style="color:#a6e22e">instanceof</span> <span style="color:#a6e22e">mysqli_result</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">mysqli_free_result</span>($result);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Close a MySQL connection.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Emulates mysql_close().
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">mysql_close</span>($link_identifier <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">global</span> $g_mysqli_conn;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> ($link_identifier <span style="color:#f92672">===</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>        $link_identifier <span style="color:#f92672">=</span> $g_mysqli_conn;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> ($link_identifier) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">mysqli_close</span>($link_identifier);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Get MySQL error string.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> * Emulates mysql_error().
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">mysql_error</span>($link_identifier <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">global</span> $g_mysqli_conn;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> ($link_identifier <span style="color:#f92672">===</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>        $link_identifier <span style="color:#f92672">=</span> $g_mysqli_conn;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>$link_identifier) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Use mysqli_connect_error() if no link is active
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">mysqli_connect_error</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">mysqli_error</span>($link_identifier);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//
+</span></span></span></code></pre></div><p>mysql_query($query)
+mysqli_query($link, $query)</p>
+<pre tabindex="0"><code>
+End of MySQL Shim
+</code></pre><p>$mysqli = new \mysqli($host, $user, $password, $dbName);
+$mysqli-&gt;set_charset(&lsquo;utf8mb4&rsquo;);
+$mysqli = mysqli_connect($host, $user, $password, $dbName);
+mysqli_set_charset($mysqli, &lsquo;utf8mb4&rsquo;);
+$link = mysql_connect($host, $user, $password);
+mysql_select_db($dbName, $link);
+mysql_query(&lsquo;SET NAMES utf8&rsquo;);
+$login = mysql_real_escape_string($_POST[&rsquo;login&rsquo;]);
+$result = mysql_query(&ldquo;SELECT * FROM users WHERE user=&rsquo;$login&rsquo;&rdquo;);
+$stmt = $mysqli-&gt;prepare(&lsquo;SELECT * FROM users WHERE user=?&rsquo;);
+$stmt-&gt;bind_param(&rsquo;s&rsquo;, $_POST[&rsquo;login&rsquo;]);
+$stmt-&gt;execute();
+$result = $stmt-&gt;get_result();
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+$mysqli = new \mysqli($host, $user, $password, $dbName);
+$mysqli-&gt;set_charset(&lsquo;utf8mb4&rsquo;);
+$result = mysql_query(&lsquo;SELECT * WHERE 1=1&rsquo;);
+if (!$result) {
+die(&lsquo;Invalid query: &rsquo; . mysql_error());
+}
+$result = mysql_query(&lsquo;SELECT * WHERE 1=1&rsquo;) or die(mysql_error());
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+$mysqli = new \mysqli($host, $user, $password, $dbName);
+$mysqli-&gt;set_charset(&lsquo;utf8mb4&rsquo;);</p>
+<p>$result = $mysqli-&gt;query(&lsquo;SELECT * FROM non_existent_table&rsquo;);
+// The following line will never be executed due to the mysqli_sql_exception being thrown above
+foreach ($result as $row) {
+// &hellip;
+}
+$result = $mysqli-&gt;query(&lsquo;SELECT * FROM non_existent_table&rsquo;) or trigger_error($mysqli-&gt;error, E_USER_ERROR);</p>
+<pre tabindex="0"><code>
+?&gt;
+</code></pre><p><strong>Usage:</strong></p>
+<p>Include this file at the beginning of your script:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">require_once</span> <span style="color:#e6db74">&#39;mysql_shim.php&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Now your old mysql_* calls should work
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$conn <span style="color:#f92672">=</span> <span style="color:#a6e22e">mysql_connect</span>(<span style="color:#e6db74">&#34;localhost&#34;</span>, <span style="color:#e6db74">&#34;user&#34;</span>, <span style="color:#e6db74">&#34;password&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">mysql_select_db</span>(<span style="color:#e6db74">&#34;mydatabase&#34;</span>, $conn);
+</span></span><span style="display:flex;"><span>$result <span style="color:#f92672">=</span> <span style="color:#a6e22e">mysql_query</span>(<span style="color:#e6db74">&#34;SELECT * FROM users&#34;</span>, $conn);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// ...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">mysql_close</span>($conn);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p><strong>Alternative:</strong> Libraries like <code>phpclasses.org</code> offer pre-built drop-in replacement packages for the <code>mysql</code> extension. You can find one such package <a href="https://www.phpclasses.org/package/9199-PHP-Replace-mysql-functions-using-the-mysqli-extension.html" target="_blank" rel="noopener">here</a>
+, along with a migration guide.</p>
+<h5 id="solution-6-considering-pdo">Solution 6: Considering PDO</h5>
+<p>For a more abstract and database-agnostic approach, consider using PHP Data Objects (PDO). PDO provides a consistent interface across different database systems, making it easier to switch databases in the future.</p>
+<p><strong>Example PDO Connection:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>$host <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;localhost&#39;</span>;
+</span></span><span style="display:flex;"><span>$db   <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;mydatabase&#39;</span>;
+</span></span><span style="display:flex;"><span>$user <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;user&#39;</span>;
+</span></span><span style="display:flex;"><span>$pass <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;password&#39;</span>;
+</span></span><span style="display:flex;"><span>$charset <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;utf8mb4&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$dsn <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;mysql:host=</span><span style="color:#e6db74">$host</span><span style="color:#e6db74">;dbname=</span><span style="color:#e6db74">$db</span><span style="color:#e6db74">;charset=</span><span style="color:#e6db74">$charset</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>$options <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">PDO</span><span style="color:#f92672">::</span><span style="color:#a6e22e">ATTR_ERRMODE</span>            <span style="color:#f92672">=&gt;</span> <span style="color:#a6e22e">PDO</span><span style="color:#f92672">::</span><span style="color:#a6e22e">ERRMODE_EXCEPTION</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">PDO</span><span style="color:#f92672">::</span><span style="color:#a6e22e">ATTR_DEFAULT_FETCH_MODE</span> <span style="color:#f92672">=&gt;</span> <span style="color:#a6e22e">PDO</span><span style="color:#f92672">::</span><span style="color:#a6e22e">FETCH_ASSOC</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">PDO</span><span style="color:#f92672">::</span><span style="color:#a6e22e">ATTR_EMULATE_PREPARES</span>   <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">false</span>,
+</span></span><span style="display:flex;"><span>];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>    $pdo <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">PDO</span>($dsn, $user, $pass, $options);
+</span></span><span style="display:flex;"><span>} <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">\PDOException</span> $e) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">\PDOException</span>($e<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">getMessage</span>(), (<span style="color:#a6e22e">int</span>)$e<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">getCode</span>());
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Using prepared statements with PDO
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$stmt <span style="color:#f92672">=</span> $pdo<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">prepare</span>(<span style="color:#e6db74">&#34;SELECT * FROM users WHERE username = ?&#34;</span>);
+</span></span><span style="display:flex;"><span>$stmt<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">execute</span>([$_POST[<span style="color:#e6db74">&#39;username&#39;</span>]]);
+</span></span><span style="display:flex;"><span>$user <span style="color:#f92672">=</span> $stmt<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">fetch</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">print_r</span>($user);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><h4 id="key-considerations-during-migration">Key Considerations During Migration</h4>
+<ul>
+<li><strong>Connection Parameters:</strong> Ensure all connection parameters are correctly passed. With <code>mysqli</code>, the database name can be passed as the fourth argument to <code>mysqli_connect()</code>.</li>
+<li><strong>Error Handling:</strong> Implement robust error handling. <code>mysqli</code> supports exceptions, which can simplify error management. Enable reporting with <code>mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);</code>.</li>
+<li><strong>Function Signatures:</strong> Pay close attention to the arguments required by <code>mysqli_*</code> functions, especially the connection link identifier.</li>
+<li><strong>Character Sets:</strong> Explicitly set the character set (e.g., <code>utf8mb4</code>) using <code>mysqli_set_charset()</code> for proper handling of diverse character data.</li>
+<li><strong>Deprecations:</strong> Be aware that some older <code>mysql_*</code> functions have no direct <code>mysqli</code> counterpart (e.g., <code>mysql_create_db</code>). You may need to use <code>mysqli_query()</code> with SQL statements like <code>CREATE DATABASE</code> or rely on prepared statements for database manipulation.</li>
+<li><strong>Legacy Code Management:</strong> For extensive legacy codebases, consider a phased migration or the use of shim functions as a temporary bridge. However, a complete rewrite using modern practices like prepared statements and object-oriented <code>mysqli</code> or PDO is the ideal long-term solution.</li>
+</ul>
+<h4 id="summary-of-replacements-and-changes">Summary of Replacements and Changes</h4>
+<p>| Old <code>mysql_*</code> Function          | New <code>mysqli_*</code> Equivalent/Approach                                                                            | Notes                                                                                             |
+| :</p>
+<pre tabindex="0"><code>$con = mysqli_connect($serverName,$dbusername,$dbpassword);
+</code></pre><p>| :</p>
+<pre tabindex="0"><code>$data = mysql_db_name($result, $row);
+mysqli_data_seek($result, $row);
+  $fetch = mysql_fetch_row($result);
+  $data = $fetch[0];
+composer require rector/rector --dev
+&amp;lt;?php
+
+use Rector\Set\ValueObject\SetList;
+use Rector\Config\RectorConfig;
+
+return static function (RectorConfig $rectorConfig): void {
+    $rectorConfig-&amp;gt;sets([
+        SetList::MYSQL_TO_MYSQLI,
+    ]);
+};
+vendor/bin/rector process src --dry-run
+vendor/bin/rector process src
+</code></pre><p>| :</p>
+<pre tabindex="0"><code>//local
+$sql_host =     &#34;localhost&#34;;      
+$sql_username = &#34;root&#34;;    
+$sql_password = &#34;&#34;;       
+$sql_database = &#34;db&#34;; 
+
+
+$mysqli = new mysqli($sql_host , $sql_username , $sql_password , $sql_database );
+
+/* check connection */
+if ($mysqli-&amp;gt;connect_errno) {
+    printf(&#34;Connect failed: %s\n&#34;, $mysqli-&amp;gt;connect_error);
+    exit();
+}
+
+// /* change character set to utf8 */
+if (!$mysqli-&amp;gt;set_charset(&#34;utf8&#34;)) {
+    printf(&#34;Error loading character set utf8: %s\n&#34;, $mysqli-&amp;gt;error);
+    exit();
+} else {
+    // printf(&#34;Current character set: %s\n&#34;, $mysqli-&amp;gt;character_set_name());
+}
+if (!function_exists(&#39;mysql_real_escape_string&#39;)) {
+    function mysql_real_escape_string($string){
+        global $mysqli;
+        if($string){
+            // $mysqli = new mysqli($sql_host , $sql_username , $sql_password , $sql_database );            
+            $newString =  $mysqli-&amp;gt;real_escape_string($string);
+            return $newString;
+        }
+    }
+}
+// $mysqli-&amp;gt;close();
+$conn = null;
+if (!function_exists(&#39;mysql_query&#39;)) {
+    function mysql_query($query) {
+        global $mysqli;
+        // echo &#34;DAAAAA&#34;;
+        if($query) {
+            $result = $mysqli-&amp;gt;query($query);
+            return $result;
+        }
+    }
+}
+else {
+    $conn=mysql_connect($sql_host,$sql_username, $sql_password);
+    mysql_set_charset(&#34;utf8&#34;, $conn);
+    mysql_select_db($sql_database);
+}
+
+if (!function_exists(&#39;mysql_fetch_array&#39;)) {
+    function mysql_fetch_array($result){
+        if($result){
+            $row =  $result-&amp;gt;fetch_assoc();
+            return $row;
+        }
+    }
+}
+
+if (!function_exists(&#39;mysql_num_rows&#39;)) {
+    function mysql_num_rows($result){
+        if($result){
+            $row_cnt = $result-&amp;gt;num_rows;;
+            return $row_cnt;
+        }
+    }
+}
+
+if (!function_exists(&#39;mysql_free_result&#39;)) {
+    function mysql_free_result($result){
+        if($result){
+            global $mysqli;
+            $result-&amp;gt;free();
+
+        }
+    }
+}
+
+if (!function_exists(&#39;mysql_data_seek&#39;)) {
+    function mysql_data_seek($result, $offset){
+        if($result){
+            global $mysqli;
+            return $result-&amp;gt;data_seek($offset);
+
+        }
+    }
+}
+
+if (!function_exists(&#39;mysql_close&#39;)) {
+    function mysql_close(){
+        global $mysqli;
+        return $mysqli-&amp;gt;close();
+    }
+}
+
+if (!function_exists(&#39;mysql_insert_id&#39;)) {
+    function mysql_insert_id(){
+            global $mysqli;
+            $lastInsertId = $mysqli-&amp;gt;insert_id;
+            return $lastInsertId;
+    }
+}
+
+if (!function_exists(&#39;mysql_error&#39;)) {
+    function mysql_error(){
+        global $mysqli;
+        $error = $mysqli-&amp;gt;error;
+        return $error;
+    }
+}
+</code></pre><p>|
+| <code>mysql_connect()</code>               | <code>mysqli_connect()</code>                                                                                            | Can include DB name as 4th param.                                                                 |
+| <code>mysql_select_db()</code>             | Pass DB name to <code>mysqli_connect()</code> or use <code>mysqli_select_db()</code>                                                |                                                                                                   |
+| <code>mysql_query()</code>                 | <code>mysqli_query($link, $query)</code>                                                                                 | Requires the connection link.                                                                     |
+| <code>mysql_fetch_assoc()</code>           | <code>$result-&gt;fetch_assoc()</code> (OO) or <code>mysqli_fetch_assoc($result)</code> (procedural)                                   |                                                                                                   |
+| <code>mysql_fetch_array()</code>           | <code>$result-&gt;fetch_array(MYSQLI_BOTH)</code> (OO) or <code>mysqli_fetch_array($result, MYSQLI_BOTH)</code> (procedural)             | <code>MYSQLI_BOTH</code> is the default.                                                                     |
+| <code>mysql_num_rows()</code>              | <code>$result-&gt;num_rows</code> (OO) or <code>mysqli_num_rows($result)</code> (procedural)                                            |                                                                                                   |
+| <code>mysql_error()</code>                 | <code>$mysqli-&gt;error</code> (OO) or <code>mysqli_error($link)</code> (procedural) / <code>mysqli_connect_error()</code> for connection errors. |                                                                                                   |
+| <code>mysql_close()</code>                 | <code>$mysqli-&gt;close()</code> (OO) or <code>mysqli_close($link)</code> (procedural)                                                 |                                                                                                   |
+| <code>mysql_insert_id()</code>             | <code>$mysqli-&gt;insert_id</code> (OO) or <code>mysqli_insert_id($link)</code> (procedural)                                           |                                                                                                   |
+| <code>mysql_real_escape_string()</code>    | <code>mysqli_real_escape_string($link, $string)</code> or <strong>Prepared Statements</strong>                                        | Prepared statements are preferred for security.                                                   |
+| <code>mysql_free_result()</code>           | <code>$result-&gt;free()</code> (OO) or <code>mysqli_free_result($result)</code> (procedural)                                          |                                                                                                   |
+| <code>mysql_pconnect()</code>              | <code>mysqli_connect(&quot;p:host...&quot;, ...)</code>                                                                            | Use the persistent connection prefix <code>p:</code>.                                                        |
+| <code>mysql_unbuffered_query()</code>      | See articles on <a href="https://www.php.net/manual/en/mysqli.quickstart.php#mysqli.quickstart.unbuffered" target="_blank" rel="noopener">Buffered and Unbuffered queries</a>
+ | No direct equivalent, requires different approach.                                                |
+| <code>mysql_list_dbs()</code>, <code>mysql_db_name()</code> | Use SQL <code>SHOW DATABASES</code>                                                                                      |                                                                                                   |
+| <code>mysql_list_tables()</code>           | Use SQL <code>SHOW TABLES FROM dbname</code>                                                                             |                                                                                                   |
+| <code>mysql_list_fields()</code>           | Use SQL <code>SHOW COLUMNS FROM tablename</code>                                                                         |                                                                                                   |</p>
+<h4 id="conclusion-on-migration">Conclusion on Migration</h4>
+<p>Migrating from the deprecated <code>mysql_*</code> extension to <code>mysqli_*</code> is essential for maintaining secure, efficient, and modern PHP applications. While manual replacement is feasible for smaller projects, tools like Rector can significantly accelerate the process for larger codebases. Always prioritize security by adopting prepared statements. For long-term flexibility, consider PDO.</p>
+<hr>
+<h3 id="faqs-on-migrating-php-mysql_-to-mysqli_">FAQs on Migrating PHP mysql_* to mysqli_*</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the main reason to move from mysql to mysqli in PHP</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The primary reasons are security, performance, and compatibility. The <code>mysql_*</code> extension is deprecated and removed in recent PHP versions, lacks support for modern MySQL features, and is more vulnerable to security threats like SQL injection compared to <code>mysqli</code>&rsquo;s prepared statements and improved error handling.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I still use the procedural style with mysqli</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, the <code>mysqli</code> extension offers both an object-oriented and a procedural API. The procedural API closely mirrors the old <code>mysql_*</code> functions, making it a familiar transition for developers.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is it mandatory to switch to mysqli or PDO</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: If you are using PHP 7 or later, it is mandatory to switch, as the <code>mysql_*</code> extension has been removed. For older PHP versions, it is strongly recommended for security and to leverage newer database features.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How do prepared statements improve security</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Prepared statements separate the SQL command from the data. The database server compiles the command first, and then the data is sent separately, ensuring that any special characters in the data are treated as literal values rather than executable SQL code, thus preventing SQL injection.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the difference between mysqli_connect_error and mysqli_error</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: <code>mysqli_connect_error()</code> is used to retrieve the error message from the last connection attempt. <code>mysqli_error($link)</code> (or <code>$mysqli-&gt;error</code> in OO style) is used to retrieve the error message from the last query execution on a specific connection (<code>$link</code> or <code>$mysqli</code>).</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How can I handle character encoding issues during migration</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: After establishing a connection using <code>mysqli</code>, it is crucial to set the character set using <code>$mysqli-&gt;set_charset(&quot;utf8mb4&quot;);</code> or <code>mysqli_set_charset($link, &quot;utf8mb4&quot;);</code> to ensure consistent data handling.</div>
+    </div>
+</div>
+<hr>
+<p>We’d love to hear your feedback! Drop your comments or questions below.</p>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

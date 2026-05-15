@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Spark DataFrame: Find Row with Max Value Per Group - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore effective methods for selecting the row with the maximum value within each group in a Spark DataFrame, covering window functions, aggregations, and …">
+
+
+
+<meta name="keywords" content="Spark DataFrame, max value per group, window functions, groupBy, aggregation, Scala">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Spark DataFrame: Find Row with Max Value Per Group - sqlpey">
+<meta name="DC.description" content="Explore effective methods for selecting the row with the maximum value within each group in a Spark DataFrame, covering window functions, aggregations, and more.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-07-22">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Spark DataFrame: Find Row with Max Value Per Group - sqlpey">
+<meta property="og:description" content="Explore effective methods for selecting the row with the maximum value within each group in a Spark DataFrame, covering window functions, aggregations, and …">
+<meta property="og:url" content="https://sqlpey.com/sql/spark-dataframe-max-value-per-group/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-07-22T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-07-22T00:00:00Z">
+<meta property="article:modified_time" content="2025-07-22T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Spark">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Spark DataFrame: Find Row with Max Value Per Group">
+<meta name="twitter:description" content="Explore effective methods for selecting the row with the maximum value within each group in a Spark DataFrame, covering window functions, aggregations, and …">
+
+
+<link rel="canonical" href="https://sqlpey.com/sql/spark-dataframe-max-value-per-group/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Spark DataFrame: Find Row with Max Value Per Group\"",
+  "description": "\"Explore effective methods for selecting the row with the maximum value within each group in a Spark DataFrame, covering window functions, aggregations, and more.\"",
+  "url": "\"https://sqlpey.com/sql/spark-dataframe-max-value-per-group/\"",
+  "datePublished": "\"2025-07-22T00:00:00Z\"",
+  "dateModified": "\"2025-07-22T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/sql/spark-dataframe-max-value-per-group/\""
+  },
+  "articleSection": "\"Spark\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Spark DataFrame: Find Row with Max Value Per Group</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Spark</span>
+              
+              <span class="tag">DataFrame</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              9 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 22, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#spark-dataframe-find-row-with-max-value-per-group">&ldquo;Spark DataFrame: Find Row with Max Value Per Group&rdquo;</a>
+      <ul>
+        <li><a href="#solution-1-using-window-functions">Solution 1: Using Window Functions</a></li>
+        <li><a href="#solution-2-plain-sql-aggregation-followed-by-join">Solution 2: Plain SQL Aggregation Followed by Join</a></li>
+        <li><a href="#solution-3-using-ordering-over-structs">Solution 3: Using Ordering Over Structs</a></li>
+        <li><a href="#solution-4-using-the-dataset-api-spark-16-and-20">Solution 4: Using the DataSet API (Spark 1.6+ and 2.0+)</a></li>
+        <li><a href="#solution-5-sql-query-approach">Solution 5: SQL Query Approach</a></li>
+        <li><a href="#solution-6-using-max_by-spark-30">Solution 6: Using <code>max_by()</code> (Spark 3.0+)</a></li>
+        <li><a href="#solution-7-using-apache-datafu">Solution 7: Using Apache DataFu</a></li>
+        <li><a href="#solution-8-rdd-functionality">Solution 8: RDD Functionality</a></li>
+        <li><a href="#solution-9-groupbykey-with-mapgroups-spark-20">Solution 9: <code>groupByKey</code> with <code>mapGroups</code> (Spark 2.0+)</a></li>
+        <li><a href="#solution-10-using-first-after-groupby">Solution 10: Using <code>first()</code> after <code>groupBy</code></a></li>
+        <li><a href="#solution-11-optimized-join-strategy">Solution 11: Optimized <code>join</code> Strategy</a></li>
+        <li><a href="#faqs-on-spark-dataframe-find-row-with-max-value-per-group">FAQs on Spark DataFrame: Find Row with Max Value Per Group</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="spark-dataframe-find-row-with-max-value-per-group">&ldquo;Spark DataFrame: Find Row with Max Value Per Group&rdquo;</h2>
+<p>This is a common data manipulation task in big data processing, often encountered when analyzing datasets where you need to identify the top record within distinct categories. Several approaches exist, each with its own performance characteristics and suitability depending on the Spark version and data distribution.</p>
+<p>Let&rsquo;s consider a sample DataFrame with <code>Hour</code>, <code>Category</code>, and <code>TotalValue</code> columns, where we want to find the <code>Category</code> with the highest <code>TotalValue</code> for each <code>Hour</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-scala" data-lang="scala"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> org.apache.spark.sql.SparkSession
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">import</span> org.apache.spark.sql.functions._
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">import</span> org.apache.spark.sql.expressions.Window
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">val</span> spark <span style="color:#66d9ef">=</span> <span style="color:#a6e22e">SparkSession</span><span style="color:#f92672">.</span>builder<span style="color:#f92672">.</span>appName<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;MaxValuePerRow&#34;</span><span style="color:#f92672">).</span>getOrCreate<span style="color:#f92672">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">import</span> spark.implicits._
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">val</span> df <span style="color:#66d9ef">=</span> <span style="color:#a6e22e">Seq</span><span style="color:#f92672">(</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;cat26&#34;</span><span style="color:#f92672">,</span><span style="color:#ae81ff">30.9</span><span style="color:#f92672">),</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;cat13&#34;</span><span style="color:#f92672">,</span><span style="color:#ae81ff">22.1</span><span style="color:#f92672">),</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;cat95&#34;</span><span style="color:#f92672">,</span><span style="color:#ae81ff">19.6</span><span style="color:#f92672">),</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;cat105&#34;</span><span style="color:#f92672">,</span><span style="color:#ae81ff">1.3</span><span style="color:#f92672">),</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">(</span><span style="color:#ae81ff">1</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;cat67&#34;</span><span style="color:#f92672">,</span><span style="color:#ae81ff">28.5</span><span style="color:#f92672">),</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">1</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;cat4&#34;</span><span style="color:#f92672">,</span><span style="color:#ae81ff">26.8</span><span style="color:#f92672">),</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">1</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;cat13&#34;</span><span style="color:#f92672">,</span><span style="color:#ae81ff">12.6</span><span style="color:#f92672">),</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">1</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;cat23&#34;</span><span style="color:#f92672">,</span><span style="color:#ae81ff">5.3</span><span style="color:#f92672">),</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">(</span><span style="color:#ae81ff">2</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;cat56&#34;</span><span style="color:#f92672">,</span><span style="color:#ae81ff">39.6</span><span style="color:#f92672">),</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">2</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;cat40&#34;</span><span style="color:#f92672">,</span><span style="color:#ae81ff">29.7</span><span style="color:#f92672">),</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">2</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;cat187&#34;</span><span style="color:#f92672">,</span><span style="color:#ae81ff">27.9</span><span style="color:#f92672">),</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">2</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;cat68&#34;</span><span style="color:#f92672">,</span><span style="color:#ae81ff">9.8</span><span style="color:#f92672">),</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">(</span><span style="color:#ae81ff">3</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;cat8&#34;</span><span style="color:#f92672">,</span><span style="color:#ae81ff">35.6</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">).</span>toDF<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Hour&#34;</span><span style="color:#f92672">,</span> <span style="color:#e6db74">&#34;Category&#34;</span><span style="color:#f92672">,</span> <span style="color:#e6db74">&#34;TotalValue&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>df<span style="color:#f92672">.</span>show<span style="color:#f92672">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/*
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">+
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">## Solutions
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-+
+</span></span></span></code></pre></div><p>import org.apache.spark.sql.functions.{row_number, max, broadcast}
+import org.apache.spark.sql.expressions.Window</p>
+<p>val df = sc.parallelize(Seq(
+(0,&quot;cat26&quot;,30.9), (0,&quot;cat13&quot;,22.1), (0,&quot;cat95&quot;,19.6), (0,&quot;cat105&quot;,1.3),
+(1,&quot;cat67&quot;,28.5), (1,&quot;cat4&quot;,26.8), (1,&quot;cat13&quot;,12.6), (1,&quot;cat23&quot;,5.3),
+(2,&quot;cat56&quot;,39.6), (2,&quot;cat40&quot;,29.7), (2,&quot;cat187&quot;,27.9), (2,&quot;cat68&quot;,9.8),
+(3,&quot;cat8&quot;,35.6))).toDF(&quot;Hour&quot;, &quot;Category&quot;, &quot;TotalValue&quot;)</p>
+<p>val w = Window.partitionBy($&quot;hour&quot;).orderBy($&quot;TotalValue&quot;.desc)</p>
+<p>val dfTop = df.withColumn(&quot;rn&quot;, row_number.over(w)).where($&quot;rn&quot; === 1).drop(&quot;rn&quot;)</p>
+<p>dfTop.show
+// +&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+// |Hour|Category|TotalValue|
+// +&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+// |   0|   cat26|      30.9|
+// |   1|   cat67|      28.5|
+// |   2|   cat56|      39.6|
+// |   3|    cat8|      35.6|
+// +&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+val dfMax = df.groupBy($&quot;hour&quot;.as(&quot;max_hour&quot;)).agg(max($&quot;TotalValue&quot;).as(&quot;max_value&quot;))</p>
+<p>val dfTopByJoin = df.join(broadcast(dfMax),
+($&quot;hour&quot; === $&quot;max_hour&quot;) &amp;&amp; ($&quot;TotalValue&quot; === $&quot;max_value&quot;))
+.drop(&quot;max_hour&quot;)
+.drop(&quot;max_value&quot;)</p>
+<p>dfTopByJoin.show</p>
+<p>// +&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+// |Hour|Category|TotalValue|
+// +&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+// |   0|   cat26|      30.9|
+// |   1|   cat67|      28.5|
+// |   2|   cat56|      39.6|
+// |   3|    cat8|      35.6|
+// +&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+dfTopByJoin
+.groupBy($&quot;hour&quot;)
+.agg(
+first(&quot;category&quot;).alias(&quot;category&quot;),
+first(&quot;TotalValue&quot;).alias(&quot;TotalValue&quot;))
+val dfTop = df.select($&quot;Hour&quot;, struct($&quot;TotalValue&quot;, $&quot;Category&quot;).alias(&quot;vs&quot;))
+.groupBy($&quot;hour&quot;)
+.agg(max(&quot;vs&quot;).alias(&quot;vs&quot;))
+.select($&quot;Hour&quot;, $&quot;vs.Category&quot;, $&quot;vs.TotalValue&quot;)</p>
+<p>dfTop.show
+// +&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+// |Hour|Category|TotalValue|
+// +&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+// |   0|   cat26|      30.9|
+// |   1|   cat67|      28.5|
+// |   2|   cat56|      39.6|
+// |   3|    cat8|      35.6|
+// +&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+case class Record(Hour: Integer, Category: String, TotalValue: Double)</p>
+<p>df.as[Record]
+.groupBy($&quot;hour&quot;)
+.reduce((x, y) =&gt; if (x.TotalValue &gt; y.TotalValue) x else y)
+.show</p>
+<p>// +&mdash;+&mdash;&mdash;&mdash;&mdash;&ndash;+
+// | _1|            <em>2|
+// +&mdash;+&mdash;&mdash;&mdash;&mdash;&ndash;+
+// |[0]|[0,cat26,30.9]|
+// |[1]|[1,cat67,28.5]|
+// |[2]|[2,cat56,39.6]|
+// |[3]| [3,cat8,35.6]|
+// +&mdash;+&mdash;&mdash;&mdash;&mdash;&ndash;+
+df.as[Record]
+.groupByKey(</em>.Hour)
+.reduceGroups((x, y) =&gt; if (x.TotalValue &gt; y.TotalValue) x else y)
+df.orderBy(&hellip;).groupBy(&hellip;).agg(first(&hellip;), &hellip;)
+df.orderBy(&hellip;).dropDuplicates(&hellip;)</p>
+<pre tabindex="0"><code>
+--+
+</code></pre><p>import org.apache.spark.sql.functions.row_number
+import org.apache.spark.sql.expressions.Window</p>
+<p>val w = Window.partitionBy($&ldquo;col1&rdquo;, $&ldquo;col2&rdquo;, $&ldquo;col3&rdquo;).orderBy($&ldquo;timestamp&rdquo;.desc)</p>
+<p>val refined_df = df.withColumn(&ldquo;rn&rdquo;, row_number.over(w)).where($&ldquo;rn&rdquo; === 1).drop(&ldquo;rn&rdquo;)</p>
+<pre tabindex="0"><code>
+-+
+|Hour|Category|TotalValue|
++
+</code></pre><p>df.createOrReplaceTempView(&ldquo;table&rdquo;)
+//+&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+//|Hour|Category|TotalValue|
+//+&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+//|0   |cat26   |30.9      |
+//|0   |cat13   |22.1      |
+//|0   |cat95   |19.6      |
+//|0   |cat105  |1.3       |
+//|1   |cat67   |28.5      |
+//|1   |cat4    |26.8      |
+//|1   |cat13   |12.6      |
+//|1   |cat23   |5.3       |
+//|2   |cat56   |39.6      |
+//|2   |cat40   |29.7      |
+//|2   |cat187  |27.9      |
+//|2   |cat68   |9.8       |
+//|3   |cat8    |35.6      |
+//+&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+sqlContext.sql(&ldquo;select Hour, Category, TotalValue from (select *, row_number() OVER (PARTITION BY Hour ORDER BY TotalValue DESC) as rn  FROM table) tmp where rn = 1&rdquo;).show(false)
+//+&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+//|Hour|Category|TotalValue|
+//+&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+//|1   |cat67   |28.5      |
+//|3   |cat8    |35.6      |
+//|2   |cat56   |39.6      |
+//|0   |cat26   |30.9      |
+//+&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+sqlContext.sql(&ldquo;select Hour, first(Category) as Category, first(TotalValue) as TotalValue from &quot; +
+&ldquo;(select Hour, Category, TotalValue from table tmp1 &quot; +
+&ldquo;join &quot; +
+&ldquo;(select Hour as max_hour, max(TotalValue) as max_value from table group by Hour) tmp2 &quot; +
+&ldquo;on &quot; +
+&ldquo;tmp1.Hour = tmp2.max_hour and tmp1.TotalValue = tmp2.max_value) tmp3 &quot; +
+&ldquo;group by tmp3.Hour&rdquo;)
+.show(false)
+//+&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+//|Hour|Category|TotalValue|
+//+&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+//|1   |cat67   |28.5      |
+//|3   |cat8    |35.6      |
+//|2   |cat56   |39.6      |
+//|0   |cat26   |30.9      |
+//+&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+sqlContext.sql(&ldquo;select Hour, vs.Category, vs.TotalValue from (select Hour, max(struct(TotalValue, Category)) as vs from table group by Hour)&rdquo;).show(false)
+//+&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+//|Hour|Category|TotalValue|
+//+&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+//|1   |cat67   |28.5      |
+//|3   |cat8    |35.6      |
+//|2   |cat56   |39.6      |
+//|0   |cat26   |30.9      |
+//+&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+</p>
+<pre tabindex="0"><code>
+-+
+</code></pre><p>val df = sc.parallelize(Seq(
+(0,&quot;cat26&quot;,30.9), (0,&quot;cat13&quot;,22.1), (0,&quot;cat95&quot;,19.6), (0,&quot;cat105&quot;,1.3),
+(1,&quot;cat67&quot;,28.5), (1,&quot;cat4&quot;,26.8), (1,&quot;cat13&quot;,12.6), (1,&quot;cat23&quot;,5.3),
+(2,&quot;cat56&quot;,39.6), (2,&quot;cat40&quot;,29.7), (2,&quot;cat187&quot;,27.9), (2,&quot;cat68&quot;,9.8),
+(3,&quot;cat8&quot;,35.6))).toDF(&quot;Hour&quot;, &quot;Category&quot;, &quot;TotalValue&quot;)</p>
+<p>// Register the DataFrame as a SQL temporary view
+df.createOrReplaceTempView(&quot;table&quot;)</p>
+<p>// Using SQL
+val result = spark.sql(&quot;select Hour, max_by(Category, TotalValue) AS Category, max(TotalValue) as TotalValue FROM table group by Hour order by Hour&quot;)</p>
+<p>// or Using DataFrame API
+val result = df.groupBy(&quot;Hour&quot;).
+agg(expr(&quot;max_by(Category, TotalValue)&quot;).as(&quot;Category&quot;), max(&quot;TotalValue&quot;).as(&quot;TotalValue&quot;)).
+sort(&quot;Hour&quot;)</p>
+<p>+&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+|Hour|Category|TotalValue|
++&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+|   0|   cat26|      30.9|
+|   1|   cat67|      28.5|
+|   2|   cat56|      39.6|
+|   3|    cat8|      35.6|
++&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+</p>
+<pre tabindex="0"><code>
+--+
+</code></pre><p>import datafu.spark.DataFrameOps._</p>
+<p>val df = sc.parallelize(Seq(
+(0,&quot;cat26&quot;,30.9), (0,&quot;cat13&quot;,22.1), (0,&quot;cat95&quot;,19.6), (0,&quot;cat105&quot;,1.3),
+(1,&quot;cat67&quot;,28.5), (1,&quot;cat4&quot;,26.8), (1,&quot;cat13&quot;,12.6), (1,&quot;cat23&quot;,5.3),
+(2,&quot;cat56&quot;,39.6), (2,&quot;cat40&quot;,29.7), (2,&quot;cat187&quot;,27.9), (2,&quot;cat68&quot;,9.8),
+(3,&quot;cat8&quot;,35.6))).toDF(&quot;Hour&quot;, &quot;Category&quot;, &quot;TotalValue&quot;)</p>
+<p>df.dedupWithOrder($&quot;Hour&quot;, $&quot;TotalValue&quot;.desc).show
++&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+|Hour|Category|TotalValue|
++&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+
+|   0|   cat26|      30.9|
+|   3|    cat8|      35.6|
+|   1|   cat67|      28.5|
+|   2|   cat56|      39.6|
++&mdash;-+&mdash;&mdash;&ndash;+&mdash;&mdash;&mdash;-+</p>
+<pre tabindex="0"><code>
+-+
+|   0|   cat26|      30.9|
+|   0|   cat13|      22.1|
+|   0|   cat95|      19.6|
+|   0|  cat105|       1.3|
+|   1|   cat67|      28.5|
+|   1|    cat4|      26.8|
+|   1|   cat13|      12.6|
+|   1|   cat23|       5.3|
+|   2|   cat56|      39.6|
+|   2|   cat40|      29.7|
+|   2|  cat187|      27.9|
+|   2|   cat68|       9.8|
+|   3|    cat8|      35.6|
++
+</code></pre><p>val df = Seq(
+(0,&ldquo;cat26&rdquo;,30.9), (0,&ldquo;cat13&rdquo;,22.1), (0,&ldquo;cat95&rdquo;,19.6), (0,&ldquo;cat105&rdquo;,1.3),
+(1,&ldquo;cat67&rdquo;,28.5), (1,&ldquo;cat4&rdquo;,26.8), (1,&ldquo;cat13&rdquo;,12.6), (1,&ldquo;cat23&rdquo;,5.3),
+(2,&ldquo;cat56&rdquo;,39.6), (2,&ldquo;cat40&rdquo;,29.7), (2,&ldquo;cat187&rdquo;,27.9), (2,&ldquo;cat68&rdquo;,9.8),
+(3,&ldquo;cat8&rdquo;,35.6)).toDF(&ldquo;Hour&rdquo;, &ldquo;Category&rdquo;, &ldquo;TotalValue&rdquo;)</p>
+<p>df.groupBy($&ldquo;Hour&rdquo;)
+.agg(max(struct($&ldquo;TotalValue&rdquo;, $&ldquo;Category&rdquo;)).as(&ldquo;argmax&rdquo;))
+.select($&ldquo;Hour&rdquo;, $&ldquo;argmax.*&rdquo;).show</p>
+<p>+&mdash;-+&mdash;&mdash;&mdash;-+&mdash;&mdash;&ndash;+
+|Hour|TotalValue|Category|
++&mdash;-+&mdash;&mdash;&mdash;-+&mdash;&mdash;&ndash;+
+|   1|      28.5|   cat67|
+|   3|      35.6|    cat8|
+|   2|      39.6|   cat56|
+|   0|      30.9|   cat26|
++&mdash;-+&mdash;&mdash;&mdash;-+&mdash;&mdash;&ndash;+</p>
+<pre tabindex="0"><code>
+-+
+</code></pre><p>val rdd: RDD[Row] = originalDf
+.rdd
+.groupBy(row =&gt; row.getAs<a href="%22grouping_row%22">String</a>
+)
+.map(iterableTuple =&gt; {
+iterableTuple._2.reduce(reduceFunction)
+})</p>
+<p>val productDf = sqlContext.createDataFrame(rdd, originalDf.schema)</p>
+<pre tabindex="0"><code>
+--+
+</code></pre><p>import org.apache.spark.sql.Row
+import org.apache.spark.sql.catalyst.encoders.RowEncoder
+import org.apache.spark.sql.DataFrame</p>
+<p>//df is the dataframe with Day, Category, TotalValue</p>
+<p>implicit val dfEnc = RowEncoder(df.schema)</p>
+<p>val res: DataFrame = df
+.groupByKey{(r) =&gt; r.getInt(0)}
+.mapGroups[Row]{(day: Int, rows: Iterator[Row]) =&gt; i.maxBy{(r) =&gt; r.getDouble(2)}}</p>
+<pre tabindex="0"><code>
+-+
+*/
+</code></pre><h3 id="solution-1-using-window-functions">Solution 1: Using Window Functions</h3>
+<p>Window functions are a powerful and idiomatic way to solve this problem in Spark SQL. The <code>row_number</code> window function, combined with <code>partitionBy</code> and <code>orderBy</code>, can assign a rank to each row within its partition. We then filter for the top-ranked rows.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-scala" data-lang="scala"><span style="display:flex;"><span><span style="color:#66d9ef">val</span> w <span style="color:#66d9ef">=</span> <span style="color:#a6e22e">Window</span><span style="color:#f92672">.</span>partitionBy<span style="color:#f92672">(</span>$<span style="color:#e6db74">&#34;Hour&#34;</span><span style="color:#f92672">).</span>orderBy<span style="color:#f92672">(</span>$<span style="color:#e6db74">&#34;TotalValue&#34;</span><span style="color:#f92672">.</span>desc<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">val</span> dfTop <span style="color:#66d9ef">=</span> df<span style="color:#f92672">.</span>withColumn<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;rn&#34;</span><span style="color:#f92672">,</span> row_number<span style="color:#f92672">.</span>over<span style="color:#f92672">(</span>w<span style="color:#f92672">)).</span>where<span style="color:#f92672">(</span>$<span style="color:#e6db74">&#34;rn&#34;</span> <span style="color:#f92672">===</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">).</span>drop<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;rn&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>dfTop<span style="color:#f92672">.</span>show
+</span></span></code></pre></div><p><strong>Caveats:</strong> This method can be inefficient if there&rsquo;s significant data skew across the partitioning column. Issues related to data skew are tracked in Spark JIRA tickets like SPARK-34775.</p>
+<h3 id="solution-2-plain-sql-aggregation-followed-by-join">Solution 2: Plain SQL Aggregation Followed by Join</h3>
+<p>An alternative involves a two-step process: first, aggregate to find the maximum <code>TotalValue</code> for each <code>Hour</code>, and then join this aggregated result back to the original DataFrame.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-scala" data-lang="scala"><span style="display:flex;"><span><span style="color:#66d9ef">val</span> dfMax <span style="color:#66d9ef">=</span> df<span style="color:#f92672">.</span>groupBy<span style="color:#f92672">(</span>$<span style="color:#e6db74">&#34;Hour&#34;</span><span style="color:#f92672">.</span>as<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;max_hour&#34;</span><span style="color:#f92672">)).</span>agg<span style="color:#f92672">(</span>max<span style="color:#f92672">(</span>$<span style="color:#e6db74">&#34;TotalValue&#34;</span><span style="color:#f92672">).</span>as<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;max_value&#34;</span><span style="color:#f92672">))</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">val</span> dfTopByJoin <span style="color:#66d9ef">=</span> df<span style="color:#f92672">.</span>join<span style="color:#f92672">(</span>broadcast<span style="color:#f92672">(</span>dfMax<span style="color:#f92672">),</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">(</span>$<span style="color:#e6db74">&#34;Hour&#34;</span> <span style="color:#f92672">===</span> $<span style="color:#e6db74">&#34;max_hour&#34;</span><span style="color:#f92672">)</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#f92672">(</span>$<span style="color:#e6db74">&#34;TotalValue&#34;</span> <span style="color:#f92672">===</span> $<span style="color:#e6db74">&#34;max_value&#34;</span><span style="color:#f92672">))</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">.</span>drop<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;max_hour&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">.</span>drop<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;max_value&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>dfTopByJoin<span style="color:#f92672">.</span>show
+</span></span></code></pre></div><p><strong>Handling Duplicates:</strong> If multiple categories share the same maximum <code>TotalValue</code> for a given <code>Hour</code>, this approach will include all of them. To select only one (e.g., the first encountered), an additional aggregation can be applied:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-scala" data-lang="scala"><span style="display:flex;"><span>dfTopByJoin
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">.</span>groupBy<span style="color:#f92672">(</span>$<span style="color:#e6db74">&#34;Hour&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">.</span>agg<span style="color:#f92672">(</span>
+</span></span><span style="display:flex;"><span>    first<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Category&#34;</span><span style="color:#f92672">).</span>alias<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Category&#34;</span><span style="color:#f92672">),</span>
+</span></span><span style="display:flex;"><span>    first<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;TotalValue&#34;</span><span style="color:#f92672">).</span>alias<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;TotalValue&#34;</span><span style="color:#f92672">))</span>
+</span></span></code></pre></div><h3 id="solution-3-using-ordering-over-structs">Solution 3: Using Ordering Over Structs</h3>
+<p>This elegant approach leverages Spark&rsquo;s ability to order structs. By creating a struct of <code>TotalValue</code> and <code>Category</code>, we can then use <code>max</code> on these structs within a <code>groupBy</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-scala" data-lang="scala"><span style="display:flex;"><span><span style="color:#66d9ef">val</span> dfTopStruct <span style="color:#66d9ef">=</span> df<span style="color:#f92672">.</span>select<span style="color:#f92672">(</span>$<span style="color:#e6db74">&#34;Hour&#34;</span><span style="color:#f92672">,</span> struct<span style="color:#f92672">(</span>$<span style="color:#e6db74">&#34;TotalValue&#34;</span><span style="color:#f92672">,</span> $<span style="color:#e6db74">&#34;Category&#34;</span><span style="color:#f92672">).</span>alias<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;vs&#34;</span><span style="color:#f92672">))</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">.</span>groupBy<span style="color:#f92672">(</span>$<span style="color:#e6db74">&#34;Hour&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">.</span>agg<span style="color:#f92672">(</span>max<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;vs&#34;</span><span style="color:#f92672">).</span>alias<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;vs&#34;</span><span style="color:#f92672">))</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">.</span>select<span style="color:#f92672">(</span>$<span style="color:#e6db74">&#34;Hour&#34;</span><span style="color:#f92672">,</span> $<span style="color:#e6db74">&#34;vs.Category&#34;</span><span style="color:#f92672">,</span> $<span style="color:#e6db74">&#34;vs.TotalValue&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>dfTopStruct<span style="color:#f92672">.</span>show
+</span></span></code></pre></div><h3 id="solution-4-using-the-dataset-api-spark-16-and-20">Solution 4: Using the DataSet API (Spark 1.6+ and 2.0+)</h3>
+<p>For Scala users, the Dataset API offers concise ways to achieve this, potentially with better performance due to map-side combines.</p>
+<p><strong>Spark 1.6:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-scala" data-lang="scala"><span style="display:flex;"><span><span style="color:#66d9ef">case</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Record</span><span style="color:#f92672">(</span><span style="color:#a6e22e">Hour</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Integer</span><span style="color:#f92672">,</span> <span style="color:#a6e22e">Category</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">String</span><span style="color:#f92672">,</span> <span style="color:#a6e22e">TotalValue</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Double</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">val</span> dfTopDs <span style="color:#66d9ef">=</span> df<span style="color:#f92672">.</span>as<span style="color:#f92672">[</span><span style="color:#66d9ef">Record</span><span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">.</span>groupBy<span style="color:#f92672">(</span>$<span style="color:#e6db74">&#34;Hour&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">.</span>reduce<span style="color:#f92672">((</span>x<span style="color:#f92672">,</span> y<span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>x<span style="color:#f92672">.</span><span style="color:#a6e22e">TotalValue</span> <span style="color:#f92672">&gt;</span> y<span style="color:#f92672">.</span><span style="color:#a6e22e">TotalValue</span><span style="color:#f92672">)</span> x <span style="color:#66d9ef">else</span> y<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>dfTopDs<span style="color:#f92672">.</span>show
+</span></span></code></pre></div><p><strong>Spark 2.0+:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-scala" data-lang="scala"><span style="display:flex;"><span><span style="color:#66d9ef">case</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Record</span><span style="color:#f92672">(</span><span style="color:#a6e22e">Hour</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Integer</span><span style="color:#f92672">,</span> <span style="color:#a6e22e">Category</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">String</span><span style="color:#f92672">,</span> <span style="color:#a6e22e">TotalValue</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Double</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">val</span> dfTopDs2 <span style="color:#66d9ef">=</span> df<span style="color:#f92672">.</span>as<span style="color:#f92672">[</span><span style="color:#66d9ef">Record</span><span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">.</span>groupByKey<span style="color:#f92672">(</span><span style="color:#66d9ef">_</span><span style="color:#f92672">.</span><span style="color:#a6e22e">Hour</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">.</span>reduceGroups<span style="color:#f92672">((</span>x<span style="color:#f92672">,</span> y<span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>x<span style="color:#f92672">.</span><span style="color:#a6e22e">TotalValue</span> <span style="color:#f92672">&gt;</span> y<span style="color:#f92672">.</span><span style="color:#a6e22e">TotalValue</span><span style="color:#f92672">)</span> x <span style="color:#66d9ef">else</span> y<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// The output format might differ slightly, often showing key-value pairs.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// You might need to un-nest or transform the result to match the desired output.
+</span></span></span></code></pre></div><p>These methods can be utilized with <a href="https://spark.apache.org/docs/latest/streaming-programming-guide.html#dataframe-and-dataset-operations" target="_blank" rel="noopener">Structured Streaming</a>
+ in completed output mode.</p>
+<p><strong>Discouraged Methods:</strong> Avoid using <code>df.orderBy(...).groupBy(...).agg(first(...), ...)</code> or <code>df.orderBy(...).dropDuplicates(...)</code> as they can lead to unpredictable results due to internal execution plans (see SPARK-16207 and SPARK-30335).</p>
+<h3 id="solution-5-sql-query-approach">Solution 5: SQL Query Approach</h3>
+<p>The same logic as the DataFrame API solutions can be applied using Spark SQL.</p>
+<ol>
+<li>
+<p><strong>Window Function in SQL:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> Hour, Category, TotalValue
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span> Hour, Category, TotalValue,
+</span></span><span style="display:flex;"><span>           ROW_NUMBER() OVER (PARTITION <span style="color:#66d9ef">BY</span> Hour <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> TotalValue <span style="color:#66d9ef">DESC</span>) <span style="color:#66d9ef">as</span> rn
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">table</span>
+</span></span><span style="display:flex;"><span>) tmp
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> rn <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div></li>
+<li>
+<p><strong>Aggregation and Join in SQL:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> t1.Hour, <span style="color:#66d9ef">first</span>(t1.Category) <span style="color:#66d9ef">as</span> Category, <span style="color:#66d9ef">first</span>(t1.TotalValue) <span style="color:#66d9ef">as</span> TotalValue
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">table</span> t1
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">JOIN</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span> Hour <span style="color:#66d9ef">as</span> max_hour, <span style="color:#66d9ef">MAX</span>(TotalValue) <span style="color:#66d9ef">as</span> max_value
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">table</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> Hour
+</span></span><span style="display:flex;"><span>) t2 <span style="color:#66d9ef">ON</span> t1.Hour <span style="color:#f92672">=</span> t2.max_hour <span style="color:#66d9ef">AND</span> t1.TotalValue <span style="color:#f92672">=</span> t2.max_value
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> t1.Hour
+</span></span></code></pre></div></li>
+<li>
+<p><strong>Struct Ordering in SQL:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> Hour, vs.Category, vs.TotalValue
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">SELECT</span> Hour, <span style="color:#66d9ef">MAX</span>(struct(TotalValue, Category)) <span style="color:#66d9ef">as</span> vs
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">table</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> Hour
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div></li>
+</ol>
+<h3 id="solution-6-using-max_by-spark-30">Solution 6: Using <code>max_by()</code> (Spark 3.0+)</h3>
+<p>Spark 3.0 introduced the <code>max_by()</code> function, which simplifies finding the row with the maximum value of one column based on another column.</p>
+<p><strong>Using SQL:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> Hour, max_by(Category, TotalValue) <span style="color:#66d9ef">AS</span> Category, <span style="color:#66d9ef">max</span>(TotalValue) <span style="color:#66d9ef">as</span> TotalValue
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#66d9ef">table</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">GROUP</span> <span style="color:#66d9ef">BY</span> Hour
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> Hour
+</span></span></code></pre></div><p><strong>Using DataFrame API:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-scala" data-lang="scala"><span style="display:flex;"><span><span style="color:#66d9ef">val</span> dfMaxBy <span style="color:#66d9ef">=</span> df<span style="color:#f92672">.</span>groupBy<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Hour&#34;</span><span style="color:#f92672">).</span>
+</span></span><span style="display:flex;"><span>  agg<span style="color:#f92672">(</span>expr<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;max_by(Category, TotalValue)&#34;</span><span style="color:#f92672">).</span>as<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Category&#34;</span><span style="color:#f92672">),</span> max<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;TotalValue&#34;</span><span style="color:#f92672">).</span>as<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;TotalValue&#34;</span><span style="color:#f92672">)).</span>
+</span></span><span style="display:flex;"><span>  sort<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Hour&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>dfMaxBy<span style="color:#f92672">.</span>show
+</span></span></code></pre></div><h3 id="solution-7-using-apache-datafu">Solution 7: Using Apache DataFu</h3>
+<p>The Apache DataFu library provides utility functions that can streamline this process. The <code>dedupWithOrder</code> function is particularly useful.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-scala" data-lang="scala"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> datafu.spark.DataFrameOps._
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">val</span> dfDedup <span style="color:#66d9ef">=</span> df<span style="color:#f92672">.</span>dedupWithOrder<span style="color:#f92672">(</span>$<span style="color:#e6db74">&#34;Hour&#34;</span><span style="color:#f92672">,</span> $<span style="color:#e6db74">&#34;TotalValue&#34;</span><span style="color:#f92672">.</span>desc<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>dfDedup<span style="color:#f92672">.</span>show
+</span></span></code></pre></div><p>Note that the output might not be ordered by <code>Hour</code> by default, but this can be addressed with a subsequent <code>orderBy</code> operation. DataFu also offers <code>dedupTopN</code> and <code>dedupWithCombiner</code> for more specific use cases.</p>
+<h3 id="solution-8-rdd-functionality">Solution 8: RDD Functionality</h3>
+<p>While DataFrame operations are generally preferred, you can also leverage RDDs for more fine-grained control.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-scala" data-lang="scala"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> org.apache.spark.rdd.RDD
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">import</span> org.apache.spark.sql.Row
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">val</span> rdd<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">RDD</span><span style="color:#f92672">[</span><span style="color:#66d9ef">Row</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">=</span> df<span style="color:#f92672">.</span>rdd
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">.</span>groupBy<span style="color:#f92672">(</span>row <span style="color:#66d9ef">=&gt;</span> row<span style="color:#f92672">.</span>getAs<span style="color:#f92672">[</span><span style="color:#66d9ef">String</span><span style="color:#f92672">](</span><span style="color:#e6db74">&#34;Hour&#34;</span><span style="color:#f92672">))</span> <span style="color:#75715e">// Group by Hour
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#f92672">.</span>map <span style="color:#f92672">{</span> <span style="color:#66d9ef">case</span> <span style="color:#f92672">(</span>hour<span style="color:#f92672">,</span> iterableRows<span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span>
+</span></span><span style="display:flex;"><span>    iterableRows<span style="color:#f92672">.</span>reduce <span style="color:#f92672">{</span> <span style="color:#f92672">(</span>row1<span style="color:#f92672">,</span> row2<span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>row1<span style="color:#f92672">.</span>getDouble<span style="color:#f92672">(</span><span style="color:#ae81ff">2</span><span style="color:#f92672">)</span> <span style="color:#f92672">&gt;</span> row2<span style="color:#f92672">.</span>getDouble<span style="color:#f92672">(</span><span style="color:#ae81ff">2</span><span style="color:#f92672">))</span> row1 <span style="color:#66d9ef">else</span> row2
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">val</span> productDf <span style="color:#66d9ef">=</span> spark<span style="color:#f92672">.</span>createDataFrame<span style="color:#f92672">(</span>rdd<span style="color:#f92672">,</span> df<span style="color:#f92672">.</span>schema<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>productDf<span style="color:#f92672">.</span>show
+</span></span></code></pre></div><h3 id="solution-9-groupbykey-with-mapgroups-spark-20">Solution 9: <code>groupByKey</code> with <code>mapGroups</code> (Spark 2.0+)</h3>
+<p>This approach uses <code>groupByKey</code> and <code>mapGroups</code> for a functional style of data processing.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-scala" data-lang="scala"><span style="display:flex;"><span><span style="color:#66d9ef">implicit</span> <span style="color:#66d9ef">val</span> dfEnc <span style="color:#66d9ef">=</span> org<span style="color:#f92672">.</span>apache<span style="color:#f92672">.</span>spark<span style="color:#f92672">.</span>sql<span style="color:#f92672">.</span>catalyst<span style="color:#f92672">.</span>encoders<span style="color:#f92672">.</span><span style="color:#a6e22e">RowEncoder</span><span style="color:#f92672">(</span>df<span style="color:#f92672">.</span>schema<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">val</span> res <span style="color:#66d9ef">=</span> df
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">.</span>groupByKey<span style="color:#f92672">(</span>r <span style="color:#66d9ef">=&gt;</span> r<span style="color:#f92672">.</span>getInt<span style="color:#f92672">(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">))</span> <span style="color:#75715e">// Group by the &#39;Hour&#39; column index
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#f92672">.</span>mapGroups<span style="color:#f92672">[</span><span style="color:#66d9ef">Row</span><span style="color:#f92672">]((</span>hour<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Int</span><span style="color:#f92672">,</span> rows<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Iterator</span><span style="color:#f92672">[</span><span style="color:#66d9ef">Row</span><span style="color:#f92672">])</span> <span style="color:#66d9ef">=&gt;</span> rows<span style="color:#f92672">.</span>maxBy<span style="color:#f92672">(</span>r <span style="color:#66d9ef">=&gt;</span> r<span style="color:#f92672">.</span>getDouble<span style="color:#f92672">(</span><span style="color:#ae81ff">2</span><span style="color:#f92672">)))</span> <span style="color:#75715e">// Find max by TotalValue index
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>res<span style="color:#f92672">.</span>show
+</span></span></code></pre></div><h3 id="solution-10-using-first-after-groupby">Solution 10: Using <code>first()</code> after <code>groupBy</code></h3>
+<p>A simpler aggregation using <code>first()</code> can be employed if you only need one of the matching rows and the order within the group doesn&rsquo;t strictly matter for <code>first()</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-scala" data-lang="scala"><span style="display:flex;"><span><span style="color:#66d9ef">val</span> data <span style="color:#66d9ef">=</span> df<span style="color:#f92672">.</span>groupBy<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Hour&#34;</span><span style="color:#f92672">).</span>agg<span style="color:#f92672">(</span>
+</span></span><span style="display:flex;"><span>  first<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Hour&#34;</span><span style="color:#f92672">).</span>as<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;_1&#34;</span><span style="color:#f92672">),</span>
+</span></span><span style="display:flex;"><span>  first<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Category&#34;</span><span style="color:#f92672">).</span>as<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Category&#34;</span><span style="color:#f92672">),</span>
+</span></span><span style="display:flex;"><span>  first<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;TotalValue&#34;</span><span style="color:#f92672">).</span>as<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;TotalValue&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">).</span>drop<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Hour&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">.</span>withColumnRenamed<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;_1&#34;</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;Hour&#34;</span><span style="color:#f92672">).</span>show
+</span></span></code></pre></div><h3 id="solution-11-optimized-join-strategy">Solution 11: Optimized <code>join</code> Strategy</h3>
+<p>An alternative performance optimization involves finding the latest timestamp per key first, then joining. This can be faster than a direct window function in certain scenarios.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-scala" data-lang="scala"><span style="display:flex;"><span><span style="color:#75715e">// Assuming df has a &#39;timestamp&#39; column and we&#39;re grouping by &#39;keys&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">val</span> latest_per_key <span style="color:#66d9ef">=</span> df<span style="color:#f92672">.</span>groupBy<span style="color:#f92672">(</span>keys<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">_</span><span style="color:#66d9ef">*</span><span style="color:#f92672">).</span>agg<span style="color:#f92672">(</span>max<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;timestamp&#34;</span><span style="color:#f92672">).</span>as<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;latest_timestamp&#34;</span><span style="color:#f92672">))</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">val</span> df_joined <span style="color:#66d9ef">=</span> df<span style="color:#f92672">.</span>join<span style="color:#f92672">(</span>broadcast<span style="color:#f92672">(</span>latest_per_key<span style="color:#f92672">),</span>
+</span></span><span style="display:flex;"><span>                       <span style="color:#f92672">(</span>keys <span style="color:#66d9ef">:</span><span style="color:#66d9ef">+</span> <span style="color:#960050;background-color:#1e0010">&#34;</span><span style="color:#66d9ef">timestamp</span><span style="color:#960050;background-color:#1e0010">&#34;</span><span style="color:#f92672">).</span>map<span style="color:#f92672">(</span>col <span style="color:#66d9ef">=&gt;</span> col <span style="color:#f92672">===</span> col<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;latest_timestamp&#34;</span><span style="color:#f92672">)),</span>
+</span></span><span style="display:flex;"><span>                       <span style="color:#e6db74">&#34;left_semi&#34;</span><span style="color:#f92672">)</span>
+</span></span></code></pre></div><p>(Note: The example above uses generic <code>keys</code> and <code>timestamp</code> as placeholders for a more general case. Adapt to your specific column names).</p>
+<h3 id="faqs-on-spark-dataframe-find-row-with-max-value-per-group">FAQs on Spark DataFrame: Find Row with Max Value Per Group</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How to get the row with max value per group in Spark DataFrame</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: You can use several methods including window functions like <code>row_number</code>, aggregations with joins, <code>struct</code> ordering, or specific functions like <code>max_by</code> introduced in Spark 3.0.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is using orderBy followed by dropDuplicates safe in Spark</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: No, it is generally not safe as it can lead to unpredictable results due to internal execution plans (e.g., SPARK-16207, SPARK-30335).</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Which method is most performant for finding max per group</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The most performant method can vary based on data skew and Spark version. Window functions, <code>max_by</code>, and Dataset API&rsquo;s <code>reduceGroups</code> are often efficient, but testing with your specific data is recommended.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I use SQL for this task in Spark</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, Spark SQL fully supports window functions, aggregations, and <code>max_by</code> which can be used to solve this problem effectively.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How to handle ties (multiple rows with the same max value) in Spark</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Window functions like <code>rank</code> or <code>dense_rank</code> can be used to assign the same rank to ties. The aggregation with join method naturally includes all ties.</div>
+    </div>
+</div>
+<p>We’d love to hear your feedback! Drop your comments or questions below.</p>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

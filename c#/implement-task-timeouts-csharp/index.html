@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Implement Task Timeouts in C# Async Operations - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore various C# techniques for implementing timeouts on asynchronous operations using Task.WhenAny, CancellationTokenSource, and modern .NET features.">
+
+
+
+<meta name="keywords" content="C# timeouts, async await, Task.WhenAny, CancellationTokenSource, .NET task management">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Implement Task Timeouts in C# Async Operations - sqlpey">
+<meta name="DC.description" content="Explore various C# techniques for implementing timeouts on asynchronous operations using Task.WhenAny, CancellationTokenSource, and modern .NET features.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-07-25">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Implement Task Timeouts in C# Async Operations - sqlpey">
+<meta property="og:description" content="Explore various C# techniques for implementing timeouts on asynchronous operations using Task.WhenAny, CancellationTokenSource, and modern .NET features.">
+<meta property="og:url" content="https://sqlpey.com/c%23/implement-task-timeouts-csharp/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-07-25T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-07-25T00:00:00Z">
+<meta property="article:modified_time" content="2025-07-25T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="C#">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Implement Task Timeouts in C# Async Operations">
+<meta name="twitter:description" content="Explore various C# techniques for implementing timeouts on asynchronous operations using Task.WhenAny, CancellationTokenSource, and modern .NET features.">
+
+
+<link rel="canonical" href="https://sqlpey.com/c%23/implement-task-timeouts-csharp/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Implement Task Timeouts in C# Async Operations\"",
+  "description": "\"Explore various C# techniques for implementing timeouts on asynchronous operations using Task.WhenAny, CancellationTokenSource, and modern .NET features.\"",
+  "url": "\"https://sqlpey.com/c%23/implement-task-timeouts-csharp/\"",
+  "datePublished": "\"2025-07-25T00:00:00Z\"",
+  "dateModified": "\"2025-07-25T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/c%23/implement-task-timeouts-csharp/\""
+  },
+  "articleSection": "\"C#\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Implement Task Timeouts in C# Async Operations</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">C#</span>
+              
+              <span class="tag">Async Programming</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              11 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 25, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#implement-task-timeouts-in-c-async-operations">&ldquo;Implement Task Timeouts in C# Async Operations&rdquo;</a>
+      <ul>
+        <li></li>
+        <li><a href="#faqs-on-implementing-task-timeouts-in-c">FAQs on Implementing Task Timeouts in C#</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a></li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="implement-task-timeouts-in-c-async-operations">&ldquo;Implement Task Timeouts in C# Async Operations&rdquo;</h2>
+<p>When dealing with asynchronous operations in C#, especially those involving network requests or long-running computations, it&rsquo;s crucial to implement timeouts to prevent your application from hanging indefinitely. This ensures responsiveness and graceful handling of unresponsive operations. Several strategies exist to achieve this, leveraging built-in .NET features and extension methods.</p>
+<h4 id="solution-1-basic-timeout-with-taskwhenany">Solution 1: Basic Timeout with <code>Task.WhenAny</code></h4>
+<p>A foundational approach involves using <code>Task.WhenAny</code> to race your operation against a <code>Task.Delay</code>. This allows you to detect if the operation completes within a specified time frame.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> timeoutMilliseconds = <span style="color:#ae81ff">1000</span>; <span style="color:#75715e">// 1 second</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> operationTask = SomeOperationAsync(); <span style="color:#75715e">// Your asynchronous operation</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Wait for either the operation or the delay to complete</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> completedTask = <span style="color:#66d9ef">await</span> Task.WhenAny(operationTask, Task.Delay(timeoutMilliseconds));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (completedTask == operationTask)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// The operation completed within the timeout period.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// You can await the task again to re-throw any exceptions.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">await</span> operationTask;
+</span></span><span style="display:flex;"><span>    Console.WriteLine(<span style="color:#e6db74">&#34;Operation completed successfully.&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// The operation timed out.</span>
+</span></span><span style="display:flex;"><span>    Console.WriteLine(<span style="color:#e6db74">&#34;Operation timed out.&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// You might want to handle the timeout, perhaps by initiating cancellation.</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">async</span> Task SomeOperationAsync()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Simulate a long-running operation</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">await</span> Task.Delay(<span style="color:#ae81ff">1500</span>);
+</span></span><span style="display:flex;"><span>    Console.WriteLine(<span style="color:#e6db74">&#34;Inner operation finished.&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Expanding with Cancellation:</strong></p>
+<p>To gracefully handle timeouts and potential cancellations, you can integrate a <code>CancellationToken</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> timeoutMilliseconds = <span style="color:#ae81ff">1000</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> cancellationToken = <span style="color:#66d9ef">new</span> CancellationToken(); <span style="color:#75715e">// Or pass from a calling context</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> operationTask = SomeOperationAsync(cancellationToken);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> completedTask = <span style="color:#66d9ef">await</span> Task.WhenAny(operationTask, Task.Delay(timeoutMilliseconds, cancellationToken));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (completedTask == operationTask)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Task completed within timeout.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Consider that the task may have faulted or been canceled.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Re-await the task to propagate exceptions or cancellation.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">await</span> operationTask;
+</span></span><span style="display:flex;"><span>    Console.WriteLine(<span style="color:#e6db74">&#34;Operation completed successfully.&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Timeout or cancellation logic</span>
+</span></span><span style="display:flex;"><span>    Console.WriteLine(<span style="color:#e6db74">&#34;Operation timed out or was cancelled.&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">async</span> Task SomeOperationAsync(CancellationToken token)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">await</span> Task.Delay(<span style="color:#ae81ff">1500</span>, token); <span style="color:#75715e">// Operation that respects cancellation</span>
+</span></span><span style="display:flex;"><span>    Console.WriteLine(<span style="color:#e6db74">&#34;Inner operation finished.&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-2-extension-method-for-reusability">Solution 2: Extension Method for Reusability</h4>
+<p>Creating an extension method encapsulates the timeout logic, making it easily reusable across various tasks.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TaskExtensions</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">async</span> Task&lt;TResult&gt; TimeoutAfter&lt;TResult&gt;(<span style="color:#66d9ef">this</span> Task&lt;TResult&gt; task, TimeSpan timeout)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Create a cancellation token source for the timeout</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">using</span> (<span style="color:#66d9ef">var</span> timeoutCancellationTokenSource = <span style="color:#66d9ef">new</span> CancellationTokenSource())
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Race the original task against a delay task</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">var</span> completedTask = <span style="color:#66d9ef">await</span> Task.WhenAny(task, Task.Delay(timeout, timeoutCancellationTokenSource.Token));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (completedTask == task)
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">// Original task completed first. Cancel the timeout to clean up.</span>
+</span></span><span style="display:flex;"><span>                timeoutCancellationTokenSource.Cancel();
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">// Propagate any exceptions from the original task.</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> task;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">// The delay task completed first, meaning the original task timed out.</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> TimeoutException(<span style="color:#e6db74">&#34;The operation has timed out.&#34;</span>);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Example Usage:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// var result = await myTask.TimeoutAfter(TimeSpan.FromSeconds(5));</span>
+</span></span></code></pre></div><h4 id="solution-3-built-in-taskwaitasync-net-6">Solution 3: Built-in <code>Task.WaitAsync</code> (NET 6+)</h4>
+<p>For projects targeting .NET 6 or later, the <code>Task.WaitAsync</code> method provides a direct and optimized way to handle timeouts.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">// Using TimeSpan</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">await</span> myTask.WaitAsync(TimeSpan.FromSeconds(<span style="color:#ae81ff">10</span>));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Using CancellationToken</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">await</span> myTask.WaitAsync(cancellationToken);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Using both TimeSpan and CancellationToken</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">await</span> myTask.WaitAsync(TimeSpan.FromSeconds(<span style="color:#ae81ff">10</span>), cancellationToken);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Handling potential exceptions</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">await</span> myTask.WaitAsync(TimeSpan.FromSeconds(<span style="color:#ae81ff">10</span>), cancellationToken);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">catch</span> (TaskCanceledException)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    Console.WriteLine(<span style="color:#e6db74">&#34;Task was cancelled by CancellationToken.&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">catch</span> (TimeoutException)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    Console.WriteLine(<span style="color:#e6db74">&#34;Task timed out based on TimeSpan.&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-4-combining-tasks-with-taskwaitany">Solution 4: Combining Tasks with <code>Task.WaitAny</code></h4>
+<p>Another pattern involves creating explicit timeout tasks and using <code>Task.WaitAny</code> to determine which task finishes first.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> timeoutDurationMs = <span style="color:#ae81ff">3000</span>; <span style="color:#75715e">// 3 seconds</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> shortDelayMs = <span style="color:#ae81ff">1000</span>;     <span style="color:#75715e">// 1 second</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Your primary operation task</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> workTask = Task.Run(<span style="color:#66d9ef">async</span> () =&gt;
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">await</span> Task.Delay(<span style="color:#ae81ff">2000</span>); <span style="color:#75715e">// Simulate work</span>
+</span></span><span style="display:flex;"><span>    Console.WriteLine(<span style="color:#e6db74">&#34;Work task completed.&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Success&#34;</span>;
+</span></span><span style="display:flex;"><span>});
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// A task that completes after the timeout duration</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> timeoutTask = Task.Delay(timeoutDurationMs);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Wait for the first task to complete</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> completed = <span style="color:#66d9ef">await</span> Task.WhenAny(workTask, timeoutTask);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (completed == workTask)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Work task finished first</span>
+</span></span><span style="display:flex;"><span>    Console.WriteLine(<span style="color:#e6db74">$&#34;Work task result: {await workTask}&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Timeout task finished first</span>
+</span></span><span style="display:flex;"><span>    Console.WriteLine(<span style="color:#e6db74">&#34;Operation timed out.&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Potentially cancel the workTask if it supports cancellation</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-5-encapsulating-operations-with-timeout-and-cancellation">Solution 5: Encapsulating Operations with Timeout and Cancellation</h4>
+<p>This approach creates a factory method that accepts a task-creating function and applies a timeout, also handling cancellation.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">async</span> Task&lt;TResult&gt; CancelAfterAsync&lt;TResult&gt;(
+</span></span><span style="display:flex;"><span>    Func&lt;CancellationToken, Task&lt;TResult&gt;&gt; taskFactory,
+</span></span><span style="display:flex;"><span>    TimeSpan timeout,
+</span></span><span style="display:flex;"><span>    CancellationToken externalCancellationToken)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Token source for the timeout</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">using</span> (<span style="color:#66d9ef">var</span> timeoutCts = <span style="color:#66d9ef">new</span> CancellationTokenSource())
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Linked token source to combine external cancellation and timeout</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">using</span> (<span style="color:#66d9ef">var</span> combinedCts = CancellationTokenSource.CreateLinkedTokenSource(externalCancellationToken, timeoutCts.Token))
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Start the actual operation task, passing the combined cancellation token</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> operationTask = taskFactory(combinedCts.Token);
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Task representing the timeout delay</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> delayTask = Task.Delay(timeout, timeoutCts.Token);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Wait for either the operation or the delay to complete</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> completedTask = <span style="color:#66d9ef">await</span> Task.WhenAny(operationTask, delayTask);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Cancel the timeout token source. This has no effect if the operation already completed</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// or if the timeout already occurred.</span>
+</span></span><span style="display:flex;"><span>        timeoutCts.Cancel();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (completedTask == operationTask)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Operation completed successfully or faulted before timeout.</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> operationTask; <span style="color:#75715e">// Propagate result or exception</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Timeout occurred. The combinedCts would have been cancelled if</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// externalCancellationToken wasn&#39;t already signaled.</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> TimeoutException();
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Example Usage:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// int result = await CancelAfterAsync(ct =&gt; InnerOperationAsync(ct), TimeSpan.FromSeconds(5), CancellationToken.None);</span>
+</span></span></code></pre></div><h4 id="solution-6-using-asyncex-library">Solution 6: Using <code>AsyncEx</code> Library</h4>
+<p>The <code>AsyncEx</code> library offers convenient extensions for managing asynchronous operations, including timeouts.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">// Assuming you have the AsyncEx library installed</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Nito.AsyncEx; <span style="color:#75715e">// For AsyncEx.TaskEx.Delay and others</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>TimeSpan timeout = TimeSpan.FromSeconds(<span style="color:#ae81ff">10</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Using CancellationTokenSource with a TimeSpan constructor for the timeout</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> (<span style="color:#66d9ef">var</span> cts = <span style="color:#66d9ef">new</span> CancellationTokenSource(timeout))
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">await</span> myTask.WaitAsync(cts.Token); <span style="color:#75715e">// This will throw TaskCanceledException on timeout</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-7-comprehensive-timeout-wrapper">Solution 7: Comprehensive Timeout Wrapper</h4>
+<p>This solution provides a generic wrapper for functions and tasks, allowing them to be executed with a specified timeout.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TimeoutHelper</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Wraps a Func&lt;TResult&gt; with a timeout</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> TResult TimeoutAfter&lt;TResult&gt;(<span style="color:#66d9ef">this</span> Func&lt;TResult&gt; func, TimeSpan timeout)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> task = Task.Run(func);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> TimeoutAfterAsync(task, timeout).GetAwaiter().GetResult();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Wraps a Task&lt;TResult&gt; with a timeout</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">async</span> Task&lt;TResult&gt; TimeoutAfterAsync&lt;TResult&gt;(<span style="color:#66d9ef">this</span> Task&lt;TResult&gt; task, TimeSpan timeout)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> completed = <span style="color:#66d9ef">await</span> Task.WhenAny(task, Task.Delay(timeout));
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (completed == task)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Task completed within the timeout.</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> task.GetAwaiter().GetResult();
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Task timed out.</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> TimeoutException();
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Example usage:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> MyOperation()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        Thread.Sleep(<span style="color:#ae81ff">2000</span>); <span style="color:#75715e">// Simulate work</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">42</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> Main(<span style="color:#66d9ef">string</span>[] args)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Execute MyOperation with a 1-second timeout</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">int</span> result = MyOperation.TimeoutAfter(TimeSpan.FromSeconds(<span style="color:#ae81ff">1</span>));
+</span></span><span style="display:flex;"><span>            Console.WriteLine(<span style="color:#e6db74">$&#34;Result: {result}&#34;</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">catch</span> (TimeoutException)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            Console.WriteLine(<span style="color:#e6db74">&#34;Operation timed out.&#34;</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Caveats on Exception Throwing:</strong>
+Excessive use of exceptions for control flow can impact performance. Prefer this approach when you cannot modify the underlying function to include a timeout parameter, or when dealing with third-party libraries.</p>
+<h4 id="solution-8-nested-wait-with-taskwait">Solution 8: Nested Wait with <code>Task.Wait</code></h4>
+<p>This method uses <code>Task.Wait</code> within another task to manage timeouts without blocking the main thread.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> firstTimeoutMs = <span style="color:#ae81ff">3000</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> secondTimeoutMs = <span style="color:#ae81ff">1000</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> Main(<span style="color:#66d9ef">string</span>[] args)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> scheduler = TaskScheduler.Default;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> cancellationSource = <span style="color:#66d9ef">new</span> CancellationTokenSource();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> mainTask = Task.Run(() =&gt;
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> operationCts = <span style="color:#66d9ef">new</span> CancellationTokenSource();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> workTask = Task.Run(() =&gt;
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> (!operationCts.Token.IsCancellationRequested)
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                Console.WriteLine(<span style="color:#e6db74">&#34;Working...&#34;</span>);
+</span></span><span style="display:flex;"><span>                Thread.Sleep(<span style="color:#ae81ff">500</span>);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            Console.WriteLine(<span style="color:#e6db74">&#34;Work task finished.&#34;</span>);
+</span></span><span style="display:flex;"><span>        }, operationCts.Token);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Wait for the work task with the first timeout</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">bool</span> firstTimeoutOccurred = workTask.Wait(firstTimeoutMs, cancellationSource.Token);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (!firstTimeoutOccurred)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            Console.WriteLine(<span style="color:#e6db74">&#34;First timeout reached. Still waiting...&#34;</span>);
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Wait again with the second timeout</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">bool</span> secondTimeoutOccurred = workTask.Wait(secondTimeoutMs, cancellationSource.Token);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (!secondTimeoutOccurred)
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                Console.WriteLine(<span style="color:#e6db74">&#34;Second timeout reached. Cancelling operation.&#34;</span>);
+</span></span><span style="display:flex;"><span>                operationCts.Cancel();
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            Console.WriteLine(<span style="color:#e6db74">&#34;Work task completed before the first timeout.&#34;</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    mainTask.Wait(); <span style="color:#75715e">// Wait for the main task to complete</span>
+</span></span><span style="display:flex;"><span>    Console.WriteLine(<span style="color:#e6db74">&#34;Main process finished.&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-9-reactive-extensions-rxnet">Solution 9: Reactive Extensions (Rx.NET)</h4>
+<p>Reactive Extensions can be used to elegantly manage timed operations.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Reactive.Linq;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Reactive.Concurrency;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">RxTimeoutExtensions</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> Task TimeoutAfter(<span style="color:#66d9ef">this</span> IObservable&lt;T&gt; source, TimeSpan timeout, IScheduler scheduler = <span style="color:#66d9ef">null</span>)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        scheduler ??= TaskPoolScheduler.Default;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> source.Timeout(timeout, scheduler).ToTask();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Example Usage:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// var observableTask = Observable.Interval(TimeSpan.FromMilliseconds(500))</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//                               .TimeoutAfter(TimeSpan.FromSeconds(2));</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// await observableTask;</span>
+</span></span></code></pre></div><h4 id="solution-10-cancellationtokensource-with-timespan">Solution 10: <code>CancellationTokenSource</code> with TimeSpan</h4>
+<p>A straightforward way to implement timeouts, especially with <code>.NET 6+</code>, is by utilizing the <code>CancellationTokenSource</code> constructor that accepts a <code>TimeSpan</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">async</span> Task PerformOperationWithTimeout(CancellationToken cancellationToken)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> timeout = TimeSpan.FromSeconds(<span style="color:#ae81ff">5</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Create a CancellationTokenSource that will automatically cancel after the specified TimeSpan</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">using</span> var timeoutCts = <span style="color:#66d9ef">new</span> CancellationTokenSource(timeout);
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Link the external cancellation token with the timeout token</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">using</span> var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Your asynchronous operation, passing the linked cancellation token</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">await</span> MessageResource.FetchAsync(m.Sid, linkedCts.Token);
+</span></span><span style="display:flex;"><span>        Console.WriteLine(<span style="color:#e6db74">&#34;Fetch completed successfully.&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">catch</span> (TaskCanceledException ex)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Differentiate between timeout and external cancellation</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (timeoutCts.IsCancellationRequested)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> TimeoutException(<span style="color:#e6db74">&#34;Operation timed out.&#34;</span>, ex);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">throw</span>; <span style="color:#75715e">// Rethrow if it was due to external cancellation</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-11-taskdelay-and-taskcompletionsource">Solution 11: <code>Task.Delay</code> and <code>TaskCompletionSource</code></h4>
+<p>This approach uses <code>Task.Delay</code> and <code>TaskCompletionSource</code> to manage a timeout and optionally trigger cancellation.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">async</span> Task&lt;<span style="color:#66d9ef">bool</span>&gt; BeforeTimeout(<span style="color:#66d9ef">this</span> Task task, <span style="color:#66d9ef">int</span> millisecondsTimeout)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (task.IsCompleted) <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>; <span style="color:#75715e">// Already finished</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (millisecondsTimeout == <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>; <span style="color:#75715e">// Timeout is immediate if not completed</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (millisecondsTimeout == Timeout.Infinite)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">await</span> Task.WhenAll(task); <span style="color:#75715e">// Wait indefinitely</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> tcs = <span style="color:#66d9ef">new</span> TaskCompletionSource&lt;<span style="color:#66d9ef">object</span>&gt;();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Timer triggers cancellation of the TaskCompletionSource</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">using</span> (<span style="color:#66d9ef">var</span> timer = <span style="color:#66d9ef">new</span> Timer(state =&gt; ((TaskCompletionSource&lt;<span style="color:#66d9ef">object</span>&gt;)state).TrySetCanceled(), tcs, millisecondsTimeout, Timeout.Infinite))
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Race the actual task against the timer&#39;s cancellation task</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> Task.WhenAny(task, tcs.Task) == task;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Example Usage:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// var receivingTask = connection.ReceiveAsync(ct);</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// while (!await receivingTask.BeforeTimeout(keepAliveMilliseconds)) { /* send keep-alive */ }</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// var data = await receivingTask;</span>
+</span></span></code></pre></div><h4 id="solution-12-variants-of-taskwhenany-with-cancellation">Solution 12: Variants of <code>Task.WhenAny</code> with Cancellation</h4>
+<p>These variations on <code>Task.WhenAny</code> provide flexibility in how timeouts are handled, either just detecting them or actively canceling the operation.</p>
+<p><strong>Detecting Timeout without Cancelling:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">async</span> Task&lt;<span style="color:#66d9ef">bool</span>&gt; TimedOutAsync(<span style="color:#66d9ef">this</span> Task task, <span style="color:#66d9ef">int</span> timeoutMilliseconds)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (timeoutMilliseconds &lt;= <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">return</span> !task.IsCompleted;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> cts = <span style="color:#66d9ef">new</span> CancellationTokenSource();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">await</span> Task.WhenAny(task, Task.Delay(timeoutMilliseconds, cts.Token)) == task)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        cts.Cancel(); <span style="color:#75715e">// Task completed, cancel the delay task</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">await</span> task;   <span style="color:#75715e">// Re-await to propagate exceptions</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>; <span style="color:#75715e">// Did not time out</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>; <span style="color:#75715e">// Timed out</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Cancelling Operation on Timeout:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">async</span> Task&lt;T&gt; CancelAfterAsync&lt;T&gt;(<span style="color:#66d9ef">this</span> Func&lt;CancellationToken, Task&lt;T&gt;&gt; taskFactory, <span style="color:#66d9ef">int</span> timeoutMilliseconds)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> taskCts = <span style="color:#66d9ef">new</span> CancellationTokenSource();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> timerCts = <span style="color:#66d9ef">new</span> CancellationTokenSource();
+</span></span><span style="display:flex;"><span>    Task&lt;T&gt; task = taskFactory(taskCts.Token);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">await</span> Task.WhenAny(task, Task.Delay(timeoutMilliseconds, timerCts.Token)) == task)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        timerCts.Cancel(); <span style="color:#75715e">// Task completed, cancel the timer</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        taskCts.Cancel(); <span style="color:#75715e">// Timer completed, cancel the task</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> task; <span style="color:#75715e">// Propagate result or exception</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-13-non-exception-based-timeout-extension">Solution 13: Non-Exception Based Timeout Extension</h4>
+<p>This pattern offers a way to handle timeouts without throwing exceptions, returning a boolean indicating success.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">async</span> Task&lt;<span style="color:#66d9ef">bool</span>&gt; TryWithTimeoutAfter&lt;TResult&gt;(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span> Task&lt;TResult&gt; task,
+</span></span><span style="display:flex;"><span>    TimeSpan timeout,
+</span></span><span style="display:flex;"><span>    Action&lt;TResult&gt; onSuccess)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">using</span> var timeoutCts = <span style="color:#66d9ef">new</span> CancellationTokenSource();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> completedTask = <span style="color:#66d9ef">await</span> Task.WhenAny(task, Task.Delay(timeout, timeoutCts.Token));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (completedTask == task)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        timeoutCts.Cancel(); <span style="color:#75715e">// Cancel the delay</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> result = <span style="color:#66d9ef">await</span> task; <span style="color:#75715e">// Get result or propagate exception</span>
+</span></span><span style="display:flex;"><span>        onSuccess(result);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>; <span style="color:#75715e">// Operation succeeded within timeout</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>; <span style="color:#75715e">// Operation timed out</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Example Usage:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// string result = null;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// if (await myTask.TryWithTimeoutAfter(TimeSpan.FromSeconds(1), r =&gt; result = r))</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// {</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//     Console.WriteLine($&#34;Received: {result}&#34;);</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// }</span>
+</span></span></code></pre></div><h4 id="general-best-practices-for-timeouts">General Best Practices for Timeouts</h4>
+<ul>
+<li><strong>Timeout Everything Potentially Blocking:</strong> Any operation that could potentially block indefinitely should have a timeout. This prevents applications from hanging.</li>
+<li><strong>Graceful Handling:</strong> Instead of just throwing an exception, consider how your application should react to a timeout. This might involve retries, fallback mechanisms, or informing the user.</li>
+<li><strong>Cancellation is Key:</strong> Ensure that when a timeout occurs, any ongoing work related to that operation is properly canceled. This frees up resources and prevents unexpected behavior.</li>
+<li><strong>Consider Performance:</strong> While exceptions can be used for timeouts, they are generally heavier than returning a status or using <code>Task.WhenAny</code> with a boolean result. Choose the method that best suits your performance needs and error handling strategy.</li>
+</ul>
+<h3 id="faqs-on-implementing-task-timeouts-in-c">FAQs on Implementing Task Timeouts in C#</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the primary way to implement a timeout for a C# task</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The most common and versatile method is using <code>Task.WhenAny</code> to race your target task against a <code>Task.Delay</code>, combined with <code>CancellationTokenSource</code> for managing cancellation.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: When should I use Task.WhenAny for timeouts</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Use <code>Task.WhenAny</code> when you need to detect if an asynchronous operation completes within a specific duration. It&rsquo;s a core primitive for implementing timeout logic.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How can I make timeout logic reusable in C#</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Create extension methods for <code>Task</code> or <code>Task&lt;TResult&gt;</code> that encapsulate the <code>Task.WhenAny</code> and <code>Task.Delay</code> pattern. This allows you to apply timeouts with a simple method call, like <code>myTask.TimeoutAfter(TimeSpan.FromSeconds(5))</code>.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the benefit of using Task.WaitAsync in .NET 6 and later</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: <code>Task.WaitAsync</code> provides a built-in, optimized solution for applying timeouts to tasks, simplifying the code compared to manual <code>Task.WhenAny</code> implementations. It directly supports <code>TimeSpan</code> and <code>CancellationToken</code> arguments.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How do I handle exceptions when a task times out</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: When a timeout occurs, you typically throw a <code>TimeoutException</code>. If your operation also supports cancellation, you might differentiate between a timeout and an explicit cancellation signal. Many timeout patterns re-await the original task after <code>Task.WhenAny</code> to propagate its exceptions.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is it bad practice to use exceptions for timeout control flow</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Generally, relying heavily on exceptions for normal control flow can degrade performance due to the overhead of exception handling. However, for implementing timeouts, especially when dealing with external systems or libraries that don&rsquo;t support cancellation, throwing <code>TimeoutException</code> is a common and accepted pattern.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How can I cancel an operation that has timed out</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Integrate <code>CancellationTokenSource</code> with your timeout logic. When a timeout is detected, cancel the <code>CancellationTokenSource</code> associated with the operation to signal it to stop processing.</div>
+    </div>
+</div>
+<p>We’d love to hear your feedback! Drop your comments or questions below.</p>
+<h2 id="solutions">Solutions</h2>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

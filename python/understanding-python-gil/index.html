@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Understanding Python&#39;s GIL: Performance, Multithreading &amp; CPU-Bound Tasks - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore the Python Global Interpreter Lock (GIL), its impact on multithreading and CPU-bound tasks, and effective workarounds for multi-core processors.">
+
+
+
+<meta name="keywords" content="Python GIL, Global Interpreter Lock, Python multithreading, CPU-bound tasks, multiprocessing, threading performance">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Understanding Python&#39;s GIL: Performance, Multithreading &amp; CPU-Bound Tasks - sqlpey">
+<meta name="DC.description" content="Explore the Python Global Interpreter Lock (GIL), its impact on multithreading and CPU-bound tasks, and effective workarounds for multi-core processors.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-07-22">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Understanding Python&#39;s GIL: Performance, Multithreading &amp; CPU-Bound Tasks - sqlpey">
+<meta property="og:description" content="Explore the Python Global Interpreter Lock (GIL), its impact on multithreading and CPU-bound tasks, and effective workarounds for multi-core processors.">
+<meta property="og:url" content="https://sqlpey.com/python/understanding-python-gil/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-07-22T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-07-22T00:00:00Z">
+<meta property="article:modified_time" content="2025-07-22T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Python">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Understanding Python&#39;s GIL: Performance, Multithreading &amp; CPU-Bound Tasks">
+<meta name="twitter:description" content="Explore the Python Global Interpreter Lock (GIL), its impact on multithreading and CPU-bound tasks, and effective workarounds for multi-core processors.">
+
+
+<link rel="canonical" href="https://sqlpey.com/python/understanding-python-gil/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Understanding Python's GIL: Performance, Multithreading \\u0026 CPU-Bound Tasks\"",
+  "description": "\"Explore the Python Global Interpreter Lock (GIL), its impact on multithreading and CPU-bound tasks, and effective workarounds for multi-core processors.\"",
+  "url": "\"https://sqlpey.com/python/understanding-python-gil/\"",
+  "datePublished": "\"2025-07-22T00:00:00Z\"",
+  "dateModified": "\"2025-07-22T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/python/understanding-python-gil/\""
+  },
+  "articleSection": "\"Python\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Understanding Python&rsquo;s GIL: Performance, Multithreading &amp; CPU-Bound Tasks</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Python</span>
+              
+              <span class="tag">Multithreading</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              10 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 22, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#understanding-pythons-gil-performance-multithreading--cpu-bound-tasks">&ldquo;Understanding Python&rsquo;s GIL: Performance, Multithreading &amp; CPU-Bound Tasks&rdquo;</a>
+      <ul>
+        <li><a href="#what-is-the-core-issue-with-the-python-gil-for-multi-core-systems">What is the core issue with the Python GIL for multi-core systems?</a></li>
+        <li><a href="#how-does-the-gil-affect-pythons-threading-model">How does the GIL affect Python&rsquo;s threading model?</a></li>
+        <li><a href="#are-there-alternative-approaches-to-bypass-the-gil-for-cpu-bound-parallelism">Are there alternative approaches to bypass the GIL for CPU-bound parallelism?</a></li>
+        <li><a href="#what-about-python-313-and-the-optional-gil">What about Python 3.13 and the optional GIL?</a></li>
+        <li><a href="#can-c-extensions-release-the-gil">Can C extensions release the GIL?</a></li>
+        <li><a href="#what-if-threads-share-data-how-is-that-managed">What if threads share data? How is that managed?</a></li>
+        <li><a href="#can-the-gil-cause-deadlocks">Can the GIL cause deadlocks?</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#is-the-gil-a-universal-python-feature">Is the GIL a universal Python feature?</a></li>
+        <li><a href="#what-are-the-advantages-of-using-a-gil">What are the advantages of using a GIL?</a></li>
+        <li><a href="#how-can-i-learn-more-about-pythons-gil">How can I learn more about Python&rsquo;s GIL?</a></li>
+        <li><a href="#faqs-on-python-gil">FAQs on Python GIL</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="understanding-pythons-gil-performance-multithreading--cpu-bound-tasks">&ldquo;Understanding Python&rsquo;s GIL: Performance, Multithreading &amp; CPU-Bound Tasks&rdquo;</h2>
+<p>The Global Interpreter Lock (GIL) in Python&rsquo;s CPython implementation is a central concept affecting how multithreaded programs utilize multi-core processors. At its core, the GIL is a mutex designed to protect access to Python&rsquo;s internal interpreter data structures. This serialization mechanism, while simplifying interpreter development and making object models inherently thread-safe, means that even on multi-core systems, only one thread can execute Python bytecode at any given moment. This limitation is particularly impactful for CPU-bound tasks where parallel computation is desired.</p>
+<h3 id="what-is-the-core-issue-with-the-python-gil-for-multi-core-systems">What is the core issue with the Python GIL for multi-core systems?</h3>
+<p>The fundamental problem arises because the GIL serializes Python bytecode execution. Imagine you have a program with multiple threads designed to leverage your machine&rsquo;s multiple CPU cores. Due to the GIL, only one thread can hold the interpreter lock and execute Python code at a time. While other threads might have access to available CPU cores, they remain idle, waiting for the current thread to release the GIL. This effectively negates the benefits of multi-core processing for CPU-bound operations, making a multi-threaded Python program perform similarly to a single-threaded one in such scenarios.</p>
+<p>Consider an analogy: a hundred developers needing to use a single coffee mug. Most would spend their time waiting for the mug rather than coding. Similarly, threads wait for the GIL instead of executing in parallel.</p>
+<h3 id="how-does-the-gil-affect-pythons-threading-model">How does the GIL affect Python&rsquo;s threading model?</h3>
+<p>Python&rsquo;s <code>threading</code> module provides a way to run multiple threads concurrently. However, due to the GIL, this concurrency is not true parallelism for CPU-bound tasks. Threads execute in a time-sharing manner, with the GIL being passed between them. While this rapid switching can create the illusion of parallel execution to a human observer, it introduces overhead.</p>
+<p>This is why, for CPU-intensive work, Python&rsquo;s <code>threading</code> module is often not the optimal choice for speeding up code. It&rsquo;s more suited for I/O-bound tasks, where threads spend a significant amount of time waiting for external operations (like network requests or disk reads) to complete. During these waiting periods, the GIL is released, allowing other threads to execute.</p>
+<h3 id="are-there-alternative-approaches-to-bypass-the-gil-for-cpu-bound-parallelism">Are there alternative approaches to bypass the GIL for CPU-bound parallelism?</h3>
+<p>Yes, several strategies exist to circumvent the GIL&rsquo;s limitations and achieve true parallelism in Python:</p>
+<ul>
+<li>
+<p><strong><code>multiprocessing</code> Module:</strong> This is the most common and recommended approach. The <code>multiprocessing</code> module spawns separate processes instead of threads. Each process has its own Python interpreter and memory space, thus bypassing the GIL entirely. This allows multiple processes to run truly in parallel on different CPU cores. The interface of <code>multiprocessing</code> is designed to be similar to the <code>threading</code> module, making the transition smoother.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> multiprocessing
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">square_number</span>(number):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Calculates the square of a number.&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Process </span><span style="color:#e6db74">{</span>multiprocessing<span style="color:#f92672">.</span>current_process()<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74"> calculating square of </span><span style="color:#e6db74">{</span>number<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    time<span style="color:#f92672">.</span>sleep(<span style="color:#ae81ff">1</span>) <span style="color:#75715e"># Simulate work</span>
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> number <span style="color:#f92672">*</span> number
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Process </span><span style="color:#e6db74">{</span>multiprocessing<span style="color:#f92672">.</span>current_process()<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74"> finished. Result: </span><span style="color:#e6db74">{</span>result<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> result
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
+</span></span><span style="display:flex;"><span>    numbers <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">6</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">8</span>]
+</span></span><span style="display:flex;"><span>    start_time <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Create a Pool of worker processes</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># The number of processes defaults to the number of CPUs on the machine</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> multiprocessing<span style="color:#f92672">.</span>Pool() <span style="color:#66d9ef">as</span> pool:
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Use map to apply the function to each item in the iterable</span>
+</span></span><span style="display:flex;"><span>        results <span style="color:#f92672">=</span> pool<span style="color:#f92672">.</span>map(square_number, numbers)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    end_time <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Results: </span><span style="color:#e6db74">{</span>results<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Total execution time: </span><span style="color:#e6db74">{</span>end_time <span style="color:#f92672">-</span> start_time<span style="color:#e6db74">:</span><span style="color:#e6db74">.2f</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> seconds&#34;</span>)
+</span></span></code></pre></div></li>
+<li>
+<p><strong><code>concurrent.futures.ProcessPoolExecutor</code>:</strong> This is a higher-level interface built on top of the <code>multiprocessing</code> module. It provides a convenient way to manage a pool of processes and submit tasks to them asynchronously. It offers a cleaner API for managing process-based concurrency.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> concurrent.futures <span style="color:#f92672">import</span> ProcessPoolExecutor
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">multiply_by_two</span>(x):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Multiplies a number by two.&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Process </span><span style="color:#e6db74">{</span>multiprocessing<span style="color:#f92672">.</span>current_process()<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74"> multiplying </span><span style="color:#e6db74">{</span>x<span style="color:#e6db74">}</span><span style="color:#e6db74"> by 2&#34;</span>)
+</span></span><span style="display:flex;"><span>    time<span style="color:#f92672">.</span>sleep(<span style="color:#ae81ff">0.5</span>) <span style="color:#75715e"># Simulate work</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> x <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> [<span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">20</span>, <span style="color:#ae81ff">30</span>, <span style="color:#ae81ff">40</span>, <span style="color:#ae81ff">50</span>]
+</span></span><span style="display:flex;"><span>    start_time <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Create a ProcessPoolExecutor</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> ProcessPoolExecutor() <span style="color:#66d9ef">as</span> executor:
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Submit tasks and get futures</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># map applies the function to each item in the iterable and returns results in order</span>
+</span></span><span style="display:flex;"><span>        results <span style="color:#f92672">=</span> list(executor<span style="color:#f92672">.</span>map(multiply_by_two, data))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    end_time <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Calculated values: </span><span style="color:#e6db74">{</span>results<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Time taken: </span><span style="color:#e6db74">{</span>end_time <span style="color:#f92672">-</span> start_time<span style="color:#e6db74">:</span><span style="color:#e6db74">.2f</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> seconds&#34;</span>)
+</span></span></code></pre></div></li>
+<li>
+<p><strong>External Libraries (C Extensions, NumPy, etc.):</strong> Certain computationally intensive libraries, like NumPy for numerical operations, are often implemented in C or other compiled languages. These libraries are designed to release the GIL during their heavy computations. When Python code calls these libraries, the GIL is temporarily released, allowing the underlying optimized code to run and potentially utilize multiple cores.</p>
+</li>
+<li>
+<p><strong>Jython and IronPython:</strong> These are alternative Python implementations. Jython runs on the Java Virtual Machine (JVM), and IronPython runs on the .NET Common Language Runtime (CLR). Neither of these implementations has a GIL, allowing for true multi-threaded parallelism. However, they may have compatibility differences with CPython extensions.</p>
+</li>
+</ul>
+<h3 id="what-about-python-313-and-the-optional-gil">What about Python 3.13 and the optional GIL?</h3>
+<p>A significant development is the introduction of an optional GIL in Python 3.13. This change, driven by PEP 703, allows developers to build Python with the GIL disabled. When the GIL is disabled, Python threads can indeed execute truly in parallel on multi-core processors. However, this feature requires specific build configurations and might not be universally available in all Python distributions immediately. As of mid-2025, it&rsquo;s still an evolving area, and wider adoption by operating system distributions is anticipated. If you&rsquo;re keen to explore this, you might need to compile Python from source or find distributions that have enabled this option. You can find discussions on how to disable the GIL in Python 3.13 in various forums and developer resources.</p>
+<h3 id="can-c-extensions-release-the-gil">Can C extensions release the GIL?</h3>
+<p>Yes, developers writing C extensions for Python can explicitly release the GIL when performing operations that are themselves thread-safe or would otherwise block. This allows other Python threads to execute while the C extension is busy. Common scenarios include I/O operations or computationally intensive tasks within the C extension.</p>
+<h3 id="what-if-threads-share-data-how-is-that-managed">What if threads share data? How is that managed?</h3>
+<p>When multiple threads access shared data, potential race conditions can occur, leading to unpredictable behavior. This is a concern independent of the GIL, though the GIL&rsquo;s serialization of Python bytecode can sometimes mask or alter the manifestation of these issues.</p>
+<p>To safely manage shared data between threads, explicit synchronization mechanisms are necessary:</p>
+<ul>
+<li>
+<p><strong>Locks (Mutexes):</strong> A lock, or mutex, is a primitive synchronization object that can be acquired by only one thread at a time. Threads attempting to acquire an already-held lock will block until it&rsquo;s released. This prevents multiple threads from modifying shared data simultaneously.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> threading
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>counter <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create a lock object</span>
+</span></span><span style="display:flex;"><span>lock <span style="color:#f92672">=</span> threading<span style="color:#f92672">.</span>Lock()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">increment_counter</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">global</span> counter
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">100000</span>):
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Acquire the lock before accessing shared data</span>
+</span></span><span style="display:flex;"><span>        lock<span style="color:#f92672">.</span>acquire()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            counter <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">finally</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># Release the lock after accessing shared data</span>
+</span></span><span style="display:flex;"><span>            lock<span style="color:#f92672">.</span>release()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>thread1 <span style="color:#f92672">=</span> threading<span style="color:#f92672">.</span>Thread(target<span style="color:#f92672">=</span>increment_counter)
+</span></span><span style="display:flex;"><span>thread2 <span style="color:#f92672">=</span> threading<span style="color:#f92672">.</span>Thread(target<span style="color:#f92672">=</span>increment_counter)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>thread1<span style="color:#f92672">.</span>start()
+</span></span><span style="display:flex;"><span>thread2<span style="color:#f92672">.</span>start()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>thread1<span style="color:#f92672">.</span>join()
+</span></span><span style="display:flex;"><span>thread2<span style="color:#f92672">.</span>join()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Final counter value: </span><span style="color:#e6db74">{</span>counter<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div></li>
+<li>
+<p><strong>Semaphores:</strong> Semaphores are more generalized synchronization primitives that control access to a resource with a limited number of available instances.</p>
+</li>
+<li>
+<p><strong>Queues:</strong> Python&rsquo;s <code>queue</code> module provides thread-safe queue implementations, which are excellent for passing data between threads without direct shared memory access.</p>
+</li>
+</ul>
+<h3 id="can-the-gil-cause-deadlocks">Can the GIL cause deadlocks?</h3>
+<p>While the GIL itself doesn&rsquo;t directly cause deadlocks, the way threads interact with locks and the GIL can lead to deadlock situations. A common scenario involves a thread acquiring a lock and then attempting to acquire the GIL (or vice versa) in a way that creates a circular dependency.</p>
+<p>Consider this example from a VFX context:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#75715e">// Hypothetical C++ code snippet
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">MyCallback</span>(<span style="color:#66d9ef">const</span> Context <span style="color:#f92672">&amp;</span>context) {
+</span></span><span style="display:flex;"><span>    Auto<span style="color:#f92672">&lt;</span>Lock<span style="color:#f92672">&gt;</span> lock(GetMyMutexFromContext(context)); <span style="color:#75715e">// Thread acquires a custom mutex
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// ... some operations ...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    EvalMyPythonString(str); <span style="color:#75715e">// This function might try to acquire the GIL
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// ... more operations ...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p>A deadlock could occur if:</p>
+<p>| Step | Main Thread                      | Other Thread                     |
+| :</p>
+<h2 id="solutions">Solutions</h2>
+<p>| :</p>
+<ul>
+<li>
+<p>| :</p>
+</li>
+<li>
+<p>|
+| 1    | Acquires GIL                     | Work starts                      |
+| 2    | Computation requested            | <code>MyCallback</code> runs and acquires <code>MyMutex</code> |
+| 3    |                                  | <code>MyCallback</code> waits for GIL       |
+| 4    | <code>MyCallback</code> runs and waits for <code>MyMutex</code> | waiting for GIL                  |</p>
+</li>
+</ul>
+<p>In this scenario, the Main Thread holds the GIL and waits for <code>MyMutex</code> (which is held by the Other Thread). Simultaneously, the Other Thread holds <code>MyMutex</code> and waits for the GIL (which is held by the Main Thread). Neither can proceed, resulting in a deadlock. Releasing the GIL in C extensions at appropriate times is crucial to prevent such scenarios.</p>
+<h3 id="is-the-gil-a-universal-python-feature">Is the GIL a universal Python feature?</h3>
+<p>No, the GIL is an implementation detail specific to CPython, the most common Python interpreter. Other implementations like Jython (running on the JVM) and IronPython (running on .NET CLR) do not have a GIL, and thus can achieve true multi-threaded parallelism without requiring the <code>multiprocessing</code> module. PyPy, another Python implementation, also has a different threading model.</p>
+<h3 id="what-are-the-advantages-of-using-a-gil">What are the advantages of using a GIL?</h3>
+<p>Despite its performance implications for multi-core CPU-bound tasks, the GIL offers several benefits:</p>
+<ul>
+<li><strong>Simplified Interpreter Implementation:</strong> A single global lock makes managing the interpreter&rsquo;s internal state and object model much simpler and less prone to race conditions during development.</li>
+<li><strong>Ease of C Library Integration:</strong> Many existing C libraries are not inherently thread-safe. The GIL makes it easier to integrate these libraries into a multi-threaded Python environment, as the GIL serializes access to Python objects, providing a layer of protection.</li>
+<li><strong>Performance in Single-Threaded Scenarios:</strong> For programs that are primarily single-threaded or I/O-bound, the overhead of acquiring and releasing fine-grained locks across all data structures can be greater than the cost of a single GIL.</li>
+</ul>
+<h3 id="how-can-i-learn-more-about-pythons-gil">How can I learn more about Python&rsquo;s GIL?</h3>
+<p>For a deeper dive into the intricacies of the Python GIL, its history, and its implications, explore these resources:</p>
+<ul>
+<li><a href="https://docs.python.org/3/library/threading.html" target="_blank" rel="noopener">Python Threading Documentation</a>
+</li>
+<li><a href="https://docs.python.org/3/glossary.html#term-global-interpreter-lock" target="_blank" rel="noopener">CPython Implementation Details</a>
+</li>
+<li><a href="https://peps.python.org/pep-0703/" target="_blank" rel="noopener">PEP 703: Making the GIL optional in CPython</a>
+</li>
+<li><a href="https://docs.python.org/3/library/multiprocessing.html" target="_blank" rel="noopener">multiprocessing Module Documentation</a>
+</li>
+<li><a href="https://docs.python.org/3/library/concurrent.futures.html" target="_blank" rel="noopener">concurrent.futures Documentation</a>
+</li>
+</ul>
+<hr>
+<h3 id="faqs-on-python-gil">FAQs on Python GIL</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the main purpose of Python&#39;s Global Interpreter Lock</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The Global Interpreter Lock (GIL) in CPython is a mutex that ensures only one thread executes Python bytecode at a time. This simplifies memory management and makes Python&rsquo;s object model inherently safe from concurrent access issues.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Does the GIL prevent Python from using multiple CPU cores</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, for CPU-bound tasks, the GIL prevents Python threads from running in parallel on multiple CPU cores. Only one thread can hold the GIL and execute Python code at any given moment, even on multi-core systems.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: When is Python&#39;s threading module still useful</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Python&rsquo;s <code>threading</code> module remains useful for I/O-bound tasks. When threads wait for I/O operations (like network requests or disk access), they release the GIL, allowing other threads to run. This improves the responsiveness and efficiency of applications that perform a lot of waiting.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How can I achieve true parallelism in Python for CPU-bound tasks</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: To achieve true parallelism for CPU-bound tasks, you should use the <code>multiprocessing</code> module or <code>concurrent.futures.ProcessPoolExecutor</code>. These approaches create separate processes, each with its own Python interpreter and GIL, enabling parallel execution across multiple CPU cores.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Are there Python implementations without a GIL</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, alternative Python implementations like Jython (running on the JVM) and IronPython (running on .NET CLR) do not have a GIL, allowing for true multi-threaded parallelism without needing separate processes.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the impact of the GIL on C extensions</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: C extensions can release the GIL when performing long-running or blocking operations. This allows other Python threads to execute while the C extension is busy, improving overall program performance.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is the GIL being removed from Python</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The GIL is being made optional in Python 3.13. This means it can be disabled during the build process, allowing for true multi-threaded parallelism. However, its widespread availability depends on distribution support.</div>
+    </div>
+</div>
+<p>We&rsquo;d love to hear your thoughts or if you have any further questions about the Python GIL or its impact on your projects! Please share your feedback in the comments below.</p>
+<p>For more on Python programming, check out <a href="https://sqlpey.com/python/what-is-python" target="_blank" rel="noopener">What is Python</a>
+ and explore solutions to common Python errors like <a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">How to Fix SSL Certificate Verify Failed Error in Python</a>
+.</p>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

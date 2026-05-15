@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Crafting 32-Bit Executables from Assembly: A Detailed Inquiry - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore the nuances of building 32-bit executables from assembly code, covering GCC flags, assembler directives, linker options, and common pitfalls.">
+
+
+
+<meta name="keywords" content="assembly, x86, 32-bit, GCC, linker, Linux, ELF, NASM, YASM">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Crafting 32-Bit Executables from Assembly: A Detailed Inquiry - sqlpey">
+<meta name="DC.description" content="Explore the nuances of building 32-bit executables from assembly code, covering GCC flags, assembler directives, linker options, and common pitfalls.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-07-22">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Crafting 32-Bit Executables from Assembly: A Detailed Inquiry - sqlpey">
+<meta property="og:description" content="Explore the nuances of building 32-bit executables from assembly code, covering GCC flags, assembler directives, linker options, and common pitfalls.">
+<meta property="og:url" content="https://sqlpey.com/assembly/building-32-bit-assembly/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-07-22T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-07-22T00:00:00Z">
+<meta property="article:modified_time" content="2025-07-22T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Assembly">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Crafting 32-Bit Executables from Assembly: A Detailed Inquiry">
+<meta name="twitter:description" content="Explore the nuances of building 32-bit executables from assembly code, covering GCC flags, assembler directives, linker options, and common pitfalls.">
+
+
+<link rel="canonical" href="https://sqlpey.com/assembly/building-32-bit-assembly/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Crafting 32-Bit Executables from Assembly: A Detailed Inquiry\"",
+  "description": "\"Explore the nuances of building 32-bit executables from assembly code, covering GCC flags, assembler directives, linker options, and common pitfalls.\"",
+  "url": "\"https://sqlpey.com/assembly/building-32-bit-assembly/\"",
+  "datePublished": "\"2025-07-22T00:00:00Z\"",
+  "dateModified": "\"2025-07-22T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/assembly/building-32-bit-assembly/\""
+  },
+  "articleSection": "\"Assembly\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Crafting 32-Bit Executables from Assembly: A Detailed Inquiry</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Assembly</span>
+              
+              <span class="tag">Linux</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              9 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 22, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#crafting-32-bit-executables-from-assembly-a-detailed-inquiry">&ldquo;Crafting 32-Bit Executables from Assembly: A Detailed Inquiry&rdquo;</a>
+      <ul>
+        <li></li>
+        <li><a href="#faqs-on-crafting-32-bit-executables-from-assembly">FAQs on Crafting 32-Bit Executables from Assembly</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a></li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="crafting-32-bit-executables-from-assembly-a-detailed-inquiry">&ldquo;Crafting 32-Bit Executables from Assembly: A Detailed Inquiry&rdquo;</h2>
+<p>When working with assembly language on a 64-bit system, particularly on Linux distributions like Ubuntu, you might encounter specific requirements or challenges when aiming to produce 32-bit executables. This exploration delves into the methods and considerations for achieving this, addressing common directives, compiler/linker flags, and potential issues.</p>
+<h4 id="core-principles-for-32-bit-assembly-creation">Core Principles for 32-Bit Assembly Creation</h4>
+<p>The fundamental aspect of generating a 32-bit executable involves ensuring that both the assembler and the linker operate in a 32-bit context. This dictates the structure of the output file and how instructions are interpreted.</p>
+<h5 id="the-role-of-code32-vs-output-format">The Role of <code>.code32</code> vs. Output Format</h5>
+<p>A common point of confusion is the <code>.code32</code> directive. It&rsquo;s important to clarify that <code>.code32</code> is primarily for assembling kernels that intermix 16-bit and 32-bit code. It does <em>not</em> alter the output file&rsquo;s format, which is the definitive factor in determining the execution mode. Relying on <code>.code32</code> can lead to obscure runtime errors rather than clear build-time failures, especially if you accidentally use instructions like <code>push</code> or <code>pop</code> in a context that&rsquo;s incompatible with the target mode. For general assembly programming, it&rsquo;s often best to avoid <code>.code32</code> and let the linker flags define the 32-bit nature of the final binary.</p>
+<h5 id="leveraging-the-s-file-extension">Leveraging the <code>.S</code> File Extension</h5>
+<p>A recommended practice is to use the <code>.S</code> file extension for hand-written assembly source files. This convention signals to <code>gcc</code> that the file should be processed by the C preprocessor (<code>cpp</code>) before being passed to the assembler. This allows you to utilize preprocessor directives like <code>#include &lt;sys/syscall.h&gt;</code>, which is invaluable for accessing system call numbers directly, simplifying interaction with the operating system kernel. This also helps distinguish your assembly sources from <code>.s</code> files generated by C compilers, such as <code>gcc foo.c -O3 -S</code>.</p>
+<h4 id="essential-gcc-and-linker-commands">Essential GCC and Linker Commands</h4>
+<p>To construct 32-bit binaries, a combination of specific GCC and linker options is required.</p>
+<h5 id="static-32-bit-binaries-no-libraries">Static 32-Bit Binaries (No Libraries)</h5>
+<p>For creating a static 32-bit binary that includes absolutely no external libraries or startup code, the following command is effective:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>gcc -g your_assembly_file.S -o output_executable -m32 -nostdlib -static
+</span></span></code></pre></div><ul>
+<li><code>-m32</code>: This crucial flag instructs GCC to target a 32-bit architecture.</li>
+<li><code>-nostdlib</code>: This option prevents GCC from linking against the standard C library startup files. This means you are responsible for providing your own entry point and handling all necessary initializations.</li>
+<li><code>-static</code>: This ensures that the resulting executable is statically linked, meaning all necessary code from libraries (if any were explicitly linked) is embedded within the executable itself.</li>
+</ul>
+<p>Note that even with <code>-nostdlib</code>, on Linux systems where Position-Independent Executables (PIE) are the default, or on macOS, dynamic linking might still occur if not explicitly overridden.</p>
+<h5 id="dynamic-32-bit-binaries-with-startup-code">Dynamic 32-Bit Binaries (With Startup Code)</h5>
+<p>If your assembly code is designed to define a <code>main</code> function rather than a custom <code>_start</code> entry point, or if you wish to include the standard boilerplate startup code, you can use:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>gcc -g your_assembly_file.S -o output_executable -m32 -no-pie
+</span></span></code></pre></div><ul>
+<li><code>-no-pie</code>: This flag disables the creation of Position-Independent Executables. While not strictly required for 32-bit output, it&rsquo;s often used in conjunction with generating standard executables that rely on a fixed entry point.</li>
+</ul>
+<p>This command will link against the necessary startup code (CRT startup files) and libraries, allowing for dynamic linking.</p>
+<h4 id="manual-assembly-and-linking">Manual Assembly and Linking</h4>
+<p>For a more granular approach, you can bypass GCC&rsquo;s integrated process and use the assembler (<code>as</code>) and linker (<code>ld</code>) directly. This offers a deeper look into the build pipeline.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>as your_assembly_file.S -o your_assembly_file.o -g --32
+</span></span><span style="display:flex;"><span>ld -o output_executable your_assembly_file.o -m elf_i386
+</span></span></code></pre></div><ul>
+<li><code>as ... --32</code>: The <code>--32</code> flag for the assembler (<code>as</code>) specifically directs it to produce 32-bit object code.</li>
+<li><code>ld ... -m elf_i386</code>: The <code>-m elf_i386</code> flag for the linker (<code>ld</code>) tells it to create an ELF (Executable and Linkable Format) binary for the i386 architecture (which corresponds to 32-bit x86).</li>
+</ul>
+<p>This manual method is more verbose but provides direct control over the assembly and linking stages. The command <code>gcc -nostdlib -m32</code> is a more convenient shorthand for this process across different platforms where executable formats might vary.</p>
+<h4 id="using-nasm-or-yasm-assemblers">Using NASM or YASM Assemblers</h4>
+<p>GCC cannot directly process NASM syntax. However, you can assemble your code using NASM or YASM and then link the resulting object files with GCC or <code>ld</code>.</p>
+<p>A helpful script for automating the NASM/YASM assembly and linking process can streamline this workflow. Such a script, like the example provided in the original content, can handle different assembly syntaxes and linker options for 32-bit (and other) targets.</p>
+<h5 id="considerations-for-nasmyasm">Considerations for NASM/YASM</h5>
+<ul>
+<li><strong>Syntax Differences:</strong> NASM and YASM use different directives and syntax compared to GNU AS (e.g., <code>global</code> vs. <code>.globl</code>).</li>
+<li><strong>Linker Integration:</strong> You can link object files generated by NASM/YASM using <code>gcc</code> with appropriate flags, or directly with <code>ld</code>.</li>
+<li><strong>Debugging:</strong> Using flags like <code>-g</code> with the assembler is crucial for enabling debugging capabilities in tools like GDB. For NASM, you might need <code>-felf32</code> and for YASM, <code>-gdwarf2</code> is often preferred for detailed debugging information.</li>
+</ul>
+<h5 id="script-example-conceptual">Script Example (Conceptual)</h5>
+<p>A script designed to facilitate this might look like this (simplified):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e"># Script to assemble and link 32-bit ELF binaries</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ASM_FILE<span style="color:#f92672">=</span>$1
+</span></span><span style="display:flex;"><span>OUTPUT_NAME<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>ASM_FILE%.*<span style="color:#e6db74">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Use NASM for assembly (adjust for YASM if preferred)</span>
+</span></span><span style="display:flex;"><span>nasm -felf32 -g <span style="color:#e6db74">&#34;</span>$ASM_FILE<span style="color:#e6db74">&#34;</span> -o <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>OUTPUT_NAME<span style="color:#e6db74">}</span><span style="color:#e6db74">.o&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Link using GCC for 32-bit ELF</span>
+</span></span><span style="display:flex;"><span>gcc <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>OUTPUT_NAME<span style="color:#e6db74">}</span><span style="color:#e6db74">.o&#34;</span> -o <span style="color:#e6db74">&#34;</span>$OUTPUT_NAME<span style="color:#e6db74">&#34;</span> -m32 -nostdlib -static <span style="color:#75715e"># Or appropriate flags for dynamic linking</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;Successfully built </span>$OUTPUT_NAME<span style="color:#e6db74">&#34;</span>
+</span></span></code></pre></div><h4 id="interacting-with-libraries-eg-libc">Interacting with Libraries (e.g., libc)</h4>
+<p>When your assembly code needs to utilize functions from libraries like <code>libc</code> (e.g., <code>printf</code>, <code>malloc</code>), special attention must be paid to initialization. Functions such as <code>malloc</code> rely on global data structures being properly set up.</p>
+<ul>
+<li>
+<p><strong><code>gcc -nostartfiles</code>:</strong> This flag excludes the standard C runtime startup code. While it still links <code>libc</code> (dynamically by default), on Linux, shared library initializers can run before your code&rsquo;s entry point. This means calling <code>printf</code> might work even with <code>-nostartfiles</code> because the dynamic linker handles necessary initializations.</p>
+</li>
+<li>
+<p><strong>Dynamic Linking Behavior:</strong> When dynamically linking, the kernel typically executes the ELF interpreter (e.g., <code>/lib/ld-linux.so.2</code> on 32-bit Linux) before jumping to your <code>_start</code> entry point. This interpreter performs essential setup for the dynamic libraries.</p>
+</li>
+<li>
+<p><strong>Static Linking Pitfalls:</strong> <code>gcc -nostartfiles -static</code> can lead to runtime crashes if library initialization routines are not explicitly called. This is because static linking bypasses the dynamic linker&rsquo;s setup. Without the appropriate glibc initialization functions (like <code>__libc_init_first</code>), functions that depend on these initialized structures will fail.</p>
+</li>
+</ul>
+<h4 id="example-hello-world-in-32-bit-assembly">Example: &ldquo;Hello, World!&rdquo; in 32-Bit Assembly</h4>
+<p>Here&rsquo;s an assembly program designed to print &ldquo;Hello, World!&rdquo; and demonstrate the use of <code>printf</code> and <code>exit</code> from <code>libc</code>.</p>
+<pre tabindex="0"><code class="language-assembly" data-lang="assembly"># hello32.S
+
+#include &lt;asm/unistd_32.h&gt;   # Defines syscall numbers for 32-bit Linux
+
+.section .text
+.global _start
+
+_start:
+    # Make a system call to gettimeofday, observable with strace
+    mov     $__NR_gettimeofday, %eax
+    int     $0x80
+
+    # Prepare arguments for printf
+    push    %esp         # Push stack pointer to pass address for argument alignment
+    push    $print_fmt   # Push address of the format string
+    call    printf       # Call the printf function
+
+    # Prepare for exit. Using exit(3) from libc handles buffer flushing.
+    movl    $0, (%esp)   # Set exit code to 0 in the stack slot used by printf
+    call    exit         # Call the exit function from libc
+
+.section .rodata
+print_fmt: .asciz &#34;Hello, World!\n%%esp at startup = %#lx\n&#34;
+</code></pre><p><strong>Compilation and Linking Commands:</strong></p>
+<ul>
+<li>
+<p><strong>Incorrect Attempt (Undefined Reference):</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>gcc -m32 -nostdlib hello32.S
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Error: undefined reference to `printf&#39;</span>
+</span></span></code></pre></div><p>This fails because <code>printf</code> is not provided and <code>_start</code> is not handled by standard runtime.</p>
+</li>
+<li>
+<p><strong>Incorrect Attempt (Multiple Definition):</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>gcc -m32 hello32.S
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Error: multiple definition of `_start&#39;</span>
+</span></span></code></pre></div><p>This occurs because <code>gcc</code> links standard startup code which also defines <code>_start</code>.</p>
+</li>
+<li>
+<p><strong>Static Link Failure:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>gcc -m32 -nostartfiles -static hello32.S
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Runs, but crashes with SIGSEGV due to uninitialized libc.</span>
+</span></span></code></pre></div></li>
+<li>
+<p><strong>Correct Command (Dynamic Link):</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>gcc -m32 -nostartfiles hello32.S
+</span></span></code></pre></div><p>This correctly links dynamically, allowing <code>printf</code> and <code>exit</code> to function.</p>
+</li>
+</ul>
+<p><strong>Execution Verification:</strong></p>
+<p>After successful compilation, you can run the executable and use tools like <code>strace</code> or <code>ltrace</code> to observe its behavior:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>./a.out
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Output: Hello, World!</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#         %esp at startup = &lt;address&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>strace -s128 ./a.out &gt; /dev/null <span style="color:#75715e"># Observe system calls</span>
+</span></span><span style="display:flex;"><span>ltrace -s128 ./a.out &gt; /dev/null <span style="color:#75715e"># Observe library calls</span>
+</span></span></code></pre></div><h4 id="handling-assembly-directly">Handling Assembly Directly</h4>
+<p>You can also use <code>as</code> and <code>ld</code> for this example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>as -g hello32.S -o hello32.o --32
+</span></span><span style="display:flex;"><span>ld -o hello32 hello32.o -m elf_i386
+</span></span></code></pre></div><p>This bypasses the C preprocessor, meaning you&rsquo;d need to manually define constants or find an alternative way to include header information.</p>
+<h4 id="considerations-for-register-usage-64-bit-vs-32-bit">Considerations for Register Usage (64-bit vs. 32-bit)</h4>
+<p>For those transitioning from 64-bit assembly, adapting to the 32-bit register set (e.g., <code>EAX</code>, <code>EBX</code>, <code>ESP</code>, <code>EBP</code>) is essential. While the fundamental concepts of system calls and memory access remain, the specific register names and their sizes differ. For instance, using 64-bit registers like <code>RAX</code> or <code>RSP</code> in a 32-bit context will result in assembly errors.</p>
+<h3 id="faqs-on-crafting-32-bit-executables-from-assembly">FAQs on Crafting 32-Bit Executables from Assembly</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the primary difference in building 32-bit assembly compared to 64-bit</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The main difference lies in the target architecture flags used during assembly and linking. For 32-bit, you&rsquo;ll typically use <code>-m32</code> with GCC and <code>-m elf_i386</code> with <code>ld</code>, along with assembler directives like <code>--32</code> for GNU AS. This ensures the output file is formatted and interpreted as a 32-bit executable.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is the .code32 directive always necessary for 32-bit assembly</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: No, the <code>.code32</code> directive is generally not necessary for creating standard 32-bit executables. It&rsquo;s primarily used for kernels mixing 16-bit and 32-bit code. Relying on it can lead to runtime issues. The output format specified during linking (e.g., <code>-m elf_i386</code>) dictates the execution mode.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why use the .S extension for assembly files</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Using the <code>.S</code> extension signals to GCC that the file should be preprocessed by the C preprocessor (cpp) before assembly. This allows you to use <code>#include</code> directives, which is useful for including system call definitions from headers like <code>&lt;asm/unistd_32.h&gt;</code>, simplifying the process of interacting with the operating system.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What happens if I forget to use the -m32 flag with GCC</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: If you forget the <code>-m32</code> flag when compiling assembly for a 32-bit target on a 64-bit system, GCC will default to building a 64-bit executable. This will likely lead to errors if your assembly code uses 32-bit specific instructions or expects 32-bit register sizes.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I link NASM or YASM object files with GCC</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, you can link object files produced by NASM or YASM with GCC. You will typically assemble your NASM/YASM code into a 32-bit object file (e.g., using <code>nasm -felf32 ...</code> or <code>yasm -felf32 ...</code>) and then link that object file with GCC using the appropriate 32-bit flags like <code>-m32</code>.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the purpose of -nostdlib and -nostartfiles</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The <code>-nostdlib</code> flag tells GCC not to link the standard C library startup files. The <code>-nostartfiles</code> flag specifically omits the standard C runtime startup code (CRT). These are useful when you want full control over the program&rsquo;s entry point and initialization, especially in bare-metal or specialized assembly programming.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why did my statically linked 32-bit assembly program crash with a segmentation fault</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: A common reason for this when using <code>-nostartfiles -static</code> is the absence of necessary C library initialization routines. Static linking bypasses the dynamic linker&rsquo;s setup phase, which normally performs these initializations. If your code calls library functions that depend on these initializations (like <code>printf</code> relying on <code>stdout</code> buffer setup), it can lead to a crash. Ensure you are linking dynamically or manually call the required initialization functions if statically linking library code.</div>
+    </div>
+</div>
+<p>We’d love to hear your feedback! Drop your comments or questions below. For more on system programming and assembly, explore <a href="https://www.sqlpey.com/sql/what-is-sql" target="_blank" rel="noopener">what is assembly language</a>
+ or delve into specific architectures like <a href="https://sqlpey.com/postgresql/what-is-postgresql" target="_blank" rel="noopener">what is PostgreSQL</a>
+.</p>
+<h2 id="solutions">Solutions</h2>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

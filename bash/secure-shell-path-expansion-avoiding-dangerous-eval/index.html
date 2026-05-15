@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Secure Shell Path Expansion: Avoiding Dangerous Eval for Tilde Replacement - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Exploring safe and effective shell techniques to expand the tilde (~) in paths without resorting to insecure eval commands, focusing on alternatives.">
+
+
+
+<meta name="keywords" content="tilde expansion, shell security, eval command, Bash parameter expansion">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Secure Shell Path Expansion: Avoiding Dangerous Eval for Tilde Replacement - sqlpey">
+<meta name="DC.description" content="Exploring safe and effective shell techniques to expand the tilde (~) in paths without resorting to insecure eval commands, focusing on alternatives.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Secure Shell Path Expansion: Avoiding Dangerous Eval for Tilde Replacement - sqlpey">
+<meta property="og:description" content="Exploring safe and effective shell techniques to expand the tilde (~) in paths without resorting to insecure eval commands, focusing on alternatives.">
+<meta property="og:url" content="https://sqlpey.com/bash/secure-shell-path-expansion-avoiding-dangerous-eval/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Shell Scripting">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Secure Shell Path Expansion: Avoiding Dangerous Eval for Tilde Replacement">
+<meta name="twitter:description" content="Exploring safe and effective shell techniques to expand the tilde (~) in paths without resorting to insecure eval commands, focusing on alternatives.">
+
+
+<link rel="canonical" href="https://sqlpey.com/bash/secure-shell-path-expansion-avoiding-dangerous-eval/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Secure Shell Path Expansion: Avoiding Dangerous Eval for Tilde Replacement\"",
+  "description": "\"Exploring safe and effective shell techniques to expand the tilde (~) in paths without resorting to insecure eval commands, focusing on alternatives.\"",
+  "url": "\"https://sqlpey.com/bash/secure-shell-path-expansion-avoiding-dangerous-eval/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/bash/secure-shell-path-expansion-avoiding-dangerous-eval/\""
+  },
+  "articleSection": "\"Shell Scripting\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Secure Shell Path Expansion: Avoiding Dangerous Eval for Tilde Replacement</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Shell Scripting</span>
+              
+              <span class="tag">Bash</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              6 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#secure-shell-path-expansion-avoiding-dangerous-eval-for-tilde-replacement">&ldquo;Secure Shell Path Expansion: Avoiding Dangerous Eval for Tilde Replacement&rdquo;</a>
+      <ul>
+        <li><a href="#the-risk-of-using-eval-directly-with-user-input">The Risk of Using <code>eval</code> Directly with User Input</a></li>
+        <li><a href="#solution-1-bash-parameter-expansion-for-simple-replacement">Solution 1: Bash Parameter Expansion for Simple Replacement</a></li>
+        <li><a href="#solution-2-relying-on-native-home-directory-variable">Solution 2: Relying on Native Home Directory Variable</a></li>
+        <li><a href="#solution-3-robust-path-expansion-functions">Solution 3: Robust Path Expansion Functions</a></li>
+        <li><a href="#solution-4-using-external-tools-realpath-or-readlink">Solution 4: Using External Tools (<code>realpath</code> or <code>readlink</code>)</a></li>
+        <li><a href="#solution-5-utilizing-python-as-a-subprocess">Solution 5: Utilizing Python as a Subprocess</a></li>
+        <li><a href="#solution-6-array-declaration-trick-zshbash-context">Solution 6: Array Declaration Trick (Zsh/Bash context)</a></li>
+        <li><a href="#solution-7-tilde-expansion-via-temporary-symbolic-link-advancedrisky">Solution 7: Tilde Expansion via Temporary Symbolic Link (Advanced/Risky)</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#faqs-on-secure-shell-path-expansion-avoiding-dangerous-eval">FAQs on Secure Shell Path Expansion Avoiding Dangerous Eval</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="secure-shell-path-expansion-avoiding-dangerous-eval-for-tilde-replacement">&ldquo;Secure Shell Path Expansion: Avoiding Dangerous Eval for Tilde Replacement&rdquo;</h2>
+<p>When scripting in shells like Bash, substituting the tilde character (<code>~</code>) with the user&rsquo;s home directory is a frequent operation. While the <code>eval</code> command can force this expansion, its use with user-supplied input poses significant security risks, potentially leading to arbitrary command execution. How can developers reliably and securely achieve tilde expansion in shell scripts, avoiding the pitfalls of <code>eval</code>?</p>
+<p>We examine several robust solutions proposed by the community to safely resolve paths starting with <code>~</code>.</p>
+<h3 id="the-risk-of-using-eval-directly-with-user-input">The Risk of Using <code>eval</code> Directly with User Input</h3>
+<p>Directly employing <code>eval</code> on user input to process the tilde symbol is highly discouraged due to command injection vulnerabilities.</p>
+<p>Consider the danger if a user inputs a malicious string, such as <code>var=&quot;$(rm -rf $HOME/)&quot;</code>.</p>
+<p><strong>Insecure Example (Avoid at all costs):</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># If var is user input, this is perilous!</span>
+</span></span><span style="display:flex;"><span>eval var<span style="color:#f92672">=</span>$var
+</span></span></code></pre></div><p>A safer approach leverages native shell features designed for string manipulation.</p>
+<h3 id="solution-1-bash-parameter-expansion-for-simple-replacement">Solution 1: Bash Parameter Expansion for Simple Replacement</h3>
+<p>For the most straightforward cases where you simply need to substitute <code>~</code> with <code>$HOME</code> at the beginning of a string, Bash parameter expansion offers a clean, built-in mechanism.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Safe replacement using parameter expansion</span>
+</span></span><span style="display:flex;"><span>var<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>var/#<span style="color:#ae81ff">\~</span>/$HOME<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span></code></pre></div><p>This method specifically looks for <code>~</code> at the start of <code>$var</code> and replaces it with the contents of the <code>$HOME</code> environment variable.</p>
+<h3 id="solution-2-relying-on-native-home-directory-variable">Solution 2: Relying on Native Home Directory Variable</h3>
+<p>If the objective is purely to reference the current user&rsquo;s home directory, the most idiomatic and secure practice is to bypass tilde expansion entirely and use the predefined <code>$HOME</code> variable directly.</p>
+<p><strong>Alternative for Direct Home Path:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Instead of relying on expansion logic, use $HOME directly if possible</span>
+</span></span><span style="display:flex;"><span>homedir<span style="color:#f92672">=</span>$HOME
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;Home directory is: </span>$homedir<span style="color:#e6db74">&#34;</span>
+</span></span></code></pre></div><h3 id="solution-3-robust-path-expansion-functions">Solution 3: Robust Path Expansion Functions</h3>
+<p>When supporting more complex scenarios, such as expanding paths to other users&rsquo; home directories (e.g., <code>~username/path</code>) or handling paths containing the colon separator (like <code>$PATH</code>), creating a dedicated function using safer tools like <code>getent</code> or advanced case logic is necessary.</p>
+<h4 id="a-function-utilizing-getent-for-user-lookups">A Function Utilizing <code>getent</code> for User Lookups</h4>
+<p>This approach attempts to replicate functionality similar to Python&rsquo;s <code>os.path.expanduser()</code> by querying the system&rsquo;s user database (<code>getent passwd</code>). This method robustly handles <code>~</code>, <code>~username</code>, <code>~+</code> (current directory), and <code>~-</code> (old directory).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>expandPath<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>  local path
+</span></span><span style="display:flex;"><span>  local -a pathElements resultPathElements
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Split path if it contains colons (like $PATH)</span>
+</span></span><span style="display:flex;"><span>  IFS<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;:&#39;</span> read -r -a pathElements <span style="color:#f92672">&lt;&lt;&lt;</span> <span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">for</span> path in <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>pathElements[@]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>; <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">case</span> $path in
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;~+&#34;</span>/*<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># ~+ resolves to PWD</span>
+</span></span><span style="display:flex;"><span>        path<span style="color:#f92672">=</span>$PWD/<span style="color:#e6db74">${</span>path#<span style="color:#e6db74">&#34;~+/&#34;</span><span style="color:#e6db74">}</span>
+</span></span><span style="display:flex;"><span>        ;;
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;~-&#34;</span>/*<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># ~- resolves to OLDPWD</span>
+</span></span><span style="display:flex;"><span>        path<span style="color:#f92672">=</span>$OLDPWD/<span style="color:#e6db74">${</span>path#<span style="color:#e6db74">&#34;~-/&#34;</span><span style="color:#e6db74">}</span>
+</span></span><span style="display:flex;"><span>        ;;
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;~&#34;</span>/*<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># ~ resolves to HOME</span>
+</span></span><span style="display:flex;"><span>        path<span style="color:#f92672">=</span>$HOME/<span style="color:#e6db74">${</span>path#<span style="color:#e6db74">&#34;~/&#34;</span><span style="color:#e6db74">}</span>
+</span></span><span style="display:flex;"><span>        ;;
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;~&#34;</span>*<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># ~username resolution</span>
+</span></span><span style="display:flex;"><span>        username<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>path%%/*<span style="color:#e6db74">}</span>
+</span></span><span style="display:flex;"><span>        username<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>username#<span style="color:#e6db74">&#34;~&#34;</span><span style="color:#e6db74">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Safely retrieve home directory for the specified user</span>
+</span></span><span style="display:flex;"><span>        IFS<span style="color:#f92672">=</span>: read -r _ _ _ _ _ homedir _ &lt; &lt;<span style="color:#f92672">(</span>getent passwd <span style="color:#e6db74">&#34;</span>$username<span style="color:#e6db74">&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#f92672">[[</span> $path <span style="color:#f92672">=</span> */* <span style="color:#f92672">]]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>          path<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>homedir<span style="color:#e6db74">}</span>/<span style="color:#e6db74">${</span>path#*/<span style="color:#e6db74">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>          path<span style="color:#f92672">=</span>$homedir
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>        ;;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">esac</span>
+</span></span><span style="display:flex;"><span>    resultPathElements<span style="color:#f92672">+=(</span><span style="color:#e6db74">&#34;</span>$path<span style="color:#e6db74">&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">done</span>
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Reassemble the path elements joined by colons</span>
+</span></span><span style="display:flex;"><span>  local result
+</span></span><span style="display:flex;"><span>  printf -v result <span style="color:#e6db74">&#39;%s:&#39;</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>resultPathElements[@]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>  printf <span style="color:#e6db74">&#39;%s\n&#39;</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>result%:<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Example Usage</span>
+</span></span><span style="display:flex;"><span>resulting_path<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>expandPath <span style="color:#e6db74">&#39;~/Documents/project_files&#39;</span><span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;Expanded path: </span>$resulting_path<span style="color:#e6db74">&#34;</span>
+</span></span></code></pre></div><h4 id="a-simpler-cautious-eval-wrapper">A Simpler, Cautious <code>eval</code> Wrapper</h4>
+<p>If one must use <code>eval</code>, it should only be applied after carefully sanitizing the input portion that might contain special characters, preventing shell expansion outside the intended path segment. This example uses <code>printf '%q'</code> to quote the path suffix before incorporating it into an <code>eval</code> statement.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>expandPath_cautious<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">case</span> $1 in
+</span></span><span style="display:flex;"><span>    ~<span style="color:#f92672">[</span>+-<span style="color:#f92672">]</span>*<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># Handle ~+ and ~-</span>
+</span></span><span style="display:flex;"><span>      local content_q
+</span></span><span style="display:flex;"><span>      printf -v content_q <span style="color:#e6db74">&#39;%q&#39;</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>1:2<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>      eval <span style="color:#e6db74">&#34;content=</span><span style="color:#e6db74">${</span>1:0:2<span style="color:#e6db74">}${</span>content_q<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>      printf <span style="color:#e6db74">&#39;%s\n&#39;</span> <span style="color:#e6db74">&#34;</span>$content<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>      ;;
+</span></span><span style="display:flex;"><span>    ~*<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># Handle ~ and ~username</span>
+</span></span><span style="display:flex;"><span>      local content_q
+</span></span><span style="display:flex;"><span>      printf -v content_q <span style="color:#e6db74">&#39;%q&#39;</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>1:1<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>      eval <span style="color:#e6db74">&#34;content=~</span><span style="color:#e6db74">${</span>content_q<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>      printf <span style="color:#e6db74">&#39;%s\n&#39;</span> <span style="color:#e6db74">&#34;</span>$content<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>      ;;
+</span></span><span style="display:flex;"><span>    *<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># No tilde, output as is</span>
+</span></span><span style="display:flex;"><span>      printf <span style="color:#e6db74">&#39;%s\n&#39;</span> <span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>      ;;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">esac</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><h3 id="solution-4-using-external-tools-realpath-or-readlink">Solution 4: Using External Tools (<code>realpath</code> or <code>readlink</code>)</h3>
+<p>For resolving canonical paths, especially if symbolic links are involved, standard utilities can sometimes achieve the desired result, although their direct tilde expansion capability varies by environment.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Note: These typically resolve the *current* working directory or absolute paths, </span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># and may not natively handle ~ unless it&#39;s already resolved by the shell context.</span>
+</span></span><span style="display:flex;"><span>path_resolved<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>realpath <span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">`</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Alternative utility</span>
+</span></span><span style="display:flex;"><span>path_resolved_2<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>readlink -f <span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">`</span>
+</span></span></code></pre></div><h3 id="solution-5-utilizing-python-as-a-subprocess">Solution 5: Utilizing Python as a Subprocess</h3>
+<p>If your environment permits running Python, the <code>os.path.expanduser()</code> function is specifically designed for this, offering a highly reliable, language-agnostic solution executed via a subprocess call.</p>
+<p><strong>Command Line Execution:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python -c <span style="color:#e6db74">&#39;import os; import sys; print(os.path.expanduser(sys.argv[1]))&#39;</span> ~/my/target/path
+</span></span></code></pre></div><p><strong>Within a Bash Script:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/usr/bin/env bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Execute Python to safely expand the user path argument</span>
+</span></span><span style="display:flex;"><span>thepath<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>python3 -c <span style="color:#e6db74">&#39;import os, sys; print(os.path.expanduser(sys.argv[1]))&#39;</span> <span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;Resolved path via Python: </span>$thepath<span style="color:#e6db74">&#34;</span>
+</span></span></code></pre></div><h3 id="solution-6-array-declaration-trick-zshbash-context">Solution 6: Array Declaration Trick (Zsh/Bash context)</h3>
+<p>In some specific shell contexts, declaring a path within parentheses can trigger expansion when the element is later accessed, though this is less portable than parameter expansion.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># This might work in certain setups but relies on how the shell parses arrays</span>
+</span></span><span style="display:flex;"><span>thepath<span style="color:#f92672">=(</span> ~/abc/def/ghi <span style="color:#f92672">)</span> 
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Accessing ${thepath[1]} might yield the expanded path.</span>
+</span></span></code></pre></div><h3 id="solution-7-tilde-expansion-via-temporary-symbolic-link-advancedrisky">Solution 7: Tilde Expansion via Temporary Symbolic Link (Advanced/Risky)</h3>
+<p>A creative, albeit complex, method involves using <code>printf '%q'</code> to safely quote the path, creating a temporary symlink, resolving the link path via <code>readlink</code>, and cleaning up. This attempts to isolate the potentially dangerous <code>eval</code> call to a controlled environment.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>magic<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Safely quote the input path segment</span>
+</span></span><span style="display:flex;"><span>    local _safe_path; printf -v _safe_path <span style="color:#e6db74">&#34;%q&#34;</span> <span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Attempt to link the safely quoted string; eval is confined here</span>
+</span></span><span style="display:flex;"><span>    eval <span style="color:#e6db74">&#34;ln -sf </span><span style="color:#e6db74">${</span>_safe_path#<span style="color:#ae81ff">\\</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> /tmp/realpath.</span>$$<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    readlink /tmp/realpath.$$
+</span></span><span style="display:flex;"><span>    rm -f /tmp/realpath.$$
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><h2 id="solutions">Solutions</h2>
+<h3 id="faqs-on-secure-shell-path-expansion-avoiding-dangerous-eval">FAQs on Secure Shell Path Expansion Avoiding Dangerous Eval</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the primary security flaw when using eval for tilde expansion</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The primary flaw is command injection. If user input is passed directly to <code>eval</code>, the user can inject arbitrary shell commands instead of just a path string, leading to potential system compromise.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is Bash parameter expansion `${var/#\~/$HOME}` sufficient for all tilde needs</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: It is sufficient for replacing the tilde character (<code>~</code>) only when it appears at the very beginning of the variable&rsquo;s value, mapping it to <code>$HOME</code>. It does not handle <code>~username</code> expansion.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Which technique is best for expanding paths to other user home directories like ~bob</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The robust function utilizing <code>getent passwd &quot;$username&quot;</code> (Solution 3) is generally the safest approach for resolving paths specific to other named users.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I use realpath or readlink to handle tilde expansion automatically</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: No, utilities like <code>realpath</code> or <code>readlink -f</code> typically resolve symbolic links and canonicalize absolute paths but do not natively perform shell tilde expansion (<code>~</code> to <code>$HOME</code>) unless the shell has already processed it beforehand.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the simplest cross-platform way to expand a tilde in a script</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Calling an external Python interpreter with <code>os.path.expanduser()</code> (Solution 5) is often the simplest, most reliable method if Python is available, as it avoids shell-specific syntax pitfalls.</div>
+    </div>
+</div>
+<p>We are keen to refine these techniques. Do you have a safer or more performant method for handling tilde expansion in your shell scripts? Share your insights or alternative solutions in the comments below!</p>
+<p>Check out related topics for further scripting challenges:
+<a href="https://sqlpey.com/python/top-4-ways-to-resolve-syntaxwarning-invalid-escape-sequence-in-python/" target="_blank" rel="noopener">Top 4 Methods to Solve SyntaxWarning Invalid Escape Sequence in Python</a>
+
+<a href="https://sqlpey.com/python/how-to-properly-configure-pythonpath/" target="_blank" rel="noopener">How to Properly Configure PYTHONPATH</a>
+
+<a href="https://sqlpey.com/python/top-5-methods-to-ping-servers-in-python/" target="_blank" rel="noopener">Top 5 Methods to Ping Servers in Python</a>
+</p>
+<pre tabindex="0"><code>eval var=$var  # Do not use this!
+var=&#34;${var/#\~/$HOME}&#34;
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

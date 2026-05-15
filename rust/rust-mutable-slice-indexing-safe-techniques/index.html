@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Rust Mutable Slice Indexing: Safe Techniques for Dual Mutable Borrows - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore secure and efficient Rust methods to obtain mutable references to two distinct elements within a slice, bypassing strict borrow checker limitations.">
+
+
+
+<meta name="keywords" content="Rust mutable slice, split_at_mut, get_disjoint_mut, unsafe Rust, mutable references in Rust, slice indexing">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Rust Mutable Slice Indexing: Safe Techniques for Dual Mutable Borrows - sqlpey">
+<meta name="DC.description" content="Explore secure and efficient Rust methods to obtain mutable references to two distinct elements within a slice, bypassing strict borrow checker limitations.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Rust Mutable Slice Indexing: Safe Techniques for Dual Mutable Borrows - sqlpey">
+<meta property="og:description" content="Explore secure and efficient Rust methods to obtain mutable references to two distinct elements within a slice, bypassing strict borrow checker limitations.">
+<meta property="og:url" content="https://sqlpey.com/rust/rust-mutable-slice-indexing-safe-techniques/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Rust">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Rust Mutable Slice Indexing: Safe Techniques for Dual Mutable Borrows">
+<meta name="twitter:description" content="Explore secure and efficient Rust methods to obtain mutable references to two distinct elements within a slice, bypassing strict borrow checker limitations.">
+
+
+<link rel="canonical" href="https://sqlpey.com/rust/rust-mutable-slice-indexing-safe-techniques/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Rust Mutable Slice Indexing: Safe Techniques for Dual Mutable Borrows\"",
+  "description": "\"Explore secure and efficient Rust methods to obtain mutable references to two distinct elements within a slice, bypassing strict borrow checker limitations.\"",
+  "url": "\"https://sqlpey.com/rust/rust-mutable-slice-indexing-safe-techniques/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/rust/rust-mutable-slice-indexing-safe-techniques/\""
+  },
+  "articleSection": "\"Rust\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Rust Mutable Slice Indexing: Safe Techniques for Dual Mutable Borrows</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Rust</span>
+              
+              <span class="tag">Borrow Checker</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              9 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#rust-mutable-slice-indexing-safe-techniques-for-dual-mutable-borrows">&ldquo;Rust Mutable Slice Indexing: Safe Techniques for Dual Mutable Borrows&rdquo;</a>
+      <ul>
+        <li><a href="#analyzing-the-borrowing-constraint">Analyzing the Borrowing Constraint</a></li>
+        <li><a href="#solution-1-utilizing-split_at_mut-for-known-separations">Solution 1: Utilizing <code>split_at_mut</code> for Known Separations</a></li>
+        <li><a href="#solution-2-pattern-matching-on-fixed-size-arrays-compile-time-known-indices">Solution 2: Pattern Matching on Fixed-Size Arrays (Compile-Time Known Indices)</a></li>
+        <li><a href="#solution-3-using-get_disjoint_mut-rust-186">Solution 3: Using <code>get_disjoint_mut</code> (Rust 1.86+)</a></li>
+        <li><a href="#solution-4-when-manual-control-or-complexity-demands-unsafe">Solution 4: When Manual Control or Complexity Demands <code>unsafe</code></a></li>
+        <li><a href="#solution-5-extension-trait-via-iter_mut">Solution 5: Extension Trait via <code>iter_mut()</code></a></li>
+        <li><a href="#solution-6-full-mutable-borrow-collection-via-split_at_mut-looping">Solution 6: Full Mutable Borrow Collection via <code>split_at_mut</code> Looping</a></li>
+        <li><a href="#solution-8-external-crates-for-safe-multi-index-access">Solution 8: External Crates for Safe Multi-Index Access</a></li>
+        <li><a href="#faqs-on-rust-mutable-slice-indexing">FAQs on Rust Mutable Slice Indexing</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a></li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="rust-mutable-slice-indexing-safe-techniques-for-dual-mutable-borrows">&ldquo;Rust Mutable Slice Indexing: Safe Techniques for Dual Mutable Borrows&rdquo;</h2>
+<p>How can one securely acquire mutable references to two distinct elements in a slice or vector in Rust when the standard indexing (<code>&amp;mut v[i]</code>, <code>&amp;mut v[j]</code>) fails due to overlapping mutable borrows?</p>
+<h3 id="analyzing-the-borrowing-constraint">Analyzing the Borrowing Constraint</h3>
+<p>The core difficulty lies in the compiler&rsquo;s inability to statically prove that two index accesses, say <code>&amp;mut v[i]</code> and <code>&amp;mut v[j]</code>, point to non-overlapping memory locations unless the operation itself enforces this separation. Attempting to create an abstraction that holds a mutable reference while simultaneously mutating another part of the same underlying container is fundamentally what the borrow checker forbids.</p>
+<p>If you attempt a pattern that looks like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#75715e">// Hypothetical unsafe pattern the compiler prevents
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">let</span> guard <span style="color:#f92672">=</span> something(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> v[i]); <span style="color:#75715e">// Borrows v mutably
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>do_something_else(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> v[j]);    <span style="color:#75715e">// Fails if j is not provably different from i
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>guard.do_job();
+</span></span></code></pre></div><p>The compiler must safeguard against cases where <code>i == j</code>, leading to a violation where one piece of code holds an exclusive reference (<code>guard</code>) while another tries to mutate the same location via <code>v[j]</code>.</p>
+<p>Here are several robust techniques and alternative approaches to safely handle mutable access to two separate elements:</p>
+<h3 id="solution-1-utilizing-split_at_mut-for-known-separations">Solution 1: Utilizing <code>split_at_mut</code> for Known Separations</h3>
+<p>For scenarios where you can split the slice at a known point between the two indices, <code>split_at_mut()</code> is an excellent, safe built-in tool. It returns two disjoint mutable slices.</p>
+<p>If you know index <code>a</code> is less than index <code>b</code>, you can split at <code>a+1</code> to place <code>a</code> in the first subslice and <code>b</code> in the second (after adjusting <code>b</code>&rsquo;s relative index). However, the direct application is cleaner if the split index separates the two desired elements:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">swap_elements</span>(a: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">mut</span> <span style="color:#66d9ef">i32</span>, b: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">mut</span> <span style="color:#66d9ef">i32</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> temp <span style="color:#f92672">=</span> <span style="color:#f92672">*</span>a;
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">*</span>a <span style="color:#f92672">=</span> <span style="color:#f92672">*</span>b;
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">*</span>b <span style="color:#f92672">=</span> temp;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">apply_split_at_mut_swap</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> data_vec <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">20</span>, <span style="color:#ae81ff">30</span>, <span style="color:#ae81ff">40</span>];
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Goal: Swap element at index 0 (value 10) and index 2 (value 30)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">let</span> split_point <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>; <span style="color:#75715e">// Split before index 2
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> (left_slice, right_slice) <span style="color:#f92672">=</span> data_vec.split_at_mut(split_point); 
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// left_slice: &amp;mut [10, 20]
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// right_slice: &amp;mut [30, 40]
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Element at original index 0 is now left_slice[0]
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">let</span> element_a <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> left_slice[<span style="color:#ae81ff">0</span>]; 
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Element at original index 2 is now right_slice[0]
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">let</span> element_b <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> right_slice[<span style="color:#ae81ff">0</span>]; 
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    swap_elements(element_a, element_b);
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// data_vec is now [30, 20, 10, 40]
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;Vector after split_at_mut swap: </span><span style="color:#e6db74">{:?}</span><span style="color:#e6db74">&#34;</span>, data_vec);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The original example mentioned a pattern for handling three distinct cases (indices equal, out of bounds, or distinct):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">enum</span> <span style="color:#a6e22e">IndexPair</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    Both(T, T),
+</span></span><span style="display:flex;"><span>    One(T),
+</span></span><span style="display:flex;"><span>    None,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">index_twice</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span>(slc: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">mut</span> [T], a: <span style="color:#66d9ef">usize</span>, b: <span style="color:#66d9ef">usize</span>) -&gt; <span style="color:#a6e22e">IndexPair</span><span style="color:#f92672">&lt;&amp;</span><span style="color:#66d9ef">mut</span> T<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> a <span style="color:#f92672">==</span> b {
+</span></span><span style="display:flex;"><span>        slc.get_mut(a).map_or(IndexPair::None, IndexPair::One)
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> a <span style="color:#f92672">&gt;=</span> slc.len() <span style="color:#f92672">||</span> b <span style="color:#f92672">&gt;=</span> slc.len() {
+</span></span><span style="display:flex;"><span>        IndexPair::None
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// SAFETY: We have checked bounds and ensured a != b.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">unsafe</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Directly casting raw pointers derived from unchecked mutable access is necessary here.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            <span style="color:#66d9ef">let</span> ar <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> <span style="color:#f92672">*</span>(slc.get_unchecked_mut(a) <span style="color:#66d9ef">as</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">mut</span> _);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">let</span> br <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> <span style="color:#f92672">*</span>(slc.get_unchecked_mut(b) <span style="color:#66d9ef">as</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">mut</span> _);
+</span></span><span style="display:flex;"><span>            IndexPair::Both(ar, br)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="solution-2-pattern-matching-on-fixed-size-arrays-compile-time-known-indices">Solution 2: Pattern Matching on Fixed-Size Arrays (Compile-Time Known Indices)</h3>
+<p>For fixed-size arrays (<code>[T; N]</code>), pattern matching can provide safe extraction of mutable elements if the indices correspond to specific positions in the pattern. This is powerful when indices are known early:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">perform_array_swap</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> fixed_array <span style="color:#f92672">=</span> [<span style="color:#ae81ff">50</span>, <span style="color:#ae81ff">60</span>, <span style="color:#ae81ff">70</span>, <span style="color:#ae81ff">80</span>];
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Target: Swap element at index 0 (50) and index 2 (70)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// We use ref mut to bind the mutable reference to a variable name.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">let</span> [<span style="color:#66d9ef">ref</span> <span style="color:#66d9ef">mut</span> element_a, _, <span style="color:#66d9ef">ref</span> <span style="color:#66d9ef">mut</span> element_b, <span style="color:#f92672">..</span>] <span style="color:#f92672">=</span> fixed_array;
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Standard swap logic
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">let</span> temp <span style="color:#f92672">=</span> <span style="color:#f92672">*</span>element_a;
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">*</span>element_a <span style="color:#f92672">=</span> <span style="color:#f92672">*</span>element_b;
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">*</span>element_b <span style="color:#f92672">=</span> temp;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">assert_eq!</span>(fixed_array, [<span style="color:#ae81ff">70</span>, <span style="color:#ae81ff">60</span>, <span style="color:#ae81ff">50</span>, <span style="color:#ae81ff">80</span>]);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;Array after pattern match swap: </span><span style="color:#e6db74">{:?}</span><span style="color:#e6db74">&#34;</span>, fixed_array);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="solution-3-using-get_disjoint_mut-rust-186">Solution 3: Using <code>get_disjoint_mut</code> (Rust 1.86+)</h3>
+<p>The <code>get_disjoint_mut</code> method, available on slices, is specifically designed for this purpose. It returns an <code>Option&lt;[&amp;mut T; N]&gt;</code> containing mutable references to <code>N</code> elements specified by the input indices, provided they are within bounds and <strong>disjoint</strong> (non-overlapping).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">apply_get_disjoint</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> data_vec <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">100</span>, <span style="color:#ae81ff">200</span>, <span style="color:#ae81ff">300</span>];
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Attempt to get disjoint mutable references to indices 0 and 2.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> Some([a, b]) <span style="color:#f92672">=</span> data_vec.get_disjoint_mut([<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">2</span>]) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Safe to modify a and b independently
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#f92672">*</span>a <span style="color:#f92672">=</span> <span style="color:#ae81ff">999</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">*</span>b <span style="color:#f92672">=</span> <span style="color:#ae81ff">777</span>;
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">panic!</span>(<span style="color:#e6db74">&#34;Indices 0 and 2 were not disjoint or out of bounds.&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// data_vec is now [999, 200, 777]
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;Vector after get_disjoint_mut: </span><span style="color:#e6db74">{:?}</span><span style="color:#e6db74">&#34;</span>, data_vec);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="solution-4-when-manual-control-or-complexity-demands-unsafe">Solution 4: When Manual Control or Complexity Demands <code>unsafe</code></h3>
+<p>When the compiler cannot verify safety (as discussed, this happens when indices are runtime variables and not obviously separate), the underlying mechanisms often rely on <code>unsafe</code> code, as seen in Solution 1. The rationale behind these restrictions is to prevent hard-to-trace errors where internal state (like an <code>Iterator</code> or an owning guard) might be invalidated by an unexpected mutation elsewhere.</p>
+<p>If you need to swap elements dynamically, the built-in <code>Vec::swap(i, j)</code> method is the safest and idiomatic way to perform an in-place swap without worrying about managing mutable references:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">safe_swap_via_method</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> numbers <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">15</span>];
+</span></span><span style="display:flex;"><span>    numbers.swap(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">2</span>); <span style="color:#75715e">// Swaps elements at index 0 and 2
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">assert_eq!</span>(numbers, <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">15</span>, <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">5</span>]);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>For general-purpose indexed manipulation requiring multiple mutable access points, exploring libraries that encapsulate safe <code>unsafe</code> logic is often recommended, such as those providing multi-index access wrappers.</p>
+<h3 id="solution-5-extension-trait-via-iter_mut">Solution 5: Extension Trait via <code>iter_mut()</code></h3>
+<p>You can craft an extension trait utilizing <code>iter_mut()</code> combined with <code>nth()</code> to fetch two distinct mutable references. This relies on the iterator advancing past the first element before seeking the second, guaranteeing disjointness by construction.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::cmp::Ordering;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">pub</span> <span style="color:#66d9ef">trait</span> SliceMutExt<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">get_two_mut</span>(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> self, index0: <span style="color:#66d9ef">usize</span>, index1: <span style="color:#66d9ef">usize</span>) -&gt; (<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> T, <span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> T);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">impl</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> SliceMutExt<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">for</span> [T] {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">get_two_mut</span>(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> self, index0: <span style="color:#66d9ef">usize</span>, index1: <span style="color:#66d9ef">usize</span>) -&gt; (<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> T, <span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> T) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">match</span> index0.cmp(<span style="color:#f92672">&amp;</span>index1) {
+</span></span><span style="display:flex;"><span>            Ordering::Less <span style="color:#f92672">=&gt;</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> iter <span style="color:#f92672">=</span> self.iter_mut();
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">// Get the first item
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                <span style="color:#66d9ef">let</span> item0 <span style="color:#f92672">=</span> iter.nth(index0).expect(<span style="color:#e6db74">&#34;Index 0 out of bounds&#34;</span>);
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">// Calculate how many steps to jump from the *next* position to reach item1
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                <span style="color:#66d9ef">let</span> steps_to_item1 <span style="color:#f92672">=</span> index1 <span style="color:#f92672">-</span> index0 <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">let</span> item1 <span style="color:#f92672">=</span> iter.nth(steps_to_item1).expect(<span style="color:#e6db74">&#34;Index 1 out of bounds&#34;</span>);
+</span></span><span style="display:flex;"><span>                (item0, item1)
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            Ordering::Equal <span style="color:#f92672">=&gt;</span> <span style="color:#a6e22e">panic!</span>(<span style="color:#e6db74">&#34;Indices must be distinct for dual mutable access&#34;</span>),
+</span></span><span style="display:flex;"><span>            Ordering::Greater <span style="color:#f92672">=&gt;</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">// Handle the greater index first if logic dictates, or simply swap logic path
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> iter <span style="color:#f92672">=</span> self.iter_mut();
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">let</span> item1 <span style="color:#f92672">=</span> iter.nth(index1).expect(<span style="color:#e6db74">&#34;Index 1 out of bounds&#34;</span>);
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">let</span> steps_to_item0 <span style="color:#f92672">=</span> index0 <span style="color:#f92672">-</span> index1 <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">let</span> item0 <span style="color:#f92672">=</span> iter.nth(steps_to_item0).expect(<span style="color:#e6db74">&#34;Index 0 out of bounds&#34;</span>);
+</span></span><span style="display:flex;"><span>                (item0, item1) <span style="color:#75715e">// Return order based on index0, index1 input order
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">apply_extension_trait</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> data <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#e6db74">&#39;A&#39;</span>, <span style="color:#e6db74">&#39;B&#39;</span>, <span style="color:#e6db74">&#39;C&#39;</span>, <span style="color:#e6db74">&#39;D&#39;</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Swap &#39;B&#39; (index 1) and &#39;D&#39; (index 3)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">let</span> (mut_b, mut_d) <span style="color:#f92672">=</span> data.get_two_mut(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">3</span>);
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    std::mem::swap(mut_b, mut_d);
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// data is now [&#39;A&#39;, &#39;D&#39;, &#39;C&#39;, &#39;B&#39;]
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;Array after custom extension: </span><span style="color:#e6db74">{:?}</span><span style="color:#e6db74">&#34;</span>, data);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="solution-6-full-mutable-borrow-collection-via-split_at_mut-looping">Solution 6: Full Mutable Borrow Collection via <code>split_at_mut</code> Looping</h3>
+<p>If the objective is to obtain a <code>Vec&lt;&amp;mut T&gt;</code> representing mutable access to <em>every</em> element, you can iteratively use <code>split_at_mut</code> until the original vector is exhausted. This yields a collection where each element is borrowed mutably, allowing indexed access later without violating the borrow checker on the original vector, because the original vector itself is fully consumed into slices:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">borrow_mut_elementwise</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">&#39;a</span>, T<span style="color:#f92672">&gt;</span>(v: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#a6e22e">mut</span> Vec<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span>) -&gt; Vec<span style="color:#f92672">&lt;&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#66d9ef">mut</span> T<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> result: Vec<span style="color:#f92672">&lt;&amp;</span><span style="color:#a6e22e">&#39;a</span> <span style="color:#66d9ef">mut</span> T<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> Vec::new();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> remaining_slice <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> v[<span style="color:#f92672">..</span>];
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> <span style="color:#f92672">!</span>remaining_slice.is_empty() {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Split off the first element as its own mutable slice
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">let</span> (current_part, rest) <span style="color:#f92672">=</span> remaining_slice.split_at_mut(<span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Push the reference to the first element of the current part
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        result.push(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> current_part[<span style="color:#ae81ff">0</span>]);
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Update the remaining slice for the next iteration
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        remaining_slice <span style="color:#f92672">=</span> rest;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    result
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">demonstrate_elementwise_borrow</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> items <span style="color:#f92672">=</span> <span style="color:#a6e22e">vec!</span>[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> items_mut_refs <span style="color:#f92672">=</span> borrow_mut_elementwise(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> items);
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Now we can mutate items via the collected references
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#f92672">*</span>items_mut_refs[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> <span style="color:#ae81ff">99</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">*</span>items_mut_refs[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> <span style="color:#ae81ff">101</span>;
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// items is [99, 2, 101]
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;Items after elementwise borrowing: </span><span style="color:#e6db74">{:?}</span><span style="color:#e6db74">&#34;</span>, items);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="solution-8-external-crates-for-safe-multi-index-access">Solution 8: External Crates for Safe Multi-Index Access</h3>
+<p>For complex, dynamic index access, relying on well-vetted external crates is often the safest route, as they handle the necessary <code>unsafe</code> verification meticulously. The <code>arref</code> crate, for example, provides macros that perform runtime checks to ensure indices are distinct before performing the raw pointer manipulation:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#75715e">// Requires adding &#39;arref&#39; to Cargo.toml
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// use arref::array_mut_ref;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/*
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">fn use_arref_example() {
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    let mut data_arr = vec![10, 20, 30, 40];
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    // If indices are distinct, this is safe:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    let (ref_20, ref_30) = array_mut_ref!(&amp;mut data_arr, [1, 2]);
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    *ref_20 = 22;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    *ref_30 = 33;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    // data_arr is now [10, 22, 33, 40]
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">}
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">*/</span>
+</span></span></code></pre></div><p>The underlying sound implementation in <code>arref</code> often looks like this, ensuring <code>a0 != a1</code> before proceeding:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">pub</span> <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">array_mut_ref</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span>(arr: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">mut</span> [T], a0: <span style="color:#66d9ef">usize</span>, a1: <span style="color:#66d9ef">usize</span>) -&gt; (<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> T, <span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> T) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">assert!</span>(a0 <span style="color:#f92672">!=</span> a1, <span style="color:#e6db74">&#34;Indices must be different for safe, simultaneous mutable access.&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// SAFETY: Assert guarantees a0 and a1 point to unique locations.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">unsafe</span> {
+</span></span><span style="display:flex;"><span>        (
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> <span style="color:#f92672">*</span>(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> arr[a0] <span style="color:#66d9ef">as</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">mut</span> _),
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> <span style="color:#f92672">*</span>(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> arr[a1] <span style="color:#66d9ef">as</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">mut</span> _),
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="faqs-on-rust-mutable-slice-indexing">FAQs on Rust Mutable Slice Indexing</h3>
+<p><div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the main reason Rust forbids mutable indexing like &amp;mut v[i] and &amp;mut v[j] simultaneously</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The borrow checker prevents simultaneous mutable borrows because it cannot statically guarantee that the indices <code>i</code> and <code>j</code> are different, which would lead to Undefined Behavior through aliasing mutable references.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Does split_at_mut work if the indices are far apart</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, <code>split_at_mut</code> works by creating two non-overlapping slices based on the split point. You can use it effectively if you can logically separate the two target indices into these two resulting slices.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is get_disjoint_mut the preferred modern solution</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: <code>get_disjoint_mut</code> (since Rust 1.86) is excellent for fetching a fixed, small number of explicitly listed disjoint mutable elements safely.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: When should I use Vec swap instead of manual reference juggling</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Use <code>Vec::swap(i, j)</code> whenever you only need to exchange the values at two indices; it is the idiomatic, safest, and simplest approach.</div>
+    </div>
+</div></p>
+<p>We encourage you to experiment with these techniques! Which method best suits your specific indexing requirements? Share your thoughts or alternative approaches in the comments below.</p>
+<p>For further exploration on related Rust constraints and error resolution, check out topics like fixing import errors during testing or resolving dependency requirement issues when installing packages:</p>
+<ul>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-import-errors-in-pytest-when-python-can-import-modules/" target="_blank" rel="noopener">How to Fix Import Errors in Pytest When Python Can Import Modules</a>
+</li>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-could-not-find-a-version-that-satisfies-the-requirement-error-in-python/" target="_blank" rel="noopener">Solved: How to Fix Could Not Find A Version That Satisfies The Requirement Error in Python</a>
+</li>
+</ul>
+<h2 id="solutions">Solutions</h2>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Mongoose Population Filtering: Replacing .populate() with MongoDB Aggregation $lookup - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore efficient methods to filter populated sub-documents in Mongoose, contrasting Mongoose .populate() behavior with server-side joins using MongoDB $lookup …">
+
+
+
+<meta name="keywords" content="$lookup, Mongoose populate filter, Aggregation Pipeline, Server-side join">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Mongoose Population Filtering: Replacing .populate() with MongoDB Aggregation $lookup - sqlpey">
+<meta name="DC.description" content="Explore efficient methods to filter populated sub-documents in Mongoose, contrasting Mongoose .populate() behavior with server-side joins using MongoDB $lookup aggregation.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Mongoose Population Filtering: Replacing .populate() with MongoDB Aggregation $lookup - sqlpey">
+<meta property="og:description" content="Explore efficient methods to filter populated sub-documents in Mongoose, contrasting Mongoose .populate() behavior with server-side joins using MongoDB $lookup …">
+<meta property="og:url" content="https://sqlpey.com/nodejs/mongoose-populate-aggregation-lookup-filtering/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Mongoose">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Mongoose Population Filtering: Replacing .populate() with MongoDB Aggregation $lookup">
+<meta name="twitter:description" content="Explore efficient methods to filter populated sub-documents in Mongoose, contrasting Mongoose .populate() behavior with server-side joins using MongoDB $lookup …">
+
+
+<link rel="canonical" href="https://sqlpey.com/nodejs/mongoose-populate-aggregation-lookup-filtering/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Mongoose Population Filtering: Replacing .populate() with MongoDB Aggregation $lookup\"",
+  "description": "\"Explore efficient methods to filter populated sub-documents in Mongoose, contrasting Mongoose .populate() behavior with server-side joins using MongoDB $lookup aggregation.\"",
+  "url": "\"https://sqlpey.com/nodejs/mongoose-populate-aggregation-lookup-filtering/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/nodejs/mongoose-populate-aggregation-lookup-filtering/\""
+  },
+  "articleSection": "\"Mongoose\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Mongoose Population Filtering: Replacing .populate() with MongoDB Aggregation $lookup</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Mongoose</span>
+              
+              <span class="tag">MongoDB</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              12 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#mongoose-population-filtering-replacing-populate-with-mongodb-aggregation-lookup">&ldquo;Mongoose Population Filtering: Replacing .populate() with MongoDB Aggregation $lookup&rdquo;</a></li>
+    <li><a href="#method-1-server-side-joining-with-lookup-unwind-and-match-pre-mongodb-36-optimization">Method 1: Server-Side Joining with <code>$lookup</code>, <code>$unwind</code>, and <code>$match</code> (Pre-MongoDB 3.6 Optimization)</a>
+      <ul>
+        <li><a href="#aggregation-pipeline-optimization-insight">Aggregation Pipeline Optimization Insight</a></li>
+      </ul>
+    </li>
+    <li><a href="#method-2-mongodb-36-with-lookup-sub-pipelines-for-true-left-join-fidelity">Method 2: MongoDB 3.6+ with <code>$lookup</code> Sub-Pipelines for True LEFT JOIN Fidelity</a>
+      <ul>
+        <li><a href="#implementing-a-custom-lookup-static-method">Implementing a Custom <code>.lookup()</code> Static Method</a></li>
+      </ul>
+    </li>
+    <li><a href="#alternative-mongoose-approaches-client-side-filtering">Alternative Mongoose Approaches (Client-Side Filtering)</a>
+      <ul>
+        <li><a href="#alternative-a-using-match-within-populate-mongoose-v460">Alternative A: Using <code>match</code> within <code>.populate()</code> (Mongoose v4.6.0+)</a></li>
+        <li><a href="#alternative-b-filtering-after-execution">Alternative B: Filtering After Execution</a></li>
+        <li><a href="#alternative-c-two-step-query-with-all-for-required-tag-presence">Alternative C: Two-Step Query with <code>$all</code> (For Required Tag Presence)</a></li>
+        <li><a href="#faqs-on-mongoose-populate-filtering">FAQs on Mongoose Populate Filtering</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="mongoose-population-filtering-replacing-populate-with-mongodb-aggregation-lookup">&ldquo;Mongoose Population Filtering: Replacing .populate() with MongoDB Aggregation $lookup&rdquo;</h2>
+<p>When utilizing Mongoose, the familiar <code>.populate()</code> method is often used to resolve relationships between documents, similar to a <code>JOIN</code> in SQL. However, <code>.populate()</code> typically executes multiple queries on the client side to emulate this join. For performance and scalability, especially with large datasets, leveraging native MongoDB aggregation features like <code>$lookup</code> to perform server-side joins is preferable.</p>
+<p>How can we effectively filter documents embedded via relationships, traditionally achieved with <code>.populate()</code>, by shifting the logic to the MongoDB aggregation pipeline using <code>$lookup</code>, particularly when complex matching criteria on the foreign collection fields are involved?</p>
+<h2 id="method-1-server-side-joining-with-lookup-unwind-and-match-pre-mongodb-36-optimization">Method 1: Server-Side Joining with <code>$lookup</code>, <code>$unwind</code>, and <code>$match</code> (Pre-MongoDB 3.6 Optimization)</h2>
+<p>For MongoDB versions greater than 3.2, the <code>$lookup</code> aggregation operator offers a more direct route to achieving joins on the server. When combined with <code>$unwind</code> and <code>$match</code>, this sequence emulates a <code>LEFT JOIN</code> followed by filtering, but with significant performance gains due to server-side processing.</p>
+<p>The standard pattern involves these steps:</p>
+<ol>
+<li><strong><code>$lookup</code></strong>: Perform the join operation, referencing the related collection (e.g., <code>ItemTags</code>).</li>
+<li><strong><code>$unwind</code></strong>: Deconstruct the resulting array from the join.</li>
+<li><strong><code>$match</code></strong>: Apply the required filter criteria on the fields of the joined collection.</li>
+<li><strong><code>$group</code></strong>: Reconstruct the original document structure after filtering.</li>
+</ol>
+<p>A crucial detail when using Mongoose models with <code>$lookup</code> is obtaining the actual MongoDB collection name, which Mongoose often pluralizes. Accessing <code>Model.collection.name</code> avoids hardcoding names.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// Example using Item model referencing ItemTag via &#39;tags&#39; array field
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">Item</span>.<span style="color:#a6e22e">aggregate</span>(
+</span></span><span style="display:flex;"><span>  [
+</span></span><span style="display:flex;"><span>    { 
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;$lookup&#34;</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;from&#34;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">ItemTags</span>.<span style="color:#a6e22e">collection</span>.<span style="color:#a6e22e">name</span>, <span style="color:#75715e">// Actual collection name
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#e6db74">&#34;localField&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;tags&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;foreignField&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;_id&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;as&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;tags&#34;</span>
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    { <span style="color:#e6db74">&#34;$unwind&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;$tags&#34;</span> },
+</span></span><span style="display:flex;"><span>    { <span style="color:#e6db74">&#34;$match&#34;</span><span style="color:#f92672">:</span> { <span style="color:#e6db74">&#34;tags.tagName&#34;</span><span style="color:#f92672">:</span> { <span style="color:#e6db74">&#34;$in&#34;</span><span style="color:#f92672">:</span> [ <span style="color:#e6db74">&#34;funny&#34;</span>, <span style="color:#e6db74">&#34;politics&#34;</span> ] } } },
+</span></span><span style="display:flex;"><span>    { 
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;$group&#34;</span><span style="color:#f92672">:</span> { 
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;_id&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;$_id&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;dateCreated&#34;</span><span style="color:#f92672">:</span> { <span style="color:#e6db74">&#34;$first&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;$dateCreated&#34;</span> },
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;title&#34;</span><span style="color:#f92672">:</span> { <span style="color:#e6db74">&#34;$first&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;$title&#34;</span> },
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;description&#34;</span><span style="color:#f92672">:</span> { <span style="color:#e6db74">&#34;$first&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;$description&#34;</span> },
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;tags&#34;</span><span style="color:#f92672">:</span> { <span style="color:#e6db74">&#34;$push&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;$tags&#34;</span> }
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  ],
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">err</span>, <span style="color:#a6e22e">result</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// &#39;tags&#39; array now contains only matching documents
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  }
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><h3 id="aggregation-pipeline-optimization-insight">Aggregation Pipeline Optimization Insight</h3>
+<p>When <code>$lookup</code> is immediately followed by <code>$unwind</code> and <code>$match</code>, MongoDB can often optimize these stages into a single, highly efficient operation, effectively filtering the collection before the join array is materialized.</p>
+<p>An optimized, though less intuitive, representation of this logic might look like:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span>   { <span style="color:#e6db74">&#34;$lookup&#34;</span> <span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>     <span style="color:#e6db74">&#34;from&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;itemtags&#34;</span>,
+</span></span><span style="display:flex;"><span>     <span style="color:#e6db74">&#34;as&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;tags&#34;</span>,
+</span></span><span style="display:flex;"><span>     <span style="color:#e6db74">&#34;localField&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;tags&#34;</span>,
+</span></span><span style="display:flex;"><span>     <span style="color:#e6db74">&#34;foreignField&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;_id&#34;</span>,
+</span></span><span style="display:flex;"><span>     <span style="color:#e6db74">&#34;unwinding&#34;</span> <span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>       <span style="color:#e6db74">&#34;preserveNullAndEmptyArrays&#34;</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">false</span> <span style="color:#75715e">// Important for optimization vs. LEFT JOIN fidelity
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>     },
+</span></span><span style="display:flex;"><span>     <span style="color:#e6db74">&#34;matching&#34;</span> <span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>       <span style="color:#e6db74">&#34;tagName&#34;</span> <span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>         <span style="color:#e6db74">&#34;$in&#34;</span> <span style="color:#f92672">:</span> [
+</span></span><span style="display:flex;"><span>           <span style="color:#e6db74">&#34;funny&#34;</span>,
+</span></span><span style="display:flex;"><span>           <span style="color:#e6db74">&#34;politics&#34;</span>
+</span></span><span style="display:flex;"><span>         ]
+</span></span><span style="display:flex;"><span>       }
+</span></span><span style="display:flex;"><span>     }
+</span></span><span style="display:flex;"><span>   }}
+</span></span></code></pre></div><p>This optimization filters the join candidates first, minimizing data transfer across stages, but this optimized sequence inherently behaves more like an <code>INNER JOIN</code> because <code>$unwind</code> removes documents with empty arrays unless specific options are set.</p>
+<h2 id="method-2-mongodb-36-with-lookup-sub-pipelines-for-true-left-join-fidelity">Method 2: MongoDB 3.6+ with <code>$lookup</code> Sub-Pipelines for True LEFT JOIN Fidelity</h2>
+<p>MongoDB version 3.6 introduced a more expressive <code>$lookup</code> form allowing an embedded aggregation pipeline, which resolves the limitation of losing the <code>LEFT JOIN</code> behavior when strictly optimizing the sequence described above. This approach retains the ability to filter results optimally while maintaining null preservation if needed.</p>
+<p>We use <code>$expr</code> within the sub-pipeline&rsquo;s <code>$match</code> stage to compare the foreign document&rsquo;s <code>_id</code> against the local document&rsquo;s array field (aliased via <code>$$</code>).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// MongoDB 3.6+ Example with Sub-Pipeline
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">Item</span>.<span style="color:#a6e22e">aggregate</span>([
+</span></span><span style="display:flex;"><span>  { 
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;$lookup&#34;</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;from&#34;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">ItemTags</span>.<span style="color:#a6e22e">collection</span>.<span style="color:#a6e22e">name</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;let&#34;</span><span style="color:#f92672">:</span> { <span style="color:#e6db74">&#34;localTagsArray&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;$tags&#34;</span> }, <span style="color:#75715e">// Alias local field array
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>      <span style="color:#e6db74">&#34;pipeline&#34;</span><span style="color:#f92672">:</span> [
+</span></span><span style="display:flex;"><span>        { 
+</span></span><span style="display:flex;"><span>          <span style="color:#e6db74">&#34;$match&#34;</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;tagName&#34;</span><span style="color:#f92672">:</span> { <span style="color:#e6db74">&#34;$in&#34;</span><span style="color:#f92672">:</span> [ <span style="color:#e6db74">&#34;politics&#34;</span>, <span style="color:#e6db74">&#34;funny&#34;</span> ] },
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;$expr&#34;</span><span style="color:#f92672">:</span> { <span style="color:#e6db74">&#34;$in&#34;</span><span style="color:#f92672">:</span> [ <span style="color:#e6db74">&#34;$_id&#34;</span>, <span style="color:#e6db74">&#34;$$localTagsArray&#34;</span> ] } <span style="color:#75715e">// Match against IDs in local array
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>          }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>      ],
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;as&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;tags&#34;</span> <span style="color:#75715e">// The result is placed in the &#39;tags&#39; array field
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>])
+</span></span></code></pre></div><p>This structure is immensely powerful, permitting nested lookups within the sub-pipeline itself, far exceeding the capabilities of standard <code>.populate()</code>.</p>
+<h3 id="implementing-a-custom-lookup-static-method">Implementing a Custom <code>.lookup()</code> Static Method</h3>
+<p>To make this functionality cleanly accessible like <code>.populate()</code>, you can extend the Mongoose model with a static method.</p>
+<h4 id="working-example-using-asyncawait-modern-node">Working Example using Async/Await (Modern Node)</h4>
+<p>This example shows how to create a reusable static method <code>Item.lookup()</code> that uses the <code>$lookup</code> aggregation strategy, returning results structured similarly to <code>.populate()</code> after rehydrating the documents.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mongoose</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;mongoose&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">Schema</span>, <span style="color:#a6e22e">Types</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">ObjectId</span> } } <span style="color:#f92672">=</span> <span style="color:#a6e22e">mongoose</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">uri</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;mongodb://localhost/looktest_agg&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Setup Schemas
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">itemTagSchema</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Schema</span>({
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">tagName</span><span style="color:#f92672">:</span> String
+</span></span><span style="display:flex;"><span>});
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">itemSchema</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Schema</span>({
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">title</span><span style="color:#f92672">:</span> String,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span> String,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">tags</span><span style="color:#f92672">:</span> [{ <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">ObjectId</span>, <span style="color:#a6e22e">ref</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;ItemTag&#39;</span> }]
+</span></span><span style="display:flex;"><span>},{ <span style="color:#a6e22e">timestamps</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span> });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Custom lookup static method supporting advanced filtering via aggregation
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">itemSchema</span>.<span style="color:#a6e22e">statics</span>.<span style="color:#a6e22e">lookup</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>({ <span style="color:#a6e22e">path</span>, <span style="color:#a6e22e">query</span> }) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">rel</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">mongoose</span>.<span style="color:#a6e22e">model</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">schema</span>.<span style="color:#a6e22e">path</span>(<span style="color:#a6e22e">path</span>).<span style="color:#a6e22e">caster</span>.<span style="color:#a6e22e">options</span>.<span style="color:#a6e22e">ref</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Using MongoDB 3.6+ $lookup with sub-pipeline for powerful filtering
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">pipeline</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    { <span style="color:#e6db74">&#34;$lookup&#34;</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;from&#34;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rel</span>.<span style="color:#a6e22e">collection</span>.<span style="color:#a6e22e">name</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;as&#34;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">path</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;let&#34;</span><span style="color:#f92672">:</span> { [<span style="color:#a6e22e">path</span>]<span style="color:#f92672">:</span> <span style="color:#e6db74">`$</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">path</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span> },
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;pipeline&#34;</span><span style="color:#f92672">:</span> [
+</span></span><span style="display:flex;"><span>        { <span style="color:#e6db74">&#34;$match&#34;</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>          ...<span style="color:#a6e22e">query</span>,
+</span></span><span style="display:flex;"><span>          <span style="color:#e6db74">&#34;$expr&#34;</span><span style="color:#f92672">:</span> { <span style="color:#e6db74">&#34;$in&#34;</span><span style="color:#f92672">:</span> [ <span style="color:#e6db74">&#34;$_id&#34;</span>, <span style="color:#e6db74">`$$</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">path</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span> ] }
+</span></span><span style="display:flex;"><span>        }}
+</span></span><span style="display:flex;"><span>      ]
+</span></span><span style="display:flex;"><span>    }}
+</span></span><span style="display:flex;"><span>  ];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">aggregate</span>(<span style="color:#a6e22e">pipeline</span>).<span style="color:#a6e22e">exec</span>().<span style="color:#a6e22e">then</span>(<span style="color:#a6e22e">r</span> =&gt; <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">map</span>(<span style="color:#a6e22e">m</span> =&gt;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Rehydrate results back into Mongoose instances for consistency
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">this</span>({ ...<span style="color:#a6e22e">m</span>, [<span style="color:#a6e22e">path</span>]<span style="color:#f92672">:</span> <span style="color:#a6e22e">m</span>[<span style="color:#a6e22e">path</span>].<span style="color:#a6e22e">map</span>(<span style="color:#a6e22e">itemTagDoc</span> =&gt; <span style="color:#a6e22e">rel</span>(<span style="color:#a6e22e">itemTagDoc</span>)) })
+</span></span><span style="display:flex;"><span>  ));
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">Item</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">mongoose</span>.<span style="color:#a6e22e">model</span>(<span style="color:#e6db74">&#39;Item&#39;</span>, <span style="color:#a6e22e">itemSchema</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ItemTag</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">mongoose</span>.<span style="color:#a6e22e">model</span>(<span style="color:#e6db74">&#39;ItemTag&#39;</span>, <span style="color:#a6e22e">itemTagSchema</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">log</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">body</span> =&gt; <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">body</span>, <span style="color:#66d9ef">null</span>, <span style="color:#ae81ff">2</span>));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>(<span style="color:#66d9ef">async</span> <span style="color:#66d9ef">function</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">mongoose</span>.<span style="color:#a6e22e">connect</span>(<span style="color:#a6e22e">uri</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Clean up previous data
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">await</span> Promise.<span style="color:#a6e22e">all</span>(Object.<span style="color:#a6e22e">entries</span>(<span style="color:#a6e22e">mongoose</span>.<span style="color:#a6e22e">models</span>).<span style="color:#a6e22e">map</span>(([<span style="color:#a6e22e">k</span>, <span style="color:#a6e22e">m</span>]) =&gt; <span style="color:#a6e22e">m</span>.<span style="color:#a6e22e">deleteMany</span>({})));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Create reference tags
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">tags</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">ItemTag</span>.<span style="color:#a6e22e">insertMany</span>(
+</span></span><span style="display:flex;"><span>      [<span style="color:#e6db74">&#34;movies&#34;</span>, <span style="color:#e6db74">&#34;tech&#34;</span>, <span style="color:#e6db74">&#34;funny&#34;</span>].<span style="color:#a6e22e">map</span>(<span style="color:#a6e22e">tagName</span> =&gt; ({ <span style="color:#a6e22e">tagName</span> }))
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Create main item referencing some tags
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">item</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">Item</span>.<span style="color:#a6e22e">create</span>({
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;title&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Advanced Query Test&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;description&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Checking filtered lookups&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">tags</span><span style="color:#f92672">:</span> [<span style="color:#a6e22e">tags</span>[<span style="color:#ae81ff">1</span>].<span style="color:#a6e22e">_id</span>, <span style="color:#a6e22e">tags</span>[<span style="color:#ae81ff">2</span>].<span style="color:#a6e22e">_id</span>] <span style="color:#75715e">// tech and funny
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Execute filtered lookup
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> (<span style="color:#66d9ef">await</span> <span style="color:#a6e22e">Item</span>.<span style="color:#a6e22e">lookup</span>({
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">path</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;tags&#39;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">query</span><span style="color:#f92672">:</span> { <span style="color:#e6db74">&#39;tagName&#39;</span><span style="color:#f92672">:</span> { <span style="color:#e6db74">&#39;$in&#39;</span><span style="color:#f92672">:</span> [ <span style="color:#e6db74">&#39;funny&#39;</span>, <span style="color:#e6db74">&#39;politics&#39;</span> ] } } <span style="color:#75715e">// Only &#39;funny&#39; should match in this setup
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    }));
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#960050;background-color:#1e0010">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">##</span> <span style="color:#a6e22e">Solutions</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Query</span> <span style="color:#a6e22e">Results</span> (<span style="color:#a6e22e">Only</span> <span style="color:#a6e22e">Items</span> <span style="color:#66d9ef">with</span> <span style="color:#a6e22e">matching</span> <span style="color:#a6e22e">tags</span>)
+</span></span></code></pre></div><p>Item.aggregate(
+[
+{ &ldquo;$lookup&rdquo;: {
+&ldquo;from&rdquo;: ItemTags.collection.name,
+&ldquo;localField&rdquo;: &ldquo;tags&rdquo;,
+&ldquo;foreignField&rdquo;: &ldquo;_id&rdquo;,
+&ldquo;as&rdquo;: &ldquo;tags&rdquo;
+}},
+{ &ldquo;$unwind&rdquo;: &ldquo;$tags&rdquo; },
+{ &ldquo;$match&rdquo;: { &ldquo;tags.tagName&rdquo;: { &ldquo;$in&rdquo;: [ &ldquo;funny&rdquo;, &ldquo;politics&rdquo; ] } } },
+{ &ldquo;$group&rdquo;: {
+&ldquo;_id&rdquo;: &ldquo;$_id&rdquo;,
+&ldquo;dateCreated&rdquo;: { &ldquo;$first&rdquo;: &ldquo;$dateCreated&rdquo; },
+&ldquo;title&rdquo;: { &ldquo;$first&rdquo;: &ldquo;$title&rdquo; },
+&ldquo;description&rdquo;: { &ldquo;$first&rdquo;: &ldquo;$description&rdquo; },
+&ldquo;tags&rdquo;: { &ldquo;$push&rdquo;: &ldquo;$tags&rdquo; }
+}}
+],
+function(err, result) {
+// &ldquo;tags&rdquo; is now filtered by condition and &ldquo;joined&rdquo;
+}
+)
+{ &ldquo;$lookup&rdquo; : {
+&ldquo;from&rdquo; : &ldquo;itemtags&rdquo;,
+&ldquo;as&rdquo; : &ldquo;tags&rdquo;,
+&ldquo;localField&rdquo; : &ldquo;tags&rdquo;,
+&ldquo;foreignField&rdquo; : &ldquo;_id&rdquo;,
+&ldquo;unwinding&rdquo; : {
+&ldquo;preserveNullAndEmptyArrays&rdquo; : false
+},
+&ldquo;matching&rdquo; : {
+&ldquo;tagName&rdquo; : {
+&ldquo;$in&rdquo; : [
+&ldquo;funny&rdquo;,
+&ldquo;politics&rdquo;
+]
+}
+}
+}}
+Item.aggregate([
+{ &ldquo;$lookup&rdquo;: {
+&ldquo;from&rdquo;: ItemTags.collection.name,
+&ldquo;let&rdquo;: { &ldquo;tags&rdquo;: &ldquo;$tags&rdquo; },
+&ldquo;pipeline&rdquo;: [
+{ &ldquo;$match&rdquo;: {
+&ldquo;tags&rdquo;: { &ldquo;$in&rdquo;: [ &ldquo;politics&rdquo;, &ldquo;funny&rdquo; ] },
+&ldquo;$expr&rdquo;: { &ldquo;$in&rdquo;: [ &ldquo;$_id&rdquo;, &ldquo;$$tags&rdquo; ] }
+}}
+]
+}}
+])
+Item.lookup(
+{
+path: &rsquo;tags&rsquo;,
+query: { &rsquo;tags.tagName&rsquo; : { &lsquo;$in&rsquo;: [ &lsquo;funny&rsquo;, &lsquo;politics&rsquo; ] } }
+},
+callback
+)
+let results = await Item.lookup({
+path: &rsquo;tags&rsquo;,
+query: { &rsquo;tagName&rsquo; : { &lsquo;$in&rsquo;: [ &lsquo;funny&rsquo;, &lsquo;politics&rsquo; ] } }
+})
+const async = require(&lsquo;async&rsquo;),
+mongoose = require(&lsquo;mongoose&rsquo;),
+Schema = mongoose.Schema;</p>
+<p>mongoose.Promise = global.Promise;
+mongoose.set(&lsquo;debug&rsquo;, true);
+mongoose.connect(&lsquo;mongodb://localhost/looktest&rsquo;);</p>
+<p>const itemTagSchema = new Schema({
+tagName: String
+});</p>
+<p>const itemSchema = new Schema({
+dateCreated: { type: Date, default: Date.now },
+title: String,
+description: String,
+tags: [{ type: Schema.Types.ObjectId, ref: &lsquo;ItemTag&rsquo; }]
+});</p>
+<p>itemSchema.statics.lookup = function(opt,callback) {
+let rel =
+mongoose.model(this.schema.path(opt.path).caster.options.ref);</p>
+<p>let group = { &ldquo;$group&rdquo;: { } };
+this.schema.eachPath(p =&gt;
+group.$group[p] = (p === &ldquo;_id&rdquo;) ? &ldquo;$_id&rdquo; :
+(p === opt.path) ? { &ldquo;$push&rdquo;: <code>$${p}</code> } : { &ldquo;$first&rdquo;: <code>$${p}</code> });</p>
+<p>let pipeline = [
+{ &ldquo;$lookup&rdquo;: {
+&ldquo;from&rdquo;: rel.collection.name,
+&ldquo;as&rdquo;: opt.path,
+&ldquo;localField&rdquo;: opt.path,
+&ldquo;foreignField&rdquo;: &ldquo;_id&rdquo;
+}},
+{ &ldquo;$unwind&rdquo;: <code>$${opt.path}</code> },
+{ &ldquo;$match&rdquo;: opt.query },
+group
+];</p>
+<p>this.aggregate(pipeline,(err,result) =&gt; {
+if (err) callback(err);
+result = result.map(m =&gt; {
+m[opt.path] = m[opt.path].map(r =&gt; rel(r));
+return this(m);
+});
+callback(err,result);
+});
+}</p>
+<p>const Item = mongoose.model(&lsquo;Item&rsquo;, itemSchema);
+const ItemTag = mongoose.model(&lsquo;ItemTag&rsquo;, itemTagSchema);</p>
+<p>function log(body) {
+console.log(JSON.stringify(body, undefined, 2))
+}
+async.series(
+[
+// Clean data
+(callback) =&gt; async.each(mongoose.models,(model,callback) =&gt;
+model.remove({},callback),callback),</p>
+<pre><code>// Create tags and items
+(callback) =&amp;gt;
+  async.waterfall(
+    [
+      (callback) =&amp;gt;
+        ItemTag.create([{ &quot;tagName&quot;: &quot;movies&quot; }, { &quot;tagName&quot;: &quot;funny&quot; }],
+          callback),
+
+      (tags, callback) =&amp;gt;
+        Item.create({ &quot;title&quot;: &quot;Something&quot;,&quot;description&quot;: &quot;An item&quot;,
+          &quot;tags&quot;: tags },callback)
+    ],
+    callback
+  ),
+
+// Query with our static
+(callback) =&amp;gt;
+  Item.lookup(
+    {
+      path: 'tags',
+      query: { 'tags.tagName' : { '$in': [ 'funny', 'politics' ] } }
+    },
+    callback
+  )
+</code></pre>
+<p>],
+(err,results) =&gt; {
+if (err) throw err;
+let result = results.pop();
+log(result);
+mongoose.disconnect();
+}
+)
+const { Schema } = mongoose = require(&lsquo;mongoose&rsquo;);
+const uri = &lsquo;mongodb://localhost/looktest&rsquo;;</p>
+<p>mongoose.Promise = global.Promise;
+mongoose.set(&lsquo;debug&rsquo;, true);</p>
+<p>const itemTagSchema = new Schema({
+tagName: String
+});</p>
+<p>const itemSchema = new Schema({
+dateCreated: { type: Date, default: Date.now },
+title: String,
+description: String,
+tags: [{ type: Schema.Types.ObjectId, ref: &lsquo;ItemTag&rsquo; }]
+});</p>
+<p>itemSchema.statics.lookup = function(opt) {
+let rel =
+mongoose.model(this.schema.path(opt.path).caster.options.ref);</p>
+<p>let group = { &ldquo;$group&rdquo;: { } };
+this.schema.eachPath(p =&gt;
+group.$group[p] = (p === &ldquo;_id&rdquo;) ? &ldquo;$_id&rdquo; :
+(p === opt.path) ? { &ldquo;$push&rdquo;: <code>$${p}</code> } : { &ldquo;$first&rdquo;: <code>$${p}</code> });</p>
+<p>let pipeline = [
+{ &ldquo;$lookup&rdquo;: {
+&ldquo;from&rdquo;: rel.collection.name,
+&ldquo;as&rdquo;: opt.path,
+&ldquo;localField&rdquo;: opt.path,
+&ldquo;foreignField&rdquo;: &ldquo;_id&rdquo;
+}},
+{ &ldquo;$unwind&rdquo;: <code>$${opt.path}</code> },
+{ &ldquo;$match&rdquo;: opt.query },
+group
+];</p>
+<p>return this.aggregate(pipeline).exec().then(r =&gt; r.map(m =&gt;
+this({ &hellip;m, [opt.path]: m[opt.path].map(r =&gt; rel(r)) })
+));
+}</p>
+<p>const Item = mongoose.model(&lsquo;Item&rsquo;, itemSchema);
+const ItemTag = mongoose.model(&lsquo;ItemTag&rsquo;, itemTagSchema);</p>
+<p>const log = body =&gt; console.log(JSON.stringify(body, undefined, 2));</p>
+<p>(async function() {
+try {</p>
+<pre><code>const conn = await mongoose.connect(uri);
+
+// Clean data
+await Promise.all(Object.entries(conn.models).map(([k,m]) =&amp;gt; m.remove()));
+
+// Create tags and items
+const tags = await ItemTag.create(
+  [&quot;movies&quot;, &quot;funny&quot;].map(tagName =&amp;gt;({ tagName }))
+);
+const item = await Item.create({ 
+  &quot;title&quot;: &quot;Something&quot;,
+  &quot;description&quot;: &quot;An item&quot;,
+  tags 
+});
+
+// Query with our static
+const result = (await Item.lookup({
+  path: 'tags',
+  query: { 'tags.tagName' : { '$in': [ 'funny', 'politics' ] } }
+})).pop();
+log(result);
+
+mongoose.disconnect();
+</code></pre>
+<p>} catch (e) {
+console.error(e);
+} finally {
+process.exit()
+}
+})()
+const { Schema, Types: { ObjectId } } = mongoose = require(&lsquo;mongoose&rsquo;);</p>
+<p>const uri = &lsquo;mongodb://localhost/looktest&rsquo;;</p>
+<p>mongoose.Promise = global.Promise;
+mongoose.set(&lsquo;debug&rsquo;, true);</p>
+<p>const itemTagSchema = new Schema({
+tagName: String
+});</p>
+<p>const itemSchema = new Schema({
+title: String,
+description: String,
+tags: [{ type: Schema.Types.ObjectId, ref: &lsquo;ItemTag&rsquo; }]
+},{ timestamps: true });</p>
+<p>itemSchema.statics.lookup = function({ path, query }) {
+let rel =
+mongoose.model(this.schema.path(path).caster.options.ref);</p>
+<p>// MongoDB 3.6 and up $lookup with sub-pipeline
+let pipeline = [
+{ &ldquo;$lookup&rdquo;: {
+&ldquo;from&rdquo;: rel.collection.name,
+&ldquo;as&rdquo;: path,
+&ldquo;let&rdquo;: { [path]: <code>$${path}</code> },
+&ldquo;pipeline&rdquo;: [
+{ &ldquo;$match&rdquo;: {
+&hellip;query,
+&ldquo;$expr&rdquo;: { &ldquo;$in&rdquo;: [ &ldquo;$_id&rdquo;, <code>$$${path}</code> ] }
+}}
+]
+}}
+];</p>
+<p>return this.aggregate(pipeline).exec().then(r =&gt; r.map(m =&gt;
+this({ &hellip;m, [path]: m[path].map(r =&gt; rel(r)) })
+));
+};</p>
+<p>const Item = mongoose.model(&lsquo;Item&rsquo;, itemSchema);
+const ItemTag = mongoose.model(&lsquo;ItemTag&rsquo;, itemTagSchema);</p>
+<p>const log = body =&gt; console.log(JSON.stringify(body, undefined, 2));</p>
+<p>(async function() {</p>
+<p>try {</p>
+<pre><code>const conn = await mongoose.connect(uri);
+
+// Clean data
+await Promise.all(Object.entries(conn.models).map(([k,m]) =&amp;gt; m.remove()));
+
+// Create tags and items
+const tags = await ItemTag.insertMany(
+  [&quot;movies&quot;, &quot;funny&quot;].map(tagName =&amp;gt; ({ tagName }))
+);
+
+const item = await Item.create({
+  &quot;title&quot;: &quot;Something&quot;,
+  &quot;description&quot;: &quot;An item&quot;,
+  tags
+});
+
+// Query with our static
+let result = (await Item.lookup({
+  path: 'tags',
+  query: { 'tagName': { '$in': [ 'funny', 'politics' ] } }
+})).pop();
+log(result);
+
+
+await mongoose.disconnect();
+</code></pre>
+<p>} catch(e) {
+console.error(e)
+} finally {
+process.exit()
+}</p>
+<p>})()</p>
+<pre tabindex="0"><code>
+&#34;);
+    log(result);
+
+  } catch(e) {
+    console.error(&#34;Operation failed:&#34;, e);
+  } finally {
+    await mongoose.disconnect();
+  }
+})();
+</code></pre><h2 id="alternative-mongoose-approaches-client-side-filtering">Alternative Mongoose Approaches (Client-Side Filtering)</h2>
+<p>If utilizing aggregation is not feasible or an immediate solution is needed, Mongoose offers ways to influence population results before the final retrieval, though these generally perform filtering client-side or rely on specific Mongoose features.</p>
+<h3 id="alternative-a-using-match-within-populate-mongoose-v460">Alternative A: Using <code>match</code> within <code>.populate()</code> (Mongoose v4.6.0+)</h3>
+<p>For recent Mongoose versions, you can specify a <code>match</code> condition directly inside the populate object. This is simpler than writing a full aggregation pipeline if the filtering is straightforward.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// Filtering the populated sub-documents directly
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">Item</span>.<span style="color:#a6e22e">find</span>({}).<span style="color:#a6e22e">populate</span>({
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">path</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;tags&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">match</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">tagName</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">$in</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#39;funny&#39;</span>, <span style="color:#e6db74">&#39;politics&#39;</span>] }}
+</span></span><span style="display:flex;"><span>}).<span style="color:#a6e22e">exec</span>((<span style="color:#a6e22e">err</span>, <span style="color:#a6e22e">items</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Note: If a document has no matching tags, the &#39;tags&#39; array might still exist 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// but contain only matching entries, or be filtered based on Mongoose version/behavior.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>});
+</span></span></code></pre></div><h3 id="alternative-b-filtering-after-execution">Alternative B: Filtering After Execution</h3>
+<p>If <code>.populate()</code> returns documents, you can filter the resulting array client-side. This is least efficient for large datasets as all data is retrieved first.</p>
+<p>If <code>.populate()</code> leaves documents with empty arrays where no matches were found, filter by array length:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#a6e22e">query</span>....
+</span></span><span style="display:flex;"><span>.<span style="color:#a6e22e">exec</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">err</span>, <span style="color:#a6e22e">docs</span>){
+</span></span><span style="display:flex;"><span>   <span style="color:#a6e22e">docs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">docs</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">doc</span>){
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">doc</span>.<span style="color:#a6e22e">tags</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>; <span style="color:#75715e">// Keep only documents that ended up with matching tags
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>   })
+</span></span><span style="display:flex;"><span>   <span style="color:#75715e">// Process filtered docs
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>});
+</span></span></code></pre></div><p><em>Note: Some older Mongoose behaviors might result in <code>null</code> instead of an empty array for non-matches, requiring checks like <code>doc.tags != null</code>.</em></p>
+<h3 id="alternative-c-two-step-query-with-all-for-required-tag-presence">Alternative C: Two-Step Query with <code>$all</code> (For Required Tag Presence)</h3>
+<p>If the goal is to find items that possess <em>all</em> specified tags (not just filter the returned tags), an initial query to find the relevant tag IDs followed by a query on the main collection using <code>$all</code> is effective:</p>
+<ol>
+<li>Find IDs of tags matching criteria.</li>
+<li>Find items where the <code>tags</code> array field contains <code>$all</code> of those IDs.</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#a6e22e">ItemTag</span>
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">find</span>({ <span style="color:#a6e22e">tagName</span> <span style="color:#f92672">:</span> { <span style="color:#a6e22e">$in</span> <span style="color:#f92672">:</span> [<span style="color:#e6db74">&#39;funny&#39;</span>,<span style="color:#e6db74">&#39;politics&#39;</span>] } })
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">lean</span>()
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">distinct</span>(<span style="color:#e6db74">&#39;_id&#39;</span>)
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">exec</span>((<span style="color:#a6e22e">err</span>, <span style="color:#a6e22e">itemTagIds</span>) =&gt; {
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) { <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">error</span>(<span style="color:#a6e22e">err</span>); <span style="color:#66d9ef">return</span>; }
+</span></span><span style="display:flex;"><span>     <span style="color:#75715e">// Finds items whose &#39;tags&#39; array includes every ID in itemTagIds
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>     <span style="color:#a6e22e">Item</span>.<span style="color:#a6e22e">find</span>({ <span style="color:#a6e22e">tags</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">$all</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">itemTagIds</span>} }, (<span style="color:#a6e22e">err</span>, <span style="color:#a6e22e">items</span>) =&gt; {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">items</span>); <span style="color:#75715e">// Items linked to ALL specified tags
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>     });
+</span></span><span style="display:flex;"><span>  });
+</span></span></code></pre></div><pre tabindex="0"><code>query....
+.exec(function(err, docs){
+   docs = docs.filter(function(doc){
+     return doc.tags.length;
+   })
+   // do stuff with docs
+});
+</code></pre><h3 id="faqs-on-mongoose-populate-filtering">FAQs on Mongoose Populate Filtering</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is $lookup better than Mongoose populate</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: In most scenarios requiring filtering based on the foreign document&rsquo;s fields, $lookup within an aggregation pipeline is significantly more performant as it executes the join logic entirely on the database server, avoiding multiple round trips from the client.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What happens if I use $unwind without preserving nulls</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Using $unwind without preserving nulls effectively turns a LEFT JOIN emulation into an INNER JOIN, discarding any parent documents that had no matching sub-documents in the joined collection.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How do I access the actual collection name in Mongoose for $lookup</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Use the model&rsquo;s property: <code>ModelName.collection.name</code>. This correctly returns the pluralized name MongoDB expects for server-side operations, overriding the need to hardcode strings like &ldquo;itemtags&rdquo;.</div>
+    </div>
+</div>
+<p>We value your input! Share your experiences or alternative approaches to conditional population in the comments below.</p>
+<p>For further exploration into related technical challenges:</p>
+<ul>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">Fixing SSL verification errors when using Python requests</a>
+</li>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-could-not-find-a-version-that-satisfies-the-requirement-error-in-python/" target="_blank" rel="noopener">Resolving issues with Python package dependency satisfaction</a>
+</li>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-unicodeencodeerror-charmap-codec-cant-encode-characters/" target="_blank" rel="noopener">Techniques for handling Python Unicode encoding problems</a>
+</li>
+</ul>
+<pre tabindex="0"><code>.populate(&#39;tags&#39;).where(&#39;tags.tagName&#39;).in([&#39;funny&#39;, &#39;politics&#39;])
+.populate( &#39;tags&#39;, null, { tagName: { $in: [&#39;funny&#39;, &#39;politics&#39;] } } )
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>R Pipe Operators: Comparing Magrittr vs Base R for Data Flow - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore the technical distinctions, performance characteristics, and placeholder limitations between the Magrittr pipe operator (%)&gt;% and the native base R pipe …">
+
+
+
+<meta name="keywords" content="magrittr, base R pipe, R pipeline operator, placeholder _ vs .">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="R Pipe Operators: Comparing Magrittr vs Base R for Data Flow - sqlpey">
+<meta name="DC.description" content="Explore the technical distinctions, performance characteristics, and placeholder limitations between the Magrittr pipe operator (%)&gt;% and the native base R pipe (|&gt;) in R programming.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="R Pipe Operators: Comparing Magrittr vs Base R for Data Flow - sqlpey">
+<meta property="og:description" content="Explore the technical distinctions, performance characteristics, and placeholder limitations between the Magrittr pipe operator (%)&gt;% and the native base R pipe …">
+<meta property="og:url" content="https://sqlpey.com/r/r-pipe-operators-magrittr-vs-base-r/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="R Programming">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="R Pipe Operators: Comparing Magrittr vs Base R for Data Flow">
+<meta name="twitter:description" content="Explore the technical distinctions, performance characteristics, and placeholder limitations between the Magrittr pipe operator (%)&gt;% and the native base R pipe …">
+
+
+<link rel="canonical" href="https://sqlpey.com/r/r-pipe-operators-magrittr-vs-base-r/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"R Pipe Operators: Comparing Magrittr vs Base R for Data Flow\"",
+  "description": "\"Explore the technical distinctions, performance characteristics, and placeholder limitations between the Magrittr pipe operator (%)\\u003e% and the native base R pipe (|\\u003e) in R programming.\"",
+  "url": "\"https://sqlpey.com/r/r-pipe-operators-magrittr-vs-base-r/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/r/r-pipe-operators-magrittr-vs-base-r/\""
+  },
+  "articleSection": "\"R Programming\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">R Pipe Operators: Comparing Magrittr vs Base R for Data Flow</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">R Programming</span>
+              
+              <span class="tag">Data Piping</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              13 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#r-pipe-operators-comparing-magrittr-vs-base-r-for-data-flow">&ldquo;R Pipe Operators: Comparing Magrittr vs Base R for Data Flow&rdquo;</a>
+      <ul>
+        <li><a href="#core-operator-functionality-and-syntax">Core Operator Functionality and Syntax</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li></li>
+        <li><a href="#placeholder-limitations-repetition-and-naming">Placeholder Limitations: Repetition and Naming</a></li>
+        <li><a href="#extraction-syntax-comparison">Extraction Syntax Comparison</a></li>
+        <li><a href="#performance-benchmarks">Performance Benchmarks</a></li>
+        <li><a href="#alternative-pipe-implementations-and-workarounds">Alternative Pipe Implementations and Workarounds</a></li>
+        <li><a href="#faqs-on-r-pipe-operators">FAQs on R Pipe Operators</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="r-pipe-operators-comparing-magrittr-vs-base-r-for-data-flow">&ldquo;R Pipe Operators: Comparing Magrittr vs Base R for Data Flow&rdquo;</h2>
+<p>When working with R for data manipulation, pipe operators significantly improve code readability by chaining function calls. Two primary options exist: the well-established pipe from the <code>magrittr</code> package (<code>%&gt;%</code>) and the native pipe (<code>|&gt;</code>) introduced in R 4.1.0 (and enhanced in R 4.2.0). How do these operators differ in syntax, capabilities, and performance?</p>
+<h3 id="core-operator-functionality-and-syntax">Core Operator Functionality and Syntax</h3>
+<p>The fundamental difference lies in how they handle function execution and the placeholder for the piped-in value.</p>
+<p>| Feature | Magrittr Pipe (<code>%&gt;%</code>) | Base R Pipe (<code>|&gt;</code>) |
+| :</p>
+<h2 id="solutions">Solutions</h2>
+<p>| :</p>
+<pre tabindex="0"><code>library(magrittr)
+
+1:3 |&amp;gt; sum
+#Error: The pipe operator requires a function call as RHS
+
+1:3 |&amp;gt; sum()
+#[1] 6
+
+1:3 |&amp;gt; approxfun(1:3, 4:6)()
+#[1] 4 5 6
+
+1:3 %&amp;gt;% sum
+#[1] 6
+
+1:3 %&amp;gt;% sum()
+#[1] 6
+
+1:3 %&amp;gt;% approxfun(1:3, 4:6)  #But in this case empty parentheses are needed
+#Error in if (is.na(method)) stop(&amp;quot;invalid interpolation method&amp;quot;) :
+1:3 %&amp;gt;% approxfun(1:3, 4:6)()
+#[1] 4 5 6
+1:3 |&amp;gt; `+`(4)
+#Error: function &#39;+&#39; not supported in RHS call of a pipe
+
+1:3 |&amp;gt; (`+`)(4)
+#[1] 5 6 7
+
+1:3 |&amp;gt; base::`+`(4)
+#[1] 5 6 7
+
+1:3 |&amp;gt;  `+`(4, e2 = _)
+#[1] 5 6 7
+
+1 |&amp;gt; (`+`)(2) |&amp;gt; (`*`)(3) #(1 + 2) * 3  or `*`(`+`(1, 2), 3) and NOT 1 + 2 * 3
+#[1] 9
+
+1:3 |&amp;gt; (\(.) . + 4)()
+#[1] 5 6 7
+
+fun &amp;lt;- `+`
+1:3 |&amp;gt; fun(4)
+#[1] 5 6 7
+
+1:3 %&amp;gt;% `+`(4)
+#[1] 5 6 7
+2 |&amp;gt; setdiff(1:3, _)
+#Error: pipe placeholder can only be used as a named argument
+
+2 |&amp;gt; setdiff(1:3, y = _)
+#[1] 1 3
+
+2 |&amp;gt; (\(.) setdiff(1:3, .))()
+#[1] 1 3
+
+2 %&amp;gt;% setdiff(1:3, .)
+#[1] 1 3
+
+2 %&amp;gt;% setdiff(1:3, y = .)
+#[1] 1 3
+&amp;quot;b&amp;quot; |&amp;gt;  paste(&amp;quot;a&amp;quot;, _, &amp;quot;c&amp;quot;)
+#Error: pipe placeholder can only be used as a named argument
+
+&amp;quot;b&amp;quot; |&amp;gt;  paste(&amp;quot;a&amp;quot;, . = _, &amp;quot;c&amp;quot;)
+#[1] &amp;quot;a b c&amp;quot;
+
+&amp;quot;b&amp;quot; |&amp;gt;  (\(.) paste(&amp;quot;a&amp;quot;, ., &amp;quot;c&amp;quot;))()
+#[1] &amp;quot;a b c&amp;quot;
+1:3 |&amp;gt; setNames(nm = _)
+#1 2 3 
+#1 2 3 
+
+1:3 |&amp;gt; setNames(object = _, nm = _)
+#Error in setNames(object = &amp;quot;_&amp;quot;, nm = &amp;quot;_&amp;quot;) : 
+#  pipe placeholder may only appear once
+
+1:3 |&amp;gt; (\(.) setNames(., .))()
+#1 2 3 
+#1 2 3 
+
+1:3 |&amp;gt; list() |&amp;gt; setNames(&amp;quot;.&amp;quot;) |&amp;gt; with(setNames(., .))
+#1 2 3 
+#1 2 3 
+
+1:3 |&amp;gt; list(. = _) |&amp;gt; with(setNames(., .))
+#1 2 3
+#1 2 3
+
+1:3 %&amp;gt;% setNames(object = ., nm = .)
+#1 2 3
+#1 2 3
+
+1:3 %&amp;gt;% setNames(., .)
+#1 2 3 
+#1 2 3
+1:3 |&amp;gt; sum(sqrt(x=_))
+#Error in sum(1:3, sqrt(x = &amp;quot;_&amp;quot;)) : invalid use of pipe placeholder
+
+1:3 |&amp;gt; (\(.) sum(sqrt(.)))()
+#[1] 4.146264
+
+1:3 %&amp;gt;% {sum(sqrt(.))}
+#[1] 4.146264
+mtcars |&amp;gt; _$cyl
+mtcars |&amp;gt; _[[&amp;quot;cyl&amp;quot;]]
+mtcars |&amp;gt; _[,&amp;quot;cyl&amp;quot;]
+# [1] 6 6 4 6 8 6 8 4 4 6 6 8 8 8 8 8 8 4 4 4 4 8 8 8 8 4 4 4 8 6 8 4
+
+mtcars |&amp;gt; _$cyl[[4]]
+#[1] 6
+
+mtcars %&amp;gt;% .$cyl
+mtcars %&amp;gt;% .[[&amp;quot;cyl&amp;quot;]]
+mtcars %&amp;gt;% .[,&amp;quot;cyl&amp;quot;]
+# [1] 6 6 4 6 8 6 8 4 4 6 6 8 8 8 8 8 8 4 4 4 4 8 8 8 8 4 4 4 8 6 8 4
+
+#mtcars %&amp;gt;% .$cyl[4] #gives mtcars[[4]]
+mtcars %&amp;gt;% .$cyl %&amp;gt;% .[4]
+#[1] 6
+assign(&amp;quot;x&amp;quot;, 1)
+x
+#[1] 1
+
+&amp;quot;x&amp;quot; |&amp;gt; assign(2)
+x
+#[1] 2
+
+&amp;quot;x&amp;quot; |&amp;gt; (\(x) assign(x, 3))()
+x
+#[1] 2
+
+1:3 |&amp;gt; assign(&amp;quot;x&amp;quot;, value=_)
+x
+#[1] 1 2 3
+
+&amp;quot;x&amp;quot; %&amp;gt;% assign(4)
+x
+#[1] 1 2 3
+
+4 %&amp;gt;% assign(&amp;quot;x&amp;quot;, .)
+x
+#[1] 1 2 3
+
+&amp;quot;x&amp;quot; %!&amp;gt;% assign(4) #Use instead the eager pipe
+x
+#[1] 4
+
+5 %!&amp;gt;% assign(&amp;quot;x&amp;quot;, .)
+x
+#[1] 5
+top6 &amp;lt;- . %&amp;gt;% sort() %&amp;gt;% tail()
+top6(c(1:10,10:1))
+#[1]  8  8  9  9 10 10
+1:3 -&amp;gt;.; sum(.)
+#[1] 6
+
+mtcars -&amp;gt;.; .$cyl
+# [1] 6 6 4 6 8 6 8 4 4 6 6 8 8 8 8 8 8 4 4 4 4 8 8 8 8 4 4 4 8 6 8 4
+
+mtcars -&amp;gt;.; .$cyl[4]
+#[1] 6
+
+1:3 -&amp;gt;.; setNames(., .)
+#1 2 3 
+#1 2 3 
+
+1:3 -&amp;gt;.; sum(sqrt(x=.))
+#[1] 4.146264
+
+&amp;quot;x&amp;quot; -&amp;gt;.; assign(., 5)
+x
+#[1] 5
+
+6 -&amp;gt;.; assign(&amp;quot;x&amp;quot;, .)
+x
+#[1] 6
+
+1:3 -&amp;gt;.; . + 4
+#[1] 5 6 7
+
+1 -&amp;gt;.; (`+`)(., 2) -&amp;gt;.; (`*`)(., 3)
+#[1] 9
+
+1 -&amp;gt;.; .+2 -&amp;gt;.; .*3
+#[1] 9
+x &amp;lt;- data.frame(a=0)
+f1 &amp;lt;- \(x) {message(&amp;quot;IN 1&amp;quot;); x$b &amp;lt;- 1; message(&amp;quot;OUT 1&amp;quot;); x}
+f2 &amp;lt;- \(x) {message(&amp;quot;IN 2&amp;quot;); x$c &amp;lt;- 2; message(&amp;quot;OUT 2&amp;quot;); x}
+
+x -&amp;gt;.; f1(.) -&amp;gt;.; f2(.)
+#IN 1
+#OUT 1
+#IN 2
+#OUT 2
+#  a b c
+#1 0 1 2
+
+x |&amp;gt; f1() |&amp;gt; f2()
+#IN 2
+#IN 1
+#OUT 1
+#OUT 2
+#  a b c
+#1 0 1 2
+
+f2(f1(x))
+#IN 2
+#IN 1
+#OUT 1
+#OUT 2
+#  a b c
+#1 0 1 2
+`:=` &amp;lt;- \(lhs, rhs) eval(substitute(rhs), list(. = lhs))
+
+mtcars := .$cyl[4]
+#[1] 6
+
+1:3 := setNames(., .)
+#1 2 3 
+#1 2 3 
+
+1:3 := sum(sqrt(x=.))
+#[1] 4.146264
+
+&amp;quot;x&amp;quot; := assign(., 6)
+x
+#Error: object &#39;x&#39; not found
+
+1 := .+2 := .*3
+#[1] 9
+`?` &amp;lt;- \(lhs, rhs) {
+  on.exit(if(exists(&amp;quot;.&amp;quot;, parent.frame())) rm(., envir = parent.frame()))
+  assign(&amp;quot;.&amp;quot;, lhs, envir=parent.frame())
+  eval.parent(substitute(rhs))
+}
+
+mtcars ? .$cyl[4]
+#[1] 6
+
+1:3 ? setNames(., .)
+#1 2 3 
+#1 2 3 
+
+1:3 ? sum(sqrt(x=.))
+#[1] 4.146264
+
+&amp;quot;x&amp;quot; ? assign(., 6)
+x
+#[1] 6
+
+1 ? .+2 ? .*3
+#[1] 9
+`%|&amp;gt;%` &amp;lt;- \(lhs, rhs)
+  eval.parent(eval(call(&#39;substitute&#39;, substitute(rhs), list(. = lhs))))
+
+mtcars %|&amp;gt;% .$cyl[4]
+[1] 6
+
+1:3 %|&amp;gt;% setNames(., .)
+1 2 3 
+1 2 3
+
+1:3 %|&amp;gt;% sum(sqrt(x=.))
+[1] 4.146264
+
+&amp;quot;x&amp;quot; %|&amp;gt;% assign(., 6)
+x
+#[1] 6
+
+1 %|&amp;gt;% .+2 %|&amp;gt;% .*3
+#[1] 7
+library(magrittr)
+
+`:=` &amp;lt;- \(lhs, rhs) eval(substitute(rhs), list(. = lhs))
+
+`?` &amp;lt;- \(lhs, rhs) {
+  on.exit(if(exists(&amp;quot;.&amp;quot;, parent.frame())) rm(., envir = parent.frame()))
+  assign(&amp;quot;.&amp;quot;, lhs, envir=parent.frame())
+  eval.parent(substitute(rhs))
+}
+
+`%|&amp;gt;%` &amp;lt;- \(lhs, rhs)
+  eval.parent(eval(call(&#39;substitute&#39;, substitute(rhs), list(. = lhs))))
+
+
+x &amp;lt;- 42
+bench::mark(min_time = 0.2, max_iterations = 1e8
+, x
+, identity(x)
+, &amp;quot;|&amp;gt;&amp;quot; = x |&amp;gt; identity()
+, &amp;quot;|&amp;gt; _&amp;quot; = x |&amp;gt; identity(x=_)
+, &amp;quot;-&amp;gt;.;&amp;quot; = {x -&amp;gt;.; identity(.)}
+, &amp;quot;|&amp;gt; f()&amp;quot; = x |&amp;gt; (\(y) identity(y))()
+, &amp;quot;%&amp;gt;%&amp;quot; = x %&amp;gt;% identity
+, &amp;quot;:=&amp;quot; = x := identity(.)
+, &amp;quot;list.&amp;quot; = x |&amp;gt; list() |&amp;gt; setNames(&amp;quot;.&amp;quot;) |&amp;gt; with(identity(.))
+, &amp;quot;%|&amp;gt;%&amp;quot; = x %|&amp;gt;% identity(.)
+, &amp;quot;?&amp;quot; = x ? identity(.)
+)
+expression       min   median `itr/sec` mem_alloc `gc/sec`   n_itr  n_gc
+   &amp;lt;bch:expr&amp;gt;  &amp;lt;bch:tm&amp;gt; &amp;lt;bch:tm&amp;gt;     &amp;lt;dbl&amp;gt; &amp;lt;bch:byt&amp;gt;    &amp;lt;dbl&amp;gt;   &amp;lt;int&amp;gt; &amp;lt;dbl&amp;gt;
+ 1 x            31.08ns   48.2ns 19741120.        0B     7.46 2646587     1
+ 2 identity(x) 491.04ns 553.09ns  1750116.        0B    27.0   323575     5
+ 3 |&amp;gt;          497.91ns 548.08ns  1758553.        0B    27.3   322408     5
+ 4 |&amp;gt; _        506.87ns 568.92ns  1720374.        0B    26.9   320003     5
+ 5 -&amp;gt;.;        725.03ns 786.04ns  1238488.        0B    21.2   233864     4
+ 6 |&amp;gt; f()      972.07ns   1.03µs   929926.        0B    37.8   172288     7
+ 7 %&amp;gt;%           2.76µs   3.05µs   315448.        0B    37.2    59361     7
+ 8 :=            3.02µs   3.35µs   288025.        0B    37.0    54561     7
+ 9 list.         5.19µs   5.89µs   166721.        0B    36.8    31752     7
+10 %|&amp;gt;%          6.01µs   6.86µs   143294.        0B    37.0    27076     7
+11 ?             30.9µs  32.79µs    30074.        0B    31.3     5768     6
+</code></pre><p>| :</p>
+<pre tabindex="0"><code>c(&amp;quot;dogs&amp;quot;, &amp;quot;cats&amp;quot;, &amp;quot;rats&amp;quot;) %&amp;gt;% grepl(&amp;quot;at&amp;quot;, .)
+#[1] FALSE  TRUE  TRUE
+c(&amp;quot;dogs&amp;quot;, &amp;quot;cats&amp;quot;, &amp;quot;rats&amp;quot;) |&amp;gt; grepl(&amp;quot;at&amp;quot;, x = _)
+#[1] FALSE  TRUE  TRUE
+c(&amp;quot;dogs&amp;quot;, &amp;quot;cats&amp;quot;, &amp;quot;rats&amp;quot;) %&amp;gt;% 
+  paste(., ., toupper(.)) 
+#[1] &amp;quot;dogs dogs DOGS&amp;quot; &amp;quot;cats cats CATS&amp;quot; &amp;quot;rats rats RATS&amp;quot;
+
+c(&amp;quot;dogs&amp;quot;, &amp;quot;cats&amp;quot;, &amp;quot;rats&amp;quot;) |&amp;gt;
+  paste(x = &amp;quot;no&amp;quot;, y = _) 
+# Error in paste(x = &amp;quot;_&amp;quot;, y = &amp;quot;_&amp;quot;) : pipe placeholder may only appear once
+c(&amp;quot;dogs&amp;quot;, &amp;quot;cats&amp;quot;, &amp;quot;rats&amp;quot;) |&amp;gt;
+  paste(x = &amp;quot;no&amp;quot;, y = _) 
+#[1] &amp;quot;no dogs&amp;quot; &amp;quot;no cats&amp;quot; &amp;quot;no rats&amp;quot;
+find_at = function(x) grepl(&amp;quot;at&amp;quot;, x)
+c(&amp;quot;dogs&amp;quot;, &amp;quot;cats&amp;quot;, &amp;quot;rats&amp;quot;) |&amp;gt; find_at()
+#[1] FALSE  TRUE  TRUE
+c(&amp;quot;dogs&amp;quot;, &amp;quot;cats&amp;quot;, &amp;quot;rats&amp;quot;) |&amp;gt; {function(x) grepl(&amp;quot;at&amp;quot;, x)}()
+c(&amp;quot;dogs&amp;quot;, &amp;quot;cats&amp;quot;, &amp;quot;rats&amp;quot;) |&amp;gt; {\(x) grepl(&amp;quot;at&amp;quot;, x)}()
+c(&amp;quot;dogs&amp;quot;, &amp;quot;cats&amp;quot;, &amp;quot;rats&amp;quot;) |&amp;gt; grepl(pattern=&amp;quot;at&amp;quot;)
+#&amp;gt; [1] FALSE  TRUE  TRUE
+</code></pre><p>|
+| <strong>Package</strong> | <code>magrittr</code> (Version 2.0.3 specified) | Base R (Since 4.1.0, improved in 4.3.0) |
+| <strong>Placeholder</strong> | <code>.</code> | <code>_</code> (Since R 4.2.0) |
+| <strong>Function Call</strong> | <code>1:3 %&gt;% sum()</code> | <code>1:3 |&gt; sum()</code> |
+| <strong>Implicit Call</strong> | <code>1:3 %&gt;% sum</code> (Requires parentheses for non-function calls like <code>approxfun</code>) | <code>1:3 |&gt; sum</code> (Requires parentheses for a proper function call) |
+| <strong>Placeholder Insertion</strong> | Can insert into any argument position (named or unnamed). | Placeholder (<code>_</code>) must be used as a <strong>named argument</strong>. |
+| <strong>Placeholder Repetition</strong> | Placeholder (<code>.</code>) can be repeated freely. | Placeholder (<code>_</code>) can only appear <strong>once</strong> per call RHS. |
+| <strong>Environment Handling</strong> | Carries additional function environment context (e.g., using <code>%!&gt;%</code> for eager evaluation or <code>%T&gt;%</code> for side effects). | Focuses purely on functional composition; no built-in eager evaluation pipe counterpart. |
+| <strong>Performance</strong> | Generally exhibits slightly more overhead due to function call complexity. | Typically faster due to direct syntax transformation. |</p>
+<h4 id="code-example-basic-function-application">Code Example: Basic Function Application</h4>
+<p>The base R pipe transforms <code>lhs |&gt; func(arg1, arg2)</code> into <code>func(lhs, arg1, arg2)</code>, whereas <code>magrittr</code> handles argument substitution more flexibly.</p>
+<p><strong>Using the implicit call (where available):</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e"># Magrittr handles implicit function calls gracefully (though parens are recommended)</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">library</span>(magrittr)
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">3</span> <span style="color:#f92672">%&gt;%</span> sum
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [1] 6 </span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Base R requires explicit parentheses for non-trivial function calls</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 1:3 |&gt; sum </span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Error: The pipe operator requires a function call as RHS</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">3</span> <span style="color:#f92672">|&gt;</span> <span style="color:#a6e22e">sum</span>()
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [1] 6</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Base R requires parentheses even for functions that don&#39;t execute immediately if they are the RHS of the pipe</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">3</span> <span style="color:#f92672">|&gt;</span> <span style="color:#a6e22e">approxfun</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span><span style="color:#f92672">:</span><span style="color:#ae81ff">6</span>) 
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Error in if (is.na(method)) stop(&#34;invalid interpolation method&#34;) : </span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">3</span> <span style="color:#f92672">|&gt;</span> <span style="color:#a6e22e">approxfun</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span><span style="color:#f92672">:</span><span style="color:#ae81ff">6</span>)()
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [1] 4 5 6</span>
+</span></span></code></pre></div><h4 id="code-example-handling-operators-and-placeholder-placement">Code Example: Handling Operators and Placeholder Placement</h4>
+<p>When working with operators or functions that don&rsquo;t support the implicit placeholder location:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e"># Magrittr allows direct use of the placeholder for operators like &#39;+&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">3</span> <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">`+`</span>(<span style="color:#ae81ff">4</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [1] 5 6 7</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Base R requires explicit function wrapping or naming the argument</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">3</span> <span style="color:#f92672">|&gt;</span> (`+`)(<span style="color:#ae81ff">4</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [1] 5 6 7</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">3</span> <span style="color:#f92672">|&gt;</span> base<span style="color:#f92672">::</span><span style="color:#a6e22e">`+`</span>(<span style="color:#ae81ff">4</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [1] 5 6 7</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">3</span> <span style="color:#f92672">|&gt;</span>  <span style="color:#a6e22e">`+`</span>(<span style="color:#ae81ff">4</span>, e2 <span style="color:#f92672">=</span> _)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [1] 5 6 7</span>
+</span></span></code></pre></div><h3 id="placeholder-limitations-repetition-and-naming">Placeholder Limitations: Repetition and Naming</h3>
+<p>The primary constraint noted with the base R pipe (<code>|&gt;</code>) compared to <code>magrittr</code> (<code>%&gt;%</code>) involves the placeholder (<code>_</code> vs. <code>.</code>).</p>
+<ol>
+<li><strong>Named Arguments:</strong> The base R placeholder <code>_</code> <em>must</em> be supplied as a named argument.</li>
+<li><strong>Repetition:</strong> The base R placeholder <code>_</code> can only appear once.</li>
+</ol>
+<p>Consider using the <code>paste</code> function with multiple arguments:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>input_text <span style="color:#f92672">&lt;-</span> <span style="color:#e6db74">&#34;b&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Magrittr flexibility: . can be repeated</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">library</span>(magrittr)
+</span></span><span style="display:flex;"><span>input_text <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">paste</span>(<span style="color:#e6db74">&#34;a&#34;</span>, ., <span style="color:#e6db74">&#34;c&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [1] &#34;a b c&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Base R limitation: &#39;_&#39; must be named and cannot be repeated</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># input_text |&gt; paste(&#34;a&#34;, _, &#34;c&#34;) </span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Error: pipe placeholder can only be used as a named argument</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Base R workaround using named arguments:</span>
+</span></span><span style="display:flex;"><span>input_text <span style="color:#f92672">|&gt;</span> <span style="color:#a6e22e">paste</span>(x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;a&#34;</span>, y <span style="color:#f92672">=</span> _)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [1] &#34;a b&#34; </span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># NOTE: This example shows it being placed where the second argument is expected, not repeating.</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># To achieve the triple concatenation in base R, an anonymous function is necessary:</span>
+</span></span><span style="display:flex;"><span>input_text <span style="color:#f92672">|&gt;</span> (<span style="color:#a6e22e">\</span>(val) <span style="color:#a6e22e">paste</span>(<span style="color:#e6db74">&#34;a&#34;</span>, val, <span style="color:#e6db74">&#34;c&#34;</span>))()
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [1] &#34;a b c&#34;</span>
+</span></span></code></pre></div><p>If a function requires multiple inputs from the pipe, <code>magrittr</code> handles this easily:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>data_vector <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;dogs&#34;</span>, <span style="color:#e6db74">&#34;cats&#34;</span>, <span style="color:#e6db74">&#34;rats&#34;</span>)
+</span></span><span style="display:flex;"><span>data_vector <span style="color:#f92672">%&gt;%</span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">expand.grid</span>(x <span style="color:#f92672">=</span> ., y <span style="color:#f92672">=</span> .)
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#     x    y</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#1 dogs dogs</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#2 cats dogs</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#... (9 rows total)</span>
+</span></span></code></pre></div><p>The base R pipe fails when repeating <code>_</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>data_vector <span style="color:#f92672">|&gt;</span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">expand.grid</span>(x <span style="color:#f92672">=</span> _, y <span style="color:#f92672">=</span> _)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Error in expand.grid(x = &#34;_&#34;, y = &#34;_&#34;) : pipe placeholder may only appear once</span>
+</span></span></code></pre></div><p>The established workaround for base R is wrapping the second use of the value in an anonymous function:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>data_vector <span style="color:#f92672">|&gt;</span>
+</span></span><span style="display:flex;"><span>  (<span style="color:#a6e22e">\</span>(val) <span style="color:#a6e22e">expand.grid</span>(x <span style="color:#f92672">=</span> val, y <span style="color:#f92672">=</span> val))()
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#     x    y</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#1 dogs dogs</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#2 cats dogs</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#... (9 rows total)</span>
+</span></span></code></pre></div><h3 id="extraction-syntax-comparison">Extraction Syntax Comparison</h3>
+<p>Since R 4.3.0, the base R pipe supports extraction calls using <code>_</code>, mirroring some of <code>magrittr</code>&rsquo;s capabilities.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e"># Sample data frame (using mtcars internally for demonstration)</span>
+</span></span><span style="display:flex;"><span>mtcars_data <span style="color:#f92672">&lt;-</span> mtcars 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Magrittr extraction</span>
+</span></span><span style="display:flex;"><span>mtcars_data <span style="color:#f92672">%&gt;%</span> .$cyl
+</span></span><span style="display:flex;"><span>mtcars_data <span style="color:#f92672">%&gt;%</span> .[[<span style="color:#e6db74">&#34;cyl&#34;</span>]]
+</span></span><span style="display:flex;"><span>mtcars_data <span style="color:#f92672">%&gt;%</span> .[, <span style="color:#e6db74">&#34;cyl&#34;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Base R extraction (R &gt;= 4.3.0)</span>
+</span></span><span style="display:flex;"><span>mtcars_data <span style="color:#f92672">|&gt;</span> _<span style="color:#f92672">$</span>cyl
+</span></span><span style="display:flex;"><span>mtcars_data <span style="color:#f92672">|&gt;</span> _[[<span style="color:#e6db74">&#34;cyl&#34;</span>]]
+</span></span><span style="display:flex;"><span>mtcars_data <span style="color:#f92672">|&gt;</span> _[, <span style="color:#e6db74">&#34;cyl&#34;</span>]
+</span></span></code></pre></div><h3 id="performance-benchmarks">Performance Benchmarks</h3>
+<p>The native base R pipe (<code>|&gt;</code>) is generally favored for speed as it involves a direct syntax transformation into a standard function call, minimizing runtime overhead compared to the more complex machinery of <code>magrittr</code>.</p>
+<p>When benchmarking basic operations:</p>
+<p>| Expression | Median Time (Approx.) |
+| :</p>
+<pre tabindex="0"><code>&amp;gt; 1:5 |&amp;gt; sum()             # simple use of |&amp;gt;
+[1] 15
+&amp;gt; deparse(substitute( 1:5 |&amp;gt; sum() ))
+[1] &amp;quot;sum(1:5)&amp;quot;
+&amp;gt;
+&amp;gt; Sys.setenv(&amp;quot;_R_USE_PIPEBIND_&amp;quot;=TRUE)
+&amp;gt; mtcars |&amp;gt; subset(cyl == 4) |&amp;gt; d =&amp;gt; lm(mpg ~ disp, data = d)
+
+Call:
+lm(formula = mpg ~ disp, data = subset(mtcars, cyl == 4))
+
+Coefficients:
+(Intercept)         disp  
+     40.872       -0.135  
+
+&amp;gt; deparse(substitute(mtcars |&amp;gt; subset(cyl==4) |&amp;gt; d =&amp;gt; lm(mpg ~ disp, data = d)))
+[1] &amp;quot;lm(mpg ~ disp, data = subset(mtcars, cyl == 4))&amp;quot;
+&amp;gt;
+</code></pre><p>| :</p>
+<pre tabindex="0"><code>microbenchmark::microbenchmark(
+  sqrt(1), 
+  2 |&amp;gt; sqrt(), 
+  3 %&amp;gt;% sqrt()
+)
+
+# Unit: nanoseconds
+#          expr  min     lq    mean median   uq   max neval
+#       sqrt(1)  117  126.5  141.66  132.0  139   246   100
+#       sqrt(2)  118  129.0  156.16  134.0  145  1792   100
+#  3 %&amp;gt;% sqrt() 2695 2762.5 2945.26 2811.5 2855 13736   100
+quote(2 |&amp;gt; sqrt())
+# sqrt(2)
+</code></pre><p>|
+| <code>x</code> (Raw value) | 48.2 ns |
+| <code>x |&gt; identity()</code> (Base R) | 548.08 ns |
+| <code>x %&gt;% identity</code> (Magrittr) | 3.05 µs (3050 ns) |</p>
+<p>This indicates a significant speed advantage for the base R pipe when dealing with simple function wrapping. For detailed benchmarking results, refer to external performance analyses. See specific R performance comparisons for related topics like <a href="https://sqlpey.com/dotnet/mudblazor-layouts-perfecting/" target="_blank" rel="noopener">R data flow optimization techniques</a>
+.</p>
+<h3 id="alternative-pipe-implementations-and-workarounds">Alternative Pipe Implementations and Workarounds</h3>
+<p>Developers looking for custom behavior or environment manipulation have created other operators:</p>
+<ol>
+<li>
+<p><strong>Bizarro Pipe (<code>-&gt;.</code>)</strong>: This operator is not a true pipe but rather an assignment operator that evaluates the right-hand side in the context of the left-hand side value being assigned to <code>.</code>. It differs from standard pipes as it changes state more readily.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">3</span> <span style="color:#f92672">-&gt;</span>.; <span style="color:#a6e22e">sum</span>(.)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [1] 6</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">3</span> <span style="color:#f92672">-&gt;</span>.; . <span style="color:#f92672">+</span> <span style="color:#ae81ff">4</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [1] 5 6 7</span>
+</span></span></code></pre></div></li>
+<li>
+<p><strong>Custom Assignment Pipe (<code>:=</code>)</strong>: Evaluates the RHS in a new environment where the LHS is bound to <code>.</code>. It <em>cannot</em> create or modify variables in the calling environment.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">3</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sum</span>(<span style="color:#a6e22e">sqrt</span>(x<span style="color:#f92672">=</span>.))
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [1] 4.146264</span>
+</span></span></code></pre></div></li>
+<li>
+<p><strong>Environment-Sensitive Pipe (<code>?</code>)</strong>: Assigns the LHS to <code>.</code> in the parent environment and evaluates the RHS there, cleaning up <code>.</code> afterward if it existed before.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#e6db74">&#34;my_var&#34;</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">assign</span>(., <span style="color:#ae81ff">99</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Check in calling environment:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># my_var is now 99</span>
+</span></span></code></pre></div></li>
+<li>
+<p><strong>Substitution Pipe (<code>%|&gt;%</code>)</strong>: Performs a parent evaluation after substituting <code>lhs</code> for <code>.</code> in the <code>rhs</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#ae81ff">1</span> <span style="color:#f92672">%|&gt;%</span> .+2 <span style="color:#f92672">%|&gt;%</span> .*3
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># [1] 9  (Equivalent to (1 + 2) * 3)</span>
+</span></span></code></pre></div></li>
+</ol>
+<h3 id="faqs-on-r-pipe-operators">FAQs on R Pipe Operators</h3>
+<p><div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What placeholder does the base R pipe use</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The base R pipe (<code>|&gt;</code>) uses the underscore symbol (<code>_</code>). This feature was introduced in R version 4.2.0.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can the base R pipe placeholder _ be used multiple times</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: No, the base R pipe placeholder (<code>_</code>) can only appear once on the right-hand side of the expression. Magrittr&rsquo;s placeholder (<code>.</code>) allows unlimited repetition.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why is the native base R pipe typically faster than magrittr</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The native pipe (<code>|&gt;</code>) performs a direct syntax transformation into a standard function call (<code>func(lhs, ...)</code>), which involves less computational overhead compared to the more complex evaluation mechanism of the <code>magrittr</code> pipe (<code>%&gt;%</code>).</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How can I use the base R pipe with functions accepting multiple arguments from the pipeline</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: You must use an anonymous function (e.g., <code>\(x) func(y=x, z=x)</code>) or ensure the piped value is assigned to a uniquely named argument (e.g., <code>func(arg_name = _)</code>).</div>
+    </div>
+</div></p>
+<p>We&rsquo;d welcome your input on which piping style you prefer for specific tasks, or if you have run into limitations with the base R pipe that forced you back to <code>magrittr</code>. Share your thoughts below!</p>
+<pre tabindex="0"><code>c(&amp;quot;dogs&amp;quot;, &amp;quot;cats&amp;quot;, &amp;quot;rats&amp;quot;) |&amp;gt; 
+    grepl(&amp;quot;at&amp;quot;, x = _)
+#[1] FALSE  TRUE  TRUE
+c(&amp;quot;dogs&amp;quot;, &amp;quot;cats&amp;quot;, &amp;quot;rats&amp;quot;) |&amp;gt; 
+    grepl(&amp;quot;at&amp;quot;, _)
+#Error: pipe placeholder can only be used as a named argument
+c(&amp;quot;dogs&amp;quot;, &amp;quot;cats&amp;quot;, &amp;quot;rats&amp;quot;) |&amp;gt; 
+  expand.grid(x = _, y = _)
+# Error in expand.grid(x = &amp;quot;_&amp;quot;, y = &amp;quot;_&amp;quot;) : pipe placeholder may only appear once
+library(magrittr)
+c(&amp;quot;dogs&amp;quot;, &amp;quot;cats&amp;quot;, &amp;quot;rats&amp;quot;) %&amp;gt;% 
+  expand.grid(x = ., y = .)
+#     x    y
+#1 dogs dogs
+#2 cats dogs
+#3 rats dogs
+#4 dogs cats
+#5 cats cats
+#6 rats cats
+#7 dogs rats
+#8 cats rats
+#9 rats rats
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

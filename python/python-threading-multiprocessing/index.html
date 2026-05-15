@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Optimizing Python Code: Threading vs. Multiprocessing Explained - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore effective Python threading strategies for I/O-bound tasks and understand the role of multiprocessing for CPU-bound operations. See practical examples …">
+
+
+
+<meta name="keywords" content="python threading, python multiprocessing, python concurrency, GIL python, parallelism python, thread pool python, process pool python">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Optimizing Python Code: Threading vs. Multiprocessing Explained - sqlpey">
+<meta name="DC.description" content="Explore effective Python threading strategies for I/O-bound tasks and understand the role of multiprocessing for CPU-bound operations. See practical examples and best practices.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2024-07-22">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Optimizing Python Code: Threading vs. Multiprocessing Explained - sqlpey">
+<meta property="og:description" content="Explore effective Python threading strategies for I/O-bound tasks and understand the role of multiprocessing for CPU-bound operations. See practical examples …">
+<meta property="og:url" content="https://sqlpey.com/python/python-threading-multiprocessing/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2024-07-22T00:00:00Z">
+
+
+<meta property="article:published_time" content="2024-07-22T00:00:00Z">
+<meta property="article:modified_time" content="2024-07-22T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Python">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Optimizing Python Code: Threading vs. Multiprocessing Explained">
+<meta name="twitter:description" content="Explore effective Python threading strategies for I/O-bound tasks and understand the role of multiprocessing for CPU-bound operations. See practical examples …">
+
+
+<link rel="canonical" href="https://sqlpey.com/python/python-threading-multiprocessing/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Optimizing Python Code: Threading vs. Multiprocessing Explained\"",
+  "description": "\"Explore effective Python threading strategies for I/O-bound tasks and understand the role of multiprocessing for CPU-bound operations. See practical examples and best practices.\"",
+  "url": "\"https://sqlpey.com/python/python-threading-multiprocessing/\"",
+  "datePublished": "\"2024-07-22T00:00:00Z\"",
+  "dateModified": "\"2024-07-22T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/python/python-threading-multiprocessing/\""
+  },
+  "articleSection": "\"Python\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Optimizing Python Code: Threading vs. Multiprocessing Explained</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Python</span>
+              
+              <span class="tag">Concurrency</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              11 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 22, 2024
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#optimizing-python-code-threading-vs-multiprocessing-explained">&ldquo;Optimizing Python Code: Threading vs. Multiprocessing Explained&rdquo;</a>
+      <ul>
+        <li></li>
+        <li><a href="#faqs-on-optimizing-python-code-threading-vs-multiprocessing-explained">FAQs on Optimizing Python Code: Threading vs. Multiprocessing Explained</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="optimizing-python-code-threading-vs-multiprocessing-explained">&ldquo;Optimizing Python Code: Threading vs. Multiprocessing Explained&rdquo;</h2>
+<p>The effectiveness of Python threading for parallel execution largely depends on the nature of the task. For <strong>I/O-bound tasks</strong> (e.g., network requests, file operations), threading can significantly improve performance by allowing other threads to run while one thread is waiting for I/O to complete. This is because Python&rsquo;s Global Interpreter Lock (GIL) is released during these I/O waits.</p>
+<p>For <strong>CPU-bound tasks</strong> (e.g., heavy calculations, data processing), Python&rsquo;s GIL prevents true parallel execution across multiple CPU cores using threads. Instead, threads will interleave execution, with only one thread running Python bytecode at any given moment. In such cases, the <code>multiprocessing</code> module, which spawns separate processes each with its own Python interpreter and GIL, is a better choice for achieving true parallelism.</p>
+<p>Let&rsquo;s explore various methods and their applications:</p>
+<h4 id="solution-1-using-multiprocessingdummypool-for-io-bound-tasks">Solution 1: Using <code>multiprocessing.dummy.Pool</code> for I/O-Bound Tasks</h4>
+<p>The <code>multiprocessing.dummy</code> module provides a thread-based version of the <code>multiprocessing</code> API. This is excellent for I/O-bound operations where you want to leverage concurrency without the overhead of separate processes.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> multiprocessing.dummy <span style="color:#f92672">import</span> Pool <span style="color:#66d9ef">as</span> ThreadPool
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> urllib.request
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>urls <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#39;http://www.python.org&#39;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#39;http://www.python.org/about/&#39;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#39;http://www.onlamp.com/pub/a/python/2003/04/17/metaclasses.html&#39;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#39;http://www.python.org/doc/&#39;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#39;http://www.python.org/download/&#39;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#39;http://www.python.org/getit/&#39;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#39;http://www.python.org/community/&#39;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#39;https://wiki.python.org/moin/&#39;</span>,
+</span></span><span style="display:flex;"><span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create a pool of worker threads</span>
+</span></span><span style="display:flex;"><span>pool <span style="color:#f92672">=</span> ThreadPool(<span style="color:#ae81ff">4</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Open the URLs concurrently</span>
+</span></span><span style="display:flex;"><span>results <span style="color:#f92672">=</span> pool<span style="color:#f92672">.</span>map(urllib<span style="color:#f92672">.</span>request<span style="color:#f92672">.</span>urlopen, urls)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Close the pool and wait for all threads to finish</span>
+</span></span><span style="display:flex;"><span>pool<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>pool<span style="color:#f92672">.</span>join()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;All URLs fetched.&#34;</span>)
+</span></span></code></pre></div><p>This approach maps the <code>urlopen</code> function to each URL in the <code>urls</code> list, executing these network requests concurrently. The <code>pool.map</code> function efficiently handles the distribution of tasks and collection of results.</p>
+<h4 id="solution-2-utilizing-threadingthread-with-queues">Solution 2: Utilizing <code>threading.Thread</code> with Queues</h4>
+<p>The <code>threading</code> module along with <code>queue.Queue</code> is a robust pattern for managing tasks and results between threads. Queues are thread-safe, simplifying inter-thread communication.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> queue
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> threading
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> urllib.request
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Function executed by each thread</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_url_content</span>(url_queue):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            url <span style="color:#f92672">=</span> url_queue<span style="color:#f92672">.</span>get(block<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>) <span style="color:#75715e"># Get URL without blocking</span>
+</span></span><span style="display:flex;"><span>            data <span style="color:#f92672">=</span> urllib<span style="color:#f92672">.</span>request<span style="color:#f92672">.</span>urlopen(url)<span style="color:#f92672">.</span>read()
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Successfully fetched </span><span style="color:#e6db74">{</span>url<span style="color:#e6db74">}</span><span style="color:#e6db74">, size: </span><span style="color:#e6db74">{</span>len(data)<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            url_queue<span style="color:#f92672">.</span>task_done() <span style="color:#75715e"># Signal task completion</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span> queue<span style="color:#f92672">.</span>Empty:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">break</span> <span style="color:#75715e"># Exit if queue is empty</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Error fetching </span><span style="color:#e6db74">{</span>url<span style="color:#e6db74">}</span><span style="color:#e6db74">: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            url_queue<span style="color:#f92672">.</span>task_done() <span style="color:#75715e"># Still mark as done to avoid blocking</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>worker_urls <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;http://google.com&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;http://yahoo.com&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;http://bing.com&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;http://www.python.org&#34;</span>
+</span></span><span style="display:flex;"><span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Load data into the queue</span>
+</span></span><span style="display:flex;"><span>url_q <span style="color:#f92672">=</span> queue<span style="color:#f92672">.</span>Queue()
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> url <span style="color:#f92672">in</span> worker_urls:
+</span></span><span style="display:flex;"><span>    url_q<span style="color:#f92672">.</span>put(url)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create and start worker threads</span>
+</span></span><span style="display:flex;"><span>thread_count <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>threads <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(thread_count):
+</span></span><span style="display:flex;"><span>    t <span style="color:#f92672">=</span> threading<span style="color:#f92672">.</span>Thread(target<span style="color:#f92672">=</span>get_url_content, args<span style="color:#f92672">=</span>(url_q,))
+</span></span><span style="display:flex;"><span>    t<span style="color:#f92672">.</span>start()
+</span></span><span style="display:flex;"><span>    threads<span style="color:#f92672">.</span>append(t)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Wait for all tasks in the queue to be processed</span>
+</span></span><span style="display:flex;"><span>url_q<span style="color:#f92672">.</span>join()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Wait for all threads to finish (optional, as queue.join already synchronizes)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> t <span style="color:#f92672">in</span> threads:
+</span></span><span style="display:flex;"><span>    t<span style="color:#f92672">.</span>join()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;All content fetched and processed.&#34;</span>)
+</span></span></code></pre></div><p>This example demonstrates a common pattern: populate a queue with work, have worker threads consume from the queue, and use <code>queue.join()</code> to wait for all items to be processed.</p>
+<h4 id="solution-3-using-concurrentfutures-for-thread-and-process-pools">Solution 3: Using <code>concurrent.futures</code> for Thread and Process Pools</h4>
+<p>The <code>concurrent.futures</code> module offers a higher-level interface for managing thread and process pools, making concurrency management much simpler.</p>
+<p><strong>Thread Pool for I/O-Bound Tasks:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> concurrent.futures
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> urllib.request
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>URLS <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;http://www.foxnews.com/&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;http://www.cnn.com/&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;http://europe.wsj.com/&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;http://www.bbc.co.uk/&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;http://some-made-up-domain.com/&#39;</span>
+</span></span><span style="display:flex;"><span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">load_url</span>(url, timeout<span style="color:#f92672">=</span><span style="color:#ae81ff">60</span>):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Retrieves content from a URL.&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">with</span> urllib<span style="color:#f92672">.</span>request<span style="color:#f92672">.</span>urlopen(url, timeout<span style="color:#f92672">=</span>timeout) <span style="color:#66d9ef">as</span> conn:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> conn<span style="color:#f92672">.</span>read()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Error loading </span><span style="color:#e6db74">{</span>url<span style="color:#e6db74">}</span><span style="color:#e6db74">: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Use a ThreadPoolExecutor for I/O-bound tasks</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> concurrent<span style="color:#f92672">.</span>futures<span style="color:#f92672">.</span>ThreadPoolExecutor(max_workers<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>) <span style="color:#66d9ef">as</span> executor:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Submit tasks and map futures to URLs</span>
+</span></span><span style="display:flex;"><span>    future_to_url <span style="color:#f92672">=</span> {executor<span style="color:#f92672">.</span>submit(load_url, url): url <span style="color:#66d9ef">for</span> url <span style="color:#f92672">in</span> URLS}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> future <span style="color:#f92672">in</span> concurrent<span style="color:#f92672">.</span>futures<span style="color:#f92672">.</span>as_completed(future_to_url):
+</span></span><span style="display:flex;"><span>        url <span style="color:#f92672">=</span> future_to_url[future]
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            data <span style="color:#f92672">=</span> future<span style="color:#f92672">.</span>result()
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> data:
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">{</span>url<span style="color:#e6db74">}</span><span style="color:#e6db74"> page is </span><span style="color:#e6db74">{</span>len(data)<span style="color:#e6db74">}</span><span style="color:#e6db74"> bytes&#39;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> exc:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">{</span>url<span style="color:#e6db74">}</span><span style="color:#e6db74"> generated an exception: </span><span style="color:#e6db74">{</span>exc<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span></code></pre></div><p><strong>Process Pool for CPU-Bound Tasks:</strong></p>
+<p>For CPU-intensive operations, <code>ProcessPoolExecutor</code> is the way to go, as it bypasses the GIL.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> concurrent.futures
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> math
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>PRIMES_TO_CHECK <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">112272535095293</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">112582705942171</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">115280095190773</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">115797848077099</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">1099726899285419</span>
+</span></span><span style="display:flex;"><span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">is_prime</span>(n):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Checks if a number is prime.&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> n <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">2</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> n <span style="color:#f92672">%</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> n <span style="color:#f92672">==</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>    sqrt_n <span style="color:#f92672">=</span> int(math<span style="color:#f92672">.</span>sqrt(n))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">3</span>, sqrt_n <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> n <span style="color:#f92672">%</span> i <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">check_primes_concurrently</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Checks a list of numbers for primality using a process pool.&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> concurrent<span style="color:#f92672">.</span>futures<span style="color:#f92672">.</span>ProcessPoolExecutor() <span style="color:#66d9ef">as</span> executor:
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># executor.map applies the function to each item and returns results in order</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> number, is_p <span style="color:#f92672">in</span> zip(PRIMES_TO_CHECK, executor<span style="color:#f92672">.</span>map(is_prime, PRIMES_TO_CHECK)):
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">{</span>number<span style="color:#e6db74">}</span><span style="color:#e6db74"> is prime: </span><span style="color:#e6db74">{</span>is_p<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;__main__&#39;</span>:
+</span></span><span style="display:flex;"><span>    check_primes_concurrently()
+</span></span></code></pre></div><h4 id="solution-4-demonstrating-threading-vs-multiprocessing-for-cpu-bound-tasks">Solution 4: Demonstrating Threading vs. Multiprocessing for CPU-Bound Tasks</h4>
+<p>This example benchmarks different approaches for a CPU-bound task (finding prime numbers) to illustrate the impact of threading, multiprocessing, and their respective executor versions.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> math
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> timeit
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> threading
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> multiprocessing
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> concurrent.futures <span style="color:#f92672">import</span> ThreadPoolExecutor, ProcessPoolExecutor
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">time_execution</span>(func):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Decorator to measure function execution time.&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">wrapper</span>(<span style="color:#f92672">*</span>args, <span style="color:#f92672">**</span>kwargs):
+</span></span><span style="display:flex;"><span>        t0 <span style="color:#f92672">=</span> timeit<span style="color:#f92672">.</span>default_timer()
+</span></span><span style="display:flex;"><span>        result <span style="color:#f92672">=</span> func(<span style="color:#f92672">*</span>args, <span style="color:#f92672">**</span>kwargs)
+</span></span><span style="display:flex;"><span>        t1 <span style="color:#f92672">=</span> timeit<span style="color:#f92672">.</span>default_timer()
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Execution time: </span><span style="color:#e6db74">{</span>t1 <span style="color:#f92672">-</span> t0<span style="color:#e6db74">:</span><span style="color:#e6db74">.6f</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> seconds&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> result
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> wrapper
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">find_primes_in_range</span>(nmin, nmax):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Finds prime numbers within a given range.&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    primes_found <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> current_num <span style="color:#f92672">in</span> range(nmin, nmax <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> current_num <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">2</span>: <span style="color:#66d9ef">continue</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> current_num <span style="color:#f92672">==</span> <span style="color:#ae81ff">2</span>:
+</span></span><span style="display:flex;"><span>            primes_found<span style="color:#f92672">.</span>append(current_num)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">continue</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> current_num <span style="color:#f92672">%</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>: <span style="color:#66d9ef">continue</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        sqrt_current <span style="color:#f92672">=</span> int(math<span style="color:#f92672">.</span>sqrt(current_num))
+</span></span><span style="display:flex;"><span>        is_prime_flag <span style="color:#f92672">=</span> <span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> divisor <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">3</span>, sqrt_current <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>):
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> current_num <span style="color:#f92672">%</span> divisor <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>                is_prime_flag <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> is_prime_flag:
+</span></span><span style="display:flex;"><span>            primes_found<span style="color:#f92672">.</span>append(current_num)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Found </span><span style="color:#e6db74">{</span>len(primes_found)<span style="color:#e6db74">}</span><span style="color:#e6db74"> primes in range </span><span style="color:#e6db74">{</span>nmin<span style="color:#e6db74">}</span><span style="color:#e6db74">-</span><span style="color:#e6db74">{</span>nmax<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@time_execution</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">run_sequential</span>(nmin, nmax):
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;Running Sequential...&#34;</span>)
+</span></span><span style="display:flex;"><span>    find_primes_in_range(nmin, nmax)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@time_execution</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">run_with_threading</span>(nmin, nmax, num_threads<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span>):
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Running with </span><span style="color:#e6db74">{</span>num_threads<span style="color:#e6db74">}</span><span style="color:#e6db74"> Threads...&#34;</span>)
+</span></span><span style="display:flex;"><span>    threads <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    range_size <span style="color:#f92672">=</span> (nmax <span style="color:#f92672">-</span> nmin) <span style="color:#f92672">//</span> num_threads
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(num_threads):
+</span></span><span style="display:flex;"><span>        start <span style="color:#f92672">=</span> nmin <span style="color:#f92672">+</span> i <span style="color:#f92672">*</span> range_size
+</span></span><span style="display:flex;"><span>        end <span style="color:#f92672">=</span> start <span style="color:#f92672">+</span> range_size <span style="color:#66d9ef">if</span> i <span style="color:#f92672">&lt;</span> num_threads <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">else</span> nmax
+</span></span><span style="display:flex;"><span>        t <span style="color:#f92672">=</span> threading<span style="color:#f92672">.</span>Thread(target<span style="color:#f92672">=</span>find_primes_in_range, args<span style="color:#f92672">=</span>(start, end))
+</span></span><span style="display:flex;"><span>        threads<span style="color:#f92672">.</span>append(t)
+</span></span><span style="display:flex;"><span>        t<span style="color:#f92672">.</span>start()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> t <span style="color:#f92672">in</span> threads:
+</span></span><span style="display:flex;"><span>        t<span style="color:#f92672">.</span>join()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@time_execution</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">run_with_multiprocessing</span>(nmin, nmax, num_processes<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span>):
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Running with </span><span style="color:#e6db74">{</span>num_processes<span style="color:#e6db74">}</span><span style="color:#e6db74"> Processes...&#34;</span>)
+</span></span><span style="display:flex;"><span>    processes <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    range_size <span style="color:#f92672">=</span> (nmax <span style="color:#f92672">-</span> nmin) <span style="color:#f92672">//</span> num_processes
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(num_processes):
+</span></span><span style="display:flex;"><span>        start <span style="color:#f92672">=</span> nmin <span style="color:#f92672">+</span> i <span style="color:#f92672">*</span> range_size
+</span></span><span style="display:flex;"><span>        end <span style="color:#f92672">=</span> start <span style="color:#f92672">+</span> range_size <span style="color:#66d9ef">if</span> i <span style="color:#f92672">&lt;</span> num_processes <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">else</span> nmax
+</span></span><span style="display:flex;"><span>        p <span style="color:#f92672">=</span> multiprocessing<span style="color:#f92672">.</span>Process(target<span style="color:#f92672">=</span>find_primes_in_range, args<span style="color:#f92672">=</span>(start, end))
+</span></span><span style="display:flex;"><span>        processes<span style="color:#f92672">.</span>append(p)
+</span></span><span style="display:flex;"><span>        p<span style="color:#f92672">.</span>start()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> p <span style="color:#f92672">in</span> processes:
+</span></span><span style="display:flex;"><span>        p<span style="color:#f92672">.</span>join()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@time_execution</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">run_with_thread_pool</span>(nmin, nmax, max_workers<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span>):
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Running with ThreadPoolExecutor (</span><span style="color:#e6db74">{</span>max_workers<span style="color:#e6db74">}</span><span style="color:#e6db74"> workers)...&#34;</span>)
+</span></span><span style="display:flex;"><span>    range_size <span style="color:#f92672">=</span> (nmax <span style="color:#f92672">-</span> nmin) <span style="color:#f92672">//</span> max_workers
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> ThreadPoolExecutor(max_workers<span style="color:#f92672">=</span>max_workers) <span style="color:#66d9ef">as</span> executor:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(max_workers):
+</span></span><span style="display:flex;"><span>            start <span style="color:#f92672">=</span> nmin <span style="color:#f92672">+</span> i <span style="color:#f92672">*</span> range_size
+</span></span><span style="display:flex;"><span>            end <span style="color:#f92672">=</span> start <span style="color:#f92672">+</span> range_size <span style="color:#66d9ef">if</span> i <span style="color:#f92672">&lt;</span> max_workers <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">else</span> nmax
+</span></span><span style="display:flex;"><span>            executor<span style="color:#f92672">.</span>submit(find_primes_in_range, start, end)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@time_execution</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">run_with_process_pool</span>(nmin, nmax, max_workers<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span>):
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Running with ProcessPoolExecutor (</span><span style="color:#e6db74">{</span>max_workers<span style="color:#e6db74">}</span><span style="color:#e6db74"> workers)...&#34;</span>)
+</span></span><span style="display:flex;"><span>    range_size <span style="color:#f92672">=</span> (nmax <span style="color:#f92672">-</span> nmin) <span style="color:#f92672">//</span> max_workers
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> ProcessPoolExecutor(max_workers<span style="color:#f92672">=</span>max_workers) <span style="color:#66d9ef">as</span> executor:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(max_workers):
+</span></span><span style="display:flex;"><span>            start <span style="color:#f92672">=</span> nmin <span style="color:#f92672">+</span> i <span style="color:#f92672">*</span> range_size
+</span></span><span style="display:flex;"><span>            end <span style="color:#f92672">=</span> start <span style="color:#f92672">+</span> range_size <span style="color:#66d9ef">if</span> i <span style="color:#f92672">&lt;</span> max_workers <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">else</span> nmax
+</span></span><span style="display:flex;"><span>            executor<span style="color:#f92672">.</span>submit(find_primes_in_range, start, end)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
+</span></span><span style="display:flex;"><span>    min_val <span style="color:#f92672">=</span> int(<span style="color:#ae81ff">1e7</span>)
+</span></span><span style="display:flex;"><span>    max_val <span style="color:#f92672">=</span> int(<span style="color:#ae81ff">1.05e7</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    run_sequential(min_val, max_val)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;-&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">30</span>)
+</span></span><span style="display:flex;"><span>    run_with_threading(min_val, max_val)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;-&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">30</span>)
+</span></span><span style="display:flex;"><span>    run_with_multiprocessing(min_val, max_val)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;-&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">30</span>)
+</span></span><span style="display:flex;"><span>    run_with_thread_pool(min_val, max_val)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;-&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">30</span>)
+</span></span><span style="display:flex;"><span>    run_with_process_pool(min_val, max_val)
+</span></span></code></pre></div><p>When running this code on a multi-core machine, you&rsquo;ll typically observe that <code>multiprocessing</code> and <code>ProcessPoolExecutor</code> significantly outperform threading for this CPU-bound task due to overcoming the GIL limitation.</p>
+<h4 id="solution-5-basic-thread-creation-and-management">Solution 5: Basic Thread Creation and Management</h4>
+<p>For very simple cases, directly using <code>threading.Thread</code> is straightforward.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> threading
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">task_runner</span>(task_name, duration):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;A simple function to simulate work.&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Thread &#39;</span><span style="color:#e6db74">{</span>task_name<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39; starting. Will run for </span><span style="color:#e6db74">{</span>duration<span style="color:#e6db74">}</span><span style="color:#e6db74"> seconds.&#34;</span>)
+</span></span><span style="display:flex;"><span>    time<span style="color:#f92672">.</span>sleep(duration)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Thread &#39;</span><span style="color:#e6db74">{</span>task_name<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39; finished.&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create thread objects</span>
+</span></span><span style="display:flex;"><span>thread1 <span style="color:#f92672">=</span> threading<span style="color:#f92672">.</span>Thread(target<span style="color:#f92672">=</span>task_runner, args<span style="color:#f92672">=</span>(<span style="color:#e6db74">&#34;Task A&#34;</span>, <span style="color:#ae81ff">2</span>))
+</span></span><span style="display:flex;"><span>thread2 <span style="color:#f92672">=</span> threading<span style="color:#f92672">.</span>Thread(target<span style="color:#f92672">=</span>task_runner, args<span style="color:#f92672">=</span>(<span style="color:#e6db74">&#34;Task B&#34;</span>, <span style="color:#ae81ff">3</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Start threads</span>
+</span></span><span style="display:flex;"><span>thread1<span style="color:#f92672">.</span>start()
+</span></span><span style="display:flex;"><span>thread2<span style="color:#f92672">.</span>start()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Wait for both threads to complete</span>
+</span></span><span style="display:flex;"><span>thread1<span style="color:#f92672">.</span>join()
+</span></span><span style="display:flex;"><span>thread2<span style="color:#f92672">.</span>join()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;All threads have completed.&#34;</span>)
+</span></span></code></pre></div><p>This demonstrates creating threads, starting them, and then waiting for their completion using <code>join()</code>.</p>
+<h4 id="solution-6-using-threadingsemaphore-for-concurrency-control">Solution 6: Using <code>threading.Semaphore</code> for Concurrency Control</h4>
+<p>When you need to limit the number of concurrently executing threads, <code>threading.Semaphore</code> is a useful tool.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> threading
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> subprocess
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Limit to 4 concurrent threads</span>
+</span></span><span style="display:flex;"><span>MAX_CONCURRENT_THREADS <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>
+</span></span><span style="display:flex;"><span>semaphore <span style="color:#f92672">=</span> threading<span style="color:#f92672">.</span>Semaphore(MAX_CONCURRENT_THREADS)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">execute_command</span>(command):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Acquires a semaphore, runs a command, and releases the semaphore.&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> semaphore: <span style="color:#75715e"># Acquires the semaphore, blocks if unavailable</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[</span><span style="color:#e6db74">{</span>threading<span style="color:#f92672">.</span>current_thread()<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">] Running: </span><span style="color:#e6db74">{</span>command<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># Example: Execute a simple DOS command</span>
+</span></span><span style="display:flex;"><span>            result <span style="color:#f92672">=</span> subprocess<span style="color:#f92672">.</span>run(command, shell<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, check<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, text<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, capture_output<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[</span><span style="color:#e6db74">{</span>threading<span style="color:#f92672">.</span>current_thread()<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">] Output:</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">{</span>result<span style="color:#f92672">.</span>stdout<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> result<span style="color:#f92672">.</span>stderr:
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[</span><span style="color:#e6db74">{</span>threading<span style="color:#f92672">.</span>current_thread()<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">] Errors:</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">{</span>result<span style="color:#f92672">.</span>stderr<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span> subprocess<span style="color:#f92672">.</span>CalledProcessError <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[</span><span style="color:#e6db74">{</span>threading<span style="color:#f92672">.</span>current_thread()<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">] Error executing &#39;</span><span style="color:#e6db74">{</span>command<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;[</span><span style="color:#e6db74">{</span>threading<span style="color:#f92672">.</span>current_thread()<span style="color:#f92672">.</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">] Finished: </span><span style="color:#e6db74">{</span>command<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Semaphore is automatically released when exiting the &#39;with&#39; block</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>commands_to_run <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;echo &#39;Task 1 started&#39;&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;echo &#39;Task 2 started&#39;&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;echo &#39;Task 3 started&#39;&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;echo &#39;Task 4 started&#39;&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;echo &#39;Task 5 started&#39;&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;echo &#39;Task 6 started&#39;&#34;</span>
+</span></span><span style="display:flex;"><span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>threads <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> cmd <span style="color:#f92672">in</span> commands_to_run:
+</span></span><span style="display:flex;"><span>    thread <span style="color:#f92672">=</span> threading<span style="color:#f92672">.</span>Thread(target<span style="color:#f92672">=</span>execute_command, args<span style="color:#f92672">=</span>(cmd,), name<span style="color:#f92672">=</span><span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Worker-</span><span style="color:#e6db74">{</span>cmd<span style="color:#f92672">.</span>split()[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    threads<span style="color:#f92672">.</span>append(thread)
+</span></span><span style="display:flex;"><span>    thread<span style="color:#f92672">.</span>start()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Wait for all threads to complete</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> thread <span style="color:#f92672">in</span> threads:
+</span></span><span style="display:flex;"><span>    thread<span style="color:#f92672">.</span>join()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;All commands processed.&#34;</span>)
+</span></span></code></pre></div><p>This example limits concurrent execution to <code>MAX_CONCURRENT_THREADS</code>, ensuring that no more than four commands run simultaneously.</p>
+<h4 id="solution-7-threading-for-asynchronous-event-monitoring">Solution 7: Threading for Asynchronous Event Monitoring</h4>
+<p>Threading is well-suited for monitoring asynchronous events or maintaining background states.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># thread_monitor.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> threading
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">EventMonitor</span>(threading<span style="color:#f92672">.</span>Thread):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__init__</span>(self, shared_state):
+</span></span><span style="display:flex;"><span>        super()<span style="color:#f92672">.</span><span style="color:#a6e22e">__init__</span>()
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>shared_state <span style="color:#f92672">=</span> shared_state
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>daemon <span style="color:#f92672">=</span> <span style="color:#66d9ef">True</span> <span style="color:#75715e"># Allows the main program to exit even if this thread is running</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">run</span>(self):
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;[Monitor] Starting...&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>            time<span style="color:#f92672">.</span>sleep(<span style="color:#ae81ff">0.5</span>) <span style="color:#75715e"># Check state periodically</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>shared_state[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;TRIGGER&#34;</span>:
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">&#34;[Monitor] Event triggered!&#34;</span>)
+</span></span><span style="display:flex;"><span>                self<span style="color:#f92672">.</span>shared_state[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;PROCESSED&#34;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">break</span> <span style="color:#75715e"># Exit loop after processing</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;[Monitor] Exiting.&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># A mutable object (like a list) to share state between threads</span>
+</span></span><span style="display:flex;"><span>    app_state <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;IDLE&#34;</span>]
+</span></span><span style="display:flex;"><span>    monitor_thread <span style="color:#f92672">=</span> EventMonitor(app_state)
+</span></span><span style="display:flex;"><span>    monitor_thread<span style="color:#f92672">.</span>start()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;[Main] App state initialized to:&#34;</span>, app_state[<span style="color:#ae81ff">0</span>])
+</span></span><span style="display:flex;"><span>    time<span style="color:#f92672">.</span>sleep(<span style="color:#ae81ff">2</span>) <span style="color:#75715e"># Simulate some work</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;[Main] Changing state to TRIGGER.&#34;</span>)
+</span></span><span style="display:flex;"><span>    app_state[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;TRIGGER&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Wait for the monitor to process the trigger</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> app_state[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;PROCESSED&#34;</span>:
+</span></span><span style="display:flex;"><span>        time<span style="color:#f92672">.</span>sleep(<span style="color:#ae81ff">0.1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;[Main] Event processed. Exiting main.&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
+</span></span><span style="display:flex;"><span>    main()
+</span></span></code></pre></div><p>In this scenario, the <code>EventMonitor</code> thread continuously checks a shared state variable. When the state changes, it reacts accordingly. Setting <code>daemon=True</code> ensures the monitor thread doesn&rsquo;t prevent the main program from exiting.</p>
+<h4 id="solution-8-using-osfork-for-process-spawning-unix-like-systems">Solution 8: Using <code>os.fork</code> for Process Spawning (Unix-like Systems)</h4>
+<p>On Unix-like systems, <code>os.fork()</code> can be used to create new processes directly. This bypasses Python&rsquo;s GIL entirely but is platform-specific.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> sys
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">process_data</span>(value):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Function to be executed by each child process.&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Process </span><span style="color:#e6db74">{</span>os<span style="color:#f92672">.</span>getpid()<span style="color:#e6db74">}</span><span style="color:#e6db74"> handling: </span><span style="color:#e6db74">{</span>value<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Simulate some work</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span>    time<span style="color:#f92672">.</span>sleep(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Process </span><span style="color:#e6db74">{</span>os<span style="color:#f92672">.</span>getpid()<span style="color:#e6db74">}</span><span style="color:#e6db74"> finished.&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> sys<span style="color:#f92672">.</span>platform<span style="color:#f92672">.</span>startswith(<span style="color:#e6db74">&#39;win&#39;</span>):
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;os.fork is not available on Windows. Consider using &#39;multiprocessing&#39;.&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>    data_items <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;alpha&#39;</span>, <span style="color:#e6db74">&#39;beta&#39;</span>, <span style="color:#e6db74">&#39;gamma&#39;</span>, <span style="color:#e6db74">&#39;delta&#39;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;Spawning processes using os.fork...&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> item <span style="color:#f92672">in</span> data_items:
+</span></span><span style="display:flex;"><span>        pid <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>fork()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> pid <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>: <span style="color:#75715e"># This is the child process</span>
+</span></span><span style="display:flex;"><span>            process_data(item)
+</span></span><span style="display:flex;"><span>            os<span style="color:#f92672">.</span>_exit(<span style="color:#ae81ff">0</span>) <span style="color:#75715e"># Exit child process cleanly</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">elif</span> pid <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>: <span style="color:#75715e"># This is the parent process</span>
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Parent created child with PID: </span><span style="color:#e6db74">{</span>pid<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#e6db74">&#34;Fork failed!&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Parent process waits for all children (optional, but good practice)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> data_items:
+</span></span><span style="display:flex;"><span>        os<span style="color:#f92672">.</span>wait()
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;Parent process finished spawning and waiting.&#34;</span>)
+</span></span></code></pre></div><p>This method is powerful for true parallelism but requires careful management of processes and their lifecycles.</p>
+<h4 id="solution-9-simple-thread-invocation">Solution 9: Simple Thread Invocation</h4>
+<p>The most basic way to start a thread is with <code>threading.Thread(target=your_function).start()</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> threading
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">greet</span>(name):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Prints a greeting message.&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Hello, </span><span style="color:#e6db74">{</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">!&#34;</span>)
+</span></span><span style="display:flex;"><span>    time<span style="color:#f92672">.</span>sleep(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Goodbye, </span><span style="color:#e6db74">{</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">!&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">calculate_square</span>(number):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Calculates and prints the square of a number.&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> number <span style="color:#f92672">*</span> number
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;The square of </span><span style="color:#e6db74">{</span>number<span style="color:#e6db74">}</span><span style="color:#e6db74"> is </span><span style="color:#e6db74">{</span>result<span style="color:#e6db74">}</span><span style="color:#e6db74">.&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create and start threads</span>
+</span></span><span style="display:flex;"><span>thread_greet <span style="color:#f92672">=</span> threading<span style="color:#f92672">.</span>Thread(target<span style="color:#f92672">=</span>greet, args<span style="color:#f92672">=</span>(<span style="color:#e6db74">&#34;Alice&#34;</span>,))
+</span></span><span style="display:flex;"><span>thread_calculate <span style="color:#f92672">=</span> threading<span style="color:#f92672">.</span>Thread(target<span style="color:#f92672">=</span>calculate_square, args<span style="color:#f92672">=</span>(<span style="color:#ae81ff">10</span>,))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>thread_greet<span style="color:#f92672">.</span>start()
+</span></span><span style="display:flex;"><span>thread_calculate<span style="color:#f92672">.</span>start()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Wait for threads to finish</span>
+</span></span><span style="display:flex;"><span>thread_greet<span style="color:#f92672">.</span>join()
+</span></span><span style="display:flex;"><span>thread_calculate<span style="color:#f92672">.</span>join()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Main thread finished.&#34;</span>)
+</span></span></code></pre></div><p>This simple approach is effective for running independent tasks concurrently.</p>
+<h3 id="faqs-on-optimizing-python-code-threading-vs-multiprocessing-explained">FAQs on Optimizing Python Code: Threading vs. Multiprocessing Explained</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: When should I use Python threading</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Use Python threading primarily for I/O-bound tasks where your program spends significant time waiting for external operations like network requests, file reads/writes, or database queries. During these waits, the Global Interpreter Lock (GIL) is released, allowing other threads to run, thereby achieving concurrency. For CPU-bound tasks, threading will not provide a speedup due to the GIL.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the Global Interpreter Lock GIL</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The Global Interpreter Lock (GIL) is a mutex (a lock) that protects access to Python objects, preventing multiple native threads from executing Python bytecodes at the same time within a single process. This means that even on multi-core processors, only one thread can execute Python code at any given moment. This mechanism simplifies memory management in CPython but limits CPU-bound parallelism for threaded applications.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How does multiprocessing differ from threading in Python</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Multiprocessing creates separate processes, each with its own Python interpreter and memory space, thus bypassing the GIL. This allows for true parallel execution of CPU-bound tasks across multiple CPU cores. Threading, on the other hand, shares the same memory space and interpreter within a single process. While it allows for concurrency (especially for I/O-bound tasks), it does not achieve true parallelism for CPU-bound tasks due to the GIL.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Which method is best for CPU-bound tasks</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: For CPU-bound tasks in Python, <code>multiprocessing</code> or <code>concurrent.futures.ProcessPoolExecutor</code> is generally the best approach. These methods utilize separate processes, allowing Python code to run in parallel across multiple CPU cores and effectively bypassing the limitations imposed by the GIL.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I pass multiple arguments to threaded functions</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, when creating a <code>threading.Thread</code>, you can pass multiple arguments to the <code>target</code> function using the <code>args</code> parameter (as a tuple) or the <code>kwargs</code> parameter (as a dictionary). For example: <code>threading.Thread(target=my_func, args=(arg1, arg2), kwargs={'kwarg1': val1})</code>. <code>concurrent.futures</code> also supports passing multiple arguments easily.</div>
+    </div>
+</div>
+<p>We hope this detailed explanation and the provided code examples help you choose the right concurrency strategy for your Python projects.</p>
+<p>What are your experiences with Python&rsquo;s threading and multiprocessing? Share your insights or challenges in the comments below!</p>
+<p>For more on Python programming, explore:</p>
+<ul>
+<li><a href="https://sqlpey.com/python/what-is-python" target="_blank" rel="noopener">What is Python</a>
+</li>
+<li><a href="https://sqlpey.com/mysql/introduction-to-mysql" target="_blank" rel="noopener">Introduction to MySQL</a>
+</li>
+<li><a href="https://sqlpey.com/dotnet/what-is-dotnet" target="_blank" rel="noopener">What is .NET</a>
+</li>
+</ul>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

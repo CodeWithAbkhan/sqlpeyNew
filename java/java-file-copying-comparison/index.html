@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Efficient Java File Copying: NIO vs. Commons IO vs. Guava - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore multiple Java methods for efficient file copying, comparing NIO, Apache Commons IO, Guava, and standard I/O streams for performance and ease of use.">
+
+
+
+<meta name="keywords" content="Java file copy, NIO file copy, Apache Commons IO, Guava file copy, FileChannel transferTo, Files.copy, performance">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Efficient Java File Copying: NIO vs. Commons IO vs. Guava - sqlpey">
+<meta name="DC.description" content="Explore multiple Java methods for efficient file copying, comparing NIO, Apache Commons IO, Guava, and standard I/O streams for performance and ease of use.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Efficient Java File Copying: NIO vs. Commons IO vs. Guava - sqlpey">
+<meta property="og:description" content="Explore multiple Java methods for efficient file copying, comparing NIO, Apache Commons IO, Guava, and standard I/O streams for performance and ease of use.">
+<meta property="og:url" content="https://sqlpey.com/java/java-file-copying-comparison/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Java">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Efficient Java File Copying: NIO vs. Commons IO vs. Guava">
+<meta name="twitter:description" content="Explore multiple Java methods for efficient file copying, comparing NIO, Apache Commons IO, Guava, and standard I/O streams for performance and ease of use.">
+
+
+<link rel="canonical" href="https://sqlpey.com/java/java-file-copying-comparison/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Efficient Java File Copying: NIO vs. Commons IO vs. Guava\"",
+  "description": "\"Explore multiple Java methods for efficient file copying, comparing NIO, Apache Commons IO, Guava, and standard I/O streams for performance and ease of use.\"",
+  "url": "\"https://sqlpey.com/java/java-file-copying-comparison/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/java/java-file-copying-comparison/\""
+  },
+  "articleSection": "\"Java\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Efficient Java File Copying: NIO vs. Commons IO vs. Guava</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Java</span>
+              
+              <span class="tag">File I/O</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              10 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#efficient-java-file-copying-nio-vs-commons-io-vs-guava">&ldquo;Efficient Java File Copying: NIO vs. Commons IO vs. Guava&rdquo;</a>
+      <ul>
+        <li><a href="#solutions-for-java-file-copying">Solutions for Java File Copying</a></li>
+        <li><a href="#important-considerations">Important Considerations</a></li>
+        <li><a href="#faqs-on-java-file-copying">FAQs on Java File Copying</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a></li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="efficient-java-file-copying-nio-vs-commons-io-vs-guava">&ldquo;Efficient Java File Copying: NIO vs. Commons IO vs. Guava&rdquo;</h2>
+<p>Copying files is a fundamental operation in software development. In Java, several approaches exist, each with its own advantages in terms of performance, simplicity, and compatibility across different Java versions. This exploration delves into the various techniques, from leveraging the New I/O (NIO) API and popular libraries like Apache Commons IO and Google Guava, to utilizing older I/O streams.</p>
+<h3 id="solutions-for-java-file-copying">Solutions for Java File Copying</h3>
+<p>Here are multiple accepted solutions detailing different strategies for copying files in Java:</p>
+<h4 id="solution-1-using-filechanneltransferfrom-nio">Solution 1: Using <code>FileChannel.transferFrom</code> (NIO)</h4>
+<p>This method bypasses much of the Java I/O layer by transferring data directly between channels, often leveraging operating system capabilities for greater efficiency.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.File;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.FileInputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.FileOutputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.IOException;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.nio.channels.FileChannel;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">NioFileCopy</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">copyFile</span>(File sourceFile, File destFile) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>destFile.<span style="color:#a6e22e">exists</span>()) {
+</span></span><span style="display:flex;"><span>            destFile.<span style="color:#a6e22e">createNewFile</span>();
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        FileChannel source <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>        FileChannel destination <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>            source <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> FileInputStream(sourceFile).<span style="color:#a6e22e">getChannel</span>();
+</span></span><span style="display:flex;"><span>            destination <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> FileOutputStream(destFile).<span style="color:#a6e22e">getChannel</span>();
+</span></span><span style="display:flex;"><span>            destination.<span style="color:#a6e22e">transferFrom</span>(source, 0, source.<span style="color:#a6e22e">size</span>());
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">finally</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (source <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>                source.<span style="color:#a6e22e">close</span>();
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (destination <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>                destination.<span style="color:#a6e22e">close</span>();
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><em>Note:</em> While powerful, learning the intricacies of NIO can be a step up from traditional I/O streams.</p>
+<h4 id="solution-2-apache-commons-io-fileutilscopyfile">Solution 2: Apache Commons IO <code>FileUtils.copyFile()</code></h4>
+<p>The Apache Commons IO library provides a convenient <code>FileUtils.copyFile()</code> method that handles the complexities for you. Recent versions (like 2.0.1 and later) utilize NIO internally for enhanced performance.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> org.apache.commons.io.FileUtils;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.File;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.IOException;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CommonsIoFileCopy</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">copyFile</span>(File sourceFile, File destFile) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        FileUtils.<span style="color:#a6e22e">copyFile</span>(sourceFile, destFile);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-3-java-7-filescopy-and-try-with-resources">Solution 3: Java 7 <code>Files.copy()</code> and <code>try-with-resources</code></h4>
+<p>Java 7 introduced more streamlined ways to handle file operations. You can use <code>FileChannel.transferFrom</code> within a <code>try-with-resources</code> block for automatic resource management, or even more simply, the <code>Files.copy()</code> method.</p>
+<p>Using <code>FileChannel</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.File;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.FileInputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.FileOutputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.IOException;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.nio.channels.FileChannel;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Java7NioFileCopy</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">copyFile</span>(File from, File to) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>to.<span style="color:#a6e22e">exists</span>()) {
+</span></span><span style="display:flex;"><span>            to.<span style="color:#a6e22e">createNewFile</span>();
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> (FileChannel in <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> FileInputStream(from).<span style="color:#a6e22e">getChannel</span>();
+</span></span><span style="display:flex;"><span>             FileChannel out <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> FileOutputStream(to).<span style="color:#a6e22e">getChannel</span>()) {
+</span></span><span style="display:flex;"><span>            out.<span style="color:#a6e22e">transferFrom</span>(in, 0, in.<span style="color:#a6e22e">size</span>());
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Using <code>Files.copy()</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.File;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.IOException;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.nio.file.Files;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.nio.file.Paths;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Java7FilesCopy</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">copyFile</span>(File from, File to) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        Files.<span style="color:#a6e22e">copy</span>(from.<span style="color:#a6e22e">toPath</span>(), to.<span style="color:#a6e22e">toPath</span>());
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-4-recursive-directory-copying-with-nio">Solution 4: Recursive Directory Copying with NIO</h4>
+<p>For copying entire directory structures, a recursive approach using <code>Files.walkFileTree</code> is effective. This involves creating a custom <code>FileVisitor</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> com.yourcompany.nio;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.File;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.IOException;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.nio.file.*;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.nio.file.attribute.BasicFileAttributes;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.nio.file.attribute.FileTime;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.Arrays;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.EnumSet;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Assuming CopyOptions and its usage are defined elsewhere or simplified here</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// For demonstration, let&#39;s focus on the core structure.</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// This example is a conceptual outline for recursive copying.</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">NioRecursiveCopy</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Simplified CopyOptions for illustration</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">enum</span> CopyOptions {
+</span></span><span style="display:flex;"><span>        REPLACE_EXISTING,
+</span></span><span style="display:flex;"><span>        COPY_ATTRIBUTES,
+</span></span><span style="display:flex;"><span>        FOLLOW_LINKS
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">copyRecursive</span>(Path source, Path target, CopyOptions... options) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        CopyVisitor copyVisitor <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> CopyVisitor(source, target, options);
+</span></span><span style="display:flex;"><span>        EnumSet<span style="color:#f92672">&lt;</span>FileVisitOption<span style="color:#f92672">&gt;</span> fileVisitOpts <span style="color:#f92672">=</span> EnumSet.<span style="color:#a6e22e">noneOf</span>(FileVisitOption.<span style="color:#a6e22e">class</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (Arrays.<span style="color:#a6e22e">asList</span>(options).<span style="color:#a6e22e">contains</span>(CopyOptions.<span style="color:#a6e22e">FOLLOW_LINKS</span>)) {
+</span></span><span style="display:flex;"><span>            fileVisitOpts.<span style="color:#a6e22e">add</span>(FileVisitOption.<span style="color:#a6e22e">FOLLOW_LINKS</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// For demonstration, walk the tree from the source</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// In a real scenario, you&#39;d handle the root directory creation.</span>
+</span></span><span style="display:flex;"><span>        Files.<span style="color:#a6e22e">walkFileTree</span>(source, fileVisitOpts, Integer.<span style="color:#a6e22e">MAX_VALUE</span>, copyVisitor);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> 0; <span style="color:#75715e">// Placeholder for success indicator</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CopyVisitor</span> <span style="color:#66d9ef">implements</span> FileVisitor<span style="color:#f92672">&lt;</span>Path<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> Path source;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> Path target;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> CopyOptions<span style="color:#f92672">[]</span> options;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> StandardCopyOption<span style="color:#f92672">[]</span> stdOptions; <span style="color:#75715e">// Map to StandardCopyOption</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        CopyVisitor(Path source, Path target, CopyOptions... options) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">source</span> <span style="color:#f92672">=</span> source;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">target</span> <span style="color:#f92672">=</span> target;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">options</span> <span style="color:#f92672">=</span> options;
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Map custom options to StandardCopyOption</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">stdOptions</span> <span style="color:#f92672">=</span> Arrays.<span style="color:#a6e22e">stream</span>(options)
+</span></span><span style="display:flex;"><span>                .<span style="color:#a6e22e">flatMap</span>(opt <span style="color:#f92672">-&gt;</span> {
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> (opt <span style="color:#f92672">==</span> CopyOptions.<span style="color:#a6e22e">REPLACE_EXISTING</span>) <span style="color:#66d9ef">return</span> Arrays.<span style="color:#a6e22e">stream</span>(<span style="color:#66d9ef">new</span> StandardCopyOption<span style="color:#f92672">[]</span>{StandardCopyOption.<span style="color:#a6e22e">REPLACE_EXISTING</span>});
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> (opt <span style="color:#f92672">==</span> CopyOptions.<span style="color:#a6e22e">COPY_ATTRIBUTES</span>) <span style="color:#66d9ef">return</span> Arrays.<span style="color:#a6e22e">stream</span>(<span style="color:#66d9ef">new</span> StandardCopyOption<span style="color:#f92672">[]</span>{StandardCopyOption.<span style="color:#a6e22e">COPY_ATTRIBUTES</span>});
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">return</span> Stream.<span style="color:#a6e22e">empty</span>();
+</span></span><span style="display:flex;"><span>                })
+</span></span><span style="display:flex;"><span>                .<span style="color:#a6e22e">toArray</span>(StandardCopyOption<span style="color:#f92672">[]</span>::<span style="color:#66d9ef">new</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> FileVisitResult <span style="color:#a6e22e">preVisitDirectory</span>(Path dir, BasicFileAttributes attrs) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>            Path newdir <span style="color:#f92672">=</span> target.<span style="color:#a6e22e">resolve</span>(source.<span style="color:#a6e22e">relativize</span>(dir));
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>                Files.<span style="color:#a6e22e">copy</span>(dir, newdir, stdOptions);
+</span></span><span style="display:flex;"><span>            } <span style="color:#66d9ef">catch</span> (FileAlreadyExistsException x) {
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">// Ignore if directory already exists</span>
+</span></span><span style="display:flex;"><span>            } <span style="color:#66d9ef">catch</span> (IOException x) {
+</span></span><span style="display:flex;"><span>                System.<span style="color:#a6e22e">err</span>.<span style="color:#a6e22e">format</span>(<span style="color:#e6db74">&#34;Unable to create directory: %s: %s%n&#34;</span>, newdir, x);
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> FileVisitResult.<span style="color:#a6e22e">SKIP_SUBTREE</span>;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> FileVisitResult.<span style="color:#a6e22e">CONTINUE</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> FileVisitResult <span style="color:#a6e22e">visitFile</span>(Path file, BasicFileAttributes attrs) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>            Path newfile <span style="color:#f92672">=</span> target.<span style="color:#a6e22e">resolve</span>(source.<span style="color:#a6e22e">relativize</span>(file));
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>                Files.<span style="color:#a6e22e">copy</span>(file, newfile, stdOptions);
+</span></span><span style="display:flex;"><span>            } <span style="color:#66d9ef">catch</span> (IOException x) {
+</span></span><span style="display:flex;"><span>                System.<span style="color:#a6e22e">err</span>.<span style="color:#a6e22e">format</span>(<span style="color:#e6db74">&#34;Unable to copy file: %s to %s: %s%n&#34;</span>, file, newfile, x);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> FileVisitResult.<span style="color:#a6e22e">CONTINUE</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> FileVisitResult <span style="color:#a6e22e">postVisitDirectory</span>(Path dir, IOException exc) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (exc <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">&amp;&amp;</span> Arrays.<span style="color:#a6e22e">asList</span>(options).<span style="color:#a6e22e">contains</span>(CopyOptions.<span style="color:#a6e22e">COPY_ATTRIBUTES</span>)) {
+</span></span><span style="display:flex;"><span>                Path newdir <span style="color:#f92672">=</span> target.<span style="color:#a6e22e">resolve</span>(source.<span style="color:#a6e22e">relativize</span>(dir));
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>                    FileTime time <span style="color:#f92672">=</span> Files.<span style="color:#a6e22e">getLastModifiedTime</span>(dir);
+</span></span><span style="display:flex;"><span>                    Files.<span style="color:#a6e22e">setLastModifiedTime</span>(newdir, time);
+</span></span><span style="display:flex;"><span>                } <span style="color:#66d9ef">catch</span> (IOException x) {
+</span></span><span style="display:flex;"><span>                    System.<span style="color:#a6e22e">err</span>.<span style="color:#a6e22e">format</span>(<span style="color:#e6db74">&#34;Unable to copy attributes to directory: %s: %s%n&#34;</span>, newdir, x);
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> FileVisitResult.<span style="color:#a6e22e">CONTINUE</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> FileVisitResult <span style="color:#a6e22e">visitFileFailed</span>(Path file, IOException exc) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (exc <span style="color:#66d9ef">instanceof</span> FileSystemLoopException) {
+</span></span><span style="display:flex;"><span>                System.<span style="color:#a6e22e">err</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Cycle detected: &#34;</span> <span style="color:#f92672">+</span> file);
+</span></span><span style="display:flex;"><span>            } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>                System.<span style="color:#a6e22e">err</span>.<span style="color:#a6e22e">format</span>(<span style="color:#e6db74">&#34;Unable to copy file: %s: %s%n&#34;</span>, file, exc);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> FileVisitResult.<span style="color:#a6e22e">CONTINUE</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Example usage:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        Path sourceDir <span style="color:#f92672">=</span> Paths.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#34;path/to/source&#34;</span>);
+</span></span><span style="display:flex;"><span>        Path targetDir <span style="color:#f92672">=</span> Paths.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#34;path/to/destination&#34;</span>);
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Create dummy files/dirs for testing if needed</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Files.createDirectories(sourceDir.resolve(&#34;subdir&#34;));</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Files.write(sourceDir.resolve(&#34;file1.txt&#34;), &#34;content1&#34;.getBytes());</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Files.write(sourceDir.resolve(&#34;subdir/file2.txt&#34;), &#34;content2&#34;.getBytes());</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        copyRecursive(sourceDir, targetDir, CopyOptions.<span style="color:#a6e22e">REPLACE_EXISTING</span>, CopyOptions.<span style="color:#a6e22e">COPY_ATTRIBUTES</span>);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Directory copy attempted.&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-5-google-guava-library">Solution 5: Google Guava Library</h4>
+<p>The Guava library, developed by Google, offers a <code>Files.copy()</code> method for straightforward file copying.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> com.google.common.io.Files;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.File;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.IOException;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">GuavaFileCopy</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">copyFile</span>(File source, File to) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        Files.<span style="color:#a6e22e">copy</span>(source, to);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><em>Warning:</em> Be aware that <code>Files.copy</code> in Guava will overwrite an existing destination file and will delete the contents if the source and destination refer to the same file.</p>
+<h4 id="solution-6-standard-io-streams-byte-by-byte">Solution 6: Standard I/O Streams (Byte-by-Byte)</h4>
+<p>This is a more manual approach using <code>FileInputStream</code> and <code>FileOutputStream</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.File;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.FileInputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.FileOutputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.IOException;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.InputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.OutputStream;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">StreamFileCopy</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">copy</span>(File src, File dst) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> (InputStream in <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> FileInputStream(src);
+</span></span><span style="display:flex;"><span>             OutputStream out <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> FileOutputStream(dst)) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> buf <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>1024<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">int</span> len;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> ((len <span style="color:#f92672">=</span> in.<span style="color:#a6e22e">read</span>(buf)) <span style="color:#f92672">&gt;</span> 0) {
+</span></span><span style="display:flex;"><span>                out.<span style="color:#a6e22e">write</span>(buf, 0, len);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-7-filechanneltransferto-with-loop-for-large-files">Solution 7: <code>FileChannel.transferTo</code> with Loop for Large Files</h4>
+<p>This is an alternative implementation of <code>transferTo</code> that attempts to handle cases where the entire file might not be transferred in a single call by looping.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.File;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.FileInputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.FileOutputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.IOException;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.nio.channels.FileChannel;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">LoopingNioFileCopy</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">copyFile</span>(File src, File dst) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>dst.<span style="color:#a6e22e">exists</span>()) {
+</span></span><span style="display:flex;"><span>            dst.<span style="color:#a6e22e">createNewFile</span>();
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        FileChannel in <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>        FileChannel out <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">long</span> currentPosition <span style="color:#f92672">=</span> 0;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">long</span> fileSize <span style="color:#f92672">=</span> src.<span style="color:#a6e22e">length</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>            in <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> FileInputStream(src).<span style="color:#a6e22e">getChannel</span>();
+</span></span><span style="display:flex;"><span>            out <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> FileOutputStream(dst).<span style="color:#a6e22e">getChannel</span>();
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> (currentPosition <span style="color:#f92672">&lt;</span> fileSize) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">long</span> bytesTransferred <span style="color:#f92672">=</span> out.<span style="color:#a6e22e">transferFrom</span>(in, currentPosition, fileSize <span style="color:#f92672">-</span> currentPosition);
+</span></span><span style="display:flex;"><span>                currentPosition <span style="color:#f92672">+=</span> bytesTransferred;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">finally</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (out <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>                out.<span style="color:#a6e22e">close</span>();
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (in <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>                in.<span style="color:#a6e22e">close</span>();
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-8-spring-framework-filecopyutils">Solution 8: Spring Framework <code>FileCopyUtils</code></h4>
+<p>If you&rsquo;re already using the Spring framework, <code>FileCopyUtils</code> offers a lightweight option.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> org.springframework.util.FileCopyUtils;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.File;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.IOException;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SpringFileCopy</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">copyFile</span>(File sourceFile, File destFile) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        FileCopyUtils.<span style="color:#a6e22e">copy</span>(sourceFile, destFile);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-9-randomaccessfile-and-filechannelmap">Solution 9: <code>RandomAccessFile</code> and <code>FileChannel.map</code></h4>
+<p>This method uses <code>RandomAccessFile</code> and memory-mapping for copying, which can be efficient on some systems.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.File;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.IOException;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.RandomAccessFile;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.nio.channels.FileChannel;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">RandomAccessFileCopy</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">copy</span>(File source, File target) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        target.<span style="color:#a6e22e">createNewFile</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> (RandomAccessFile file1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RandomAccessFile(source, <span style="color:#e6db74">&#34;r&#34;</span>);
+</span></span><span style="display:flex;"><span>             RandomAccessFile file2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RandomAccessFile(target, <span style="color:#e6db74">&#34;rw&#34;</span>)) {
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>            FileChannel sourceChannel <span style="color:#f92672">=</span> file1.<span style="color:#a6e22e">getChannel</span>();
+</span></span><span style="display:flex;"><span>            FileChannel targetChannel <span style="color:#f92672">=</span> file2.<span style="color:#a6e22e">getChannel</span>();
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>            targetChannel.<span style="color:#a6e22e">write</span>(sourceChannel.<span style="color:#a6e22e">map</span>(FileChannel.<span style="color:#a6e22e">MapMode</span>.<span style="color:#a6e22e">READ_ONLY</span>, 0, source.<span style="color:#a6e22e">length</span>()));
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-10-performance-comparison-illustrative-methods">Solution 10: Performance Comparison (Illustrative Methods)</h4>
+<p>While not a single solution, this demonstrates how to benchmark different methods.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.File;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.FileInputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.FileOutputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.IOException;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.nio.file.Files;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.nio.file.Path;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.nio.file.Paths;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.nio.file.StandardCopyOption;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.nio.channels.FileChannel;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">PerformanceTest</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Method 1: Using File I/O Streams</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">long</span> <span style="color:#a6e22e">fileCopyUsingFileStreams</span>(File fileToCopy, File newFile) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">long</span> start <span style="color:#f92672">=</span> System.<span style="color:#a6e22e">currentTimeMillis</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> (FileInputStream input <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> FileInputStream(fileToCopy);
+</span></span><span style="display:flex;"><span>             FileOutputStream output <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> FileOutputStream(newFile)) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> buf <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>1024<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">int</span> bytesRead;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> ((bytesRead <span style="color:#f92672">=</span> input.<span style="color:#a6e22e">read</span>(buf)) <span style="color:#f92672">&gt;</span> 0) {
+</span></span><span style="display:flex;"><span>                output.<span style="color:#a6e22e">write</span>(buf, 0, bytesRead);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">long</span> end <span style="color:#f92672">=</span> System.<span style="color:#a6e22e">currentTimeMillis</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> (end <span style="color:#f92672">-</span> start);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Method 2: Using NIO FileChannel transferTo</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">long</span> <span style="color:#a6e22e">fileCopyUsingNIOChannelClass</span>(File fileToCopy, File newFile) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">long</span> start <span style="color:#f92672">=</span> System.<span style="color:#a6e22e">currentTimeMillis</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> (FileInputStream inputStream <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> FileInputStream(fileToCopy);
+</span></span><span style="display:flex;"><span>             FileChannel inChannel <span style="color:#f92672">=</span> inputStream.<span style="color:#a6e22e">getChannel</span>();
+</span></span><span style="display:flex;"><span>             FileOutputStream outputStream <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> FileOutputStream(newFile);
+</span></span><span style="display:flex;"><span>             FileChannel outChannel <span style="color:#f92672">=</span> outputStream.<span style="color:#a6e22e">getChannel</span>()) {
+</span></span><span style="display:flex;"><span>            inChannel.<span style="color:#a6e22e">transferTo</span>(0, fileToCopy.<span style="color:#a6e22e">length</span>(), outChannel);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">long</span> end <span style="color:#f92672">=</span> System.<span style="color:#a6e22e">currentTimeMillis</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> (end <span style="color:#f92672">-</span> start);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Method 3: Using Apache Commons IO</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Assumes FileUtils.copyFile is available and imported</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">/*
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    public static long fileCopyUsingApacheCommons(File fileToCopy, File newFile) throws IOException {
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">        long start = System.currentTimeMillis();
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">        org.apache.commons.io.FileUtils.copyFile(fileToCopy, newFile);
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">        long end = System.currentTimeMillis();
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">        return (end - start);
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    }
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    */</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Method 4: Using NIO Files.copy</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">long</span> <span style="color:#a6e22e">fileCopyUsingNIOFilesClass</span>(File fileToCopy, File newFile) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        Path source <span style="color:#f92672">=</span> Paths.<span style="color:#a6e22e">get</span>(fileToCopy.<span style="color:#a6e22e">getPath</span>());
+</span></span><span style="display:flex;"><span>        Path destination <span style="color:#f92672">=</span> Paths.<span style="color:#a6e22e">get</span>(newFile.<span style="color:#a6e22e">getPath</span>());
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">long</span> start <span style="color:#f92672">=</span> System.<span style="color:#a6e22e">currentTimeMillis</span>();
+</span></span><span style="display:flex;"><span>        Files.<span style="color:#a6e22e">copy</span>(source, destination, StandardCopyOption.<span style="color:#a6e22e">REPLACE_EXISTING</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">long</span> end <span style="color:#f92672">=</span> System.<span style="color:#a6e22e">currentTimeMillis</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> (end <span style="color:#f92672">-</span> start);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Example usage:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        File source <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> File(<span style="color:#e6db74">&#34;source.txt&#34;</span>); <span style="color:#75715e">// Create a dummy source file</span>
+</span></span><span style="display:flex;"><span>        File destStream <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> File(<span style="color:#e6db74">&#34;dest_stream.txt&#34;</span>);
+</span></span><span style="display:flex;"><span>        File destNioChannel <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> File(<span style="color:#e6db74">&#34;dest_nio_channel.txt&#34;</span>);
+</span></span><span style="display:flex;"><span>        File destNioFiles <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> File(<span style="color:#e6db74">&#34;dest_nio_files.txt&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Populate source file if it doesn&#39;t exist</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>source.<span style="color:#a6e22e">exists</span>()) {
+</span></span><span style="display:flex;"><span>            Files.<span style="color:#a6e22e">write</span>(source.<span style="color:#a6e22e">toPath</span>(), <span style="color:#e6db74">&#34;This is some test content.&#34;</span>.<span style="color:#a6e22e">getBytes</span>());
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">long</span> time1 <span style="color:#f92672">=</span> fileCopyUsingFileStreams(source, destStream);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;File Streams time: &#34;</span> <span style="color:#f92672">+</span> time1 <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34; ms&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">long</span> time2 <span style="color:#f92672">=</span> fileCopyUsingNIOChannelClass(source, destNioChannel);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;NIO Channel time: &#34;</span> <span style="color:#f92672">+</span> time2 <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34; ms&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">long</span> time3 <span style="color:#f92672">=</span> fileCopyUsingNIOFilesClass(source, destNioFiles);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;NIO Files.copy time: &#34;</span> <span style="color:#f92672">+</span> time3 <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34; ms&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Uncomment if you have Commons IO</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// long time4 = fileCopyUsingApacheCommons(source, destCommons);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// System.out.println(&#34;Apache Commons time: &#34; + time4 + &#34; ms&#34;);</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><em>Note:</em> Performance can vary significantly based on file size, system configuration, and Java version. NIO methods, especially <code>transferTo</code> and <code>Files.copy</code>, often show better performance due to OS integration.</p>
+<h3 id="important-considerations">Important Considerations</h3>
+<ul>
+<li><strong>Metadata:</strong> Some methods, like basic <code>Files.copy</code>, might not preserve file metadata (permissions, timestamps) by default. Options like <code>StandardCopyOption.COPY_ATTRIBUTES</code> can help. For truly identical copies, especially on Unix-like systems, native OS commands or JNI might be necessary.</li>
+<li><strong>Error Handling:</strong> Always ensure robust error handling, especially for <code>IOException</code>s. Closing resources properly is crucial, which <code>try-with-resources</code> simplifies.</li>
+<li><strong>Dependencies:</strong> Libraries like Apache Commons IO and Guava introduce external dependencies to your project.</li>
+</ul>
+<h3 id="faqs-on-java-file-copying">FAQs on Java File Copying</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the most performant way to copy files in Java</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Generally, methods leveraging Java NIO&rsquo;s <code>FileChannel.transferTo</code> or <code>Files.copy</code> (from Java 7 onwards) tend to be the most performant as they often delegate the heavy lifting to the operating system&rsquo;s native I/O capabilities, reducing data copying through the Java VM. Benchmarking with your specific use case is recommended.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Does Java file copying preserve file metadata</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Not always by default. Standard I/O streams and basic NIO <code>Files.copy</code> may not copy attributes like modification times or permissions. Some methods, like <code>Files.copy</code> with <code>StandardCopyOption.COPY_ATTRIBUTES</code>, and specific recursive copy implementations can preserve metadata. For exact metadata preservation, especially on Linux, native commands or JNI might be required.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is Apache Commons IO still relevant for file copying</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, Apache Commons IO remains highly relevant. Its <code>FileUtils.copyFile</code> method offers a convenient abstraction, and newer versions integrate NIO for improved performance, making it a solid choice for ease of use and efficiency.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How can I copy directories recursively in Java</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: You can implement recursive directory copying using Java NIO&rsquo;s <code>Files.walkFileTree</code> in conjunction with a custom <code>FileVisitor</code>. This allows you to define actions for visiting directories and files, handling the creation of target directories and copying of their contents.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What are the benefits of using Java 7&#39;s Files class for copying</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Java 7&rsquo;s <code>java.nio.file.Files</code> class provides a modern, high-level API for file operations. Its <code>Files.copy</code> method offers a concise way to copy files, and it supports options for replacing existing files and copying attributes, simplifying common file transfer tasks.</div>
+    </div>
+</div>
+<p>We’d love to hear your feedback! Share your thoughts or any specific scenarios you&rsquo;ve encountered regarding Java file copying in the comments below.</p>
+<p>For more on related Java topics, explore:</p>
+<ul>
+<li><a href="https://sqlpey.com/python/what-is-python" target="_blank" rel="noopener">What is Python</a>
+</li>
+<li><a href="https://sqlpey.com/sql/what-is-sql" target="_blank" rel="noopener">What is SQL</a>
+</li>
+<li><a href="https://sqlpey.com/mysql/introduction-to-mysql" target="_blank" rel="noopener">Introduction to MySQL</a>
+</li>
+</ul>
+<h2 id="solutions">Solutions</h2>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

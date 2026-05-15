@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Docker Compose: Connecting Multiple Projects Across Networks - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore effective strategies and code examples for enabling communication between Docker containers managed by separate docker-compose.yml files by leveraging …">
+
+
+
+<meta name="keywords" content="docker compose networking, docker compose multiple networks, docker compose service discovery, docker compose communication, docker external network">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Docker Compose: Connecting Multiple Projects Across Networks - sqlpey">
+<meta name="DC.description" content="Explore effective strategies and code examples for enabling communication between Docker containers managed by separate docker-compose.yml files by leveraging Docker networks.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Docker Compose: Connecting Multiple Projects Across Networks - sqlpey">
+<meta property="og:description" content="Explore effective strategies and code examples for enabling communication between Docker containers managed by separate docker-compose.yml files by leveraging …">
+<meta property="og:url" content="https://sqlpey.com/docker/docker-compose-cross-project-networking/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Docker">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Docker Compose: Connecting Multiple Projects Across Networks">
+<meta name="twitter:description" content="Explore effective strategies and code examples for enabling communication between Docker containers managed by separate docker-compose.yml files by leveraging …">
+
+
+<link rel="canonical" href="https://sqlpey.com/docker/docker-compose-cross-project-networking/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Docker Compose: Connecting Multiple Projects Across Networks\"",
+  "description": "\"Explore effective strategies and code examples for enabling communication between Docker containers managed by separate docker-compose.yml files by leveraging Docker networks.\"",
+  "url": "\"https://sqlpey.com/docker/docker-compose-cross-project-networking/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/docker/docker-compose-cross-project-networking/\""
+  },
+  "articleSection": "\"Docker\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Docker Compose: Connecting Multiple Projects Across Networks</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Docker</span>
+              
+              <span class="tag">Networking</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              16 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#docker-compose-connecting-multiple-projects-across-networks">&ldquo;Docker Compose: Connecting Multiple Projects Across Networks&rdquo;</a>
+      <ul>
+        <li><a href="#diverse-approaches-to-cross-project-docker-compose-networking">Diverse Approaches to Cross-Project Docker Compose Networking</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#faqs-on-docker-compose-cross-project-networking">FAQs on Docker Compose Cross-Project Networking</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="docker-compose-connecting-multiple-projects-across-networks">&ldquo;Docker Compose: Connecting Multiple Projects Across Networks&rdquo;</h2>
+<p>When working with multiple distinct <code>docker-compose.yml</code> projects, facilitating communication between their respective containers often requires careful network configuration. The core principle involves ensuring that containers from different projects reside on the same Docker network, allowing them to discover and interact with each other using service names. This can be achieved through various methods, primarily by defining and utilizing shared or external networks.</p>
+<h3 id="diverse-approaches-to-cross-project-docker-compose-networking">Diverse Approaches to Cross-Project Docker Compose Networking</h3>
+<p>Several strategies exist to accomplish this, each with its own nuances. The primary goal is to bridge the network isolation that <code>docker-compose</code> typically enforces for each project.</p>
+<h4 id="solution-1-shared-bridge-network-with-explicit-naming">Solution 1: Shared Bridge Network with Explicit Naming</h4>
+<p>This approach ensures that containers from different <code>docker-compose</code> projects are placed on the same network. By explicitly naming the network in each configuration, you enable inter-container communication.</p>
+<p><strong>Key Concept:</strong> Containers on the same network can resolve each other by service name.</p>
+<p><strong><code>front/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">front</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginx:latest</span> <span style="color:#75715e"># Example image</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">front_app</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ports</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;80:80&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">app_network</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">app_network</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">driver</span>: <span style="color:#ae81ff">bridge</span>
+</span></span></code></pre></div><p><strong><code>api/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">api</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">python:3.9-slim</span> <span style="color:#75715e"># Example image</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">api_service</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ports</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;5000:5000&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">app_network</span> <span style="color:#75715e"># Must match the network name in the other compose file</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">app_network</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">driver</span>: <span style="color:#ae81ff">bridge</span>
+</span></span></code></pre></div><p><strong>Explanation:</strong>
+Both <code>docker-compose</code> files define a network named <code>app_network</code>. When both are brought up, containers like <code>front_app</code> and <code>api_service</code> will be on this shared network. From within <code>front_app</code>, you can access the API using its service name: <code>http://api:5000</code>.</p>
+<h4 id="solution-2-leveraging-external-networks-compose-file-version-35">Solution 2: Leveraging External Networks (Compose File Version 3.5+)</h4>
+<p>Docker Compose allows you to declare networks as external, meaning they are managed outside the current <code>docker-compose.yml</code> file. This is particularly useful when one project defines a network that another project needs to join.</p>
+<p><strong><code>shared_network_project/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#34;3.5&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">proxy</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginx:latest</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ports</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;80:80&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">custom_network</span> <span style="color:#75715e"># Internal name for the network definition</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">custom_network</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">custom_shared_network</span> <span style="color:#75715e"># The actual name of the Docker network</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">driver</span>: <span style="color:#ae81ff">bridge</span>
+</span></span></code></pre></div><p><em>Running <code>docker-compose up -d</code> for this will create a network named <code>custom_shared_network</code>.</em></p>
+<p><strong><code>another_project/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#34;3.5&#34;</span> <span style="color:#75715e"># Or a compatible version</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">web</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">alpine:latest</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">my_proxy_net</span> <span style="color:#75715e"># Internal name to reference the external network</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">my_proxy_net</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">external</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">name</span>: <span style="color:#ae81ff">custom_shared_network</span> <span style="color:#75715e"># Must match the name defined in the other compose file</span>
+</span></span></code></pre></div><p><strong>Explanation:</strong>
+The first <code>docker-compose.yml</code> creates and names the Docker network <code>custom_shared_network</code>. The second <code>docker-compose.yml</code> then declares that it wants to use an <code>external</code> network with that exact name.</p>
+<h4 id="solution-3-using-the-default-network-of-another-project">Solution 3: Using the Default Network of Another Project</h4>
+<p>When you run a <code>docker-compose</code> command, it automatically creates a network for that project, typically prefixed with the project&rsquo;s directory name. You can then reference this default network as an external one.</p>
+<p><strong><code>project1/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">service1</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">alpine:latest</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">service1_app</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">default_net</span> <span style="color:#75715e"># Using &#39;default&#39; keyword here</span>
+</span></span></code></pre></div><p><strong><code>project2/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">service2</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginx:latest</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">service2_app</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">project1_default_net</span> <span style="color:#75715e"># Reference the default network of project1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">project1_default_net</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">external</span>: <span style="color:#66d9ef">true</span>
+</span></span></code></pre></div><p><strong>Explanation:</strong>
+If <code>project1</code> is in a directory named <code>project1</code>, its default network will be named <code>project1_default</code>. In <code>project2</code>&rsquo;s <code>docker-compose.yml</code>, you reference this external network. Ensure the <code>external</code> network name correctly matches the default network naming convention.</p>
+<h4 id="solution-4-explicitly-naming-networks-for-shared-usage">Solution 4: Explicitly Naming Networks for Shared Usage</h4>
+<p>This is a robust method where you define a network with a specific name that both <code>docker-compose</code> files reference.</p>
+<p><strong><code>projectA/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">my-shared-network</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">giveItANamePlease</span> <span style="color:#75715e"># The actual network name</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">driver</span>: <span style="color:#ae81ff">bridge</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">app_a</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">alpine:latest</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">my-shared-network</span>
+</span></span></code></pre></div><p><strong><code>projectB/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">my-proxy-net</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">external</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">name</span>: <span style="color:#ae81ff">giveItANamePlease</span> <span style="color:#75715e"># Must match the name from projectA</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">app_b</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginx:latest</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">my-proxy-net</span>
+</span></span></code></pre></div><p><strong>Explanation:</strong>
+<code>projectA</code> defines and names a network <code>giveItANamePlease</code>. <code>projectB</code> then uses this <code>giveItANamePlease</code> network as an external resource.</p>
+<h4 id="solution-5-joining-the-default-network-of-another-project-simplified">Solution 5: Joining the Default Network of Another Project (Simplified)</h4>
+<p>A direct way to join another project&rsquo;s default network.</p>
+<p><strong><code>api/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">default</span>: <span style="color:#75715e"># This keyword implies joining the project&#39;s default network</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">external</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">name</span>: <span style="color:#ae81ff">front_default</span> <span style="color:#75715e"># Assuming &#39;front&#39; is the directory name for the other project</span>
+</span></span></code></pre></div><p><strong>Explanation:</strong>
+This configuration tells the <code>api</code> project&rsquo;s containers to join the network named <code>front_default</code>, which is presumed to be the default network created by a <code>docker-compose</code> file in a directory named <code>front</code>.</p>
+<h4 id="solution-6-using-external_links-for-older-compose-versions-or-specific-scenarios">Solution 6: Using <code>external_links</code> for Older Compose Versions or Specific Scenarios</h4>
+<p>While less common with newer Docker Compose versions, <code>external_links</code> can be used to link containers from different Compose projects, especially when direct network sharing isn&rsquo;t ideal or feasible. This requires knowing the container names.</p>
+<p><strong><code>app1/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;2&#39;</span> <span style="color:#75715e"># Required for external_links</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">svc11</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">container11</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">alpine:latest</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">app1_net</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">app2_network</span> <span style="color:#75715e"># External network to connect to app2</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">external_links</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">container22:alias_for_container22</span> <span style="color:#75715e"># Link to a container in app2</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">app1_net</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">driver</span>: <span style="color:#ae81ff">bridge</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">app2_network</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">external</span>: <span style="color:#66d9ef">true</span>
+</span></span></code></pre></div><p><strong><code>app2/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;2&#39;</span> <span style="color:#75715e"># Required for external_links</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">svc21</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">container21</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginx:latest</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">app2_net</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">app1_network</span> <span style="color:#75715e"># External network to connect to app1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">external_links</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">container11:alias_for_container11</span> <span style="color:#75715e"># Link to a container in app1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">app2_net</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">driver</span>: <span style="color:#ae81ff">bridge</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">app1_network</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">external</span>: <span style="color:#66d9ef">true</span>
+</span></span></code></pre></div><p><strong>Explanation:</strong>
+This example sets up bidirectional linking. <code>svc11</code> links to <code>container22</code> (from <code>app2</code>) and <code>svc21</code> links to <code>container11</code> (from <code>app1</code>). Both projects define an external network to connect to the other. Note that the <code>external_links</code> target needs to be the <em>container name</em>, not the service name.</p>
+<h4 id="solution-7-standardizing-network-names-to-avoid-project-prefixes">Solution 7: Standardizing Network Names to Avoid Project Prefixes</h4>
+<p>To prevent issues where Docker Compose automatically prefixes network names with project directory names (e.g., <code>projectname_networkname</code>), explicitly define the network name.</p>
+<p><strong><code>api/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">api</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">api_service</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">python:3.9-slim</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">mynetwork</span> <span style="color:#75715e"># Using a custom, non-prefixed name</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">mynetwork</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">mynetwork</span> <span style="color:#75715e"># Explicitly naming the network</span>
+</span></span></code></pre></div><p><strong><code>front/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">front</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">front_app</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginx:latest</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">mynetwork</span> <span style="color:#75715e"># Using the same custom name</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">mynetwork</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">mynetwork</span> <span style="color:#75715e"># Explicitly naming the network</span>
+</span></span></code></pre></div><p><strong>Explanation:</strong>
+By using <code>name: mynetwork</code> in the <code>networks</code> section of both files, you ensure that both projects use a network called <code>mynetwork</code>. This avoids the need to reference the project name when making the network external.</p>
+<h4 id="solution-8-centralized-network-definition">Solution 8: Centralized Network Definition</h4>
+<p>For Compose file version 3.5+, you can override the default network name for all participating Compose files.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">default</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">my-app</span> <span style="color:#75715e"># All services in this compose file will join &#39;my-app&#39;</span>
+</span></span></code></pre></div><p><strong>Explanation:</strong>
+This configuration snippet, when added to multiple <code>docker-compose.yml</code> files, directs all services within those files to join a network named <code>my-app</code>. This is a clean way to enforce a common network.</p>
+<h4 id="solution-9-joining-another-projects-network-by-name">Solution 9: Joining Another Project&rsquo;s Network by Name</h4>
+<p>Similar to Solution 2, but using the <code>default</code> keyword for referencing another project&rsquo;s network.</p>
+<p><strong><code>ner/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">ner</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">ner_api</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">build</span>: <span style="color:#ae81ff">.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">default</span> <span style="color:#75715e"># Joins the network defined below</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">default</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">external</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">name</span>: <span style="color:#ae81ff">scoring_default</span> <span style="color:#75715e"># Assumes &#39;scoring&#39; project created this network</span>
+</span></span></code></pre></div><p><strong><code>scoring/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">api</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">build</span>: <span style="color:#ae81ff">.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># ... other configurations</span>
+</span></span></code></pre></div><p><strong>Explanation:</strong>
+The <code>ner</code> service is configured to join the <code>scoring_default</code> network, implying that the <code>scoring</code> project has created and is using this network. You can verify container membership using <code>docker inspect scoring_default</code>.</p>
+<h4 id="solution-10-using-env-for-consistent-project-names">Solution 10: Using <code>.env</code> for Consistent Project Names</h4>
+<p>Project names are derived from directory names. By using a <code>.env</code> file with <code>COMPOSE_PROJECT_NAME</code>, you can unify the project names and thus their default network names.</p>
+<p><strong><code>.env</code> file (in each project directory)</strong></p>
+<pre tabindex="0"><code class="language-dotenv" data-lang="dotenv">COMPOSE_PROJECT_NAME=unified_project
+</code></pre><p><strong>Explanation:</strong>
+With this <code>.env</code> file in place for all projects, Docker Compose will treat them as part of the same project, creating a unified network (e.g., <code>unified_project_default</code>) that all containers can join. Be aware of potential &ldquo;orphaned&rdquo; container warnings.</p>
+<h4 id="solution-11-explicit-network-creation-and-referencing">Solution 11: Explicit Network Creation and Referencing</h4>
+<p>Manually create a network or let Docker Compose create it, then reference it explicitly.</p>
+<p><strong><code>docker-compose.apline.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3.8&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">alpine</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">alpine:3.14</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">alpine_container</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">net-for-alpine</span> <span style="color:#75715e"># Internal network alias</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">stdin_open</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">tty</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">net-for-alpine</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">test-db-net</span> <span style="color:#75715e"># The actual Docker network name</span>
+</span></span></code></pre></div><p><strong><code>docker-compose.db.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3.8&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">db</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">postgres:13.4-alpine</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">psql_container</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">net-for-db</span> <span style="color:#75715e"># Internal network alias</span>
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">net-for-db</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">test-db-net</span> <span style="color:#75715e"># Must match the name from the other compose file</span>
+</span></span></code></pre></div><p><strong>Testing Connectivity:</strong>
+After starting both, exec into the <code>alpine_container</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker exec -it alpine_container sh
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Then test connectivity to the &#39;psql_container&#39;</span>
+</span></span><span style="display:flex;"><span>nc -z psql_container &lt;port&gt;
+</span></span><span style="display:flex;"><span>ping psql_container
+</span></span></code></pre></div><p><strong>Explanation:</strong>
+Both <code>docker-compose</code> files define a network alias (<code>net-for-alpine</code>, <code>net-for-db</code>) that points to the same underlying Docker network named <code>test-db-net</code>. This allows containers from both projects to communicate.</p>
+<h4 id="solution-12-combining-compose-files-with-docker-compose">Solution 12: Combining Compose Files with <code>docker compose</code></h4>
+<p>A straightforward way to ensure containers are on the same network is to tell <code>docker compose</code> to use multiple compose files at once.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker compose --file ~/project1/docker-compose.yml --file ~/project2/docker-compose.yml up -d
+</span></span></code></pre></div><p><strong>Explanation:</strong>
+This command merges the configurations from both files, treating them as a single logical project. Docker Compose will then create a common network (or join an existing one if specified) that spans services from both files.</p>
+<h4 id="solution-13-discovering-and-using-existing-network-names">Solution 13: Discovering and Using Existing Network Names</h4>
+<p>If a network is already created by another Docker Compose project, you can find its name and reference it.</p>
+<p><strong><code>second_docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">service-on-second-compose</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># ... service configuration</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">discovered_network</span> <span style="color:#75715e"># Internal alias</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">discovered_network</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">external</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">&lt;put_network_name_here&gt;</span> <span style="color:#75715e"># e.g., project1_default, or a custom name</span>
+</span></span></code></pre></div><p><strong>How to find the network name:</strong>
+Run <code>docker network ls</code> to list all Docker networks and identify the one created by the first project.</p>
+<p><strong>Explanation:</strong>
+This method requires manual inspection of existing networks and then referencing the correct name using <code>external: true</code>.</p>
+<h4 id="solution-14-host-ip-for-inter-project-communication-non-networked">Solution 14: Host IP for Inter-Project Communication (Non-Networked)</h4>
+<p>When direct network sharing is complex or undesirable (e.g., port conflicts), containers can communicate using the host machine&rsquo;s IP address and the exposed ports of services in other projects. This bypasses direct Docker networking between projects.</p>
+<p><strong>Example Scenario:</strong> <code>api_a</code> needs to talk to <code>api_b</code>.</p>
+<p><strong><code>project_api_a/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">api</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">api_a</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># ... runs Django app on 0.0.0.0:8000</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ports</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;8000:8000&#34;</span> <span style="color:#75715e"># Exposes container port 8000 to host port 8000</span>
+</span></span></code></pre></div><p><strong><code>project_api_b/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">api</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">api_b</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># ... runs Django app on 0.0.0.0:8001</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ports</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;8001:8001&#34;</span> <span style="color:#75715e"># Exposes container port 8001 to host port 8001</span>
+</span></span></code></pre></div><p><strong>Communication from <code>api_a</code> to <code>api_b</code>:</strong>
+Inside the <code>api_a</code> container, you would make a request to <code>http://&lt;host_ip&gt;:8001/</code>, where <code>&lt;host_ip&gt;</code> is your machine&rsquo;s IP address. You can find this programmatically using Python:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> socket
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_local_ip</span>():
+</span></span><span style="display:flex;"><span>    s <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>socket(socket<span style="color:#f92672">.</span>AF_INET, socket<span style="color:#f92672">.</span>SOCK_DGRAM)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        s<span style="color:#f92672">.</span>connect((<span style="color:#e6db74">&#39;10.255.255.255&#39;</span>, <span style="color:#ae81ff">1</span>)) <span style="color:#75715e"># Connect to a dummy address</span>
+</span></span><span style="display:flex;"><span>        IP <span style="color:#f92672">=</span> s<span style="color:#f92672">.</span>getsockname()[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span>:
+</span></span><span style="display:flex;"><span>        IP <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;127.0.0.1&#39;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">finally</span>:
+</span></span><span style="display:flex;"><span>        s<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> IP
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># In your application code within api_a container:</span>
+</span></span><span style="display:flex;"><span>host_ip <span style="color:#f92672">=</span> get_local_ip()
+</span></span><span style="display:flex;"><span>api_b_url <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;http://</span><span style="color:#e6db74">{</span>host_ip<span style="color:#e6db74">}</span><span style="color:#e6db74">:8001/&#34;</span>
+</span></span></code></pre></div><p><strong>Explanation:</strong>
+This method relies on the host machine acting as an intermediary. Services are exposed on the host, and other containers connect to the host&rsquo;s IP address on those exposed ports. This is useful for debugging or when direct network integration is too complex.</p>
+<h4 id="solution-15-using-nginx-proxy-manager-with-a-public-network">Solution 15: Using Nginx Proxy Manager with a Public Network</h4>
+<p>For managing multiple services from different <code>docker-compose</code> files, especially in a production-like setup, using a reverse proxy like Nginx Proxy Manager is effective.</p>
+<p><strong>1. Create a public Docker network:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker network create nginx-proxy-manager-net
+</span></span></code></pre></div><p><strong>2. <code>docker-compose.yml</code> for a service (e.g., <code>domain1.com</code>)</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#34;3.9&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">webserver</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">build</span>: <span style="color:#ae81ff">./bin/php</span> <span style="color:#75715e"># Example</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">domain1_com-webserver</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">public_net</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">internal_net</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">database</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">build</span>: <span style="color:#ae81ff">./bin/mysql</span> <span style="color:#75715e"># Example</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">domain1_com-database</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">internal_net</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">public_net</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">external</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-proxy-manager-net</span> <span style="color:#75715e"># Connects to the public network</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">internal_net</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">internal</span>: <span style="color:#66d9ef">true</span> <span style="color:#75715e"># Isolates services within this project</span>
+</span></span></code></pre></div><p><strong><code>.env</code> file for this project:</strong></p>
+<pre tabindex="0"><code class="language-dotenv" data-lang="dotenv">COMPOSE_PROJECT_NAME=domain1_com
+PHPVERSION=php7.4
+DATABASE=mysql8
+</code></pre><p><strong>Explanation:</strong>
+Services connect to the <code>nginx-proxy-manager-net</code> (making them accessible externally via the proxy) and an <code>internal_net</code> for inter-service communication within the same project. The <code>COMPOSE_PROJECT_NAME</code> helps in distinguishing services if needed. Nginx Proxy Manager can then route traffic to the correct service based on domain names.</p>
+<h4 id="solution-16-modern-compose-file-versions-and-hostnames">Solution 16: Modern Compose File Versions and Hostnames</h4>
+<p>With newer Docker Compose versions, you can leverage hostnames for inter-container communication, especially within a defined network.</p>
+<p><strong><code>kafka_consumer/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#34;3.8&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">zookeeper</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">zookeeper:3.4.10</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">kafkaNet</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">kafka</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">confluentinc/cp-kafka:4.1.4</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ports</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">9093</span>:<span style="color:#ae81ff">9093</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">environment</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">KAFKA_ADVERTISED_LISTENERS</span>: <span style="color:#ae81ff">INTERNAL://kafka:19093,EXTERNAL://127.0.0.1:9093</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">KAFKA_ZOOKEEPER_CONNECT</span>: <span style="color:#e6db74">&#34;zookeeper:2181&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">hostname</span>: <span style="color:#ae81ff">google.kafka.local.com</span> <span style="color:#75715e"># Custom hostname</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">kafkaNet</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">kafkaNet</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">driver</span>: <span style="color:#ae81ff">bridge</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">kafkanetwork</span> <span style="color:#75715e"># Explicitly named network</span>
+</span></span></code></pre></div><p><strong><code>kafka_producer/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3.8&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">awsapi</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">alpine:latest</span> <span style="color:#75715e"># Example</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">awsapinetwork</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">awsapinetwork</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">external</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">kafkanetwork</span> <span style="color:#75715e"># Joins the same network as the consumer</span>
+</span></span></code></pre></div><p><strong>Explanation:</strong>
+The <code>awsapi</code> container can communicate with the Kafka broker using the hostname <code>google.kafka.local.com</code> on port <code>9093</code>, as both services are on the <code>kafkanetwork</code>. The <code>hostname</code> directive within the Kafka service configuration provides a stable alias.</p>
+<h4 id="solution-17-network-naming-conventions-and-port-awareness">Solution 17: Network Naming Conventions and Port Awareness</h4>
+<p>When connecting external networks, be mindful of Docker&rsquo;s default network naming (prefixed with project directory) and use the container&rsquo;s internal port, not the host-mapped port, for inter-container communication.</p>
+<p><strong><code>project1/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;2&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">some-contr</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">alpine:latest</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">somenet</span> <span style="color:#75715e"># Internal alias</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ports</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;8080:8080&#34;</span> <span style="color:#75715e"># Host:Container</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">expose</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;8080&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">somenet</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">driver</span>: <span style="color:#ae81ff">bridge</span>
+</span></span></code></pre></div><p><strong><code>project2/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;2&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">pushapiserver</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginx:latest</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">working_dir</span>: <span style="color:#ae81ff">/app</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ports</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;8060:8066&#34;</span> <span style="color:#75715e"># Host:Container</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">project1_somenet</span> <span style="color:#75715e"># External reference to project1&#39;s default network</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">project1_somenet</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">external</span>: <span style="color:#66d9ef">true</span>
+</span></span></code></pre></div><p><strong>Explanation:</strong>
+The <code>pushapiserver</code> in <code>project2</code> can reach <code>some-contr</code> in <code>project1</code> using the URL <code>http://some-contr:8080/</code>. Here, <code>8080</code> is the container&rsquo;s exposed port (from <code>expose</code> and <code>ports</code>), not the host-mapped port <code>8060</code>. The network name <code>project1_somenet</code> assumes <code>project1</code> is in a directory named <code>project1</code>.</p>
+<h4 id="solution-18-direct-network-name-specification-compose-v35">Solution 18: Direct Network Name Specification (Compose v3.5+)</h4>
+<p>A simple method for shared networks using Compose file version 3.5 and above.</p>
+<p><strong><code>compose1.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">default</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">network-name</span> <span style="color:#75715e"># Explicitly names the network</span>
+</span></span></code></pre></div><p><strong><code>compose2.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">app</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># ...</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">network-name</span> <span style="color:#75715e"># References the shared network by its explicit name</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># You might need to define it as external here if not defined in compose1</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># networks:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#   network-name:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#     external: true</span>
+</span></span></code></pre></div><p><strong>Explanation:</strong>
+This approach directly assigns a common name to the network, simplifying external referencing.</p>
+<h4 id="solution-19-ip-address-based-communication-for-testinglocal-dev">Solution 19: IP Address-Based Communication (for Testing/Local Dev)</h4>
+<p>For localized testing, you can identify the IP address of a container from one project and use it to connect from a container in another. This is less about shared networks and more about direct IP communication.</p>
+<p><strong><code>app1/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">new-network</span>: <span style="color:#75715e"># Define a network for app1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">external</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">app1_shared_net</span> <span style="color:#75715e"># Name for the network</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">app</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># ...</span>
+</span></span></code></pre></div><p><strong><code>app2/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">new-network</span>: <span style="color:#75715e"># Joins the same network</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">external</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">app1_shared_net</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">app</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># ...</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Inside this container, you&#39;d need to know the IP of app1&#39;s container</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># e.g., http://172.XX.0.10:port/</span>
+</span></span></code></pre></div><p><strong>Explanation:</strong>
+This method involves inspecting <code>app1</code>&rsquo;s container to find its IP within <code>app1_shared_net</code> and then hardcoding that IP in <code>app2</code>&rsquo;s configuration or application code. It&rsquo;s a practical but less maintainable solution for complex environments.</p>
+<h4 id="solution-20-overlay-networks-in-docker-swarm">Solution 20: Overlay Networks in Docker Swarm</h4>
+<p>When using Docker Swarm, overlay networks are essential for multi-host communication and can be shared across stacks.</p>
+<p><strong><code>docker-compose.yml</code> (Stack 1)</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3.9&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">net</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">driver</span>: <span style="color:#ae81ff">overlay</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">attachable</span>: <span style="color:#66d9ef">true</span> <span style="color:#75715e"># Allows standalone containers to join</span>
+</span></span></code></pre></div><p><em>Deploy this stack with <code>docker stack deploy -c docker-compose.yml -p app</code>. The network will be named <code>app_net</code>.</em></p>
+<p><strong><code>docker-compose.yml</code> (Stack 2)</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3.9&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">net-ref</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">external</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">app_net</span> <span style="color:#75715e"># References the network from Stack 1</span>
+</span></span></code></pre></div><p><em>Deploy this stack with <code>docker stack deploy -c docker-compose.yml mystack</code>.</em></p>
+<p><strong>Explanation:</strong>
+Overlay networks enable containers across different nodes (or different compose deployments within a swarm) to communicate. By specifying <code>attachable: true</code> and referencing the network name, you can link services from distinct compose deployments.</p>
+<h4 id="solution-21-ip-address-management-ipam-with-custom-subnets">Solution 21: IP Address Management (IPAM) with Custom Subnets</h4>
+<p>For fine-grained control, you can define custom IP address ranges for your networks.</p>
+<p><strong><code>nginx-proxy-manager/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#34;3&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">app</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#e6db74">&#34;jc21/nginx-proxy-manager:latest&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ports</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;80:80&#34;</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;81:81&#34;</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;443:443&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">customnetwork</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">ipv4_address</span>: <span style="color:#ae81ff">172.20.0.10</span> <span style="color:#75715e"># Assign a specific IP</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">customnetwork</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ipam</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">config</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">subnet</span>: <span style="color:#ae81ff">172.20.0.0</span><span style="color:#ae81ff">/24</span> <span style="color:#75715e"># Define the subnet</span>
+</span></span></code></pre></div><p><strong><code>portainer/docker-compose.yml</code></strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#34;3&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">portainer</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">portainer/portainer-ce:latest</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">portainer</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ports</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">9000</span>:<span style="color:#ae81ff">9000</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">9443</span>:<span style="color:#ae81ff">9443</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">nginxproxymanager_customnetwork</span>: <span style="color:#75715e"># Reference network by project_name_network_name</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">ipv4_address</span>: <span style="color:#ae81ff">172.20.0.11</span> <span style="color:#75715e"># Assign a specific IP</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">nginxproxymanager_customnetwork</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">external</span>: <span style="color:#66d9ef">true</span> <span style="color:#75715e"># Assume the network was created by the first project</span>
+</span></span></code></pre></div><p><strong>Explanation:</strong>
+This setup manually assigns static IP addresses within a defined subnet. The second compose file references the network created by the first, ensuring both containers reside on <code>172.20.0.0/24</code> and can communicate using their assigned IPs.</p>
+<h4 id="solution-22-multihomed-containers-for-targeted-communication">Solution 22: Multihomed Containers for Targeted Communication</h4>
+<p>Instead of putting entire networks together, you can make containers &ldquo;multihomed&rdquo; by attaching them to multiple networks, allowing controlled communication.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">webserver</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">webnet</span>: <span style="color:#75715e"># Isolated network for webserver</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">ipv4_address</span>: <span style="color:#ae81ff">172.20.0.2</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">proxyserver</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">proxynet</span>: <span style="color:#75715e"># Public network for proxy</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">ipv4_address</span>: <span style="color:#ae81ff">172.19.0.111</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">webnet</span>: <span style="color:#75715e"># Also attached to the webserver&#39;s isolated network</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">ipv4_address</span>: <span style="color:#ae81ff">172.20.0.111</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ports</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;80:80&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">proxynet</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">driver</span>: <span style="color:#ae81ff">bridge</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">internal</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ipam</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">config</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">subnet</span>: <span style="color:#ae81ff">172.19.0.0</span><span style="color:#ae81ff">/16</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">webnet</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">driver</span>: <span style="color:#ae81ff">bridge</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">internal</span>: <span style="color:#66d9ef">true</span> <span style="color:#75715e"># Makes webnet traffic strictly internal</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ipam</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">config</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">subnet</span>: <span style="color:#ae81ff">172.20.0.0</span><span style="color:#ae81ff">/17</span>
+</span></span></code></pre></div><p><strong>Explanation:</strong>
+The <code>proxyserver</code> is attached to both <code>proxynet</code> (for external access) and <code>webnet</code> (to communicate with <code>webserver</code>). The <code>webserver</code> is only on the internal <code>webnet</code>. This provides granular control over network access.</p>
+<h4 id="solution-23-referencing-external-networks-by-name">Solution 23: Referencing External Networks by Name</h4>
+<p>A straightforward way to connect to a pre-existing network.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">bot</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># ...</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">my-rede</span> <span style="color:#75715e"># Internal alias</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">networks</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">my-rede</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">external</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">name</span>: <span style="color:#ae81ff">name_rede_externa</span> <span style="color:#75715e"># The actual name of the external network</span>
+</span></span></code></pre></div><p><strong>Explanation:</strong>
+This snippet indicates that the <code>bot</code> service should join an already existing Docker network named <code>name_rede_externa</code>.</p>
+<h2 id="solutions">Solutions</h2>
+<h3 id="faqs-on-docker-compose-cross-project-networking">FAQs on Docker Compose Cross-Project Networking</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How do I make containers from two different docker-compose files talk to each other?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The primary method is to ensure both sets of containers are on the same Docker network. This is often achieved by defining a shared network in both <code>docker-compose.yml</code> files or by having one project define a network that the other project references as external. You can then communicate between services using their service names.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is an &#39;external&#39; Docker network in compose?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: An &rsquo;external&rsquo; network is a Docker network that is created and managed independently of a specific <code>docker-compose.yml</code> file. When you specify a network as external in a compose file, you are telling Docker Compose to use an existing network rather than creating a new one. This is crucial for connecting services across different compose projects.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I use service names to communicate between containers from different compose projects?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, provided those containers are on the same Docker network. Docker&rsquo;s DNS resolution within a network allows containers to find each other using their service names defined in the <code>docker-compose.yml</code> files.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What happens if I don&#39;t specify a network name in docker-compose?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: If you don&rsquo;t explicitly define networks, Docker Compose typically creates a default network for each project. This default network is usually named by prefixing the project&rsquo;s directory name with the network name you would have specified (e.g., <code>myproject_default</code>). If projects have different default network names, their containers won&rsquo;t be able to communicate directly unless you configure them to join the same network.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How do I find the name of a network created by another docker-compose project?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: You can use the command <code>docker network ls</code> to list all available Docker networks. Look for network names that correspond to your other project&rsquo;s directory or explicitly defined network names.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is it possible to connect containers from different compose projects without using shared networks?</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, it is possible by having containers communicate via the host machine&rsquo;s IP address and the ports exposed by services. This bypasses direct Docker networking between the compose projects but requires careful management of exposed ports and host IP addresses. This is often used for debugging or simpler local setups.</div>
+    </div>
+</div>
+<p>We’d love to hear your feedback! Drop your comments or questions below.</p>
+<pre tabindex="0"><code># front/docker-compose.yml
+services:
+  front:
+    ...
+    networks:
+      - some-net
+networks:
+  some-net:
+    driver: bridge
+# api/docker-compose.yml
+services:
+  api:
+    ...
+    networks:
+      - front_some-net
+networks:
+  front_some-net:
+    external: true
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

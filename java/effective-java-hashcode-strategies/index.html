@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Effective Java HashCode Implementation Strategies for Object Equality - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Exploring diverse, production-ready methods for implementing robust hashCode() functions in Java, ranging from Effective Java patterns to modern library usage.">
+
+
+
+<meta name="keywords" content="hashCode implementation, Effective Java, Objects.hash, equals and hashCode contract">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Effective Java HashCode Implementation Strategies for Object Equality - sqlpey">
+<meta name="DC.description" content="Exploring diverse, production-ready methods for implementing robust hashCode() functions in Java, ranging from Effective Java patterns to modern library usage.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Effective Java HashCode Implementation Strategies for Object Equality - sqlpey">
+<meta property="og:description" content="Exploring diverse, production-ready methods for implementing robust hashCode() functions in Java, ranging from Effective Java patterns to modern library usage.">
+<meta property="og:url" content="https://sqlpey.com/java/effective-java-hashcode-strategies/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Java">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Effective Java HashCode Implementation Strategies for Object Equality">
+<meta name="twitter:description" content="Exploring diverse, production-ready methods for implementing robust hashCode() functions in Java, ranging from Effective Java patterns to modern library usage.">
+
+
+<link rel="canonical" href="https://sqlpey.com/java/effective-java-hashcode-strategies/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Effective Java HashCode Implementation Strategies for Object Equality\"",
+  "description": "\"Exploring diverse, production-ready methods for implementing robust hashCode() functions in Java, ranging from Effective Java patterns to modern library usage.\"",
+  "url": "\"https://sqlpey.com/java/effective-java-hashcode-strategies/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/java/effective-java-hashcode-strategies/\""
+  },
+  "articleSection": "\"Java\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Effective Java HashCode Implementation Strategies for Object Equality</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Java</span>
+              
+              <span class="tag">Object Equality</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              7 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#effective-java-hashcode-implementation-strategies-for-object-equality">&ldquo;Effective Java HashCode Implementation Strategies for Object Equality&rdquo;</a>
+      <ul>
+        <li><a href="#solution-approaches-for-hashcode-calculation">Solution Approaches for <code>hashCode()</code> Calculation</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li></li>
+        <li><a href="#critical-rules-for-hashcode-integrity">Critical Rules for <code>hashCode()</code> Integrity</a></li>
+        <li><a href="#alternative-implementation-approaches">Alternative Implementation Approaches</a></li>
+        <li><a href="#faqs-on-effective-java-hashcode-implementation-strategies">FAQs on Effective Java HashCode Implementation Strategies</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="effective-java-hashcode-implementation-strategies-for-object-equality">&ldquo;Effective Java HashCode Implementation Strategies for Object Equality&rdquo;</h2>
+<p>When overriding the <code>hashCode()</code> method in custom Java classes, the central challenge lies in creating an algorithm that produces an even distribution of hash values while strictly adhering to the contract imposed by the <code>equals()</code> method. What are the most reliable and high-performance patterns for deriving a hash code from object fields, particularly when dealing with various primitive types, objects, and arrays?</p>
+<h3 id="solution-approaches-for-hashcode-calculation">Solution Approaches for <code>hashCode()</code> Calculation</h3>
+<p>The &ldquo;best&rdquo; implementation frequently hinges on the specific usage profile of the object. Several proven techniques exist:</p>
+<h4 id="1-the-effective-java-recurrence-formula-josh-blochs-pattern">1. The Effective Java Recurrence Formula (Josh Bloch&rsquo;s Pattern)</h4>
+<p>A highly recommended approach, detailed in <em>Effective Java</em> (Item 8, second edition), provides a sound foundation for most scenarios. The process involves initializing a result variable (often a non-zero prime, like 17 or 37) and iteratively combining the hash codes of each significant field.</p>
+<p><strong>The Combination Step:</strong>
+The accumulated result is updated using the formula:
+$$ \text{result} = \text{multiplier} \times \text{result} + \text{field_hash_code} $$
+Where a multiplier of 37 is often cited in this context.</p>
+<p><strong>Field Hashing Breakdown:</strong></p>
+<p>| Field Type | Hash Code Calculation (<code>c</code>) |
+| :</p>
+<h2 id="solutions">Solutions</h2>
+<p>| :</p>
+<pre tabindex="0"><code>result = 37 * result + c
+</code></pre><p>|
+| <code>boolean</code> | <code>(f ? 0 : 1)</code> |
+| <code>byte</code>, <code>short</code>, <code>int</code> | <code>(int)f</code> |
+| <code>long</code> | <code>(int)(f \wedge (f \gg\gg 32))</code> (XORing the upper and lower 32 bits) |
+| <code>float</code> | <code>Float.floatToIntBits(f)</code> |
+| <code>double</code> | <code>Double.doubleToLongBits(f)</code> treated as a long, then combined as above. |
+| <code>Object</code> | <code>f.hashCode()</code> (or 0 if $f$ is <code>null</code>) |
+| <code>Array</code> | Calculated recursively, combining the hash of each element. |</p>
+<p>This recursive combination aims for good distribution across the 32-bit integer space.</p>
+<p><strong>Example of Field Combination Logic:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">hashCode</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Start with a non-zero constant. 37 is a common choice here.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> result <span style="color:#f92672">=</span> 17; 
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> c;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Example for a long field:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">long</span> longField <span style="color:#f92672">=</span> 123456789012345L; 
+</span></span><span style="display:flex;"><span>    c <span style="color:#f92672">=</span> (<span style="color:#66d9ef">int</span>)(longField <span style="color:#f92672">^</span> (longField <span style="color:#f92672">&gt;&gt;&gt;</span> 32));
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> 37 <span style="color:#f92672">*</span> result <span style="color:#f92672">+</span> c;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Example for an object field:</span>
+</span></span><span style="display:flex;"><span>    Object referenceField <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Object();
+</span></span><span style="display:flex;"><span>    c <span style="color:#f92672">=</span> (referenceField <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span>) <span style="color:#f92672">?</span> 0 : referenceField.<span style="color:#a6e22e">hashCode</span>();
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> 37 <span style="color:#f92672">*</span> result <span style="color:#f92672">+</span> c;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> result;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="2-leveraging-standard-library-utilities-javautilobjectshash">2. Leveraging Standard Library Utilities (<code>java.util.Objects.hash</code>)</h4>
+<p>For Java 7 and later, developers can delegate the entire calculation to <code>java.util.Objects.hash(Object... values)</code>. This method internally implements a highly optimized combination logic, often similar to the Effective Java pattern, and handles <code>null</code> values gracefully. This is generally the cleanest approach if external dependencies like Guava are not preferred.</p>
+<p><strong>Practical Code Example (Java 7+):</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">hashCode</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Simple and null-safe delegation for fields firstName and lastName</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> java.<span style="color:#a6e22e">util</span>.<span style="color:#a6e22e">Objects</span>.<span style="color:#a6e22e">hash</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">firstName</span>, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">lastName</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="3-detailed-field-by-field-implementation-with-prime-multiplier-31">3. Detailed Field-by-Field Implementation with Prime Multiplier (31)</h4>
+<p>A variation often seen uses a constant multiplier of 31 (which is odd, avoiding bit loss) and a starting seed of 17. This approach explicitly shows how different primitive sizes are mapped to the 32-bit integer.</p>
+<p><strong>Detailed Implementation Sample:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@Override</span> 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">hashCode</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Start with a non-zero constant. Prime is preferred</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> result <span style="color:#f92672">=</span> 17;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Primitives</span>
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> 31 <span style="color:#f92672">*</span> result <span style="color:#f92672">+</span> (booleanField <span style="color:#f92672">?</span> 1 : 0);                   
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> 31 <span style="color:#f92672">*</span> result <span style="color:#f92672">+</span> byteField;                                
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> 31 <span style="color:#f92672">*</span> result <span style="color:#f92672">+</span> charField;                                
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> 31 <span style="color:#f92672">*</span> result <span style="color:#f92672">+</span> shortField;                               
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> 31 <span style="color:#f92672">*</span> result <span style="color:#f92672">+</span> intField;                                 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Long mapping to int</span>
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> 31 <span style="color:#f92672">*</span> result <span style="color:#f92672">+</span> (<span style="color:#66d9ef">int</span>)(longField <span style="color:#f92672">^</span> (longField <span style="color:#f92672">&gt;&gt;&gt;</span> 32));    
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Float mapping</span>
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> 31 <span style="color:#f92672">*</span> result <span style="color:#f92672">+</span> Float.<span style="color:#a6e22e">floatToIntBits</span>(floatField);         
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Double mapping</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">long</span> doubleFieldBits <span style="color:#f92672">=</span> Double.<span style="color:#a6e22e">doubleToLongBits</span>(doubleField);     
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> 31 <span style="color:#f92672">*</span> result <span style="color:#f92672">+</span> (<span style="color:#66d9ef">int</span>)(doubleFieldBits <span style="color:#f92672">^</span> (doubleFieldBits <span style="color:#f92672">&gt;&gt;&gt;</span> 32));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Objects and Arrays</span>
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> 31 <span style="color:#f92672">*</span> result <span style="color:#f92672">+</span> java.<span style="color:#a6e22e">util</span>.<span style="color:#a6e22e">Arrays</span>.<span style="color:#a6e22e">hashCode</span>(arrayField);              
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> 31 <span style="color:#f92672">*</span> result <span style="color:#f92672">+</span> (referenceField <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">?</span> 0 : referenceField.<span style="color:#a6e22e">hashCode</span>());
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> result;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>If implementing <code>hashCode()</code>, you must also implement <code>equals()</code> to maintain consistency. The corresponding <code>equals()</code> check ensures field equality across all types:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">boolean</span> <span style="color:#a6e22e">equals</span>(Object o) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span> <span style="color:#f92672">==</span> o) <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>(o <span style="color:#66d9ef">instanceof</span> MyType)) <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    MyType lhs <span style="color:#f92672">=</span> (MyType) o; 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Primitive checks</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span>     booleanField <span style="color:#f92672">==</span> lhs.<span style="color:#a6e22e">booleanField</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&amp;&amp;</span> byteField    <span style="color:#f92672">==</span> lhs.<span style="color:#a6e22e">byteField</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// ... checks for all fields, including object comparison and null checks for references</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&amp;&amp;</span> java.<span style="color:#a6e22e">util</span>.<span style="color:#a6e22e">Arrays</span>.<span style="color:#a6e22e">equals</span>(arrayField, lhs.<span style="color:#a6e22e">arrayField</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&amp;&amp;</span> java.<span style="color:#a6e22e">util</span>.<span style="color:#a6e22e">Objects</span>.<span style="color:#a6e22e">equals</span>(referenceField, lhs.<span style="color:#a6e22e">referenceField</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&amp;&amp;</span> java.<span style="color:#a6e22e">util</span>.<span style="color:#a6e22e">Objects</span>.<span style="color:#a6e22e">equals</span>(nullableReferenceField, lhs.<span style="color:#a6e22e">nullableReferenceField</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="4-using-external-libraries-apache-commons-lang">4. Using External Libraries (Apache Commons Lang)</h4>
+<p>For developers working in environments where utility libraries are common, Apache Commons Lang provides <code>HashCodeBuilder</code> and <code>EqualsBuilder</code>. These builders utilize reflection or builder patterns to construct the methods, which can reduce manual coding effort.</p>
+<h4 id="5-handling-collections-and-inheritance-with-objectshash">5. Handling Collections and Inheritance with <code>Objects.hash</code></h4>
+<p>When dealing with classes that extend others, or when using collections as fields, the <code>Objects.hash()</code> approach simplifies parent class inclusion.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">B</span> <span style="color:#66d9ef">extends</span> A {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> String param2;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> String param3;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ... constructor ...</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">final</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">hashCode</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Includes parent&#39;s hash code (from A.hashCode()) for full consistency</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> java.<span style="color:#a6e22e">util</span>.<span style="color:#a6e22e">Objects</span>.<span style="color:#a6e22e">hash</span>(
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">super</span>.<span style="color:#a6e22e">hashCode</span>(),
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">param2</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">param3</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="6-specialized-combination-techniques-boostxor-methods">6. Specialized Combination Techniques (Boost/XOR Methods)</h4>
+<p>Alternative algorithms exist that focus on better bit mixing than simple multiplication/addition cycles. The formula inspired by the Boost C++ library aims for high diffusion:</p>
+<p>$$ \text{seed} \wedge = \text{hasher}(v) + 0x9e3779b9 + (\text{seed} \ll 6) + (\text{seed} \gg 2) $$</p>
+<p>This method involves XORing the seed with a mix derived from the new hash value and a large prime constant (<code>0x9e3779b9</code>), along with bit shifts.</p>
+<h3 id="critical-rules-for-hashcode-integrity">Critical Rules for <code>hashCode()</code> Integrity</h3>
+<p>Regardless of the chosen implementation, certain requirements must be met for proper functioning, especially when these objects are used as keys in hash-based collections like <code>HashMap</code> or <code>HashSet</code>:</p>
+<ol>
+<li><strong>Consistency with <code>equals()</code>:</strong> If two objects are determined to be equal via the <code>equals()</code> method, their <code>hashCode()</code> values <strong>must</strong> be identical.</li>
+<li><strong>Inconsistency is allowed:</strong> If <code>a.equals(b)</code> returns <code>false</code>, their hash codes are <em>not</em> required to differ, though good design strives for this difference to minimize collisions.</li>
+<li><strong>Immutability:</strong> The fields used in the hash calculation must not change while the object is stored in a hash-based collection. Modifying these fields after insertion breaks the collection&rsquo;s ability to locate the object.</li>
+</ol>
+<h3 id="alternative-implementation-approaches">Alternative Implementation Approaches</h3>
+<ul>
+<li><strong>IDE Generation:</strong> Tools like Eclipse offer automatic generation (<code>Source -&gt; Generate hashCode() and equals()</code>), allowing developers to select which fields participate in the logic.</li>
+<li><strong>Collection Inheritance:</strong> If a class extends <code>AbstractList</code>, the default implementation often aggregates the hash codes of its elements:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">hashCode</span>() {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">int</span> hashCode <span style="color:#f92672">=</span> 1;
+</span></span><span style="display:flex;"><span>      Iterator i <span style="color:#f92672">=</span> iterator();
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">while</span> (i.<span style="color:#a6e22e">hasNext</span>()) {
+</span></span><span style="display:flex;"><span>        Object obj <span style="color:#f92672">=</span> i.<span style="color:#a6e22e">next</span>();
+</span></span><span style="display:flex;"><span>        hashCode <span style="color:#f92672">=</span> 31<span style="color:#f92672">*</span>hashCode <span style="color:#f92672">+</span> (obj<span style="color:#f92672">==</span><span style="color:#66d9ef">null</span> <span style="color:#f92672">?</span> 0 : obj.<span style="color:#a6e22e">hashCode</span>());
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> hashCode;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div></li>
+</ul>
+<h3 id="faqs-on-effective-java-hashcode-implementation-strategies">FAQs on Effective Java HashCode Implementation Strategies</h3>
+<p><div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What multiplier is best for combining hash codes</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Any odd multiplier is suitable as it prevents losing information via bit shifting. Small multipliers (like 31) might offer minor speed gains on older systems due to JIT optimization paths but can increase collisions for small inputs. Prime numbers are often used, though mathematically, primes offer no special advantage in the ring $Z/(2^{32})$.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Should I use the same multiplier in all hashCode calls</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Using the same multiplier consistently (like 31) is conventional and simplifies reasoning. Using different multipliers in different calculation contexts <em>might</em> help reduce collisions but often adds unnecessary complexity unless the risk of predictable collisions is high.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What happens if equals returns true but hashCodes differ</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: This violates the fundamental contract. Objects used as keys in a <code>HashMap</code> or elements in a <code>HashSet</code> may become effectively lost or inaccessible because the collection relies on the hash code to find the bucket where the object should reside.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is XORing enough for long fields</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: For <code>long</code> fields, simply using the value directly won&rsquo;t fit into the 32-bit <code>int</code> return type. The standard practice is to XOR the upper 32 bits with the lower 32 bits ($f \wedge (f \gg 32)$) to condense the 64 bits into a resulting 32-bit hash, which is then combined into the result.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How do I handle arrays in hashCode</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Arrays require special handling. For primitive arrays, use <code>Arrays.hashCode()</code>. For object arrays, use <code>Arrays.hashCode()</code>. For nested arrays, <code>Arrays.deepHashCode()</code> ensures recursive calculation.</div>
+    </div>
+</div></p>
+<p>We are eager to hear your thoughts on these patterns. Which method do you find most reliable for production code, and what specific collision scenarios have you encountered? Share your experiences below!</p>
+<p>For further exploration on related consistency issues in Python environments or framework timeouts, you might check out resources on <a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">fixing SSL verification errors in Python requests</a>
+ or <a href="https://sqlpey.com/dotnet/resolve-blazor-server-timeout-issues/" target="_blank" rel="noopener">resolving Blazor Server timeout issues</a>
+.</p>
+<pre tabindex="0"><code>@Override
+public int hashCode() {
+    return Objects.hash(this.firstName, this.lastName);
+}
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>C# .NET Enumerable Batching Techniques: Alternative Methods to Chunk Sequences - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore various C# implementation strategies for splitting IEnumerables into fixed-size batches or chunks, from .NET 6&#43; Enumerable.Chunk() to custom lazy …">
+
+
+
+<meta name="keywords" content="LINQ .NET, C# Batching, IEnumerable Chunk, LINQ Batch, .NET 6 Chunk">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="C# .NET Enumerable Batching Techniques: Alternative Methods to Chunk Sequences - sqlpey">
+<meta name="DC.description" content="Explore various C# implementation strategies for splitting IEnumerables into fixed-size batches or chunks, from .NET 6&#43; Enumerable.Chunk() to custom lazy enumerators.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="C# .NET Enumerable Batching Techniques: Alternative Methods to Chunk Sequences - sqlpey">
+<meta property="og:description" content="Explore various C# implementation strategies for splitting IEnumerables into fixed-size batches or chunks, from .NET 6&#43; Enumerable.Chunk() to custom lazy …">
+<meta property="og:url" content="https://sqlpey.com/c%23/csharp-enumerable-batching-techniques/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="dotnet">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="C# .NET Enumerable Batching Techniques: Alternative Methods to Chunk Sequences">
+<meta name="twitter:description" content="Explore various C# implementation strategies for splitting IEnumerables into fixed-size batches or chunks, from .NET 6&#43; Enumerable.Chunk() to custom lazy …">
+
+
+<link rel="canonical" href="https://sqlpey.com/c%23/csharp-enumerable-batching-techniques/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"C# .NET Enumerable Batching Techniques: Alternative Methods to Chunk Sequences\"",
+  "description": "\"Explore various C# implementation strategies for splitting IEnumerables into fixed-size batches or chunks, from .NET 6+ Enumerable.Chunk() to custom lazy enumerators.\"",
+  "url": "\"https://sqlpey.com/c%23/csharp-enumerable-batching-techniques/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/c%23/csharp-enumerable-batching-techniques/\""
+  },
+  "articleSection": "\"dotnet\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">C# .NET Enumerable Batching Techniques: Alternative Methods to Chunk Sequences</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">dotnet</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              12 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#c-net-enumerable-batching-techniques-alternative-methods-to-chunk-sequences">&ldquo;C# .NET Enumerable Batching Techniques: Alternative Methods to Chunk Sequences&rdquo;</a>
+      <ul>
+        <li><a href="#solution-1-utilizing-the-native-enumerablechunk-method-net-6">Solution 1: Utilizing the Native <code>Enumerable.Chunk()</code> Method (.NET 6+)</a></li>
+        <li><a href="#solution-2-employing-morelinqbatch">Solution 2: Employing <code>MoreLINQ.Batch()</code></a></li>
+        <li><a href="#solution-3-linq-grouping-based-on-index">Solution 3: LINQ Grouping Based on Index</a></li>
+        <li><a href="#solution-4-iterative-take-and-skip-caution-advised">Solution 4: Iterative <code>Take</code> and <code>Skip</code> (Caution Advised)</a></li>
+        <li><a href="#solution-5-truly-lazy-enumerator-implementation">Solution 5: Truly Lazy Enumerator Implementation</a></li>
+        <li><a href="#solution-6-optimized-pipelined-enumerator-low-accumulation">Solution 6: Optimized Pipelined Enumerator (Low Accumulation)</a></li>
+        <li><a href="#solution-7-classic-for-loop-with-index-management-for-ilistt">Solution 7: Classic <code>for</code>-loop with Index Management (For <code>IList&lt;T&gt;</code>)</a></li>
+        <li><a href="#solution-8-strict-lazy-batching-and-ilistt-specific-implementation">Solution 8: Strict Lazy Batching and <code>IList&lt;T&gt;</code> Specific Implementation</a></li>
+        <li><a href="#solution-9-list-based-accumulation-readability-focus">Solution 9: List-Based Accumulation (Readability Focus)</a></li>
+        <li><a href="#solution-10-computed-batching-with-array-buffering">Solution 10: Computed Batching with Array Buffering</a></li>
+        <li><a href="#solution-11-functional-style-using-unfold-advancedhaskell-inspired">Solution 11: Functional Style Using Unfold (Advanced/Haskell Inspired)</a></li>
+        <li><a href="#solution-12-performance-comparison-of-groupby-vs-skiptake-looping">Solution 12: Performance Comparison of GroupBy vs. Skip/Take Looping</a></li>
+        <li><a href="#solution-13-custom-non-linq-enumerable-implementation">Solution 13: Custom Non-LINQ Enumerable Implementation</a></li>
+        <li><a href="#solution-14-range-calculation-with-listtgetrange">Solution 14: Range Calculation with <code>List&lt;T&gt;.GetRange()</code></a></li>
+        <li><a href="#solution-15-reactive-extensions-rx-buffer-operator">Solution 15: Reactive Extensions (Rx) <code>Buffer</code> Operator</a></li>
+        <li><a href="#solution-16-simple-listtgetrange-loop">Solution 16: Simple <code>List&lt;T&gt;.GetRange()</code> Loop</a></li>
+        <li><a href="#solution-17-net-6-chunk-iteration-example">Solution 17: .NET 6 <code>Chunk()</code> Iteration Example</a></li>
+        <li><a href="#solution-18-asynchronous-streaming-chunking-iasyncenumerable">Solution 18: Asynchronous Streaming Chunking (<code>IAsyncEnumerable</code>)</a></li>
+        <li><a href="#solution-19-linq-projection-using-skip-and-takewhile">Solution 19: LINQ Projection using <code>Skip</code> and <code>TakeWhile</code></a></li>
+        <li><a href="#solution-20-fixed-size-batching-via-overloaded-functions">Solution 20: Fixed-Size Batching via Overloaded Functions</a></li>
+        <li><a href="#solution-21-tolookup-based-grouping">Solution 21: <code>ToLookup</code> Based Grouping</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#faqs-on-c-enumerable-batching-techniques">FAQs on C# Enumerable Batching Techniques</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="c-net-enumerable-batching-techniques-alternative-methods-to-chunk-sequences">&ldquo;C# .NET Enumerable Batching Techniques: Alternative Methods to Chunk Sequences&rdquo;</h2>
+<p>Here are several accepted solutions detailing different methodologies for achieving this batching effect.</p>
+<h3 id="solution-1-utilizing-the-native-enumerablechunk-method-net-6">Solution 1: Utilizing the Native <code>Enumerable.Chunk()</code> Method (.NET 6+)</h3>
+<p>For projects targeting .NET 6 or newer, the framework introduced a straightforward extension method for this exact purpose.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Linq;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Collections.Generic;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> integerSequence = <span style="color:#66d9ef">new</span> List&lt;<span style="color:#66d9ef">int</span>&gt; { <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">6</span>, <span style="color:#ae81ff">7</span> };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Splits the sequence into chunks of size 3</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> segmentedData = integerSequence.Chunk(<span style="color:#ae81ff">3</span>);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Result will yield: { { 1, 2, 3 }, { 4, 5, 6 }, { 7 } }</span>
+</span></span></code></pre></div><p>If upgrading to .NET 6 is infeasible, the source code for this implementation is often available for reference or direct inclusion, such as retrieving it from the official <a href="https://github.com/dotnet/runtime/blob/main/src/libraries/System.Linq/src/System/Linq/Enumerable.Chunk.cs" target="_blank" rel="noopener">GitHub repository for .NET Core</a>
+.</p>
+<h3 id="solution-2-employing-morelinqbatch">Solution 2: Employing <code>MoreLINQ.Batch()</code></h3>
+<p>If utilizing external NuGet packages is acceptable, the <code>MoreLINQ</code> library provides a widely used <code>Batch</code> method that operates similarly.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">// Installation required: Install-Package MoreLINQ</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> MoreLinq;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> desiredSize = <span style="color:#ae81ff">10</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> batches = sequence.Batch(desiredSize); <span style="color:#75715e">// &#39;sequence&#39; is the IEnumerable&lt;T&gt; source</span>
+</span></span></code></pre></div><p>The underlying implementation often resembles the following custom implementation structure, focusing on creating fixed-size buckets:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> IEnumerable&lt;IEnumerable&lt;TSource&gt;&gt; Batch&lt;TSource&gt;(
+</span></span><span style="display:flex;"><span>                  <span style="color:#66d9ef">this</span> IEnumerable&lt;TSource&gt; source, <span style="color:#66d9ef">int</span> size)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    TSource[] bucket = <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> count = <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">foreach</span> (<span style="color:#66d9ef">var</span> item <span style="color:#66d9ef">in</span> source)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (bucket == <span style="color:#66d9ef">null</span>)
+</span></span><span style="display:flex;"><span>            bucket = <span style="color:#66d9ef">new</span> TSource[size];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        bucket[count++] = item;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (count != size)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">continue</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">yield</span> <span style="color:#66d9ef">return</span> bucket;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        bucket = <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>        count = <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (bucket != <span style="color:#66d9ef">null</span> &amp;&amp; count &gt; <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">yield</span> <span style="color:#66d9ef">return</span> bucket.Take(count).ToArray();
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="solution-3-linq-grouping-based-on-index">Solution 3: LINQ Grouping Based on Index</h3>
+<p>This approach uses LINQ&rsquo;s <code>Select</code> with an index parameter combined with <code>GroupBy</code> to partition elements mathematically.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyExtensions</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> IEnumerable&lt;IEnumerable&lt;T&gt;&gt; Batch&lt;T&gt;(<span style="color:#66d9ef">this</span> IEnumerable&lt;T&gt; items,
+</span></span><span style="display:flex;"><span>                                                       <span style="color:#66d9ef">int</span> maxItems)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> items.Select((item, inx) =&gt; <span style="color:#66d9ef">new</span> { item, inx })
+</span></span><span style="display:flex;"><span>                    .GroupBy(x =&gt; x.inx / maxItems)
+</span></span><span style="display:flex;"><span>                    .Select(g =&gt; g.Select(x =&gt; x.item));
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Example Usage:</span>
+</span></span><span style="display:flex;"><span>List&lt;<span style="color:#66d9ef">int</span>&gt; dataList = <span style="color:#66d9ef">new</span> List&lt;<span style="color:#66d9ef">int</span>&gt;() { <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">6</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">9</span> };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">foreach</span>(<span style="color:#66d9ef">var</span> segment <span style="color:#66d9ef">in</span> dataList.Batch(<span style="color:#ae81ff">3</span>))
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    Console.WriteLine(String.Join(<span style="color:#e6db74">&#34;,&#34;</span>, segment));
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/* OUTPUT:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">0,1,2
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">3,4,5
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">6,7,8
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">9
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">*/</span>
+</span></span></code></pre></div><h3 id="solution-4-iterative-take-and-skip-caution-advised">Solution 4: Iterative <code>Take</code> and <code>Skip</code> (Caution Advised)</h3>
+<p>For sequences that can be safely enumerated multiple times (like arrays or <code>List&lt;T&gt;</code>), a simple <code>while</code> loop using <code>Take</code> and <code>Skip</code> is possible.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">// IMPORTANT: This re-enumerates the sequence on each Skip call, which is slow </span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// and dangerous for deferred sources (like database queries).</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">while</span> (sequence.Any())
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> batch = sequence.Take(<span style="color:#ae81ff">10</span>);
+</span></span><span style="display:flex;"><span>    sequence = sequence.Skip(<span style="color:#ae81ff">10</span>); <span style="color:#75715e">// Reassigns the sequence variable</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Process &#39;batch&#39;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="solution-5-truly-lazy-enumerator-implementation">Solution 5: Truly Lazy Enumerator Implementation</h3>
+<p>This advanced implementation aims for minimal overhead by forwarding iteration directly through the source enumerator, similar to Python&rsquo;s <code>itertools.groupby</code>. It requires strict sequential enumeration.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> IEnumerable&lt;IEnumerable&lt;T&gt;&gt; Batch&lt;T&gt;(<span style="color:#66d9ef">this</span> IEnumerable&lt;T&gt; source, <span style="color:#66d9ef">int</span> size)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (source == <span style="color:#66d9ef">null</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> ArgumentNullException(<span style="color:#e6db74">&#34;source&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (size &lt;= <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> ArgumentOutOfRangeException(<span style="color:#e6db74">&#34;size&#34;</span>, <span style="color:#e6db74">&#34;Must be greater than zero.&#34;</span>);
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">using</span> (<span style="color:#66d9ef">var</span> enumerator = source.GetEnumerator())
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> (enumerator.MoveNext())
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">int</span> i = <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Local iterator function that captures &#39;i&#39; and &#39;enumerator&#39;</span>
+</span></span><span style="display:flex;"><span>            IEnumerable&lt;T&gt; BatchInner()
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">do</span> <span style="color:#66d9ef">yield</span> <span style="color:#66d9ef">return</span> enumerator.Current;
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">while</span> (++i &lt; size &amp;&amp; enumerator.MoveNext());
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">yield</span> <span style="color:#66d9ef">return</span> BatchInner();
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Explicitly discard elements that were not consumed by the inner batch if any were left unconsumed</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> (++i &lt; size &amp;&amp; enumerator.MoveNext());
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>If buffering is required to lift these strict sequential access constraints, a wrapper like <code>Buffer(batched) =&gt; batched.Select(e =&gt; e.ToList())</code> would introduce accumulation penalties.</p>
+<h3 id="solution-6-optimized-pipelined-enumerator-low-accumulation">Solution 6: Optimized Pipelined Enumerator (Low Accumulation)</h3>
+<p>This approach seeks better performance than Solution 5 by minimizing accumulation while maintaining a close relationship to the enumerator movement.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">BatchLinq</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> IEnumerable&lt;IEnumerable&lt;T&gt;&gt; Batch&lt;T&gt;(<span style="color:#66d9ef">this</span> IEnumerable&lt;T&gt; source, <span style="color:#66d9ef">int</span> size) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (size &lt;= <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> ArgumentOutOfRangeException(<span style="color:#e6db74">&#34;size&#34;</span>, <span style="color:#e6db74">&#34;Must be greater than zero.&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">using</span> (IEnumerator&lt;T&gt; enumerator = source.GetEnumerator())
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> (enumerator.MoveNext())
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">yield</span> <span style="color:#66d9ef">return</span> TakeFromEnumerator(enumerator, size);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> IEnumerable&lt;T&gt; TakeFromEnumerator&lt;T&gt;(IEnumerator&lt;T&gt; source, <span style="color:#66d9ef">int</span> size) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> i = <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">yield</span> <span style="color:#66d9ef">return</span> source.Current;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> (++i &lt; size &amp;&amp; source.MoveNext());
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Note: Each resulting batch must be fully consumed before requesting the next batch </span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// from the outer loop&#39;s MoveNext call.</span>
+</span></span></code></pre></div><h3 id="solution-7-classic-for-loop-with-index-management-for-ilistt">Solution 7: Classic <code>for</code>-loop with Index Management (For <code>IList&lt;T&gt;</code>)</h3>
+<p>When working specifically with indexable collections like <code>List&lt;T&gt;</code>, traditional loops offer clarity and predictable performance, especially when using methods like <code>GetRange</code>.</p>
+<p><strong>Pattern 1: Using <code>Skip</code> and <code>Take</code> (Slow due to repeated enumeration)</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span>List&lt;<span style="color:#66d9ef">int</span>&gt; source = Enumerable.Range(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">23</span>).ToList();
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> batchSize = <span style="color:#ae81ff">10</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i = <span style="color:#ae81ff">0</span>; i &lt; source.Count; i += batchSize)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// WARNING: &#39;source&#39; is re-enumerated by Skip on every iteration</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> batch = source.Skip(i).Take(batchSize); 
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Pattern 2: Using <code>List&lt;T&gt;.GetRange()</code> (Requires calculation for final batch)</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i = <span style="color:#ae81ff">0</span>; i &lt; source.Count; i += batchSize)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> remaining = source.Count - i;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Determines correct length for the final, potentially smaller batch</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> batch = remaining &gt; batchSize  ? source.GetRange(i, batchSize) : source.GetRange(i, remaining);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Pattern 3: Single Enumeration with Nested Loops (Efficient for lists)</strong></p>
+<p>This method ensures the source is iterated only once by manually managing indices.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> currentBatchSize = <span style="color:#ae81ff">10</span>;
+</span></span><span style="display:flex;"><span>List&lt;<span style="color:#66d9ef">int</span>&gt; tempBatch = <span style="color:#66d9ef">new</span> List&lt;<span style="color:#66d9ef">int</span>&gt;(currentBatchSize);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i = <span style="color:#ae81ff">0</span>; i &lt; source.Count; i += currentBatchSize)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Recalculate size to prevent OutOfRangeException on the last segment</span>
+</span></span><span style="display:flex;"><span>    currentBatchSize = source.Count - i &gt; currentBatchSize ? currentBatchSize : source.Count - i;
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> j = i; j &lt; i + currentBatchSize; j++)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        tempBatch.Add(source[j]);
+</span></span><span style="display:flex;"><span>    }           
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Process tempBatch here</span>
+</span></span><span style="display:flex;"><span>    tempBatch.Clear();
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="solution-8-strict-lazy-batching-and-ilistt-specific-implementation">Solution 8: Strict Lazy Batching and <code>IList&lt;T&gt;</code> Specific Implementation</h3>
+<p>This solution provides a strict lazy batch method for <code>IEnumerable&lt;T&gt;</code> that throws an exception if enumeration order is violated. It also includes a separate, non-restrictive version specialized for <code>IList&lt;T&gt;</code>.</p>
+<p><strong>Strict IEnumerable Batching:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> IEnumerable&lt;IEnumerable&lt;TSource&gt;&gt; BatchStrict&lt;TSource&gt;(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span> IEnumerable&lt;TSource&gt; source, <span style="color:#66d9ef">int</span> size)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (size &lt;= <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> ArgumentOutOfRangeException(nameof(size));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">using</span> (<span style="color:#66d9ef">var</span> enumerator = source.GetEnumerator())
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> i = <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> (enumerator.MoveNext())
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (i % size != <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> InvalidOperationException(
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;The enumeration is out of order.&#34;</span>);
+</span></span><span style="display:flex;"><span>            i++;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">yield</span> <span style="color:#66d9ef">return</span> GetBatch(enumerator, size, <span style="color:#66d9ef">ref</span> i);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Helper omitted for brevity, focuses on the core structure.</span>
+</span></span></code></pre></div><p><strong>Non-Restrictive IList Batching (Allows partial/re-enumeration):</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> IEnumerable&lt;IEnumerable&lt;TSource&gt;&gt; BatchForList&lt;TSource&gt;(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span> IList&lt;TSource&gt; source, <span style="color:#66d9ef">int</span> size)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (size &lt;= <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> ArgumentOutOfRangeException(nameof(size));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> enumerator = source.GetEnumerator();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i = <span style="color:#ae81ff">0</span>; i &lt; source.Count; i += size)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        enumerator.MoveNext(); <span style="color:#75715e">// Dummy move to maintain state consistency, though riskier regarding disposal</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">yield</span> <span style="color:#66d9ef">return</span> GetChunkForList(source, i, Math.Min(i + size, source.Count));
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Helper GetChunkForList omitted for brevity.</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="solution-9-list-based-accumulation-readability-focus">Solution 9: List-Based Accumulation (Readability Focus)</h3>
+<p>Similar to the <code>MoreLINQ</code> structure, but uses <code>List&lt;T&gt;</code> instead of arrays for intermediate storage, prioritizing developer readability.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> IEnumerable&lt;IEnumerable&lt;T&gt;&gt; BatchReadable&lt;T&gt;(<span style="color:#66d9ef">this</span> IEnumerable&lt;T&gt; source, <span style="color:#66d9ef">int</span> size)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    List&lt;T&gt; currentBatch = <span style="color:#66d9ef">new</span> List&lt;T&gt;();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">foreach</span> (<span style="color:#66d9ef">var</span> item <span style="color:#66d9ef">in</span> source)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        currentBatch.Add(item);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (currentBatch.Count &gt;= size)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">yield</span> <span style="color:#66d9ef">return</span> currentBatch;
+</span></span><span style="display:flex;"><span>            currentBatch.Clear(); <span style="color:#75715e">// Prepare for the next batch</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (currentBatch.Count &gt; <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">yield</span> <span style="color:#66d9ef">return</span> currentBatch;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="solution-10-computed-batching-with-array-buffering">Solution 10: Computed Batching with Array Buffering</h3>
+<p>This approach computes the total number of required batches upfront and uses LINQ to generate the ranges, ensuring that each yielded batch is an array (<code>.ToArray()</code>), which prevents issues seen in highly lazy implementations when the results are materialized later (e.g., <code>.ToArray()</code>).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> IEnumerable&lt;IEnumerable&lt;T&gt;&gt; BatchComputed&lt;T&gt;(<span style="color:#66d9ef">this</span> IEnumerable&lt;T&gt; source, <span style="color:#66d9ef">int</span> count)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (source == <span style="color:#66d9ef">null</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> System.ArgumentNullException(<span style="color:#e6db74">&#34;source&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (count &lt;= <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> System.ArgumentOutOfRangeException(<span style="color:#e6db74">&#34;count&#34;</span>, <span style="color:#e6db74">&#34;Must be greater than zero.&#34;</span>);
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">using</span> (<span style="color:#66d9ef">var</span> enumerator = source.GetEnumerator())
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        IEnumerable&lt;T&gt; BatchInner()
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">int</span> counter = <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">yield</span> <span style="color:#66d9ef">return</span> enumerator.Current;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> (++counter &lt; count &amp;&amp; enumerator.MoveNext());
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Crucial difference: Materializing the inner batch immediately forces computation</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> (enumerator.MoveNext())
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">yield</span> <span style="color:#66d9ef">return</span> BatchInner().ToArray(); 
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Example demonstrating why buffering is key here:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// If the underlying implementation *doesn&#39;t* use .ToArray(), accessing &#39;e&#39; later </span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// might yield unexpected results if the original enumerator is exhausted.</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> data = Enumerable.Range(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">20</span>).BatchComputed(<span style="color:#ae81ff">8</span>).ToArray(); 
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// data now contains materialized arrays, safe for multiple reads.</span>
+</span></span></code></pre></div><h3 id="solution-11-functional-style-using-unfold-advancedhaskell-inspired">Solution 11: Functional Style Using Unfold (Advanced/Haskell Inspired)</h3>
+<p>A functional pattern involving an <code>Unfold</code> helper function, which constructs sequences based on a seed. While syntactically clean, this C# recursion risks stack overflow errors on very large inputs unless implemented carefully (e.g., using F#&rsquo;s native yield features).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">// Unfold helper (simplified, likely unsafe for deep recursion in C#)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">static</span> IEnumerable&lt;T&gt; Unfold&lt;T, U&gt;(Func&lt;U, IEnumerable&lt;Tuple&lt;U, T&gt;&gt;&gt; f, U seed)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> maybeNewSeedAndElement = f(seed);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> maybeNewSeedAndElement.SelectMany(x =&gt; <span style="color:#66d9ef">new</span>[] { x.Item2 }.Concat(Unfold(f, x.Item1)));
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">static</span> IEnumerable&lt;IEnumerable&lt;T&gt;&gt; BatchFunctional&lt;T&gt;(IEnumerable&lt;T&gt; xs, <span style="color:#66d9ef">int</span> n)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> Unfold(ys =&gt;
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> head = ys.Take(n);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> tail = ys.Skip(n);
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Returns the &#39;head&#39; batch and the &#39;tail&#39; as the next seed</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> head.Take(<span style="color:#ae81ff">1</span>).Select(_ =&gt; Tuple.Create(tail, head));
+</span></span><span style="display:flex;"><span>    }, xs);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="solution-12-performance-comparison-of-groupby-vs-skiptake-looping">Solution 12: Performance Comparison of GroupBy vs. Skip/Take Looping</h3>
+<p>This comparison evaluates the speed difference between the index-based grouping method (Solution 3) and the iterative <code>Skip</code>/<code>Take</code> method (Solution 4) when processing a large <code>List&lt;string&gt;</code>. The results strongly favor the index-based approach for performance.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">// Extension methods defined: Batch (GroupBy) and Batch2 (Skip/Take)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// ... (omitted boilerplate GetData definitions) ...</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Batch (GroupBy) Test:</span>
+</span></span><span style="display:flex;"><span>FirstWatch.Start();
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">foreach</span> (<span style="color:#66d9ef">var</span> batch <span style="color:#66d9ef">in</span> Ids2.Batch(<span style="color:#ae81ff">5000</span>)) { <span style="color:#75715e">/* Process */</span> }
+</span></span><span style="display:flex;"><span>FirstWatch.Stop(); 
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Time taken: ~00:00:00.0708 </span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Batch2 (Skip/Take) Test:</span>
+</span></span><span style="display:flex;"><span>Second.Start();
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">while</span> (Length &gt; <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> SecBatch = Ids2.Batch2(StartIndex, BatchSize); <span style="color:#75715e">// Skip(n).Take(size)</span>
+</span></span><span style="display:flex;"><span>    Length = Length - BatchSize;
+</span></span><span style="display:flex;"><span>    StartIndex += BatchSize;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>Second.Stop();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Time taken: ~00:00:00.0008 (Significantly faster when source is IList)</span>
+</span></span></code></pre></div><h3 id="solution-13-custom-non-linq-enumerable-implementation">Solution 13: Custom Non-LINQ Enumerable Implementation</h3>
+<p>For environments where maximum control over enumeration is needed without relying on LINQ&rsquo;s overhead or specific enumeration constraints, implementing a custom <code>IEnumerator&lt;T&gt;</code> wrapper ensures a single, low-memory pass over the source data.</p>
+<p>This involves creating a custom structure (<code>SplittingEnumerable</code> and its internal <code>Enumerator</code>) that manages the state of the backing enumerator precisely to yield chunks.</p>
+<p><em>(Due to the length, the detailed implementation code for <code>SplittingEnumerable</code> is preserved as provided in the original content, representing a high-control, single-pass approach.)</em></p>
+<h3 id="solution-14-range-calculation-with-listtgetrange">Solution 14: Range Calculation with <code>List&lt;T&gt;.GetRange()</code></h3>
+<p>A concise, one-liner that works well for concrete <code>List&lt;T&gt;</code> types by calculating the required number of batches using integer arithmetic and then utilizing <code>GetRange</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> aList = Enumerable.Range(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">100</span>).ToList();
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> size = <span style="color:#ae81ff">9</span>; 
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Calculation for total batches: (Count + size - 1) / size</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> batches = Enumerable.Range(<span style="color:#ae81ff">0</span>, (aList.Count() + size - <span style="color:#ae81ff">1</span>) / size)
+</span></span><span style="display:flex;"><span>    .Select(i =&gt; aList.GetRange(i * size, Math.Min(size, aList.Count() - i * size)));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// This method is highly performant for List&lt;T&gt; as GetRange is efficient.</span>
+</span></span></code></pre></div><h3 id="solution-15-reactive-extensions-rx-buffer-operator">Solution 15: Reactive Extensions (Rx) <code>Buffer</code> Operator</h3>
+<p>For applications utilizing the Reactive Extensions library, the <code>Buffer</code> operator on an observable stream provides immediate batching capabilities.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">// Requires System.Reactive NuGet package</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Reactive.Linq;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// If &#39;anAnumerable&#39; is converted to IObservable&lt;T&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> observableBatches = anAnumerable.ToObservable().Buffer(size);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// To materialize immediately:</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> materializedBatches = aList.ToObservable().Buffer(size).ToList().ToTask().GetAwaiter().GetResult();
+</span></span></code></pre></div><h3 id="solution-16-simple-listtgetrange-loop">Solution 16: Simple <code>List&lt;T&gt;.GetRange()</code> Loop</h3>
+<p>An easy-to-follow, imperative loop structure for <code>List&lt;T&gt;</code> that calculates ranges and manages loop termination explicitly.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> List&lt;List&lt;T&gt;&gt; ChunkListImperative&lt;T&gt;(List&lt;T&gt; listToChunk, <span style="color:#66d9ef">int</span> batchSize)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    List&lt;List&lt;T&gt;&gt; results = <span style="color:#66d9ef">new</span> List&lt;List&lt;T&gt;&gt;();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (!listToChunk.Any()) <span style="color:#66d9ef">return</span> results;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> fromRecord = <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> (fromRecord &lt; listToChunk.Count)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Determine the size of the current segment</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> countRange = Math.Min(batchSize, listToChunk.Count - fromRecord);
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        List&lt;T&gt; batch = listToChunk.GetRange(fromRecord, countRange);
+</span></span><span style="display:flex;"><span>        results.Add(batch);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        fromRecord += batch.Count;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> results;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="solution-17-net-6-chunk-iteration-example">Solution 17: .NET 6 <code>Chunk()</code> Iteration Example</h3>
+<p>A simple demonstration of consuming the built-in <code>Chunk</code> method from .NET 6, showing that it yields arrays (<code>int[]</code>).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> counter = <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">foreach</span> (<span style="color:#66d9ef">int</span>[] segment <span style="color:#66d9ef">in</span> Enumerable.Range(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">9</span>).Chunk(<span style="color:#ae81ff">3</span>))
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    Console.WriteLine(<span style="color:#e6db74">$&#34;Chunk {counter++}&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">foreach</span> (<span style="color:#66d9ef">var</span> item <span style="color:#66d9ef">in</span> segment)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        Console.WriteLine(item);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="solution-18-asynchronous-streaming-chunking-iasyncenumerable">Solution 18: Asynchronous Streaming Chunking (<code>IAsyncEnumerable</code>)</h3>
+<p>For scenarios involving asynchronous data sources (like reading from a stream or an async database result), C# 8+&rsquo;s <code>IAsyncEnumerable</code> can be used to stream batches without blocking.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">// Extension method for IAsyncEnumerable&lt;T&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">async</span> IAsyncEnumerable&lt;IEnumerable&lt;T&gt;&gt; ChunkAsync&lt;T&gt;(<span style="color:#66d9ef">this</span> IAsyncEnumerable&lt;T&gt; sequence, <span style="color:#66d9ef">int</span> maxItemsPerChunk)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ... validation omitted ...</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> chunk = <span style="color:#66d9ef">new</span> List&lt;T&gt;(maxItemsPerChunk);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">await</span> <span style="color:#66d9ef">foreach</span> (<span style="color:#66d9ef">var</span> item <span style="color:#66d9ef">in</span> sequence)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        chunk.Add(item);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (chunk.Count == maxItemsPerChunk)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">yield</span> <span style="color:#66d9ef">return</span> chunk.ToArray(); <span style="color:#75715e">// Materialize the full chunk</span>
+</span></span><span style="display:flex;"><span>            chunk.Clear();
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (chunk.Count &gt; <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">yield</span> <span style="color:#66d9ef">return</span> chunk.ToArray();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="solution-19-linq-projection-using-skip-and-takewhile">Solution 19: LINQ Projection using <code>Skip</code> and <code>TakeWhile</code></h3>
+<p>This method creates a batch for every element in the source sequence using the index, then uses <code>TakeWhile</code> to stop generating new batches once an empty batch is produced. While declarative, it suffers from the performance pitfalls of repeated <code>Skip</code> calls if the source is not a list.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> IEnumerable&lt;IEnumerable&lt;T&gt;&gt; BufferDeclarative&lt;T&gt;(IEnumerable&lt;T&gt; source, <span style="color:#66d9ef">int</span> size) =&gt;
+</span></span><span style="display:flex;"><span>    source.Select((item, index) =&gt; source.Skip(size * index).Take(size))
+</span></span><span style="display:flex;"><span>          .TakeWhile(bucket =&gt; bucket.Any());
+</span></span></code></pre></div><h3 id="solution-20-fixed-size-batching-via-overloaded-functions">Solution 20: Fixed-Size Batching via Overloaded Functions</h3>
+<p>This specialized approach provides distinct methods (<code>Batch&lt;T, TOut&gt;</code>) tailored for fixed input sizes (2, 3, 4&hellip; up to 16 elements) where the output type <code>TOut</code> is mapped directly from the fixed number of inputs using complex lambdas. This sacrifices generic batch sizing for highly optimized, fixed-width tuple creation.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">// Example usage for a batch size of 5, mapping 5 inputs to one output tuple:</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">foreach</span> (<span style="color:#66d9ef">var</span> item <span style="color:#66d9ef">in</span> Enumerable.Range(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">12</span>).ToArray().Batch((R, X1, Y1, X2, Y2) =&gt; <span style="color:#66d9ef">new</span> { R, X1, Y1, X2, Y2 }))
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    Console.WriteLine(<span style="color:#e6db74">$&#34;{item.R}, {item.X1}, {item.Y1}, {item.X2}, {item.Y2}&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="solution-21-tolookup-based-grouping">Solution 21: <code>ToLookup</code> Based Grouping</h3>
+<p>Similar to Solution 3 (GroupBy), but utilizing <code>ToLookup</code>. This approach materializes the grouping structure immediately.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">static</span> IEnumerable&lt;IEnumerable&lt;T&gt;&gt; TakeBatch&lt;T&gt;(IEnumerable&lt;T&gt; ts, <span style="color:#66d9ef">int</span> batchSize)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ToLookup materializes all groups immediately, making it less lazy than GroupBy</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">from</span> <span style="color:#66d9ef">group</span> <span style="color:#66d9ef">in</span> ts.Select((x, i) =&gt; <span style="color:#66d9ef">new</span> { x, i }).ToLookup(xi =&gt; xi.i / batchSize)
+</span></span><span style="display:flex;"><span>           <span style="color:#66d9ef">select</span> <span style="color:#66d9ef">group</span>.Select(xi =&gt; xi.x);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="solutions">Solutions</h2>
+<h3 id="faqs-on-c-enumerable-batching-techniques">FAQs on C# Enumerable Batching Techniques</h3>
+<p><div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Which batching method is best for performance with large lists</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: For in-memory collections like <code>List&lt;T&gt;</code>, methods relying on index arithmetic (Solution 14 using <code>GetRange</code> or Solution 12&rsquo;s performance test favoring GroupBy/Skip-Take loop) are generally fastest because they avoid repeated enumeration overhead associated with <code>Skip</code>. Solution 1 (<code>Enumerable.Chunk()</code>) is the modern, optimized standard for .NET 6+.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I use batching methods on deferred LINQ queries safely</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Generally no, unless the custom implementation is truly lazy (like Solution 5 or 6) and ensures the underlying enumerator is not advanced unexpectedly. Methods relying on <code>Skip(i)</code> inside a loop (Solution 4 or 19) will re-execute the source query/function repeatedly, which is usually undesirable for database or API calls.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the main difference between Chunk and Batch methods</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: In modern C#, <code>Chunk</code> (built-in in .NET 6+) is typically the preferred term, often producing arrays (<code>T[]</code>) for each segment. <code>Batch</code> is the term used historically by external libraries (like MoreLINQ) or custom implementations; implementations vary widely regarding buffering (e.g., returning <code>List&lt;T&gt;</code> vs <code>T[]</code>).</div>
+    </div>
+</div></p>
+<p>What batching strategy have you found most robust for streaming data sources? Share your experiences or alternative implementations below!</p>
+<p>For more deep dives into C# performance and language features, check out these resources:</p>
+<ul>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">Fixing SSL Certificate Errors in Python Requests</a>
+</li>
+<li><a href="https://sqlpey.com/dotnet/resolve-blazor-server-timeout-issues/" target="_blank" rel="noopener">Resolving Blazor Server Timeout Issues</a>
+</li>
+<li><a href="https://sqlpey.com/python/top-4-ways-to-resolve-syntaxwarning-invalid-escape-sequence-in-python/" target="_blank" rel="noopener">Top 4 Ways to Resolve SyntaxWarning Invalid Escape Sequence in Python</a>
+</li>
+</ul>
+<pre tabindex="0"><code></code></pre><p>var list = new List&lt;int&gt; { 1, 2, 3, 4, 5, 6, 7 };</p>
+<p>var chunks = list.Chunk(3);
+// returns { { 1, 2, 3 }, { 4, 5, 6 }, { 7 } }</p>
+<pre tabindex="0"><code></code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

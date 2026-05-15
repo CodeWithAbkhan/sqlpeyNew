@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Fixing rand() Bias: Achieving Uniform Random Number Generation - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore and implement various C/C&#43;&#43; solutions to generate uniformly distributed random numbers, avoiding modulo bias issues with rand().">
+
+
+
+<meta name="keywords" content="random number generation, uniform distribution, rand bias, modulo bias, C programming, C&#43;&#43; programming, random function, programming solutions">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Fixing rand() Bias: Achieving Uniform Random Number Generation - sqlpey">
+<meta name="DC.description" content="Explore and implement various C/C&#43;&#43; solutions to generate uniformly distributed random numbers, avoiding modulo bias issues with rand().">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Fixing rand() Bias: Achieving Uniform Random Number Generation - sqlpey">
+<meta property="og:description" content="Explore and implement various C/C&#43;&#43; solutions to generate uniformly distributed random numbers, avoiding modulo bias issues with rand().">
+<meta property="og:url" content="https://sqlpey.com/c/fixing-rand-bias-uniform-random-numbers/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="C&#43;&#43;">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Fixing rand() Bias: Achieving Uniform Random Number Generation">
+<meta name="twitter:description" content="Explore and implement various C/C&#43;&#43; solutions to generate uniformly distributed random numbers, avoiding modulo bias issues with rand().">
+
+
+<link rel="canonical" href="https://sqlpey.com/c/fixing-rand-bias-uniform-random-numbers/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Fixing rand() Bias: Achieving Uniform Random Number Generation\"",
+  "description": "\"Explore and implement various C/C++ solutions to generate uniformly distributed random numbers, avoiding modulo bias issues with rand().\"",
+  "url": "\"https://sqlpey.com/c/fixing-rand-bias-uniform-random-numbers/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/c/fixing-rand-bias-uniform-random-numbers/\""
+  },
+  "articleSection": "\"C++\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Fixing rand() Bias: Achieving Uniform Random Number Generation</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">C&#43;&#43;</span>
+              
+              <span class="tag">Programming</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              9 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#fixing-rand-bias-achieving-uniform-random-number-generation">&ldquo;Fixing rand() Bias: Achieving Uniform Random Number Generation&rdquo;</a>
+      <ul>
+        <li><a href="#addressing-rand-bias-for-uniformity">Addressing <code>rand()</code> Bias for Uniformity</a></li>
+        <li><a href="#solutions-for-uniform-random-number-generation">Solutions for Uniform Random Number Generation</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#faqs-on-fixing-rand-bias">FAQs on Fixing <code>rand()</code> Bias</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="fixing-rand-bias-achieving-uniform-random-number-generation">&ldquo;Fixing rand() Bias: Achieving Uniform Random Number Generation&rdquo;</h2>
+<p>How can we accurately generate random integers within a specific range, avoiding the distribution skew inherent in simple modulo operations?</p>
+<h3 id="addressing-rand-bias-for-uniformity">Addressing <code>rand()</code> Bias for Uniformity</h3>
+<p>The core of the problem lies in how <code>rand()</code> produces numbers. It&rsquo;s generally assumed that <code>rand()</code> provides a sequence that is uniformly distributed across its output interval, [0, <code>RAND_MAX</code>]. However, when we use <code>rand() % N</code> to constrain this output to a smaller range [0, N-1], if <code>RAND_MAX + 1</code> is not perfectly divisible by <code>N</code>, the higher numbers in the range [0, N-1] will be underrepresented.</p>
+<p>Consider the assumption that <code>rand()</code> produces numbers with a Poisson distribution: any two non-overlapping subintervals of the same size are equally likely and independent. For a finite set of values, this implies a uniform distribution. The challenge is to map these uniformly distributed outputs to a desired, potentially smaller, range without introducing bias.</p>
+<h3 id="solutions-for-uniform-random-number-generation">Solutions for Uniform Random Number Generation</h3>
+<p>Several methods exist to achieve a more uniform distribution. These often involve discarding certain <code>rand()</code> outputs or using more sophisticated arithmetic.</p>
+<h4 id="solution-1-binning-with-rejection-sampling-using-random">Solution 1: Binning with Rejection Sampling (using <code>random()</code>)</h4>
+<p>This approach divides the output range of <code>random()</code> (which is generally preferred over <code>rand()</code> for its better distribution) into equal-sized &ldquo;bins&rdquo; corresponding to the desired output range. If a generated number falls outside these bins, it&rsquo;s discarded, and a new number is generated.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdlib.h&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For random(), RAND_MAX
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Assumes 0 &lt;= max &lt;= RAND_MAX
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Returns in the closed interval [0, max]
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">long</span> <span style="color:#a6e22e">random_at_most</span>(<span style="color:#66d9ef">long</span> max) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span>
+</span></span><span style="display:flex;"><span>    num_bins <span style="color:#f92672">=</span> (<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span>)max <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>    num_rand <span style="color:#f92672">=</span> (<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span>)RAND_MAX <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>    bin_size <span style="color:#f92672">=</span> num_rand <span style="color:#f92672">/</span> num_bins,
+</span></span><span style="display:flex;"><span>    defect   <span style="color:#f92672">=</span> num_rand <span style="color:#f92672">%</span> num_bins;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">long</span> x;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">do</span> {
+</span></span><span style="display:flex;"><span>    x <span style="color:#f92672">=</span> random();
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// This is carefully written not to overflow
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">while</span> (num_rand <span style="color:#f92672">-</span> defect <span style="color:#f92672">&lt;=</span> (<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span>)x);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Truncated division is intentional
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">return</span> x <span style="color:#f92672">/</span> bin_size;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This method ensures that each desired outcome has an equal probability of being selected. For generating numbers outside the default <code>[0, RAND_MAX]</code> range, one could devise a function that pulls multiple bits and then applies <code>random_at_most</code>. To obtain values in a range <code>[min, max]</code>, the formula <code>min + random_at_most(max - min)</code> can be used.</p>
+<h4 id="solution-2-iterative-binning-for-a-specific-interval">Solution 2: Iterative Binning for a Specific Interval</h4>
+<p>This is a refined version of the binning concept, tailored to return values within a specified <code>[min, max]</code> interval.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;cstdlib&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For rand(), RAND_MAX
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">rand_interval</span>(<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> min, <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> max) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Ensure max &gt;= min and 1 + max - min &lt; RAND_MAX for this specific implementation&#39;s bounds
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// In a real-world scenario, more robust error handling or alternative methods might be needed for larger ranges.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (min <span style="color:#f92672">&gt;</span> max) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Swap min and max if they are in the wrong order
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> temp <span style="color:#f92672">=</span> min;
+</span></span><span style="display:flex;"><span>        min <span style="color:#f92672">=</span> max;
+</span></span><span style="display:flex;"><span>        max <span style="color:#f92672">=</span> temp;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> range <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> max <span style="color:#f92672">-</span> min;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> buckets <span style="color:#f92672">=</span> RAND_MAX <span style="color:#f92672">/</span> range;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> limit <span style="color:#f92672">=</span> buckets <span style="color:#f92672">*</span> range;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">/* Create equal size buckets all in a row, then fire randomly towards
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">     * the buckets until you land in one of them. All buckets are equally
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">     * likely. If you land off the end of the line of buckets, try again. */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> r;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">do</span> {
+</span></span><span style="display:flex;"><span>        r <span style="color:#f92672">=</span> rand();
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">while</span> (r <span style="color:#f92672">&gt;=</span> limit);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> min <span style="color:#f92672">+</span> (r <span style="color:#f92672">/</span> buckets);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This iterative approach is efficient and aims to minimize the number of rejections.</p>
+<h4 id="solution-3-direct-formula-with-potential-bias">Solution 3: Direct Formula (with potential bias)</h4>
+<p>A commonly seen, though potentially biased, formula is:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> r <span style="color:#f92672">=</span> (rand() <span style="color:#f92672">%</span> (max <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> min)) <span style="color:#f92672">+</span> min;
+</span></span></code></pre></div><p>This formula maps <code>rand()</code>&rsquo;s output to the desired range. However, as noted, it can introduce bias if <code>RAND_MAX + 1</code> is not divisible by <code>(max + 1 - min)</code>.</p>
+<h4 id="solution-4-floating-point-scaling">Solution 4: Floating-Point Scaling</h4>
+<p>Another approach uses floating-point arithmetic to scale the output of <code>rand()</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">randr</span>(<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> min, <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> max) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">double</span> scaled <span style="color:#f92672">=</span> (<span style="color:#66d9ef">double</span>)rand() <span style="color:#f92672">/</span> RAND_MAX;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> (max <span style="color:#f92672">-</span> min <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">*</span> scaled <span style="color:#f92672">+</span> min;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>While mathematically plausible, this method can be susceptible to floating-point precision and rounding errors, and its suitability may depend on the specific implementation and required accuracy.</p>
+<h4 id="solution-5-simple-modulo-for-specific-cases-eg-dice-roll">Solution 5: Simple Modulo for Specific Cases (e.g., Dice Roll)</h4>
+<p>For common scenarios like simulating a dice roll (1 to 6), the direct modulo approach is often used, though it carries the known bias:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;cstdlib&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For rand()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;ctime&gt;</span><span style="color:#75715e">   </span><span style="color:#75715e">// For time()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Seed the random number generator (typically once at the start of the program)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// srand(time(NULL)); 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> r <span style="color:#f92672">=</span> (rand() <span style="color:#f92672">%</span> <span style="color:#ae81ff">6</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>;
+</span></span></code></pre></div><p>Here, <code>rand() % 6</code> yields numbers from 0 to 5. Adding 1 shifts this to the desired 1 to 6 range.</p>
+<h4 id="solution-6-high-precision-fixed-point-synthesis">Solution 6: High-Precision Fixed-Point Synthesis</h4>
+<p>This method iteratively synthesizes a high-precision fixed-point random number to reduce bias, especially when the desired range is much smaller than <code>RAND_MAX</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#75715e">// For a desired range of [0, n-1]
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> r <span style="color:#f92672">=</span> n <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>; <span style="color:#75715e">// Initialize intermediate value
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>r <span style="color:#f92672">=</span> (rand() <span style="color:#f92672">*</span> n <span style="color:#f92672">+</span> r) <span style="color:#f92672">/</span> (RAND_MAX <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>r <span style="color:#f92672">=</span> (rand() <span style="color:#f92672">*</span> n <span style="color:#f92672">+</span> r) <span style="color:#f92672">/</span> (RAND_MAX <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// ... repeat as needed for higher precision
+</span></span></span></code></pre></div><p>This process effectively increases the number of bits used for the random value, leading to a more uniform distribution.</p>
+<h4 id="solution-7-refined-interval-generation">Solution 7: Refined Interval Generation</h4>
+<p>A more robust version of the binning approach, handling inclusivity and potential <code>RAND_MAX</code> limitations:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;cstdint&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For uint32_t, uint64_t
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;cstdlib&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For rand()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Begin and end are *inclusive*; =&gt; [begin, end]
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">uint32_t</span> <span style="color:#a6e22e">getRandInterval</span>(<span style="color:#66d9ef">uint32_t</span> begin, <span style="color:#66d9ef">uint32_t</span> end) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> range <span style="color:#f92672">=</span> (end <span style="color:#f92672">-</span> begin) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Calculate the largest multiple of &#39;range&#39; less than or equal to RAND_MAX + 1
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">uint32_t</span> limit <span style="color:#f92672">=</span> ((<span style="color:#66d9ef">uint64_t</span>)RAND_MAX <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">-</span> (((<span style="color:#66d9ef">uint64_t</span>)RAND_MAX <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%</span> range);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> randVal <span style="color:#f92672">=</span> rand();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> (randVal <span style="color:#f92672">&gt;=</span> limit) {
+</span></span><span style="display:flex;"><span>        randVal <span style="color:#f92672">=</span> rand(); <span style="color:#75715e">// Discard and retry if outside the valid range
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Map the valid random value to the desired range
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> (randVal <span style="color:#f92672">%</span> range) <span style="color:#f92672">+</span> begin;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This example illustrates how <code>randVal % range</code> correctly picks a bucket, and <code>+ begin</code> shifts it to the target interval.</p>
+<h4 id="solution-8-using-arc4random_uniform-if-available">Solution 8: Using <code>arc4random_uniform</code> (if available)</h4>
+<p>On systems that provide <code>arc4random_uniform</code>, it&rsquo;s a highly recommended and efficient way to get uniformly distributed random numbers:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">// For numbers between MIN and MAX (inclusive)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// unsigned int r = arc4random_uniform(MAX - MIN + 1) + MIN;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Example for numbers between 10 and 20:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// unsigned int r = arc4random_uniform(20 - 10 + 1) + 10;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// unsigned int r = arc4random_uniform(11) + 10; 
+</span></span></span></code></pre></div><p>This function is designed to produce uniform distributions without bias.</p>
+<h4 id="solution-9-leveraging-cryptographically-strong-sources">Solution 9: Leveraging Cryptographically Strong Sources</h4>
+<p>When using high-quality, cryptographically strong random number generators (like Intel&rsquo;s RDRAND), simple modulo operations often suffice because the underlying source&rsquo;s distribution is exceptionally good, minimizing observable bias.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#75715e">// Example using Intel RDRAND (requires specific hardware support and compiler flags)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">rdrand64_step</span>(<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span> <span style="color:#66d9ef">long</span> <span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>therand) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span> <span style="color:#66d9ef">long</span> <span style="color:#66d9ef">int</span> foo;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">int</span> cf_error_status;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">asm</span>(<span style="color:#e6db74">&#34;rdrand %%rax; \
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        mov $1,%%edx; \
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        cmovae %%rax,%%rdx; \
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        mov %%edx,%1; \
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        mov %%rax, %0;&#34;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;=r&#34;</span>(foo),<span style="color:#e6db74">&#34;=r&#34;</span>(cf_error_status)<span style="color:#f92672">::</span><span style="color:#e6db74">&#34;%rax&#34;</span>,<span style="color:#e6db74">&#34;%rdx&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">*</span>therand <span style="color:#f92672">=</span> foo;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> cf_error_status;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Then use this 64-bit value, potentially with modulo, for your range.
+</span></span></span></code></pre></div><h4 id="solution-10-bit-masking-for-uniformity">Solution 10: Bit Masking for Uniformity</h4>
+<p>This method masks off bits from <code>rand()</code> to create a value within a power-of-two range, which can then be more reliably mapped to the desired range.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;cstdint&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;cstdlib&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For rand()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">uint32_t</span> <span style="color:#a6e22e">randomInRange</span>(<span style="color:#66d9ef">uint32_t</span> a, <span style="color:#66d9ef">uint32_t</span> b) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> v;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> range;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> upper, lower;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint32_t</span> mask <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (a <span style="color:#f92672">==</span> b) <span style="color:#66d9ef">return</span> a;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (a <span style="color:#f92672">&gt;</span> b) { upper <span style="color:#f92672">=</span> a; lower <span style="color:#f92672">=</span> b; }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span> { upper <span style="color:#f92672">=</span> b; lower <span style="color:#f92672">=</span> a; }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    range <span style="color:#f92672">=</span> upper <span style="color:#f92672">-</span> lower;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Create a mask that&#39;s the smallest power of 2 greater than or equal to &#39;range&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// This ensures that rand() &amp; mask has a predictable power-of-2 range
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">while</span> (mask <span style="color:#f92672">&lt;</span> range) {
+</span></span><span style="display:flex;"><span>        mask <span style="color:#f92672">=</span> (mask <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">|</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Generate a random value using the mask and retry if it exceeds the desired range
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">while</span> (true) {
+</span></span><span style="display:flex;"><span>        v <span style="color:#f92672">=</span> rand() <span style="color:#f92672">&amp;</span> mask;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (v <span style="color:#f92672">&lt;=</span> range) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> lower <span style="color:#f92672">+</span> v;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-11-generating-a-floating-point-random-number-0-1">Solution 11: Generating a Floating-Point Random Number [0, 1]</h4>
+<p>A simple way to get a random floating-point value between 0 and 1:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">#define rand01() (((double)random())/((double)(RAND_MAX)))
+</span></span></span></code></pre></div><p>This can be a building block for other random number generation strategies.</p>
+<h2 id="solutions">Solutions</h2>
+<h3 id="faqs-on-fixing-rand-bias">FAQs on Fixing <code>rand()</code> Bias</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why does rand() % N cause bias</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The bias arises because the range of <code>rand()</code> (0 to <code>RAND_MAX</code>) might not be an exact multiple of your desired range size <code>N</code>. Numbers in the higher part of the <code>rand()</code> output that don&rsquo;t fit neatly into the <code>N</code> bins are discarded, disproportionately affecting the distribution of the remaining numbers.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the best practice for generating random numbers in C&#43;&#43;</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: For more critical applications, consider using the C++ <code>&lt;random&gt;</code> library, which offers various distributions (e.g., <code>std::uniform_int_distribution</code>) and high-quality random number engines (e.g., <code>std::mt19937</code>) designed to avoid bias and provide better statistical properties than <code>rand()</code>.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is it ever okay to use rand() N</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: For non-critical applications where perfect uniformity is not paramount (e.g., simple game simulations, quick prototyping), <code>rand() % N</code> might be acceptable due to its simplicity. However, for security-sensitive or statistically rigorous tasks, it&rsquo;s best avoided.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How does the rejection sampling method work</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Rejection sampling generates random numbers and discards any that fall outside a specified &ldquo;acceptable&rdquo; range. By carefully defining these acceptable ranges to be of equal size and probability, the resulting numbers within the accepted ranges will have a uniform distribution.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What&#39;s the difference between rand() and random()</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: <code>random()</code> (available in POSIX systems) generally offers a better quality of randomness and a larger output range than <code>rand()</code>. It&rsquo;s often preferred when available for achieving more uniform distributions.</div>
+    </div>
+</div>
+<pre tabindex="0"><code>#include &amp;lt;stdlib.h&amp;gt; // For random(), RAND_MAX
+
+// Assumes 0 &amp;lt;= max &amp;lt;= RAND_MAX
+// Returns in the closed interval [0, max]
+long random_at_most(long max) {
+  unsigned long
+    // max &amp;lt;= RAND_MAX &amp;lt; ULONG_MAX, so this is okay.
+    num_bins = (unsigned long) max + 1,
+    num_rand = (unsigned long) RAND_MAX + 1,
+    bin_size = num_rand / num_bins,
+    defect   = num_rand % num_bins;
+
+  long x;
+  do {
+   x = random();
+  }
+  // This is carefully written not to overflow
+  while (num_rand - defect &amp;lt;= (unsigned long)x);
+
+  // Truncated division is intentional
+  return x/bin_size;
+}
+</code></pre><p>We’d love to hear your feedback! What methods have you found most effective for generating uniform random numbers? Share your experiences and any further questions in the comments below.</p>
+<p>For more programming insights, check out <a href="https://sqlpey.com/mysql/introduction-to-mysql" target="_blank" rel="noopener">Introduction to MySQL</a>
+ or explore solutions for <a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">Python SSL certificate verification errors</a>
+.</p>
+<pre tabindex="0"><code>unsigned int rand_interval(unsigned int min, unsigned int max)
+{
+    int r;
+    const unsigned int range = 1 + max - min;
+    const unsigned int buckets = RAND_MAX / range;
+    const unsigned int limit = buckets * range;
+
+    /* Create equal size buckets all in a row, then fire randomly towards
+     * the buckets until you land in one of them. All buckets are equally
+     * likely. If you land off the end of the line of buckets, try again. */
+    do
+    {
+        r = rand();
+    } while (r &amp;gt;= limit);
+
+    return min + (r / buckets);
+}
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

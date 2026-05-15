@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>C/C&#43;&#43; Integer Overflow: Detection and Prevention Strategies - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore various C and C&#43;&#43; techniques to detect and prevent integer overflow, covering pre-computation checks, compiler intrinsics, and assembly methods.">
+
+
+
+<meta name="keywords" content="C&#43;&#43; integer overflow, detect integer overflow, prevent integer overflow, C&#43;&#43; arithmetic overflow, compiler intrinsics, assembly overflow check">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="C/C&#43;&#43; Integer Overflow: Detection and Prevention Strategies - sqlpey">
+<meta name="DC.description" content="Explore various C and C&#43;&#43; techniques to detect and prevent integer overflow, covering pre-computation checks, compiler intrinsics, and assembly methods.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-07-22">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="C/C&#43;&#43; Integer Overflow: Detection and Prevention Strategies - sqlpey">
+<meta property="og:description" content="Explore various C and C&#43;&#43; techniques to detect and prevent integer overflow, covering pre-computation checks, compiler intrinsics, and assembly methods.">
+<meta property="og:url" content="https://sqlpey.com/c&#43;&#43;/integer-overflow-detection-prevention/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-07-22T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-07-22T00:00:00Z">
+<meta property="article:modified_time" content="2025-07-22T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="C&#43;&#43;">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="C/C&#43;&#43; Integer Overflow: Detection and Prevention Strategies">
+<meta name="twitter:description" content="Explore various C and C&#43;&#43; techniques to detect and prevent integer overflow, covering pre-computation checks, compiler intrinsics, and assembly methods.">
+
+
+<link rel="canonical" href="https://sqlpey.com/c&#43;&#43;/integer-overflow-detection-prevention/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"C/C++ Integer Overflow: Detection and Prevention Strategies\"",
+  "description": "\"Explore various C and C++ techniques to detect and prevent integer overflow, covering pre-computation checks, compiler intrinsics, and assembly methods.\"",
+  "url": "\"https://sqlpey.com/c++/integer-overflow-detection-prevention/\"",
+  "datePublished": "\"2025-07-22T00:00:00Z\"",
+  "dateModified": "\"2025-07-22T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/c++/integer-overflow-detection-prevention/\""
+  },
+  "articleSection": "\"C++\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">C/C++ Integer Overflow: Detection and Prevention Strategies</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">C&#43;&#43;</span>
+              
+              <span class="tag">Programming</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              14 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 22, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#cc-integer-overflow-detection-and-prevention-strategies">&ldquo;C/C++ Integer Overflow: Detection and Prevention Strategies&rdquo;</a>
+      <ul>
+        <li></li>
+        <li><a href="#conclusion-on-prevention">Conclusion on Prevention</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#faqs-on-c-integer-overflow-detection-and-prevention">FAQs on C++ Integer Overflow Detection and Prevention</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="cc-integer-overflow-detection-and-prevention-strategies">&ldquo;C/C++ Integer Overflow: Detection and Prevention Strategies&rdquo;</h2>
+<p>Integer overflow, a common pitfall in C and C++, occurs when the result of an arithmetic operation exceeds the maximum or minimum value representable by its data type. This can lead to unexpected behavior, security vulnerabilities, and program crashes. This post delves into various strategies for detecting and preventing integer overflows, from simple pre-computation checks to leveraging compiler-specific features and even assembly language.</p>
+<h4 id="understanding-integer-overflow-behavior">Understanding Integer Overflow Behavior</h4>
+<p>Before diving into solutions, it&rsquo;s crucial to grasp how overflow behaves in C and C++.</p>
+<ul>
+<li>
+<p><strong>Unsigned Integers:</strong> For unsigned integer types, overflow results in <strong>wrapping around</strong>. For example, if you have an 8-bit unsigned integer (maximum value 255) and add 1 to 255, the result wraps around to 0. This is defined behavior.</p>
+</li>
+<li>
+<p><strong>Signed Integers:</strong> For signed integer types, overflow leads to <strong>undefined behavior (UB)</strong>. This means the compiler can do anything – the program might crash, produce incorrect results, or seem to work fine but fail under different conditions. It&rsquo;s critical to avoid signed integer overflow.</p>
+</li>
+</ul>
+<h4 id="strategies-for-detection-and-prevention">Strategies for Detection and Prevention</h4>
+<p>Several methods can be employed to handle integer overflows:</p>
+<h5 id="solution-1-pre-computation-checks-the-safe-way">Solution 1: Pre-computation Checks (The &ldquo;Safe Way&rdquo;)</h5>
+<p>This approach involves checking for potential overflow <em>before</em> performing the arithmetic operation. This is generally the most portable and safest method, especially for signed integers where UB is a concern.</p>
+<p><strong>For Addition:</strong></p>
+<p>To check if <code>a + x</code> would overflow:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;limits.h&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For INT_MAX and INT_MIN
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> a <span style="color:#f92672">=</span> <span style="color:#75715e">/* some value */</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> x <span style="color:#f92672">=</span> <span style="color:#75715e">/* some value */</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Check for positive overflow
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> (x <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> a <span style="color:#f92672">&gt;</span> INT_MAX <span style="color:#f92672">-</span> x) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// a + x would overflow
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Check for negative overflow (underflow)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> (x <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> a <span style="color:#f92672">&lt;</span> INT_MIN <span style="color:#f92672">-</span> x) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// a + x would underflow
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p><strong>For Subtraction:</strong></p>
+<p>To check if <code>a - x</code> would overflow:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;limits.h&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For INT_MAX and INT_MIN
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> a <span style="color:#f92672">=</span> <span style="color:#75715e">/* some value */</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> x <span style="color:#f92672">=</span> <span style="color:#75715e">/* some value */</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Check for positive overflow
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> (x <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> a <span style="color:#f92672">&gt;</span> INT_MAX <span style="color:#f92672">+</span> x) { <span style="color:#75715e">// Note: -x is positive here
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// a - x would overflow
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Check for negative overflow (underflow)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> (x <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> a <span style="color:#f92672">&lt;</span> INT_MIN <span style="color:#f92672">+</span> x) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// a - x would underflow
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p><strong>For Multiplication:</strong></p>
+<p>To check if <code>a * x</code> would overflow:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;limits.h&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For INT_MAX and INT_MIN
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> a <span style="color:#f92672">=</span> <span style="color:#75715e">/* some value */</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> x <span style="color:#f92672">=</span> <span style="color:#75715e">/* some value */</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Special case for INT_MIN and -1 (two&#39;s complement specific)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> ((a <span style="color:#f92672">==</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">&amp;&amp;</span> x <span style="color:#f92672">==</span> INT_MIN) <span style="color:#f92672">||</span> (x <span style="color:#f92672">==</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">&amp;&amp;</span> a <span style="color:#f92672">==</span> INT_MIN)) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// a * x can overflow
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>} <span style="color:#66d9ef">else</span> <span style="color:#a6e22e">if</span> (x <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> (a <span style="color:#f92672">&gt;</span> INT_MAX <span style="color:#f92672">/</span> x <span style="color:#f92672">||</span> a <span style="color:#f92672">&lt;</span> INT_MIN <span style="color:#f92672">/</span> x)) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// General case for overflow or underflow
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// Note: Division by zero must be avoided
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p><strong>For Division:</strong></p>
+<p>Generally, division (except for the <code>INT_MIN / -1</code> case) does not cause overflow because the result is smaller than or equal to the dividend.</p>
+<h5 id="solution-2-c23-stdckdinth-and-compiler-intrinsics">Solution 2: C23 <code>std::ckdint.h</code> and Compiler Intrinsics</h5>
+<p>Modern C and C++ standards and compilers offer built-in mechanisms for safer arithmetic.</p>
+<ul>
+<li>
+<p><strong>C23 <code>std::ckdint.h</code>:</strong> The C23 standard introduces <code>&lt;stdckdint.h&gt;</code>, providing function-like macros such as <code>ckd_add</code>, <code>ckd_sub</code>, and <code>ckd_mul</code>. These functions return a boolean indicating overflow and store the result in a provided pointer.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdckdint.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span> b, c, c_test;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// ...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> (ckd_mul(<span style="color:#f92672">&amp;</span>c_test, c, b)) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Overflow occurred
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>} <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>    c <span style="color:#f92672">=</span> c_test; <span style="color:#75715e">// No overflow
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div></li>
+<li>
+<p><strong>GCC/Clang Built-ins:</strong> Compilers like GCC and Clang provide <code>__builtin_add_overflow</code>, <code>__builtin_sub_overflow</code>, and <code>__builtin_mul_overflow</code>. These functions return a boolean indicating overflow and take a pointer to store the result.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span> b, c, c_test;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// ...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> (__builtin_mul_overflow(c, b, <span style="color:#f92672">&amp;</span>c_test)) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Overflow occurred
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>} <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>    c <span style="color:#f92672">=</span> c_test; <span style="color:#75715e">// No overflow
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div></li>
+<li>
+<p><strong>Visual Studio Intrinsics:</strong> Visual Studio offers <code>_addcarry_u32</code> and <code>_subborrow_u32</code> for unsigned addition and subtraction, found in <code>&lt;intrin.h&gt;</code>. These have a slightly different signature, returning the carry/borrow flag. Equivalents for signed operations or multiplication are less direct.</p>
+</li>
+</ul>
+<h5 id="solution-3-bitwise-operations-and-highest-set-bit">Solution 3: Bitwise Operations and Highest Set Bit</h5>
+<p>This method estimates overflow potential by examining the bit positions of the most significant set bits in the operands. While clever, it might be less efficient than direct checks due to the need to find the highest set bit.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;cstdint&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For uint32_t
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;cstddef&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For size_t
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Helper to find the position of the highest set bit
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>size_t <span style="color:#a6e22e">highestOneBitPosition</span>(<span style="color:#66d9ef">uint32_t</span> n) {
+</span></span><span style="display:flex;"><span>    size_t bits <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> (n <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">++</span>bits;
+</span></span><span style="display:flex;"><span>        n <span style="color:#f92672">&gt;&gt;=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> bits;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// For addition
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">bool</span> <span style="color:#a6e22e">addition_is_safe</span>(<span style="color:#66d9ef">uint32_t</span> a, <span style="color:#66d9ef">uint32_t</span> b) {
+</span></span><span style="display:flex;"><span>    size_t a_bits <span style="color:#f92672">=</span> highestOneBitPosition(a);
+</span></span><span style="display:flex;"><span>    size_t b_bits <span style="color:#f92672">=</span> highestOneBitPosition(b);
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Result can have at most one more bit than the largest operand
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> (a_bits <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">32</span> <span style="color:#f92672">&amp;&amp;</span> b_bits <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">32</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// For multiplication
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">bool</span> <span style="color:#a6e22e">multiplication_is_safe</span>(<span style="color:#66d9ef">uint32_t</span> a, <span style="color:#66d9ef">uint32_t</span> b) {
+</span></span><span style="display:flex;"><span>    size_t a_bits <span style="color:#f92672">=</span> highestOneBitPosition(a);
+</span></span><span style="display:flex;"><span>    size_t b_bits <span style="color:#f92672">=</span> highestOneBitPosition(b);
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Result can have at most sum of bits of operands
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> (a_bits <span style="color:#f92672">+</span> b_bits <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">32</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// For exponentiation (a^b)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">bool</span> <span style="color:#a6e22e">exponentiation_is_safe</span>(<span style="color:#66d9ef">uint32_t</span> a, <span style="color:#66d9ef">uint32_t</span> b) {
+</span></span><span style="display:flex;"><span>    size_t a_bits <span style="color:#f92672">=</span> highestOneBitPosition(a);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> (a_bits <span style="color:#f92672">*</span> b <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">32</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>A more optimized bitwise check for addition:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;limits&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For std::numeric_limits
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">bool</span> <span style="color:#a6e22e">addition_is_safe_optimized</span>(<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> a, <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> b) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> mask <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>numeric_limits<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;::</span>max();
+</span></span><span style="display:flex;"><span>    mask <span style="color:#f92672">&gt;&gt;=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>    mask <span style="color:#f92672">=</span> <span style="color:#f92672">~</span>mask; <span style="color:#75715e">// Mask for the most significant bit
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    a <span style="color:#f92672">&amp;=</span> mask;
+</span></span><span style="display:flex;"><span>    b <span style="color:#f92672">&amp;=</span> mask;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> (a <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">||</span> b <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>); <span style="color:#75715e">// If either MSB is not set, addition is safe
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><h5 id="solution-4-direct-result-comparison-unsigned-integers">Solution 4: Direct Result Comparison (Unsigned Integers)</h5>
+<p>For unsigned integers, a simple check is to compare the result with one of the operands.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> r, a, b;
+</span></span><span style="display:flex;"><span>r <span style="color:#f92672">=</span> a <span style="color:#f92672">+</span> b;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (r <span style="color:#f92672">&lt;</span> a) { <span style="color:#75715e">// Or r &lt; b
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// Overflow occurred
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><h5 id="solution-5-sign-based-checks-signed-integers">Solution 5: Sign-Based Checks (Signed Integers)</h5>
+<p>For signed integers, you can infer overflow by examining the signs of the operands and the result.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdbool.h&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For bool
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">signed</span> <span style="color:#66d9ef">int</span> r, a, b;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// ...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>r <span style="color:#f92672">=</span> a <span style="color:#f92672">+</span> b;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">bool</span> a_is_positive <span style="color:#f92672">=</span> (a <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">bool</span> b_is_positive <span style="color:#f92672">=</span> (b <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">bool</span> result_is_positive <span style="color:#f92672">=</span> (r <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Overflow occurs if operands have the same sign, but the result has a different sign
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> (a_is_positive <span style="color:#f92672">==</span> b_is_positive <span style="color:#f92672">&amp;&amp;</span> a_is_positive <span style="color:#f92672">!=</span> result_is_positive) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Overflow occurred
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><h5 id="solution-6-using-larger-data-types">Solution 6: Using Larger Data Types</h5>
+<p>If available, promoting operands to a larger integer type (e.g., <code>long long</code> for <code>int</code>) before performing the operation can help.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span> a, b;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span> <span style="color:#66d9ef">long</span> result <span style="color:#f92672">=</span> (<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span> <span style="color:#66d9ef">long</span>)a <span style="color:#f92672">*</span> b;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (result <span style="color:#f92672">&gt;</span> ULONG_MAX) { <span style="color:#75715e">// ULONG_MAX is defined in &lt;limits.h&gt; or &lt;climits&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// Overflow occurred
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p>This is particularly useful for multiplication where the result can be twice the number of bits of the operands.</p>
+<h5 id="solution-7-floating-point-approximation">Solution 7: Floating-Point Approximation</h5>
+<p>For extremely large numbers or when precise integer arithmetic isn&rsquo;t strictly necessary, using <code>double</code> can provide a wider range. However, this sacrifices precision and is not a direct solution for integer overflow detection.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;cmath&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For pow
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;cstdint&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For uint64_t
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">uint64_t</span> <span style="color:#a6e22e">foo</span>(<span style="color:#66d9ef">uint64_t</span> a, <span style="color:#66d9ef">uint64_t</span> b) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">double</span> result_double <span style="color:#f92672">=</span> pow(<span style="color:#66d9ef">static_cast</span><span style="color:#f92672">&lt;</span><span style="color:#66d9ef">double</span><span style="color:#f92672">&gt;</span>(a), <span style="color:#66d9ef">static_cast</span><span style="color:#f92672">&lt;</span><span style="color:#66d9ef">double</span><span style="color:#f92672">&gt;</span>(b));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (result_double <span style="color:#f92672">&gt;=</span> std<span style="color:#f92672">::</span>numeric_limits<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">uint64_t</span><span style="color:#f92672">&gt;::</span>max()) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Potential overflow or result too large for uint64_t
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        printf(<span style="color:#e6db74">&#34;Potential overflow detected.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Handle appropriately, perhaps return a special value or throw.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">return</span> std<span style="color:#f92672">::</span>numeric_limits<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">uint64_t</span><span style="color:#f92672">&gt;::</span>max(); <span style="color:#75715e">// Example: saturate
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Convert back, but be mindful of precision loss
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">static_cast</span><span style="color:#f92672">&lt;</span><span style="color:#66d9ef">uint64_t</span><span style="color:#f92672">&gt;</span>(result_double);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h5 id="solution-8-cpu-flags-and-inline-assembly">Solution 8: CPU Flags and Inline Assembly</h5>
+<p>Modern CPUs have dedicated flags (like the Overflow Flag) that indicate arithmetic outcomes. Accessing these directly requires assembly language.</p>
+<ul>
+<li>
+<p><strong>GCC/Clang Inline Assembly for EFLAGS:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;cstddef&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For size_t
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;cstdio&gt;</span><span style="color:#75715e">  </span><span style="color:#75715e">// For printf
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">inline</span> size_t <span style="color:#a6e22e">query_intel_x86_eflags</span>(<span style="color:#66d9ef">const</span> size_t query_bit_mask) {
+</span></span><span style="display:flex;"><span>    size_t eflags;
+</span></span><span style="display:flex;"><span>    __asm__ __volatile__(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;pushfq</span><span style="color:#ae81ff">\n\t</span><span style="color:#e6db74">&#34;</span> <span style="color:#75715e">// Push RFLAGS onto stack
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#e6db74">&#34;pop %%rax</span><span style="color:#ae81ff">\n\t</span><span style="color:#e6db74">&#34;</span> <span style="color:#75715e">// Pop RFLAGS into RAX
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#e6db74">&#34;movq %%rax, %0</span><span style="color:#ae81ff">\n\t</span><span style="color:#e6db74">&#34;</span> <span style="color:#75715e">// Move RAX to the output variable
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;=r&#34;</span>(eflags) <span style="color:#75715e">// Output operand
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#f92672">:</span> <span style="color:#75715e">// No input operands
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;%rax&#34;</span> <span style="color:#75715e">// Clobbered register
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    );
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> eflags <span style="color:#f92672">&amp;</span> query_bit_mask;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> x <span style="color:#f92672">=</span> <span style="color:#ae81ff">1000000000</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> y <span style="color:#f92672">=</span> <span style="color:#ae81ff">20000</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> z <span style="color:#f92672">=</span> x <span style="color:#f92672">*</span> y; <span style="color:#75715e">// Likely to overflow
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// 0x801 is mask for Overflow Flag (0x800) and Carry Flag (0x1)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    size_t flags <span style="color:#f92672">=</span> query_intel_x86_eflags(<span style="color:#ae81ff">0x801</span>);
+</span></span><span style="display:flex;"><span>    printf(<span style="color:#e6db74">&#34;EFLAGS mask 0x801: %X</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, (<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span>)flags); <span style="color:#75715e">// Non-zero indicates overflow/carry
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><em>Note: This specific assembly is for x86-64. Compiler support and syntax can vary.</em></p>
+</li>
+<li>
+<p><strong>Visual Studio <code>__readeflags()</code>:</strong> Visual Studio provides <code>__readeflags()</code> for reading the EFLAGS register.</p>
+</li>
+</ul>
+<h5 id="solution-9-compiler-flags-and-sanitizers">Solution 9: Compiler Flags and Sanitizers</h5>
+<ul>
+<li>
+<p><strong><code>-ftrapv</code> (GCC/Clang):</strong> This flag instructs the compiler to insert trap instructions on signed integer overflow. While useful for debugging, it can affect performance and might not always reliably trigger traps on all architectures with modern GCC versions.</p>
+</li>
+<li>
+<p><strong><code>-fsanitize=integer</code> (Clang):</strong> Clang&rsquo;s integer sanitizer provides dynamic checks for overflows during runtime, excellent for debugging and testing.</p>
+</li>
+</ul>
+<h5 id="solution-10-third-party-libraries-and-tools">Solution 10: Third-Party Libraries and Tools</h5>
+<ul>
+<li><strong><code>mozilla::CheckedInt</code>:</strong> A header-only library providing overflow-checked integer types.</li>
+<li><strong>IOC (Integer Overflow Checker):</strong> A patched Clang compiler that flags potential arithmetic overflows at compile time.</li>
+<li><strong>CERT &ldquo;as-if&rdquo; Infinitely Ranged (AIR) Integer Model:</strong> A formal model and prototype implementation for detecting signed overflow and truncation.</li>
+</ul>
+<h5 id="solution-11-specific-instruction-sets-eg-mul-on-x86">Solution 11: Specific Instruction Sets (e.g., <code>MUL</code> on x86)</h5>
+<p>Some CPU architectures have specific instructions that handle overflow more gracefully or provide separate flags. For instance, the x86 <code>MUL</code> instruction for unsigned multiplication stores the upper half of the 64-bit result in a separate register.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// For 64-bit GCC
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span> <span style="color:#a6e22e">checked_imul</span>(<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span> a, <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span> b) {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Use __uint128_t if available for the intermediate result
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">unsigned</span> __int128 res <span style="color:#f92672">=</span> (<span style="color:#66d9ef">unsigned</span> __int128)a <span style="color:#f92672">*</span> b;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> ((<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span>)(res <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">64</span>)) {
+</span></span><span style="display:flex;"><span>    printf(<span style="color:#e6db74">&#34;Overflow in integer multiply</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Handle overflow, e.g., return max value or signal error
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> std<span style="color:#f92672">::</span>numeric_limits<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span><span style="color:#f92672">&gt;::</span>max();
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> (<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span>)res;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h5 id="solution-12-custom-integer-wrapper-classes">Solution 12: Custom Integer Wrapper Classes</h5>
+<p>Create a class that encapsulates integer types and overrides arithmetic operators (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>) to include overflow checks before performing the actual operation. This promotes encapsulation and reusability.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;limits&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span> T<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SafeInt</span> {
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    T value;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Helper to check for addition overflow
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">bool</span> <span style="color:#a6e22e">addOverflow</span>(T a, T b) <span style="color:#66d9ef">const</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (std<span style="color:#f92672">::</span>is_unsigned<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;::</span>value) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> b <span style="color:#f92672">&gt;</span> std<span style="color:#f92672">::</span>numeric_limits<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;::</span>max() <span style="color:#f92672">-</span> a;
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Signed overflow check (similar to Solution 1)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            <span style="color:#66d9ef">if</span> (((b <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) <span style="color:#f92672">&amp;&amp;</span> (a <span style="color:#f92672">&gt;</span> std<span style="color:#f92672">::</span>numeric_limits<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;::</span>max() <span style="color:#f92672">-</span> b)) <span style="color:#f92672">||</span>
+</span></span><span style="display:flex;"><span>                ((b <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) <span style="color:#f92672">&amp;&amp;</span> (a <span style="color:#f92672">&lt;</span> std<span style="color:#f92672">::</span>numeric_limits<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;::</span>min() <span style="color:#f92672">-</span> b))) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> true;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> false;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Helper to check for multiplication overflow
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">bool</span> <span style="color:#a6e22e">mulOverflow</span>(T a, T b) <span style="color:#66d9ef">const</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (a <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">||</span> b <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">return</span> false;
+</span></span><span style="display:flex;"><span>        T max_val <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>numeric_limits<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;::</span>max();
+</span></span><span style="display:flex;"><span>        T min_val <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>numeric_limits<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;::</span>min();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (std<span style="color:#f92672">::</span>is_unsigned<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;::</span>value) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (a <span style="color:#f92672">&gt;</span> max_val <span style="color:#f92672">/</span> b) <span style="color:#66d9ef">return</span> true;
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (a <span style="color:#f92672">==</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">&amp;&amp;</span> b <span style="color:#f92672">==</span> min_val) <span style="color:#66d9ef">return</span> true; <span style="color:#75715e">// Special case
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            <span style="color:#66d9ef">if</span> (b <span style="color:#f92672">==</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">&amp;&amp;</span> a <span style="color:#f92672">==</span> min_val) <span style="color:#66d9ef">return</span> true;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (a <span style="color:#f92672">&gt;</span> max_val <span style="color:#f92672">/</span> b <span style="color:#f92672">||</span> a <span style="color:#f92672">&lt;</span> min_val <span style="color:#f92672">/</span> b) <span style="color:#66d9ef">return</span> true;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> false;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    SafeInt(T val <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>) <span style="color:#f92672">:</span> value(val) {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">operator</span> <span style="color:#a6e22e">T</span>() <span style="color:#66d9ef">const</span> { <span style="color:#66d9ef">return</span> value; }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    SafeInt <span style="color:#66d9ef">operator</span><span style="color:#f92672">+</span>(<span style="color:#66d9ef">const</span> SafeInt<span style="color:#f92672">&amp;</span> other) <span style="color:#66d9ef">const</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (addOverflow(value, other.value)) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">throw</span> std<span style="color:#f92672">::</span>overflow_error(<span style="color:#e6db74">&#34;Integer addition overflow&#34;</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">SafeInt</span>(value <span style="color:#f92672">+</span> other.value);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    SafeInt <span style="color:#66d9ef">operator</span><span style="color:#f92672">*</span>(<span style="color:#66d9ef">const</span> SafeInt<span style="color:#f92672">&amp;</span> other) <span style="color:#66d9ef">const</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (mulOverflow(value, other.value)) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">throw</span> std<span style="color:#f92672">::</span>overflow_error(<span style="color:#e6db74">&#34;Integer multiplication overflow&#34;</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">SafeInt</span>(value <span style="color:#f92672">*</span> other.value);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Add other operators as needed (-, /, etc.)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Example Usage:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// SafeInt&lt;int&gt; x(INT_MAX);
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// SafeInt&lt;int&gt; y(1);
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// try {
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">//     SafeInt&lt;int&gt; z = x + y; // This will throw an exception
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// } catch (const std::overflow_error&amp; e) {
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">//     std::cerr &lt;&lt; e.what() &lt;&lt; std::endl;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// }
+</span></span></span></code></pre></div><h5 id="solution-13-the-98765432-problem-analysis">Solution 13: The 98765432 Problem Analysis</h5>
+<p>In specific algorithmic problems, like finding <code>a * b = c</code> where all digits are used uniquely, an analysis of the upper bounds can reveal that overflow is never a concern. For instance, the maximum value for <code>c</code> might be limited to 98,765,432, making standard integer types sufficient. If the problem constraints guarantee results within representable ranges, explicit overflow checks might be unnecessary, simplifying the code.</p>
+<h3 id="conclusion-on-prevention">Conclusion on Prevention</h3>
+<p>The most robust approach often involves a combination of methods:</p>
+<ol>
+<li><strong>For Debugging:</strong> Utilize compiler sanitizers (<code>-fsanitize=integer</code>).</li>
+<li><strong>For Portability and Safety:</strong> Implement pre-computation checks (Solution 1) or use language features like <code>std::ckdint.h</code> (C23) or compiler intrinsics.</li>
+<li><strong>For Performance-Critical Code:</strong> Carefully consider CPU-specific instructions or assembly, but be mindful of portability.</li>
+<li><strong>For Encapsulation:</strong> Create wrapper classes for safer arithmetic.</li>
+</ol>
+<p>Choosing the right method depends on the project&rsquo;s requirements, target platforms, and performance considerations. It&rsquo;s always best to err on the side of caution with integer arithmetic.</p>
+<h2 id="solutions">Solutions</h2>
+<h3 id="faqs-on-c-integer-overflow-detection-and-prevention">FAQs on C++ Integer Overflow Detection and Prevention</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is integer overflow in C&#43;&#43;</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Integer overflow occurs when the result of an arithmetic operation exceeds the maximum or minimum value that a particular integer data type can hold. For unsigned integers, this leads to wrapping around; for signed integers, it results in undefined behavior.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is integer overflow always a bad thing</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: While generally problematic due to undefined behavior in signed integers, wrapping behavior in unsigned integers is sometimes intentionally used. However, for predictable and safe code, it&rsquo;s best to detect and prevent overflow.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How can I check for addition overflow before it happens</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: You can check if <code>a + b</code> will overflow by comparing <code>b</code> against <code>INT_MAX - a</code> (for positive overflow) or <code>INT_MIN - a</code> (for negative overflow) before performing the addition. Refer to Solution 1 for code examples.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Are there compiler-specific ways to detect overflow</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, compilers like GCC and Clang provide built-in functions such as <code>__builtin_add_overflow</code> which return a flag indicating overflow. Clang also offers runtime sanitizers like <code>-fsanitize=integer</code>. Visual Studio has intrinsics like <code>_addcarry_u32</code>.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I use assembly language to detect overflow</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, you can use inline assembly to access CPU flags (like the Overflow Flag) that are set after arithmetic operations. This is highly platform-specific. See Solution 9 for an example using GCC inline assembly.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What are the benefits of using C23&#39;s stdckdint.h</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: <code>stdckdint.h</code> provides a standardized and portable way to perform checked arithmetic. Functions like <code>ckd_mul</code> return a boolean indicating overflow and store the result safely, simplifying overflow handling in modern C code.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is it safe to convert to a larger type like unsigned long long</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Converting to a larger type before an operation, especially for multiplication, can be an effective way to detect overflow. If the result in the larger type exceeds the bounds of the original type, an overflow would have occurred. This is shown in Solution 6.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How do overflow checks affect program performance</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Adding explicit overflow checks can introduce a performance overhead because extra computations are performed. However, this is often a necessary trade-off for code safety and reliability. Compiler intrinsics and CPU-level instructions are generally more performant than manual checks.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the &#39;safe way&#39; to handle integer overflow</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The &ldquo;safe way&rdquo; typically refers to performing checks <em>before</em> an arithmetic operation occurs, preventing undefined behavior, especially with signed integers. This involves comparing operands against limits derived from <code>INT_MAX</code> and <code>INT_MIN</code>, as detailed in Solution 1.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I create my own integer types that automatically check for overflow</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Absolutely. You can create C++ classes or structs that wrap primitive integer types and overload arithmetic operators. Within these operators, you implement overflow detection logic before returning the result or throwing an exception, as demonstrated in Solution 12.</div>
+    </div>
+</div>
+<p>We’d love to hear your feedback! Drop your comments or questions below.</p>
+<p>For more insights into Python programming, check out these related topics:</p>
+<ul>
+<li><a href="https://sqlpey.com/python/what-is-python" target="_blank" rel="noopener">What is Python</a>
+</li>
+<li><a href="https://sqlpey.com/python/what-is-pandas" target="_blank" rel="noopener">What is Pandas</a>
+</li>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">Fixing SSL Certificate Errors in Python</a>
+</li>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-could-not-find-a-version-that-satisfies-the-requirement-error-in-python/" target="_blank" rel="noopener">Resolving Python Version Errors</a>
+</li>
+</ul>
+<pre tabindex="0"><code>#include &amp;lt;limits.h&amp;gt;
+
+int a = &amp;lt;something&amp;gt;;
+int x = &amp;lt;something&amp;gt;;
+a += x;              /* UB */
+if (a &amp;lt; 0) {         /* Unreliable test */
+  /* ... */
+}
+// For addition
+#include &amp;lt;limits.h&amp;gt;
+
+int a = &amp;lt;something&amp;gt;;
+int x = &amp;lt;something&amp;gt;;
+if (x &amp;gt; 0 &amp;amp;&amp;amp; a &amp;gt; INT_MAX - x) // `a + x` would overflow
+if (x &amp;lt; 0 &amp;amp;&amp;amp; a &amp;lt; INT_MIN - x) // `a + x` would underflow
+// For subtraction
+#include &amp;lt;limits.h&amp;gt;
+int a = &amp;lt;something&amp;gt;;
+int x = &amp;lt;something&amp;gt;;
+if (x &amp;lt; 0 &amp;amp;&amp;amp; a &amp;gt; INT_MAX + x) // `a - x` would overflow
+if (x &amp;gt; 0 &amp;amp;&amp;amp; a &amp;lt; INT_MIN + x) // `a - x` would underflow
+// For multiplication
+#include &amp;lt;limits.h&amp;gt;
+
+int a = &amp;lt;something&amp;gt;;
+int x = &amp;lt;something&amp;gt;;
+// There may be a need to check for -1 for two&#39;s complement machines.
+// If one number is -1 and another is INT_MIN, multiplying them we get abs(INT_MIN) which is 1 higher than INT_MAX
+if (a == -1 &amp;amp;&amp;amp; x == INT_MIN) // `a * x` can overflow
+if (x == -1 &amp;amp;&amp;amp; a == INT_MIN) // `a * x` (or `a / x`) can overflow
+// general case
+if (x != 0 &amp;amp;&amp;amp; a &amp;gt; INT_MAX / x) // `a * x` would overflow
+if (x != 0 &amp;amp;&amp;amp; a &amp;lt; INT_MIN / x) // `a * x` would underflow
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

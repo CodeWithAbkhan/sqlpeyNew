@@ -1,0 +1,2523 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Identify Processes Locking Files in C#: Advanced Techniques and Solutions - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore methods to find which processes are locking specific files on Windows using C#. Learn about Win32 Restart Manager, Sysinternals Handle.exe, and native …">
+
+
+
+<meta name="keywords" content="C#, file locking, process lock, Windows API, Restart Manager, Handle.exe, SystemHandleInformation, Win32">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Identify Processes Locking Files in C#: Advanced Techniques and Solutions - sqlpey">
+<meta name="DC.description" content="Explore methods to find which processes are locking specific files on Windows using C#. Learn about Win32 Restart Manager, Sysinternals Handle.exe, and native API calls.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Identify Processes Locking Files in C#: Advanced Techniques and Solutions - sqlpey">
+<meta property="og:description" content="Explore methods to find which processes are locking specific files on Windows using C#. Learn about Win32 Restart Manager, Sysinternals Handle.exe, and native …">
+<meta property="og:url" content="https://sqlpey.com/c%23/identify-processes-locking-files/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="C#">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Identify Processes Locking Files in C#: Advanced Techniques and Solutions">
+<meta name="twitter:description" content="Explore methods to find which processes are locking specific files on Windows using C#. Learn about Win32 Restart Manager, Sysinternals Handle.exe, and native …">
+
+
+<link rel="canonical" href="https://sqlpey.com/c%23/identify-processes-locking-files/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Identify Processes Locking Files in C#: Advanced Techniques and Solutions\"",
+  "description": "\"Explore methods to find which processes are locking specific files on Windows using C#. Learn about Win32 Restart Manager, Sysinternals Handle.exe, and native API calls.\"",
+  "url": "\"https://sqlpey.com/c%23/identify-processes-locking-files/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/c%23/identify-processes-locking-files/\""
+  },
+  "articleSection": "\"C#\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Identify Processes Locking Files in C#: Advanced Techniques and Solutions</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">C#</span>
+              
+              <span class="tag">Windows API</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              26 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#identify-processes-locking-files-in-c-advanced-techniques-and-solutions">&ldquo;Identify Processes Locking Files in C#: Advanced Techniques and Solutions&rdquo;</a>
+      <ul>
+        <li><a href="#solution-1-utilizing-the-windows-restart-manager-api">Solution 1: Utilizing the Windows Restart Manager API</a></li>
+        <li><a href="#solution-2-leveraging-sysinternals-handleexe">Solution 2: Leveraging Sysinternals Handle.exe</a></li>
+        <li><a href="#solution-3-native-api-calls-for-handle-information-more-complex">Solution 3: Native API Calls for Handle Information (More Complex)</a></li>
+        <li><a href="#solution-4-using-a-third-party-library">Solution 4: Using a Third-Party Library</a></li>
+        <li><a href="#alternative-approaches-and-considerations">Alternative Approaches and Considerations:</a></li>
+        <li><a href="#faqs-on-identifying-file-locks">FAQs on Identifying File Locks</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="identify-processes-locking-files-in-c-advanced-techniques-and-solutions">&ldquo;Identify Processes Locking Files in C#: Advanced Techniques and Solutions&rdquo;</h2>
+<p>In Windows, determining precisely which process has a file locked has historically been a complex task. Early Windows versions didn&rsquo;t readily expose this information. However, with advancements in Windows APIs, several methods now exist to achieve this. This query delves into effective C# implementations for identifying file-locking processes, drawing from various community solutions and system-level capabilities.</p>
+<h3 id="solution-1-utilizing-the-windows-restart-manager-api">Solution 1: Utilizing the Windows Restart Manager API</h3>
+<p>The Windows Restart Manager API provides a robust mechanism to query processes that are currently using specific files or resources. This approach is generally considered reliable for modern Windows operating systems.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Collections.Generic;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Diagnostics;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Runtime.InteropServices;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">FileUtil</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">    [StructLayout(LayoutKind.Sequential)]</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">RM_UNIQUE_PROCESS</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> dwProcessId;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> System.Runtime.InteropServices.ComTypes.FILETIME ProcessStartTime;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> RmRebootReasonNone = <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> CCH_RM_MAX_APP_NAME = <span style="color:#ae81ff">255</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> CCH_RM_MAX_SVC_NAME = <span style="color:#ae81ff">63</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">enum</span> RM_APP_TYPE
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        RmUnknownApp = <span style="color:#ae81ff">0</span>,
+</span></span><span style="display:flex;"><span>        RmMainWindow = <span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>        RmOtherWindow = <span style="color:#ae81ff">2</span>,
+</span></span><span style="display:flex;"><span>        RmService = <span style="color:#ae81ff">3</span>,
+</span></span><span style="display:flex;"><span>        RmExplorer = <span style="color:#ae81ff">4</span>,
+</span></span><span style="display:flex;"><span>        RmConsole = <span style="color:#ae81ff">5</span>,
+</span></span><span style="display:flex;"><span>        RmCritical = <span style="color:#ae81ff">1000</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">RM_PROCESS_INFO</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> RM_UNIQUE_PROCESS Process;
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCH_RM_MAX_APP_NAME + 1)]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">string</span> strAppName;
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCH_RM_MAX_SVC_NAME + 1)]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">string</span> strServiceShortName;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> RM_APP_TYPE ApplicationType;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">uint</span> AppStatus;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">uint</span> TSSessionId;
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">        [MarshalAs(UnmanagedType.Bool)]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">bool</span> bRestartable;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">    [DllImport(&#34;rstrtmgr.dll&#34;, CharSet = CharSet.Unicode)]</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">extern</span> <span style="color:#66d9ef">int</span> RmRegisterResources(<span style="color:#66d9ef">uint</span> pSessionHandle,
+</span></span><span style="display:flex;"><span>                                          UInt32 nFiles,
+</span></span><span style="display:flex;"><span>                                          <span style="color:#66d9ef">string</span>[] rgsFilenames,
+</span></span><span style="display:flex;"><span>                                          UInt32 nApplications,
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">                                          [In]</span> RM_UNIQUE_PROCESS[] rgApplications,
+</span></span><span style="display:flex;"><span>                                          UInt32 nServices,
+</span></span><span style="display:flex;"><span>                                          <span style="color:#66d9ef">string</span>[] rgsServiceNames);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">    [DllImport(&#34;rstrtmgr.dll&#34;, CharSet = CharSet.Auto)]</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">extern</span> <span style="color:#66d9ef">int</span> RmStartSession(<span style="color:#66d9ef">out</span> <span style="color:#66d9ef">uint</span> pSessionHandle, <span style="color:#66d9ef">int</span> dwSessionFlags, <span style="color:#66d9ef">string</span> strSessionKey);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">    [DllImport(&#34;rstrtmgr.dll&#34;)]</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">extern</span> <span style="color:#66d9ef">int</span> RmEndSession(<span style="color:#66d9ef">uint</span> pSessionHandle);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">    [DllImport(&#34;rstrtmgr.dll&#34;)]</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">extern</span> <span style="color:#66d9ef">int</span> RmGetList(<span style="color:#66d9ef">uint</span> dwSessionHandle,
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">out</span> <span style="color:#66d9ef">uint</span> pnProcInfoNeeded,
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">ref</span> <span style="color:#66d9ef">uint</span> pnProcInfo,
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">                                [In, Out]</span> RM_PROCESS_INFO[] rgAffectedApps,
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">ref</span> <span style="color:#66d9ef">uint</span> lpdwRebootReasons);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">/// &lt;summary&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">/// Find out what process(es) have a lock on the specified file.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">/// &lt;/summary&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">/// &lt;param name=&#34;path&#34;&gt;Path of the file.&lt;/param&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">/// &lt;returns&gt;Processes locking the file&lt;/returns&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">/// &lt;remarks&gt;See also:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">/// &lt;a href=&#34;http://msdn.microsoft.com/en-us/library/windows/desktop/aa373661(v=vs.85).aspx&#34;&gt;MSDN Restart Manager documentation&lt;/a&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">/// &lt;/remarks&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> List&lt;Process&gt; WhoIsLocking(<span style="color:#66d9ef">string</span> path)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">uint</span> handle;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">string</span> key = Guid.NewGuid().ToString();
+</span></span><span style="display:flex;"><span>        List&lt;Process&gt; processes = <span style="color:#66d9ef">new</span> List&lt;Process&gt;();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> res = RmStartSession(<span style="color:#66d9ef">out</span> handle, <span style="color:#ae81ff">0</span>, key);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (res != <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Exception(<span style="color:#e6db74">&#34;Could not begin restart session. Unable to determine file locker.&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> ERROR_MORE_DATA = <span style="color:#ae81ff">234</span>;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">uint</span> pnProcInfoNeeded = <span style="color:#ae81ff">0</span>,
+</span></span><span style="display:flex;"><span>                 pnProcInfo = <span style="color:#ae81ff">0</span>,
+</span></span><span style="display:flex;"><span>                 lpdwRebootReasons = RmRebootReasonNone;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">string</span>[] resources = <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">string</span>[] { path }; <span style="color:#75715e">// Just checking on one resource.</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            res = RmRegisterResources(handle, (<span style="color:#66d9ef">uint</span>)resources.Length, resources, <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">null</span>, <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">null</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (res != <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Exception(<span style="color:#e6db74">&#34;Could not register resource.&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Note: there&#39;s a race condition here -- the first call to RmGetList() returns</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// the total number of processes. However, when we call RmGetList() again to get</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// the actual processes, this number may have increased.</span>
+</span></span><span style="display:flex;"><span>            res = RmGetList(handle, <span style="color:#66d9ef">out</span> pnProcInfoNeeded, <span style="color:#66d9ef">ref</span> pnProcInfo, <span style="color:#66d9ef">null</span>, <span style="color:#66d9ef">ref</span> lpdwRebootReasons);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (res == ERROR_MORE_DATA)
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">// Create an array to store the process results</span>
+</span></span><span style="display:flex;"><span>                RM_PROCESS_INFO[] processInfo = <span style="color:#66d9ef">new</span> RM_PROCESS_INFO[pnProcInfoNeeded];
+</span></span><span style="display:flex;"><span>                pnProcInfo = pnProcInfoNeeded;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">// Get the list</span>
+</span></span><span style="display:flex;"><span>                res = RmGetList(handle, <span style="color:#66d9ef">out</span> pnProcInfoNeeded, <span style="color:#66d9ef">ref</span> pnProcInfo, processInfo, <span style="color:#66d9ef">ref</span> lpdwRebootReasons);
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> (res == <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>                {
+</span></span><span style="display:flex;"><span>                    processes = <span style="color:#66d9ef">new</span> List&lt;Process&gt;((<span style="color:#66d9ef">int</span>)pnProcInfo);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#75715e">// Enumerate all of the results and add them to the</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#75715e">// list to be returned</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i = <span style="color:#ae81ff">0</span>; i &lt; pnProcInfo; i++)
+</span></span><span style="display:flex;"><span>                    {
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">try</span>
+</span></span><span style="display:flex;"><span>                        {
+</span></span><span style="display:flex;"><span>                            processes.Add(Process.GetProcessById(processInfo[i].Process.dwProcessId));
+</span></span><span style="display:flex;"><span>                        }
+</span></span><span style="display:flex;"><span>                        <span style="color:#75715e">// Catch the error -- in case the process is no longer running</span>
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">catch</span> (ArgumentException) { }
+</span></span><span style="display:flex;"><span>                    }
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Exception(<span style="color:#e6db74">&#34;Could not list processes locking resource.&#34;</span>);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (res != <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Exception(<span style="color:#e6db74">&#34;Could not list processes locking resource. Failed to get size of result.&#34;</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">finally</span>
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            RmEndSession(handle);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> processes;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Usage Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span>List&lt;Process&gt; lockingProcesses = FileUtil.WhoIsLocking(<span style="color:#e6db74">@&#34;C:\Path\To\Your\File.txt&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">foreach</span> (Process proc <span style="color:#66d9ef">in</span> lockingProcesses)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    Console.WriteLine(<span style="color:#e6db74">$&#34;File locked by: {proc.ProcessName} (ID: {proc.Id})&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Permissions Note:</strong> This method accesses system resources. If your application runs with limited permissions (e.g., within IIS), it might lack the necessary access rights to query the registry. In such scenarios, it&rsquo;s advisable to have a separate process with elevated privileges perform the check, or to grant specific permissions.</p>
+<h3 id="solution-2-leveraging-sysinternals-handleexe">Solution 2: Leveraging Sysinternals Handle.exe</h3>
+<p>Sysinternals Handle.exe is a powerful command-line utility that can list open handles for any process. You can execute this tool from your C# application and parse its output to identify file locks.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Collections.Generic;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Diagnostics;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.IO;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Text.RegularExpressions;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">HandleUtilWrapper</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> List&lt;Process&gt; GetProcessesUsingFileWithHandle(<span style="color:#66d9ef">string</span> filePath)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> processes = <span style="color:#66d9ef">new</span> List&lt;Process&gt;();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">string</span> handleExePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, <span style="color:#e6db74">&#34;handle.exe&#34;</span>); <span style="color:#75715e">// Assuming handle.exe is in the same directory</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (!File.Exists(handleExePath))
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> FileNotFoundException(<span style="color:#e6db74">&#34;handle.exe not found. Please download it from Sysinternals and place it in the application directory.&#34;</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        Process tool = <span style="color:#66d9ef">new</span> Process();
+</span></span><span style="display:flex;"><span>        tool.StartInfo.FileName = handleExePath;
+</span></span><span style="display:flex;"><span>        tool.StartInfo.Arguments = <span style="color:#e6db74">$&#34;\&#34;</span>{filePath}<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#e6db74">&#34; /accepteula&#34;</span>; <span style="color:#75715e">// Use /accepteula to automatically accept the license agreement</span>
+</span></span><span style="display:flex;"><span>        tool.StartInfo.UseShellExecute = <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>        tool.StartInfo.RedirectStandardOutput = <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>        tool.StartInfo.CreateNoWindow = <span style="color:#66d9ef">true</span>; <span style="color:#75715e">// Hide the console window</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            tool.Start();
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">string</span> output = tool.StandardOutput.ReadToEnd();
+</span></span><span style="display:flex;"><span>            tool.WaitForExit();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Regex to find PIDs from the output</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Example line: &#34;  example.exe       pid: 1234  type: File  1234: C:\Path\To\Your\File.txt&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">string</span> matchPattern = <span style="color:#e6db74">@&#34;pid:\s*(\d+)&#34;</span>;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">foreach</span> (Match match <span style="color:#66d9ef">in</span> Regex.Matches(output, matchPattern))
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> (match.Success &amp;&amp; match.Groups.Count &gt; <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>                {
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">int</span> pid = <span style="color:#66d9ef">int</span>.Parse(match.Groups[<span style="color:#ae81ff">1</span>].Value);
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">try</span>
+</span></span><span style="display:flex;"><span>                    {
+</span></span><span style="display:flex;"><span>                        processes.Add(Process.GetProcessById(pid));
+</span></span><span style="display:flex;"><span>                    }
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">catch</span> (ArgumentException)
+</span></span><span style="display:flex;"><span>                    {
+</span></span><span style="display:flex;"><span>                        <span style="color:#75715e">// Process might have exited between Handle.exe run and GetProcessById</span>
+</span></span><span style="display:flex;"><span>                    }
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">catch</span> (Exception ex)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Log or handle exceptions, e.g., process not found, permissions issues</span>
+</span></span><span style="display:flex;"><span>            Console.WriteLine(<span style="color:#e6db74">$&#34;Error executing Handle.exe: {ex.Message}&#34;</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> processes;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Usage Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span>List&lt;Process&gt; lockingProcesses = HandleUtilWrapper.GetProcessesUsingFileWithHandle(<span style="color:#e6db74">@&#34;C:\Path\To\Your\File.txt&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">foreach</span> (Process proc <span style="color:#66d9ef">in</span> lockingProcesses)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    Console.WriteLine(<span style="color:#e6db74">$&#34;File locked by: {proc.ProcessName} (ID: {proc.Id})&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Considerations:</strong></p>
+<ul>
+<li>You need to download <code>handle.exe</code> from Microsoft Sysinternals and ensure it&rsquo;s accessible by your application.</li>
+<li>Parsing the output of a command-line tool can be brittle if the tool&rsquo;s output format changes in future versions.</li>
+<li>Permissions are crucial; <code>handle.exe</code> often requires administrative privileges to scan all processes.</li>
+</ul>
+<h3 id="solution-3-native-api-calls-for-handle-information-more-complex">Solution 3: Native API Calls for Handle Information (More Complex)</h3>
+<p>This approach involves directly calling Windows Native APIs to query system handle information. This is more complex but offers greater control and avoids external dependencies like <code>handle.exe</code>. It leverages <code>NtQuerySystemInformation</code> with <code>SystemHandleInformation</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Collections.Generic;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Diagnostics;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.IO;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Runtime.ConstrainedExecution;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Runtime.InteropServices;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Text;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Threading;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">NativeHandleFinder</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">//</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">##</span> Solutions
+</span></span><span style="display:flex;"><span>Definitions <span style="color:#66d9ef">for</span> NtQuerySystemInformation
+</span></span></code></pre></div><p>using System.Runtime.InteropServices;
+using System.Diagnostics;
+using System;
+using System.Collections.Generic;</p>
+<p>public static class FileUtil
+{
+[StructLayout(LayoutKind.Sequential)]
+struct RM_UNIQUE_PROCESS
+{
+public int dwProcessId;
+public System.Runtime.InteropServices.ComTypes.FILETIME ProcessStartTime;
+}</p>
+<pre><code>const int RmRebootReasonNone = 0;
+const int CCH_RM_MAX_APP_NAME = 255;
+const int CCH_RM_MAX_SVC_NAME = 63;
+
+enum RM_APP_TYPE
+{
+    RmUnknownApp = 0,
+    RmMainWindow = 1,
+    RmOtherWindow = 2,
+    RmService = 3,
+    RmExplorer = 4,
+    RmConsole = 5,
+    RmCritical = 1000
+}
+
+[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+struct RM_PROCESS_INFO
+{
+    public RM_UNIQUE_PROCESS Process;
+
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCH_RM_MAX_APP_NAME + 1)]
+    public string strAppName;
+
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCH_RM_MAX_SVC_NAME + 1)]
+    public string strServiceShortName;
+
+    public RM_APP_TYPE ApplicationType;
+    public uint AppStatus;
+    public uint TSSessionId;
+    [MarshalAs(UnmanagedType.Bool)]
+    public bool bRestartable;
+}
+
+[DllImport(&amp;quot;rstrtmgr.dll&amp;quot;, CharSet = CharSet.Unicode)]
+static extern int RmRegisterResources(uint pSessionHandle,
+                                      UInt32 nFiles,
+                                      string[] rgsFilenames,
+                                      UInt32 nApplications,
+                                      [In] RM_UNIQUE_PROCESS[] rgApplications,
+                                      UInt32 nServices,
+                                      string[] rgsServiceNames);
+
+[DllImport(&amp;quot;rstrtmgr.dll&amp;quot;, CharSet = CharSet.Auto)]
+static extern int RmStartSession(out uint pSessionHandle, int dwSessionFlags, string strSessionKey);
+
+[DllImport(&amp;quot;rstrtmgr.dll&amp;quot;)]
+static extern int RmEndSession(uint pSessionHandle);
+
+[DllImport(&amp;quot;rstrtmgr.dll&amp;quot;)]
+static extern int RmGetList(uint dwSessionHandle,
+                            out uint pnProcInfoNeeded,
+                            ref uint pnProcInfo,
+                            [In, Out] RM_PROCESS_INFO[] rgAffectedApps,
+                            ref uint lpdwRebootReasons);
+
+/// &amp;lt;summary&amp;gt;
+/// Find out what process(es) have a lock on the specified file.
+/// &amp;lt;/summary&amp;gt;
+/// &amp;lt;param name=&amp;quot;path&amp;quot;&amp;gt;Path of the file.&amp;lt;/param&amp;gt;
+/// &amp;lt;returns&amp;gt;Processes locking the file&amp;lt;/returns&amp;gt;
+/// &amp;lt;remarks&amp;gt;See also:
+/// http://msdn.microsoft.com/en-us/library/windows/desktop/aa373661(v=vs.85).aspx
+/// http://wyupdate.googlecode.com/svn-history/r401/trunk/frmFilesInUse.cs (no copyright in code at time of viewing)
+/// 
+/// &amp;lt;/remarks&amp;gt;
+static public List&amp;lt;Process&amp;gt; WhoIsLocking(string path)
+{
+    uint handle;
+    string key = Guid.NewGuid().ToString();
+    List&amp;lt;Process&amp;gt; processes = new List&amp;lt;Process&amp;gt;();
+
+    int res = RmStartSession(out handle, 0, key);
+    if (res != 0) throw new Exception(&amp;quot;Could not begin restart session.  Unable to determine file locker.&amp;quot;);
+
+    try
+    {
+        const int ERROR_MORE_DATA = 234;
+        uint pnProcInfoNeeded = 0,
+             pnProcInfo = 0,
+             lpdwRebootReasons = RmRebootReasonNone;
+
+        string[] resources = new string[] { path }; // Just checking on one resource.
+
+        res = RmRegisterResources(handle, (uint)resources.Length, resources, 0, null, 0, null);
+
+        if (res != 0) throw new Exception(&amp;quot;Could not register resource.&amp;quot;);                                    
+
+        //Note: there's a race condition here -- the first call to RmGetList() returns
+        //      the total number of process. However, when we call RmGetList() again to get
+        //      the actual processes this number may have increased.
+        res = RmGetList(handle, out pnProcInfoNeeded, ref pnProcInfo, null, ref lpdwRebootReasons);
+
+        if (res == ERROR_MORE_DATA)
+        {
+            // Create an array to store the process results
+            RM_PROCESS_INFO[] processInfo = new RM_PROCESS_INFO[pnProcInfoNeeded];
+            pnProcInfo = pnProcInfoNeeded;
+
+            // Get the list
+            res = RmGetList(handle, out pnProcInfoNeeded, ref pnProcInfo, processInfo, ref lpdwRebootReasons);
+            if (res == 0)
+            {
+                processes = new List&amp;lt;Process&amp;gt;((int)pnProcInfo);
+
+                // Enumerate all of the results and add them to the 
+                // list to be returned
+                for (int i = 0; i &amp;lt; pnProcInfo; i++)
+                {
+                    try
+                    {
+                        processes.Add(Process.GetProcessById(processInfo[i].Process.dwProcessId));
+                    }
+                    // catch the error -- in case the process is no longer running
+                    catch (ArgumentException) { }
+                }
+            }
+            else throw new Exception(&amp;quot;Could not list processes locking resource.&amp;quot;);                    
+        }
+        else if (res != 0) throw new Exception(&amp;quot;Could not list processes locking resource. Failed to get size of result.&amp;quot;);                    
+    }
+    finally
+    {
+        RmEndSession(handle);
+    }
+
+    return processes;
+}
+</code></pre>
+<p>}</p>
+<pre tabindex="0"><code>
+private enum NT_STATUS
+    {
+        STATUS_SUCCESS = 0x00000000,
+        STATUS_BUFFER_OVERFLOW = unchecked((int)0x80000005L),
+        STATUS_INFO_LENGTH_MISMATCH = unchecked((int)0xC0000004L)
+    }
+
+    private enum SYSTEM_INFORMATION_CLASS
+    {
+        SystemHandleInformation = 16
+    }
+
+    private enum OBJECT_INFORMATION_CLASS
+    {
+        ObjectNameInformation = 1,
+        ObjectTypeInformation = 2
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct SYSTEM_HANDLE_ENTRY
+    {
+        public int OwnerProcessId;
+        public byte ObjectTypeNumber;
+        public byte HandleFlags;
+        public short HandleValue;
+        public IntPtr Object;
+        public int AccessMask;
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    private struct OBJECT_NAME_INFORMATION
+    {
+        public IntPtr Name;
+        public int NameLength;
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    private struct OBJECT_TYPE_INFORMATION
+    {
+        public IntPtr TypeName;
+        public int TypeNameLength;
+    }
+
+    [DllImport(&#34;ntdll.dll&#34;, SetLastError = true)]
+    private static extern NT_STATUS NtQuerySystemInformation(
+        SYSTEM_INFORMATION_CLASS SystemInformationClass,
+        IntPtr SystemInformation,
+        int SystemInformationLength,
+        out int ReturnLength);
+
+    [DllImport(&#34;ntdll.dll&#34;, SetLastError = true)]
+    private static extern NT_STATUS NtQueryObject(
+        IntPtr Handle,
+        OBJECT_INFORMATION_CLASS ObjectInformationClass,
+        IntPtr ObjectInformation,
+        int ObjectInformationLength,
+        out int ReturnLength);
+
+    [DllImport(&#34;kernel32.dll&#34;)]
+    private static extern IntPtr GetCurrentProcess();
+
+    [DllImport(&#34;kernel32.dll&#34;, SetLastError = true)]
+    private static extern SafeProcessHandle OpenProcess(
+        ProcessAccessRights dwDesiredAccess,
+        bool bInheritHandle,
+        int dwProcessId);
+
+    [DllImport(&#34;kernel32.dll&#34;, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool DuplicateHandle(
+        IntPtr hSourceProcessHandle,
+        IntPtr hSourceHandle,
+        IntPtr hTargetProcessHandle,
+        out SafeObjectHandle lpTargetHandle,
+        int dwDesiredAccess,
+        bool bInheritHandle,
+        DuplicateHandleOptions dwOptions);
+
+    [DllImport(&#34;kernel32.dll&#34;)]
+    private static extern int GetProcessId(IntPtr Process);
+
+    [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
+    [DllImport(&#34;kernel32.dll&#34;, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool CloseHandle(IntPtr hObject);
+
+    [DllImport(&#34;kernel32.dll&#34;, SetLastError = true)]
+    private static extern int QueryDosDevice(string lpDeviceName, StringBuilder lpTargetPath, int ucchMax);
+
+    //
+</code></pre><p>List&lt;Process&gt; locks = Win32Processes.GetProcessesLockingFile(@&ldquo;C:\Hello.docx&rdquo;);
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.InteropServices;</p>
+<p>namespace FileLockInfo
+{
+public static class Win32Processes
+{
+/// &lt;summary&gt;
+/// Find out what process(es) have a lock on the specified file.
+/// &lt;/summary&gt;
+/// &lt;param name=&ldquo;path&rdquo;&gt;Path of the file.&lt;/param&gt;
+/// &lt;returns&gt;Processes locking the file&lt;/returns&gt;
+/// &lt;remarks&gt;See also:
+/// <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa373661%28v=vs.85%29.aspx" target="_blank" rel="noopener">http://msdn.microsoft.com/en-us/library/windows/desktop/aa373661(v=vs.85).aspx</a>
+
+/// <a href="http://wyupdate.googlecode.com/svn-history/r401/trunk/frmFilesInUse.cs" target="_blank" rel="noopener">http://wyupdate.googlecode.com/svn-history/r401/trunk/frmFilesInUse.cs</a>
+ (no copyright in code at time of viewing)
+/// &lt;/remarks&gt;
+public static List&lt;Process&gt; GetProcessesLockingFile(string path)
+{
+uint handle;
+string key = Guid.NewGuid().ToString();
+int res = RmStartSession(out handle, 0, key);</p>
+<pre><code>        if (res != 0) throw new Exception(&quot;Could not begin restart session.  Unable to determine file locker.&quot;);
+
+        try
+        {
+            const int MORE_DATA = 234;
+            uint pnProcInfoNeeded, pnProcInfo = 0, lpdwRebootReasons = RmRebootReasonNone;
+
+            string[] resources = {path}; // Just checking on one resource.
+
+            res = RmRegisterResources(handle, (uint) resources.Length, resources, 0, null, 0, null);
+
+            if (res != 0) throw new Exception(&quot;Could not register resource.&quot;);
+
+            //Note: there's a race condition here -- the first call to RmGetList() returns
+            //      the total number of process. However, when we call RmGetList() again to get
+            //      the actual processes this number may have increased.
+            res = RmGetList(handle, out pnProcInfoNeeded, ref pnProcInfo, null, ref lpdwRebootReasons);
+
+            if (res == MORE_DATA)
+            {
+                return EnumerateProcesses(pnProcInfoNeeded, handle, lpdwRebootReasons);
+            }
+            else if (res != 0) throw new Exception(&quot;Could not list processes locking resource. Failed to get size of result.&quot;);
+        }
+        finally
+        {
+            RmEndSession(handle);
+        }
+
+        return new List&amp;lt;Process&amp;gt;();
+    }
+
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct RM_UNIQUE_PROCESS
+    {
+        public int dwProcessId;
+        public System.Runtime.InteropServices.ComTypes.FILETIME ProcessStartTime;
+    }
+
+    const int RmRebootReasonNone = 0;
+    const int CCH_RM_MAX_APP_NAME = 255;
+    const int CCH_RM_MAX_SVC_NAME = 63;
+
+    public enum RM_APP_TYPE
+    {
+        RmUnknownApp = 0,
+        RmMainWindow = 1,
+        RmOtherWindow = 2,
+        RmService = 3,
+        RmExplorer = 4,
+        RmConsole = 5,
+        RmCritical = 1000
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    public struct RM_PROCESS_INFO
+    {
+        public RM_UNIQUE_PROCESS Process;
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCH_RM_MAX_APP_NAME + 1)] public string strAppName;
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCH_RM_MAX_SVC_NAME + 1)] public string strServiceShortName;
+
+        public RM_APP_TYPE ApplicationType;
+        public uint AppStatus;
+        public uint TSSessionId;
+        [MarshalAs(UnmanagedType.Bool)] public bool bRestartable;
+    }
+
+    [DllImport(&quot;rstrtmgr.dll&quot;, CharSet = CharSet.Unicode)]
+    static extern int RmRegisterResources(uint pSessionHandle, uint nFiles, string[] rgsFilenames,
+        uint nApplications, [In] RM_UNIQUE_PROCESS[] rgApplications, uint nServices,
+        string[] rgsServiceNames);
+
+    [DllImport(&quot;rstrtmgr.dll&quot;, CharSet = CharSet.Auto)]
+    static extern int RmStartSession(out uint pSessionHandle, int dwSessionFlags, string strSessionKey);
+
+    [DllImport(&quot;rstrtmgr.dll&quot;)]
+    static extern int RmEndSession(uint pSessionHandle);
+
+    [DllImport(&quot;rstrtmgr.dll&quot;)]
+    static extern int RmGetList(uint dwSessionHandle, out uint pnProcInfoNeeded,
+        ref uint pnProcInfo, [In, Out] RM_PROCESS_INFO[] rgAffectedApps,
+        ref uint lpdwRebootReasons);
+
+    private static List&amp;lt;Process&amp;gt; EnumerateProcesses(uint pnProcInfoNeeded, uint handle, uint lpdwRebootReasons)
+    {
+        var processes = new List&amp;lt;Process&amp;gt;(10);
+        // Create an array to store the process results
+        var processInfo = new RM_PROCESS_INFO[pnProcInfoNeeded];
+        var pnProcInfo = pnProcInfoNeeded;
+
+        // Get the list
+        var res = RmGetList(handle, out pnProcInfoNeeded, ref pnProcInfo, processInfo, ref lpdwRebootReasons);
+
+        if (res != 0) throw new Exception(&quot;Could not list processes locking resource.&quot;);
+        for (int i = 0; i &amp;lt; pnProcInfo; i++)
+        {
+            try
+            {
+                processes.Add(Process.GetProcessById(processInfo[i].Process.dwProcessId));
+            }
+            catch (ArgumentException) { } // catch the error -- in case the process is no longer running
+        }
+        return processes;
+    }
+}
+</code></pre>
+<p>}</p>
+<pre tabindex="0"><code>
+Safe Handles
+</code></pre><p>string fileName = @&ldquo;c:\aaa.doc&rdquo;;//Path to locked file</p>
+<p>Process tool = new Process();
+tool.StartInfo.FileName = &ldquo;handle.exe&rdquo;;
+tool.StartInfo.Arguments = fileName+&quot; /accepteula&quot;;
+tool.StartInfo.UseShellExecute = false;
+tool.StartInfo.RedirectStandardOutput = true;
+tool.Start();        <br>
+tool.WaitForExit();
+string outputTool = tool.StandardOutput.ReadToEnd();</p>
+<p>string matchPattern = @&quot;(?&lt;=\s+pid:\s+)\b(\d+)\b(?=\s+)&quot;;
+foreach(Match match in Regex.Matches(outputTool, matchPattern))
+{
+Process.GetProcessById(int.Parse(match.Value)).Kill();
+}</p>
+<pre tabindex="0"><code>
+private sealed class SafeObjectHandle : SafeHandleZeroOrMinusOneIsInvalid
+    {
+        private SafeObjectHandle() : base(true) { }
+        internal SafeObjectHandle(IntPtr preexistingHandle, bool ownsHandle) : base(ownsHandle) { SetHandle(preexistingHandle); }
+        protected override bool ReleaseHandle() =&gt; CloseHandle(handle);
+    }
+
+    private sealed class SafeProcessHandle : SafeHandleZeroOrMinusOneIsInvalid
+    {
+        private SafeProcessHandle() : base(true) { }
+        internal SafeProcessHandle(IntPtr preexistingHandle, bool ownsHandle) : base(ownsHandle) { SetHandle(preexistingHandle); }
+        protected override bool ReleaseHandle() =&gt; CloseHandle(handle);
+    }
+
+    //
+
+Helper Methods
+</code></pre><p>using System;
+using System.Collections.Generic;
+//using System.EnterpriseServices;
+using System.IO;
+using System.Runtime.CompilerServices;
+using System.Runtime.ConstrainedExecution;
+using System.Runtime.InteropServices;
+using System.Security.Permissions;
+using System.Text;
+using System.Threading;
+using Microsoft.Win32.SafeHandles;</p>
+<p>namespace Crmc.Core.BuildTasks
+{
+using System.Diagnostics;
+using System.Linq;</p>
+<pre><code>#region ENUMs
+internal enum NT_STATUS
+{
+    STATUS_SUCCESS = 0x00000000,
+    STATUS_BUFFER_OVERFLOW = unchecked((int)0x80000005L),
+    STATUS_INFO_LENGTH_MISMATCH = unchecked((int)0xC0000004L)
+}
+
+internal enum SYSTEM_INFORMATION_CLASS
+{
+    SystemBasicInformation = 0,
+    SystemPerformanceInformation = 2,
+    SystemTimeOfDayInformation = 3,
+    SystemProcessInformation = 5,
+    SystemProcessorPerformanceInformation = 8,
+    SystemHandleInformation = 16,
+    SystemInterruptInformation = 23,
+    SystemExceptionInformation = 33,
+    SystemRegistryQuotaInformation = 37,
+    SystemLookasideInformation = 45
+}
+
+internal enum OBJECT_INFORMATION_CLASS
+{
+    ObjectBasicInformation = 0,
+    ObjectNameInformation = 1,
+    ObjectTypeInformation = 2,
+    ObjectAllTypesInformation = 3,
+    ObjectHandleInformation = 4
+}
+
+[Flags]
+internal enum ProcessAccessRights
+{
+    PROCESS_DUP_HANDLE = 0x00000040
+}
+
+[Flags]
+internal enum DuplicateHandleOptions
+{
+    DUPLICATE_CLOSE_SOURCE = 0x1,
+    DUPLICATE_SAME_ACCESS = 0x2
+}
+#endregion
+
+[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
+internal sealed class SafeObjectHandle : SafeHandleZeroOrMinusOneIsInvalid
+{
+    private SafeObjectHandle()
+        : base(true)
+    { }
+
+    internal SafeObjectHandle(IntPtr preexistingHandle, bool ownsHandle)
+        : base(ownsHandle)
+    {
+        base.SetHandle(preexistingHandle);
+    }
+
+    protected override bool ReleaseHandle()
+    {
+        return NativeMethods.CloseHandle(base.handle);
+    }
+}
+
+[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
+internal sealed class SafeProcessHandle : SafeHandleZeroOrMinusOneIsInvalid
+{
+    private SafeProcessHandle()
+        : base(true)
+    { }
+
+    internal SafeProcessHandle(IntPtr preexistingHandle, bool ownsHandle)
+        : base(ownsHandle)
+    {
+        base.SetHandle(preexistingHandle);
+    }
+
+    protected override bool ReleaseHandle()
+    {
+        return NativeMethods.CloseHandle(base.handle);
+    }
+}
+
+#region Native Methods
+internal static class NativeMethods
+{
+    [DllImport(&quot;ntdll.dll&quot;)]
+    internal static extern NT_STATUS NtQuerySystemInformation(
+        [In] SYSTEM_INFORMATION_CLASS SystemInformationClass,
+        [In] IntPtr SystemInformation,
+        [In] int SystemInformationLength,
+        [Out] out int ReturnLength);
+
+    [DllImport(&quot;ntdll.dll&quot;)]
+    internal static extern NT_STATUS NtQueryObject(
+        [In] IntPtr Handle,
+        [In] OBJECT_INFORMATION_CLASS ObjectInformationClass,
+        [In] IntPtr ObjectInformation,
+        [In] int ObjectInformationLength,
+        [Out] out int ReturnLength);
+
+    [DllImport(&quot;kernel32.dll&quot;, SetLastError = true)]
+    internal static extern SafeProcessHandle OpenProcess(
+        [In] ProcessAccessRights dwDesiredAccess,
+        [In, MarshalAs(UnmanagedType.Bool)] bool bInheritHandle,
+        [In] int dwProcessId);
+
+    [DllImport(&quot;kernel32.dll&quot;, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool DuplicateHandle(
+        [In] IntPtr hSourceProcessHandle,
+        [In] IntPtr hSourceHandle,
+        [In] IntPtr hTargetProcessHandle,
+        [Out] out SafeObjectHandle lpTargetHandle,
+        [In] int dwDesiredAccess,
+        [In, MarshalAs(UnmanagedType.Bool)] bool bInheritHandle,
+        [In] DuplicateHandleOptions dwOptions);
+
+    [DllImport(&quot;kernel32.dll&quot;)]
+    internal static extern IntPtr GetCurrentProcess();
+
+    [DllImport(&quot;kernel32.dll&quot;, SetLastError = true)]
+    internal static extern int GetProcessId(
+        [In] IntPtr Process);
+
+    [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
+    [DllImport(&quot;kernel32.dll&quot;, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool CloseHandle(
+        [In] IntPtr hObject);
+
+    [DllImport(&quot;kernel32.dll&quot;, SetLastError = true)]
+    internal static extern int QueryDosDevice(
+        [In] string lpDeviceName,
+        [Out] StringBuilder lpTargetPath,
+        [In] int ucchMax);
+}
+#endregion
+
+//[ComVisible(true), EventTrackingEnabled(true)]
+public class DetectOpenFiles// : ServicedComponent
+{
+    private static Dictionary&amp;lt;string, string&amp;gt; deviceMap;
+    private const string networkDevicePrefix = &quot;\\Device\\LanmanRedirector\\&quot;;
+
+    private const int MAX_PATH = 260;
+
+    private enum SystemHandleType
+    {
+        OB_TYPE_UNKNOWN = 0,
+        OB_TYPE_TYPE = 1,
+        OB_TYPE_DIRECTORY,
+        OB_TYPE_SYMBOLIC_LINK,
+        OB_TYPE_TOKEN,
+        OB_TYPE_PROCESS,
+        OB_TYPE_THREAD,
+        OB_TYPE_UNKNOWN_7,
+        OB_TYPE_EVENT,
+        OB_TYPE_EVENT_PAIR,
+        OB_TYPE_MUTANT,
+        OB_TYPE_UNKNOWN_11,
+        OB_TYPE_SEMAPHORE,
+        OB_TYPE_TIMER,
+        OB_TYPE_PROFILE,
+        OB_TYPE_WINDOW_STATION,
+        OB_TYPE_DESKTOP,
+        OB_TYPE_SECTION,
+        OB_TYPE_KEY,
+        OB_TYPE_PORT,
+        OB_TYPE_WAITABLE_PORT,
+        OB_TYPE_UNKNOWN_21,
+        OB_TYPE_UNKNOWN_22,
+        OB_TYPE_UNKNOWN_23,
+        OB_TYPE_UNKNOWN_24,
+        //OB_TYPE_CONTROLLER,
+        //OB_TYPE_DEVICE,
+        //OB_TYPE_DRIVER,
+        OB_TYPE_IO_COMPLETION,
+        OB_TYPE_FILE
+    };
+
+    private const int handleTypeTokenCount = 27;
+    private static readonly string[] handleTypeTokens = new string[] { 
+        &quot;&quot;, &quot;&quot;, &quot;Directory&quot;, &quot;SymbolicLink&quot;, &quot;Token&quot;,
+        &quot;Process&quot;, &quot;Thread&quot;, &quot;Unknown7&quot;, &quot;Event&quot;, &quot;EventPair&quot;, &quot;Mutant&quot;,
+        &quot;Unknown11&quot;, &quot;Semaphore&quot;, &quot;Timer&quot;, &quot;Profile&quot;, &quot;WindowStation&quot;,
+        &quot;Desktop&quot;, &quot;Section&quot;, &quot;Key&quot;, &quot;Port&quot;, &quot;WaitablePort&quot;,
+        &quot;Unknown21&quot;, &quot;Unknown22&quot;, &quot;Unknown23&quot;, &quot;Unknown24&quot;, 
+        &quot;IoCompletion&quot;, &quot;File&quot;
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct SYSTEM_HANDLE_ENTRY
+    {
+        public int OwnerPid;
+        public byte ObjectType;
+        public byte HandleFlags;
+        public short HandleValue;
+        public int ObjectPointer;
+        public int AccessMask;
+    }
+
+    /// &amp;lt;summary&amp;gt;
+    /// Gets the open files enumerator.
+    /// &amp;lt;/summary&amp;gt;
+    /// &amp;lt;param name=&quot;processId&quot;&amp;gt;The process id.&amp;lt;/param&amp;gt;
+    /// &amp;lt;returns&amp;gt;&amp;lt;/returns&amp;gt;
+    public static IEnumerable&amp;lt;String&amp;gt; GetOpenFilesEnumerator(int processId)
+    {
+        return new OpenFiles(processId);
+    }
+
+    public static List&amp;lt;Process&amp;gt; GetProcessesUsingFile(string fName)
+    {
+        List&amp;lt;Process&amp;gt; result = new List&amp;lt;Process&amp;gt;();
+        foreach (var p in Process.GetProcesses())
+        {
+            try
+            {
+                if (DetectOpenFiles.GetOpenFilesEnumerator(p.Id).Contains(fName))
+                {
+                    result.Add(p);
+                }
+            }
+            catch { }//some processes will fail
+        }
+        return result;
+    }
+
+    private sealed class OpenFiles : IEnumerable&amp;lt;String&amp;gt;
+    {
+        private readonly int processId;
+
+        internal OpenFiles(int processId)
+        {
+            this.processId = processId;
+        }
+
+        #region IEnumerable&amp;lt;FileSystemInfo&amp;gt; Members
+
+        public IEnumerator&amp;lt;String&amp;gt; GetEnumerator()
+        {
+            NT_STATUS ret;
+            int length = 0x10000;
+            // Loop, probing for required memory.
+
+
+            do
+            {
+                IntPtr ptr = IntPtr.Zero;
+                RuntimeHelpers.PrepareConstrainedRegions();
+                try
+                {
+                    RuntimeHelpers.PrepareConstrainedRegions();
+                    try { }
+                    finally
+                    {
+                        // CER guarantees that the address of the allocated 
+                        // memory is actually assigned to ptr if an 
+                        // asynchronous exception occurs.
+                        ptr = Marshal.AllocHGlobal(length);
+                    }
+                    int returnLength;
+                    ret = NativeMethods.NtQuerySystemInformation(SYSTEM_INFORMATION_CLASS.SystemHandleInformation, ptr, length, out returnLength);
+                    if (ret == NT_STATUS.STATUS_INFO_LENGTH_MISMATCH)
+                    {
+                        // Round required memory up to the nearest 64KB boundary.
+                        length = ((returnLength + 0xffff) &amp;amp; ~0xffff);
+                    }
+                    else if (ret == NT_STATUS.STATUS_SUCCESS)
+                    {
+                        int handleCount = Marshal.ReadInt32(ptr);
+                        int offset = sizeof(int);
+                        int size = Marshal.SizeOf(typeof(SYSTEM_HANDLE_ENTRY));
+                        for (int i = 0; i &amp;lt; handleCount; i++)
+                        {
+                            SYSTEM_HANDLE_ENTRY handleEntry = (SYSTEM_HANDLE_ENTRY)Marshal.PtrToStructure((IntPtr)((int)ptr + offset), typeof(SYSTEM_HANDLE_ENTRY));
+                            if (handleEntry.OwnerPid == processId)
+                            {
+                                IntPtr handle = (IntPtr)handleEntry.HandleValue;
+                                SystemHandleType handleType;
+
+                                if (GetHandleType(handle, handleEntry.OwnerPid, out handleType) &amp;amp;&amp;amp; handleType == SystemHandleType.OB_TYPE_FILE)
+                                {
+                                    string devicePath;
+                                    if (GetFileNameFromHandle(handle, handleEntry.OwnerPid, out devicePath))
+                                    {
+                                        string dosPath;
+                                        if (ConvertDevicePathToDosPath(devicePath, out dosPath))
+                                        {
+                                            if (File.Exists(dosPath))
+                                            {
+                                                yield return dosPath; // return new FileInfo(dosPath);
+                                            }
+                                            else if (Directory.Exists(dosPath))
+                                            {
+                                                yield return dosPath; // new DirectoryInfo(dosPath);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            offset += size;
+                        }
+                    }
+                }
+                finally
+                {
+                    // CER guarantees that the allocated memory is freed, 
+                    // if an asynchronous exception occurs. 
+                    Marshal.FreeHGlobal(ptr);
+                    //sw.Flush();
+                    //sw.Close();
+                }
+            }
+            while (ret == NT_STATUS.STATUS_INFO_LENGTH_MISMATCH);
+        }
+
+        #endregion
+
+        #region IEnumerable Members
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        #endregion
+    }
+
+    #region Private Members
+
+    private static bool GetFileNameFromHandle(IntPtr handle, int processId, out string fileName)
+    {
+        IntPtr currentProcess = NativeMethods.GetCurrentProcess();
+        bool remote = (processId != NativeMethods.GetProcessId(currentProcess));
+        SafeProcessHandle processHandle = null;
+        SafeObjectHandle objectHandle = null;
+        try
+        {
+            if (remote)
+            {
+                processHandle = NativeMethods.OpenProcess(ProcessAccessRights.PROCESS_DUP_HANDLE, true, processId);
+                if (NativeMethods.DuplicateHandle(processHandle.DangerousGetHandle(), handle, currentProcess, out objectHandle, 0, false, DuplicateHandleOptions.DUPLICATE_SAME_ACCESS))
+                {
+                    handle = objectHandle.DangerousGetHandle();
+                }
+            }
+            return GetFileNameFromHandle(handle, out fileName, 200);
+        }
+        finally
+        {
+            if (remote)
+            {
+                if (processHandle != null)
+                {
+                    processHandle.Close();
+                }
+                if (objectHandle != null)
+                {
+                    objectHandle.Close();
+                }
+            }
+        }
+    }
+    private static bool GetFileNameFromHandle(IntPtr handle, out string fileName, int wait)
+    {
+        using (FileNameFromHandleState f = new FileNameFromHandleState(handle))
+        {
+            ThreadPool.QueueUserWorkItem(new WaitCallback(GetFileNameFromHandle), f);
+            if (f.WaitOne(wait))
+            {
+                fileName = f.FileName;
+                return f.RetValue;
+            }
+            else
+            {
+                fileName = string.Empty;
+                return false;
+            }
+        }
+    }
+
+    private class FileNameFromHandleState : IDisposable
+    {
+        private ManualResetEvent _mr;
+        private IntPtr _handle;
+        private string _fileName;
+        private bool _retValue;
+
+        public IntPtr Handle
+        {
+            get
+            {
+                return _handle;
+            }
+        }
+
+        public string FileName
+        {
+            get
+            {
+                return _fileName;
+            }
+            set
+            {
+                _fileName = value;
+            }
+
+        }
+
+        public bool RetValue
+        {
+            get
+            {
+                return _retValue;
+            }
+            set
+            {
+                _retValue = value;
+            }
+        }
+
+        public FileNameFromHandleState(IntPtr handle)
+        {
+            _mr = new ManualResetEvent(false);
+            this._handle = handle;
+        }
+
+        public bool WaitOne(int wait)
+        {
+            return _mr.WaitOne(wait, false);
+        }
+
+        public void Set()
+        {
+            try
+            {
+                _mr.Set();
+            }
+            catch{}
+        }
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            if (_mr != null)
+                _mr.Close();
+        }
+
+        #endregion
+    }
+
+    private static void GetFileNameFromHandle(object state)
+    {
+        FileNameFromHandleState s = (FileNameFromHandleState)state;
+        string fileName;
+        s.RetValue = GetFileNameFromHandle(s.Handle, out fileName);
+        s.FileName = fileName;
+        s.Set();
+    }
+
+    private static bool GetFileNameFromHandle(IntPtr handle, out string fileName)
+    {
+        IntPtr ptr = IntPtr.Zero;
+        RuntimeHelpers.PrepareConstrainedRegions();
+        try
+        {
+            int length = 0x200;  // 512 bytes
+            RuntimeHelpers.PrepareConstrainedRegions();
+            try { }
+            finally
+            {
+                // CER guarantees the assignment of the allocated 
+                // memory address to ptr, if an ansynchronous exception 
+                // occurs.
+                ptr = Marshal.AllocHGlobal(length);
+            }
+            NT_STATUS ret = NativeMethods.NtQueryObject(handle, OBJECT_INFORMATION_CLASS.ObjectNameInformation, ptr, length, out length);
+            if (ret == NT_STATUS.STATUS_BUFFER_OVERFLOW)
+            {
+                RuntimeHelpers.PrepareConstrainedRegions();
+                try { }
+                finally
+                {
+                    // CER guarantees that the previous allocation is freed,
+                    // and that the newly allocated memory address is 
+                    // assigned to ptr if an asynchronous exception occurs.
+                    Marshal.FreeHGlobal(ptr);
+                    ptr = Marshal.AllocHGlobal(length);
+                }
+                ret = NativeMethods.NtQueryObject(handle, OBJECT_INFORMATION_CLASS.ObjectNameInformation, ptr, length, out length);
+            }
+            if (ret == NT_STATUS.STATUS_SUCCESS)
+            {
+                fileName = Marshal.PtrToStringUni((IntPtr)((int)ptr + 8), (length - 9) / 2);
+                return fileName.Length != 0;
+            }
+        }
+        finally
+        {
+            // CER guarantees that the allocated memory is freed, 
+            // if an asynchronous exception occurs.
+            Marshal.FreeHGlobal(ptr);
+        }
+
+        fileName = string.Empty;
+        return false;
+    }
+
+    private static bool GetHandleType(IntPtr handle, int processId, out SystemHandleType handleType)
+    {
+        string token = GetHandleTypeToken(handle, processId);
+        return GetHandleTypeFromToken(token, out handleType);
+    }
+
+    private static bool GetHandleType(IntPtr handle, out SystemHandleType handleType)
+    {
+        string token = GetHandleTypeToken(handle);
+        return GetHandleTypeFromToken(token, out handleType);
+    }
+
+    private static bool GetHandleTypeFromToken(string token, out SystemHandleType handleType)
+    {
+        for (int i = 1; i &amp;lt; handleTypeTokenCount; i++)
+        {
+            if (handleTypeTokens[i] == token)
+            {
+                handleType = (SystemHandleType)i;
+                return true;
+            }
+        }
+        handleType = SystemHandleType.OB_TYPE_UNKNOWN;
+        return false;
+    }
+
+    private static string GetHandleTypeToken(IntPtr handle, int processId)
+    {
+        IntPtr currentProcess = NativeMethods.GetCurrentProcess();
+        bool remote = (processId != NativeMethods.GetProcessId(currentProcess));
+        SafeProcessHandle processHandle = null;
+        SafeObjectHandle objectHandle = null;
+        try
+        {
+            if (remote)
+            {
+                processHandle = NativeMethods.OpenProcess(ProcessAccessRights.PROCESS_DUP_HANDLE, true, processId);
+                if (NativeMethods.DuplicateHandle(processHandle.DangerousGetHandle(), handle, currentProcess, out objectHandle, 0, false, DuplicateHandleOptions.DUPLICATE_SAME_ACCESS))
+                {
+                    handle = objectHandle.DangerousGetHandle();
+                }
+            }
+            return GetHandleTypeToken(handle);
+        }
+        finally
+        {
+            if (remote)
+            {
+                if (processHandle != null)
+                {
+                    processHandle.Close();
+                }
+                if (objectHandle != null)
+                {
+                    objectHandle.Close();
+                }
+            }
+        }
+    }
+
+    private static string GetHandleTypeToken(IntPtr handle)
+    {
+        int length;
+        NativeMethods.NtQueryObject(handle, OBJECT_INFORMATION_CLASS.ObjectTypeInformation, IntPtr.Zero, 0, out length);
+        IntPtr ptr = IntPtr.Zero;
+        RuntimeHelpers.PrepareConstrainedRegions();
+        try
+        {
+            RuntimeHelpers.PrepareConstrainedRegions();
+            try { }
+            finally
+            {
+                ptr = Marshal.AllocHGlobal(length);
+            }
+            if (NativeMethods.NtQueryObject(handle, OBJECT_INFORMATION_CLASS.ObjectTypeInformation, ptr, length, out length) == NT_STATUS.STATUS_SUCCESS)
+            {
+                return Marshal.PtrToStringUni((IntPtr)((int)ptr + 0x60));
+            }
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(ptr);
+        }
+        return string.Empty;
+    }
+
+    private static bool ConvertDevicePathToDosPath(string devicePath, out string dosPath)
+    {
+        EnsureDeviceMap();
+        int i = devicePath.Length;
+        while (i &amp;gt; 0 &amp;amp;&amp;amp; (i = devicePath.LastIndexOf('\\', i - 1)) != -1)
+        {
+            string drive;
+            if (deviceMap.TryGetValue(devicePath.Substring(0, i), out drive))
+            {
+                dosPath = string.Concat(drive, devicePath.Substring(i));
+                return dosPath.Length != 0;
+            }
+        }
+        dosPath = string.Empty;
+        return false;
+    }
+
+    private static void EnsureDeviceMap()
+    {
+        if (deviceMap == null)
+        {
+            Dictionary&amp;lt;string, string&amp;gt; localDeviceMap = BuildDeviceMap();
+            Interlocked.CompareExchange&amp;lt;Dictionary&amp;lt;string, string&amp;gt;&amp;gt;(ref deviceMap, localDeviceMap, null);
+        }
+    }
+
+    private static Dictionary&amp;lt;string, string&amp;gt; BuildDeviceMap()
+    {
+        string[] logicalDrives = Environment.GetLogicalDrives();
+        Dictionary&amp;lt;string, string&amp;gt; localDeviceMap = new Dictionary&amp;lt;string, string&amp;gt;(logicalDrives.Length);
+        StringBuilder lpTargetPath = new StringBuilder(MAX_PATH);
+        foreach (string drive in logicalDrives)
+        {
+            string lpDeviceName = drive.Substring(0, 2);
+            NativeMethods.QueryDosDevice(lpDeviceName, lpTargetPath, MAX_PATH);
+            localDeviceMap.Add(NormalizeDeviceName(lpTargetPath.ToString()), lpDeviceName);
+        }
+        localDeviceMap.Add(networkDevicePrefix.Substring(0, networkDevicePrefix.Length - 1), &quot;\\&quot;);
+        return localDeviceMap;
+    }
+
+    private static string NormalizeDeviceName(string deviceName)
+    {
+        if (string.Compare(deviceName, 0, networkDevicePrefix, 0, networkDevicePrefix.Length, StringComparison.InvariantCulture) == 0)
+        {
+            string shareName = deviceName.Substring(deviceName.IndexOf('\\', networkDevicePrefix.Length) + 1);
+            return string.Concat(networkDevicePrefix, shareName);
+        }
+        return deviceName;
+    }
+
+    #endregion
+}
+</code></pre>
+<p>}</p>
+<pre tabindex="0"><code>
+private static Dictionary&lt;string, string&gt; deviceMap;
+    private const string networkDevicePrefix = &#34;\\Device\\LanmanRedirector\\&#34;;
+    private const int MAX_PATH = 260;
+
+    private static void EnsureDeviceMap()
+    {
+        if (deviceMap == null)
+        {
+            var localDeviceMap = BuildDeviceMap();
+            Interlocked.CompareExchange(ref deviceMap, localDeviceMap, null);
+        }
+    }
+
+    private static Dictionary&lt;string, string&gt; BuildDeviceMap()
+    {
+        string[] logicalDrives = Environment.GetLogicalDrives();
+        var localDeviceMap = new Dictionary&lt;string, string&gt;(logicalDrives.Length);
+        StringBuilder lpTargetPath = new StringBuilder(MAX_PATH);
+        foreach (string drive in logicalDrives)
+        {
+            string lpDeviceName = drive.Substring(0, 2);
+            QueryDosDevice(lpDeviceName, lpTargetPath, MAX_PATH);
+            localDeviceMap.Add(NormalizeDeviceName(lpTargetPath.ToString()), lpDeviceName);
+        }
+        localDeviceMap.Add(networkDevicePrefix.Substring(0, networkDevicePrefix.Length - 1), &#34;\\&#34;);
+        return localDeviceMap;
+    }
+
+    private static string NormalizeDeviceName(string deviceName)
+    {
+        if (deviceName.StartsWith(networkDevicePrefix, StringComparison.Ordinal))
+        {
+            string shareName = deviceName.Substring(deviceName.IndexOf(&#39;\\&#39;, networkDevicePrefix.Length) + 1);
+            return string.Concat(networkDevicePrefix, shareName);
+        }
+        return deviceName;
+    }
+
+    private static bool ConvertDevicePathToDosPath(string devicePath, out string dosPath)
+    {
+        EnsureDeviceMap();
+        int i = devicePath.Length;
+        while (i &gt; 0 &amp;&amp; (i = devicePath.LastIndexOf(&#39;\\&#39;, i - 1)) != -1)
+        {
+            if (deviceMap.TryGetValue(devicePath.Substring(0, i), out var drive))
+            {
+                dosPath = string.Concat(drive, devicePath.Substring(i));
+                return dosPath.Length != 0;
+            }
+        }
+        dosPath = string.Empty;
+        return false;
+    }
+
+    private static string GetFileNameFromHandle(IntPtr handle)
+    {
+        IntPtr ptr = IntPtr.Zero;
+        try
+        {
+            int length = 0x200; // 512 bytes buffer
+            ptr = Marshal.AllocHGlobal(length);
+            NT_STATUS ret = NtQueryObject(handle, OBJECT_INFORMATION_CLASS.ObjectNameInformation, ptr, length, out length);
+
+            if (ret == NT_STATUS.STATUS_BUFFER_OVERFLOW)
+            {
+                Marshal.FreeHGlobal(ptr);
+                ptr = Marshal.AllocHGlobal(length);
+                ret = NtQueryObject(handle, OBJECT_INFORMATION_CLASS.ObjectNameInformation, ptr, length, out length);
+            }
+
+            if (ret == NT_STATUS.STATUS_SUCCESS)
+            {
+                // The structure is OBJECT_NAME_INFORMATION, which has a Unicode string.
+                // The first part of the buffer contains a pointer to the string, and the length.
+                // The actual string data starts after the pointer and length.
+                return Marshal.PtrToStringUni((IntPtr)((int)ptr + 2 * IntPtr.Size), (length - 3 * IntPtr.Size) / 2);
+            }
+        }
+        finally
+        {
+            if (ptr != IntPtr.Zero) Marshal.FreeHGlobal(ptr);
+        }
+        return null;
+    }
+
+    private static string GetHandleType(IntPtr handle)
+    {
+        IntPtr ptr = IntPtr.Zero;
+        try
+        {
+            int length;
+            NtQueryObject(handle, OBJECT_INFORMATION_CLASS.ObjectTypeInformation, IntPtr.Zero, 0, out length);
+            ptr = Marshal.AllocHGlobal(length);
+            if (NtQueryObject(handle, OBJECT_INFORMATION_CLASS.ObjectTypeInformation, ptr, length, out length) == NT_STATUS.STATUS_SUCCESS)
+            {
+                return Marshal.PtrToStringUni((IntPtr)((int)ptr + 0x58 + 2 * IntPtr.Size)); // Offset to type name string
+            }
+        }
+        finally
+        {
+            if (ptr != IntPtr.Zero) Marshal.FreeHGlobal(ptr);
+        }
+        return null;
+    }
+
+    /// &lt;summary&gt;
+    /// Retrieves processes that have a specific file locked.
+    /// &lt;/summary&gt;
+    /// &lt;param name=&#34;filePath&#34;&gt;The full path to the file.&lt;/param&gt;
+    /// &lt;returns&gt;A list of processes that are locking the file.&lt;/returns&gt;
+    public static List&lt;Process&gt; GetProcessesLockingFileNative(string filePath)
+    {
+        var processes = new List&lt;Process&gt;();
+        IntPtr currentProcessHandle = GetCurrentProcess();
+        int currentProcessId = GetProcessId(currentProcessHandle);
+
+        int length = 0x10000; // Initial buffer size
+
+        IntPtr systemHandleInfoPtr = IntPtr.Zero;
+
+        try
+        {
+            while (true)
+            {
+                systemHandleInfoPtr = Marshal.AllocHGlobal(length);
+                int returnLength;
+                NT_STATUS status = NtQuerySystemInformation(SYSTEM_INFORMATION_CLASS.SystemHandleInformation, systemHandleInfoPtr, length, out returnLength);
+
+                if (status == NT_STATUS.STATUS_INFO_LENGTH_MISMATCH)
+                {
+                    length = returnLength; // Buffer too small, adjust and retry
+                    Marshal.FreeHGlobal(systemHandleInfoPtr);
+                    systemHandleInfoPtr = IntPtr.Zero;
+                }
+                else if (status == NT_STATUS.STATUS_SUCCESS)
+                {
+                    break; // Success
+                }
+                else
+                {
+                    throw new Exception($&#34;Failed to query system handles: {status}&#34;);
+                }
+            }
+
+            // Number of handles is at the beginning of the buffer.
+            int handleCount = (IntPtr.Size == 4) ? Marshal.ReadInt32(systemHandleInfoPtr) : (int)Marshal.ReadInt64(systemHandleInfoPtr);
+            int offset = IntPtr.Size; // Skip the handle count
+
+            for (int i = 0; i &lt; handleCount; i++)
+            {
+                SYSTEM_HANDLE_ENTRY handleEntry = (SYSTEM_HANDLE_ENTRY)Marshal.PtrToStructure((IntPtr)((int)systemHandleInfoPtr + offset), typeof(SYSTEM_HANDLE_ENTRY));
+                offset += Marshal.SizeOf(typeof(SYSTEM_HANDLE_ENTRY));
+
+                if (handleEntry.OwnerProcessId == currentProcessId) // Only consider handles from the current process for simplicity or duplicate if necessary
+                {
+                    // Get the type of the handle object
+                    string handleType = GetHandleType((IntPtr)handleEntry.HandleValue);
+                    if (handleType == &#34;File&#34;)
+                    {
+                        // Get the name of the file handle
+                        string fileName = GetFileNameFromHandle((IntPtr)handleEntry.HandleValue);
+                        if (!string.IsNullOrEmpty(fileName))
+                        {
+                            string dosPath;
+                            if (ConvertDevicePathToDosPath(fileName, out dosPath))
+                            {
+                                if (dosPath.Equals(filePath, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    try
+                                    {
+                                        processes.Add(Process.GetProcessById(handleEntry.OwnerProcessId));
+                                    }
+                                    catch (ArgumentException) { } // Process exited
+                                }
+                            }
+                        }
+                    }
+                }
+                else // For other processes, we need to duplicate the handle first. This is more complex and requires elevated privileges.
+                {
+                    SafeProcessHandle processHandle = null;
+                    SafeObjectHandle handleDuplicate = null;
+                    try
+                    {
+                        processHandle = OpenProcess(ProcessAccessRights.PROCESS_DUP_HANDLE, true, handleEntry.OwnerProcessId);
+                        if (!DuplicateHandle(processHandle.DangerousGetHandle(), (IntPtr)handleEntry.HandleValue, currentProcessHandle, out handleDuplicate, 0, false, DuplicateHandleOptions.DUPLICATE_SAME_ACCESS))
+                        {
+                            continue; // Failed to duplicate handle, skip
+                        }
+
+                        string handleType = GetHandleType(handleDuplicate.DangerousGetHandle());
+                        if (handleType == &#34;File&#34;)
+                        {
+                            string fileName = GetFileNameFromHandle(handleDuplicate.DangerousGetHandle());
+                            if (!string.IsNullOrEmpty(fileName))
+                            {
+                                string dosPath;
+                                if (ConvertDevicePathToDosPath(fileName, out dosPath))
+                                {
+                                    if (dosPath.Equals(filePath, StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        try
+                                        {
+                                            processes.Add(Process.GetProcessById(handleEntry.OwnerProcessId));
+                                        }
+                                        catch (ArgumentException) { } // Process exited
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        handleDuplicate?.Close();
+                        processHandle?.Close();
+                    }
+                }
+            }
+        }
+        finally
+        {
+            if (systemHandleInfoPtr != IntPtr.Zero) Marshal.FreeHGlobal(systemHandleInfoPtr);
+        }
+
+        return processes;
+    }
+}
+</code></pre><p><strong>Usage Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span>List&lt;Process&gt; lockingProcesses = NativeHandleFinder.GetProcessesLockingFileNative(<span style="color:#e6db74">@&#34;C:\Path\To\Your\File.txt&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">foreach</span> (Process proc <span style="color:#66d9ef">in</span> lockingProcesses)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    Console.WriteLine(<span style="color:#e6db74">$&#34;File locked by: {proc.ProcessName} (ID: {proc.Id})&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Important Considerations for Native API Calls:</strong></p>
+<ul>
+<li><strong>Permissions:</strong> This method often requires elevated privileges, especially when querying handles from other processes. Running as administrator is usually necessary.</li>
+<li><strong>Complexity:</strong> The P/Invoke signatures and data structures are intricate. Errors in these can lead to crashes or incorrect results.</li>
+<li><strong>Buffer Management:</strong> Careful management of memory buffers (using <code>Marshal.AllocHGlobal</code> and <code>Marshal.FreeHGlobal</code>) is critical to prevent memory leaks or corruption.</li>
+<li><strong>Race Conditions:</strong> The system&rsquo;s handle table can change rapidly. A process might open or close a file between the time you query its handles and when you attempt to identify it.</li>
+</ul>
+<h3 id="solution-4-using-a-third-party-library">Solution 4: Using a Third-Party Library</h3>
+<p>Several community-developed libraries wrap these complex Win32 APIs, making them easier to use. For instance, the <code>Meziantou.Framework.Win32</code> NuGet package provides a clean abstraction over the Restart Manager API.</p>
+<p>First, install the NuGet package:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>dotnet add package Meziantou.Framework.Win32
+</span></span></code></pre></div><p>Then, use it in your code:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Meziantou.Framework.Win32;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Collections.Generic;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Diagnostics;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">RestartManagerWrapper</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> IEnumerable&lt;Process&gt; GetProcessesLockingFile(<span style="color:#66d9ef">string</span> filePath)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Ensure the file path is valid and accessible</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">string</span>.IsNullOrEmpty(filePath))
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> ArgumentNullException(nameof(filePath));
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">using</span> var session = RestartManager.CreateSession();
+</span></span><span style="display:flex;"><span>            session.RegisterFile(filePath);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> session.GetProcessesLockingResources();
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">catch</span> (Exception ex)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Log or handle exceptions, e.g., permissions, file not found</span>
+</span></span><span style="display:flex;"><span>            Console.WriteLine(<span style="color:#e6db74">$&#34;Error using Restart Manager: {ex.Message}&#34;</span>);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> List&lt;Process&gt;(); <span style="color:#75715e">// Return empty list on error</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Usage Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">string</span> fileToMonitor = <span style="color:#e6db74">@&#34;C:\Path\To\Your\File.txt&#34;</span>;
+</span></span><span style="display:flex;"><span>IEnumerable&lt;Process&gt; lockingProcesses = RestartManagerWrapper.GetProcessesLockingFile(fileToMonitor);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">foreach</span> (Process proc <span style="color:#66d9ef">in</span> lockingProcesses)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    Console.WriteLine(<span style="color:#e6db74">$&#34;File locked by: {proc.ProcessName} (ID: {proc.Id})&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="alternative-approaches-and-considerations">Alternative Approaches and Considerations:</h3>
+<ol>
+<li>
+<p><strong>Process Module Check (for DLLs/EXEs):</strong> For files that are DLLs or EXEs, you can iterate through all running processes and check their loaded modules. This is less reliable for general file types but works for executables.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Diagnostics;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Linq;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> System.Collections.Generic;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> List&lt;Process&gt; GetProcessesUsingModule(<span style="color:#66d9ef">string</span> moduleFilePath)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> processes = <span style="color:#66d9ef">new</span> List&lt;Process&gt;();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">string</span> lowerCaseModulePath = moduleFilePath.ToLowerInvariant();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">foreach</span> (<span style="color:#66d9ef">var</span> process <span style="color:#66d9ef">in</span> Process.GetProcesses())
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (process.HasExited) <span style="color:#66d9ef">continue</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Check if the process has modules loaded and if the target file is among them.</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (process.Modules.Cast&lt;ProcessModule&gt;().Any(module =&gt; module.FileName.ToLowerInvariant() == lowerCaseModulePath))
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                processes.Add(process);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">catch</span> (System.ComponentModel.Win32Exception)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Access denied for some processes, ignore them.</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">catch</span> (Exception)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Other potential errors when accessing process info.</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> processes;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div></li>
+<li>
+<p><strong><code>tasklist /m</code> Command:</strong> As mentioned in some discussions, <code>tasklist /m YourDllName.dll</code> can list processes using a specific DLL. This is another command-line approach, similar to <code>handle.exe</code>, requiring parsing of its output.</p>
+</li>
+<li>
+<p><strong>Error Handling:</strong> Always wrap calls to process information with <code>try-catch</code> blocks. Accessing information about other processes can fail due to permissions (<code>Access Denied</code>) or the process exiting unexpectedly.</p>
+</li>
+</ol>
+<h3 id="faqs-on-identifying-file-locks">FAQs on Identifying File Locks</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the most reliable method to find file locks in C#</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The Windows Restart Manager API, as implemented in Solution 1 and Solution 3 (using native APIs or libraries like Meziantou.Framework.Win32), is generally the most reliable for modern Windows versions. It&rsquo;s designed for this purpose.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Do I need administrator privileges to find file locks</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, often you will need administrator privileges to query handles or use tools like Handle.exe that examine all system processes. Without elevated permissions, you might only be able to see files locked by your own application&rsquo;s process.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I find out which process is locking a file opened by Word or Excel</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, the methods described using Restart Manager or Handle.exe can identify processes like Microsoft Word or Excel locking files. The module-checking method is only effective if the file is loaded as a module (DLL/EXE).</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What happens if the locking process terminates while I&#39;m checking</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: There&rsquo;s a small chance of a race condition. The process might close the file or exit between the time you query its handles and the time you try to retrieve its process information, potentially leading to an <code>ArgumentException</code> when calling <code>Process.GetProcessById</code>. Robust code should handle this gracefully.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is there a way to do this in .NET Core or .NET 5&#43;</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, the P/Invoke solutions (Solution 1 and Solution 3) work across .NET versions, including .NET Core and later. Using a NuGet package like <code>Meziantou.Framework.Win32</code> (Solution 4) is also compatible with modern .NET.</div>
+    </div>
+</div>
+<p>We’d love to hear your feedback! Drop your comments or questions below. For more on related topics, check out our other articles on <a href="https://www.sqlpey.com/python/what-is-python" target="_blank" rel="noopener">Process management in C#</a>
+ and <a href="https://www.sqlpey.com/dotnet/what-is-dotnet" target="_blank" rel="noopener">Windows API interactions</a>
+.</p>
+<pre tabindex="0"><code>// Start an RM session
+RmStartSession(&amp;amp;sessionHandle, 0, sessionKey);
+
+// Register the file you are checking
+RmRegisterResources(sessionHandle, 1, filePathArray, 0, NULL, 0, NULL);
+
+// Get all processes that have that file open.
+RmGetList(sessionHAndle, &amp;amp;nProcInfoNeeded, &amp;amp;nProcInfo, processes, &amp;amp;rebootReason);
+RmEndSession(sessionHandle);
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

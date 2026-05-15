@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Efficiently Handle Large CSV Files in Python with Pandas Chunking - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Discover effective strategies and code examples for reading and processing large CSV files in Python using pandas chunking and alternative libraries to avoid …">
+
+
+
+<meta name="keywords" content="pandas, csv, large files, chunking, memory error, data processing, dask, modin, python">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Efficiently Handle Large CSV Files in Python with Pandas Chunking - sqlpey">
+<meta name="DC.description" content="Discover effective strategies and code examples for reading and processing large CSV files in Python using pandas chunking and alternative libraries to avoid memory errors.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-07-22">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Efficiently Handle Large CSV Files in Python with Pandas Chunking - sqlpey">
+<meta property="og:description" content="Discover effective strategies and code examples for reading and processing large CSV files in Python using pandas chunking and alternative libraries to avoid …">
+<meta property="og:url" content="https://sqlpey.com/python/pandas-large-csv-chunking/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-07-22T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-07-22T00:00:00Z">
+<meta property="article:modified_time" content="2025-07-22T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Python">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Efficiently Handle Large CSV Files in Python with Pandas Chunking">
+<meta name="twitter:description" content="Discover effective strategies and code examples for reading and processing large CSV files in Python using pandas chunking and alternative libraries to avoid …">
+
+
+<link rel="canonical" href="https://sqlpey.com/python/pandas-large-csv-chunking/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Efficiently Handle Large CSV Files in Python with Pandas Chunking\"",
+  "description": "\"Discover effective strategies and code examples for reading and processing large CSV files in Python using pandas chunking and alternative libraries to avoid memory errors.\"",
+  "url": "\"https://sqlpey.com/python/pandas-large-csv-chunking/\"",
+  "datePublished": "\"2025-07-22T00:00:00Z\"",
+  "dateModified": "\"2025-07-22T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/python/pandas-large-csv-chunking/\""
+  },
+  "articleSection": "\"Python\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Efficiently Handle Large CSV Files in Python with Pandas Chunking</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Python</span>
+              
+              <span class="tag">Pandas</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              13 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 22, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#efficiently-handle-large-csv-files-in-python-with-pandas-chunking">&ldquo;Efficiently Handle Large CSV Files in Python with Pandas Chunking&rdquo;</a>
+      <ul>
+        <li><a href="#strategies-for-reading-large-csv-files">Strategies for Reading Large CSV Files</a></li>
+        <li><a href="#other-considerations">Other Considerations</a></li>
+        <li><a href="#faqs-on-handling-large-csv-files-in-python">FAQs on Handling Large CSV Files in Python</a></li>
+        <li><a href="#faqs-on-handling-large-csv-files-in-python-1">FAQs on Handling Large CSV Files in Python</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a></li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="efficiently-handle-large-csv-files-in-python-with-pandas-chunking">&ldquo;Efficiently Handle Large CSV Files in Python with Pandas Chunking&rdquo;</h2>
+<p>This exploration delves into various techniques and libraries designed to manage large CSV files efficiently.</p>
+<h3 id="strategies-for-reading-large-csv-files">Strategies for Reading Large CSV Files</h3>
+<p>The core issue with large CSV files is that attempting to load the entire dataset into memory at once exceeds available RAM. The primary approach to circumvent this is by processing the file in smaller, manageable segments, known as &ldquo;chunks.&rdquo;</p>
+<h4 id="solution-1-using-chunksize-with-pandasread_csv">Solution 1: Using <code>chunksize</code> with <code>pandas.read_csv</code></h4>
+<p>A direct method within pandas is to utilize the <code>chunksize</code> parameter in <code>pd.read_csv</code>. This instructs pandas to return an iterator that yields DataFrames of a specified row count.</p>
+<p>For pandas versions <code>1.2</code> and later, <code>read_csv</code> with <code>chunksize</code> acts as a context manager, which is a more modern way to handle file reading.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Define the number of rows per chunk</span>
+</span></span><span style="display:flex;"><span>chunk_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span><span style="color:#f92672">**</span><span style="color:#ae81ff">6</span> 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># For pandas &gt;= 1.2, use as a context manager</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;your_large_file.csv&#39;</span>, chunksize<span style="color:#f92672">=</span>chunk_size) <span style="color:#66d9ef">as</span> reader:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> chunk <span style="color:#f92672">in</span> reader:
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># Process each chunk (e.g., print rows)</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> index, row <span style="color:#f92672">in</span> chunk<span style="color:#f92672">.</span>iterrows():
+</span></span><span style="display:flex;"><span>                print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Processing row: </span><span style="color:#e6db74">{</span>index<span style="color:#e6db74">}</span><span style="color:#e6db74"> - </span><span style="color:#e6db74">{</span>row<span style="color:#f92672">.</span>to_dict()<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">FileNotFoundError</span>:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;Error: &#39;your_large_file.csv&#39; not found.&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;An error occurred during chunk processing: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># For older pandas versions or alternative iteration:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># try:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#     for chunk in pd.read_csv(&#39;your_large_file.csv&#39;, chunksize=chunk_size):</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#         # Process each chunk</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#         for index, row in chunk.iterrows():</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#             print(f&#34;Processing row: {index} - {row.to_dict()}&#34;)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># except FileNotFoundError:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#     print(&#34;Error: &#39;your_large_file.csv&#39; not found.&#34;)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># except Exception as e:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#     print(f&#34;An error occurred during chunk processing: {e}&#34;)</span>
+</span></span></code></pre></div><h4 id="solution-2-optimizing-column-selection-and-data-types">Solution 2: Optimizing Column Selection and Data Types</h4>
+<p>Before resorting to chunking, consider if memory usage can be reduced by optimizing how data is read.</p>
+<ul>
+<li>
+<p><strong>Selecting Relevant Columns:</strong> If your dataset contains many columns, but you only need a subset, use the <code>usecols</code> parameter in <code>pd.read_csv</code> to load only the necessary ones.</p>
+</li>
+<li>
+<p><strong>Specifying Data Types:</strong> By default, pandas attempts to infer data types, which can be memory-intensive. Explicitly setting <code>dtype</code> for columns, especially using more memory-efficient types like <code>np.int16</code> or <code>np.float32</code> where appropriate, can significantly reduce memory footprints. Refer to the <a href="https://pbpython.com/pandas-dtypes.html" target="_blank" rel="noopener">NumPy/C type mapping</a>
+ for guidance.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Example of specifying dtypes</span>
+</span></span><span style="display:flex;"><span>dtype_spec <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;user_id&#34;</span>: str,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;timestamp&#34;</span>: <span style="color:#e6db74">&#39;datetime64[ns]&#39;</span>, <span style="color:#75715e"># Example for datetime</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;value&#34;</span>: np<span style="color:#f92672">.</span>float32,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;count&#34;</span>: np<span style="color:#f92672">.</span>int16,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;status&#34;</span>: <span style="color:#e6db74">&#39;category&#39;</span> <span style="color:#75715e"># &#39;category&#39; is very memory efficient for string columns with few unique values</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    df_optimized <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;your_large_file.csv&#39;</span>, dtype<span style="color:#f92672">=</span>dtype_spec, usecols<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;user_id&#39;</span>, <span style="color:#e6db74">&#39;timestamp&#39;</span>, <span style="color:#e6db74">&#39;value&#39;</span>])
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;File read with optimized dtypes and selected columns.&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">FileNotFoundError</span>:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;Error: &#39;your_large_file.csv&#39; not found.&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;An error occurred during optimized reading: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div></li>
+</ul>
+<h4 id="solution-3-leveraging-dask-for-parallel-and-out-of-core-processing">Solution 3: Leveraging <code>dask</code> for Parallel and Out-of-Core Processing</h4>
+<p>For datasets that are too large to fit into memory even with optimizations, <code>dask</code> is an excellent alternative. <code>dask.dataframe</code> mimics the pandas API but is designed for parallel and out-of-core computation, meaning it can handle datasets larger than RAM. It automatically manages chunking and parallelizes operations.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> dask.dataframe <span style="color:#66d9ef">as</span> dd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Read CSV using dask</span>
+</span></span><span style="display:flex;"><span>    ddf <span style="color:#f92672">=</span> dd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;s3://your-bucket/your_large_file*.csv&#39;</span>) <span style="color:#75715e"># Example with S3, can also be local path</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Perform operations (these are lazy, computation happens when .compute() is called)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Example: Calculate sum of a column</span>
+</span></span><span style="display:flex;"><span>    total_value <span style="color:#f92672">=</span> ddf[<span style="color:#e6db74">&#39;value&#39;</span>]<span style="color:#f92672">.</span>sum()<span style="color:#f92672">.</span>compute()
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Total value calculated using Dask: </span><span style="color:#e6db74">{</span>total_value<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Example: Filter and compute</span>
+</span></span><span style="display:flex;"><span>    filtered_data <span style="color:#f92672">=</span> ddf[ddf[<span style="color:#e6db74">&#39;count&#39;</span>] <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">100</span>]<span style="color:#f92672">.</span>compute()
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Filtered data shape: </span><span style="color:#e6db74">{</span>filtered_data<span style="color:#f92672">.</span>shape<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">FileNotFoundError</span>:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;Error: &#39;your_large_file.csv&#39; or similar not found.&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;An error occurred with Dask: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><p>You can read more about <code>dask</code> from its <a href="https://docs.dask.org/en/latest/" target="_blank" rel="noopener">official documentation</a>
+.</p>
+<h4 id="solution-4-utilizing-modin-for-scalable-pandas-workflows">Solution 4: Utilizing <code>modin</code> for Scalable Pandas Workflows</h4>
+<p><code>modin</code> is another powerful library that aims to accelerate pandas workflows by distributing computations. It provides a drop-in replacement for pandas, often requiring minimal code changes. <code>modin</code> can leverage <code>dask</code> or <code>ray</code> as its execution engine.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> modin.pandas <span style="color:#66d9ef">as</span> mpd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Read CSV using Modin</span>
+</span></span><span style="display:flex;"><span>    df_modin <span style="color:#f92672">=</span> mpd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;your_large_file.csv&#39;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;File read using Modin. DataFrame shape:&#34;</span>, df_modin<span style="color:#f92672">.</span>shape)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Example operation</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;First 5 rows:</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, df_modin<span style="color:#f92672">.</span>head())
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">FileNotFoundError</span>:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;Error: &#39;your_large_file.csv&#39; not found.&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;An error occurred with Modin: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><p>Explore <code>modin</code>&rsquo;s capabilities and its comparison with pandas in <a href="https://www.sqlpey.com/dotnet/mudblazor-layouts-perfecting/" target="_blank" rel="noopener">this article</a>
+.</p>
+<h4 id="solution-5-saving-chunks-as-pickles">Solution 5: Saving Chunks as Pickles</h4>
+<p>An intermediate strategy involves reading the large CSV in chunks and saving each chunk as a pickle file. This allows for efficient serialization and later reassembly.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> pickle
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> glob
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>in_path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;your_large_file.csv&#39;</span>  <span style="color:#75715e"># Path to your large CSV file</span>
+</span></span><span style="display:flex;"><span>out_path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;./pickles&#39;</span>         <span style="color:#75715e"># Directory to save pickle files</span>
+</span></span><span style="display:flex;"><span>chunk_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">400000</span>            <span style="color:#75715e"># Adjust based on your available memory</span>
+</span></span><span style="display:flex;"><span>separator <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;,&#39;</span>                <span style="color:#75715e"># Specify your CSV separator</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create output directory if it doesn&#39;t exist</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>exists(out_path):
+</span></span><span style="display:flex;"><span>    os<span style="color:#f92672">.</span>makedirs(out_path)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Saving chunks to pickle files...&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    reader <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(in_path, sep<span style="color:#f92672">=</span>separator, chunksize<span style="color:#f92672">=</span>chunk_size, low_memory<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i, chunk <span style="color:#f92672">in</span> enumerate(reader):
+</span></span><span style="display:flex;"><span>        out_file <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(out_path, <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;data_</span><span style="color:#e6db74">{</span>i<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">.pkl&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">with</span> open(out_file, <span style="color:#e6db74">&#34;wb&#34;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>            pickle<span style="color:#f92672">.</span>dump(chunk, f, pickle<span style="color:#f92672">.</span>HIGHEST_PROTOCOL)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Saved </span><span style="color:#e6db74">{</span>out_file<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">Reading pickle files back into a DataFrame...&#34;</span>)
+</span></span><span style="display:flex;"><span>    data_p_files <span style="color:#f92672">=</span> glob<span style="color:#f92672">.</span>glob(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(out_path, <span style="color:#e6db74">&#34;data_*.pkl&#34;</span>))
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    df_from_pickles <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>DataFrame()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> p_file <span style="color:#f92672">in</span> data_p_files:
+</span></span><span style="display:flex;"><span>        df_from_pickles <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>concat([df_from_pickles, pd<span style="color:#f92672">.</span>read_pickle(p_file)], ignore_index<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Successfully loaded </span><span style="color:#e6db74">{</span>len(data_p_files)<span style="color:#e6db74">}</span><span style="color:#e6db74"> pickle files into a DataFrame with shape: </span><span style="color:#e6db74">{</span>df_from_pickles<span style="color:#f92672">.</span>shape<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">FileNotFoundError</span>:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Error: Input file &#39;</span><span style="color:#e6db74">{</span>in_path<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39; not found.&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;An error occurred during pickle processing: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><h4 id="solution-6-processing-with-dtables">Solution 6: Processing with <code>dtables</code></h4>
+<p>The <code>datatable</code> library offers a performant way to read and process large datasets, often outperforming pandas for certain operations.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> datatable <span style="color:#66d9ef">as</span> dt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Read CSV using datatable</span>
+</span></span><span style="display:flex;"><span>    df_dt <span style="color:#f92672">=</span> dt<span style="color:#f92672">.</span>fread(<span style="color:#e6db74">&#34;your_large_file.csv&#34;</span>) 
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;File read using datatable. Frame shape:&#34;</span>, df_dt<span style="color:#f92672">.</span>shape)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Example operation: view first few rows</span>
+</span></span><span style="display:flex;"><span>    print(df_dt<span style="color:#f92672">.</span>head())
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">FileNotFoundError</span>:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;Error: &#39;your_large_file.csv&#39; not found.&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;An error occurred with datatable: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><h4 id="solution-7-iterating-row-by-row-with-a-generator">Solution 7: Iterating Row by Row with a Generator</h4>
+<p>For very specific processing needs, you might iterate through the file row by row using a generator. This is memory-efficient as it only holds one row at a time.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">row_generator</span>(filename, delimiter<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;,&#39;</span>):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Yields rows from a CSV file one by one.&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">with</span> open(filename, <span style="color:#e6db74">&#39;r&#39;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># Skip header if present, or handle it as needed</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># For simplicity, assuming no header or it&#39;s handled outside</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> line <span style="color:#f92672">in</span> f:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">yield</span> line<span style="color:#f92672">.</span>strip()<span style="color:#f92672">.</span>split(delimiter)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">FileNotFoundError</span>:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Error: File &#39;</span><span style="color:#e6db74">{</span>filename<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39; not found.&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;An error occurred during file reading: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Example usage:</span>
+</span></span><span style="display:flex;"><span>filename <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;your_large_file.csv&#39;</span>
+</span></span><span style="display:flex;"><span>delimiter <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;,&#39;</span> <span style="color:#75715e"># Adjust if your separator is different</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Process the first few rows as an example</span>
+</span></span><span style="display:flex;"><span>count <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>max_rows_to_show <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Processing first </span><span style="color:#e6db74">{</span>max_rows_to_show<span style="color:#e6db74">}</span><span style="color:#e6db74"> rows:&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> row_data <span style="color:#f92672">in</span> row_generator(filename, delimiter):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> count <span style="color:#f92672">&lt;</span> max_rows_to_show:
+</span></span><span style="display:flex;"><span>        print(row_data)
+</span></span><span style="display:flex;"><span>        count <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># For processing all rows, you&#39;d iterate without the count limit.</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Be mindful of the actual processing logic within the loop.</span>
+</span></span></code></pre></div><h4 id="solution-8-using-d6tstack-for-combined-operations">Solution 8: Using <code>d6tstack</code> for Combined Operations</h4>
+<p><code>d6tstack</code> is a library designed for ETL processes, offering capabilities to combine multiple CSV files and perform operations, all while managing large datasets through chunking.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Ensure d6tstack and its dependencies (like glob) are installed</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># pip install d6tstack</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> d6tstack.combine_csv
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> glob
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Define a function to apply to each chunk</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">process_chunk</span>(df_chunk):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Example: clean column names by removing spaces</span>
+</span></span><span style="display:flex;"><span>    df_chunk<span style="color:#f92672">.</span>columns <span style="color:#f92672">=</span> [c<span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39; &#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>) <span style="color:#66d9ef">for</span> c <span style="color:#f92672">in</span> df_chunk<span style="color:#f92672">.</span>columns]
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Perform other data transformations or filtering here</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> df_chunk
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>input_file_pattern <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;your_large_file*.csv&#39;</span> <span style="color:#75715e"># Use a glob pattern if you have multiple files</span>
+</span></span><span style="display:flex;"><span>output_csv_file <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;processed_output.csv&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Initialize CombinerCSV</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># apply_after_read is a function that gets called on each chunk</span>
+</span></span><span style="display:flex;"><span>    combiner <span style="color:#f92672">=</span> d6tstack<span style="color:#f92672">.</span>combine_csv<span style="color:#f92672">.</span>CombinerCSV(
+</span></span><span style="display:flex;"><span>        glob<span style="color:#f92672">.</span>glob(input_file_pattern), 
+</span></span><span style="display:flex;"><span>        apply_after_read<span style="color:#f92672">=</span>process_chunk, 
+</span></span><span style="display:flex;"><span>        sep<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;,&#39;</span>,          <span style="color:#75715e"># Specify your separator</span>
+</span></span><span style="display:flex;"><span>        chunksize<span style="color:#f92672">=</span><span style="color:#ae81ff">1e6</span>     <span style="color:#75715e"># Define chunk size</span>
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;Combining and processing CSV files...&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Output to CSV, automatically chunked</span>
+</span></span><span style="display:flex;"><span>    combiner<span style="color:#f92672">.</span>to_csv_combine(filename<span style="color:#f92672">=</span>output_csv_file)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Processed data saved to </span><span style="color:#e6db74">{</span>output_csv_file<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># You can also output to other formats like parquet or SQL</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># combiner.to_parquet_combine(filename=&#39;output.pq&#39;)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># combiner.to_psql_combine(&#39;postgresql+psycopg2://usr:pwd@localhost/db&#39;, &#39;tablename&#39;)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">FileNotFoundError</span>:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Error: No files matching &#39;</span><span style="color:#e6db74">{</span>input_file_pattern<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39; found.&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;An error occurred with d6tstack: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><h4 id="solution-9-using-dask_cudf-for-gpu-acceleration">Solution 9: Using <code>dask_cudf</code> for GPU Acceleration</h4>
+<p>If you have a CUDA-enabled GPU, <code>dask_cudf</code> allows you to leverage GPU resources for accelerated data processing, including reading large CSV files.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Ensure dask_cudf and its dependencies (like cudf) are installed</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># pip install dask-cudf</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> dask_cudf <span style="color:#66d9ef">as</span> dc
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Read CSV using dask_cudf</span>
+</span></span><span style="display:flex;"><span>    ddf_gpu <span style="color:#f92672">=</span> dc<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#34;your_large_data.csv&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;File read using dask_cudf. DataFrame shape:&#34;</span>, ddf_gpu<span style="color:#f92672">.</span>shape)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Perform operations, which will run on the GPU</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Example: Sum of a column</span>
+</span></span><span style="display:flex;"><span>    gpu_sum <span style="color:#f92672">=</span> ddf_gpu[<span style="color:#e6db74">&#39;value&#39;</span>]<span style="color:#f92672">.</span>sum()<span style="color:#f92672">.</span>compute()
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;GPU accelerated sum: </span><span style="color:#e6db74">{</span>gpu_sum<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">FileNotFoundError</span>:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;Error: &#39;your_large_data.csv&#39; not found.&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;An error occurred with dask_cudf. Ensure you have a CUDA-enabled GPU and compatible libraries installed: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><h4 id="solution-10-adding-progress-bars-with-tqdm">Solution 10: Adding Progress Bars with <code>tqdm</code></h4>
+<p>When processing large files, especially in chunks, it&rsquo;s helpful to visualize the progress. The <code>tqdm</code> library can be integrated with pandas chunking to provide a progress bar.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> tqdm <span style="color:#f92672">import</span> tqdm
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os <span style="color:#75715e"># Import os for getsize</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">read_csv_with_progress</span>(file_path, sep<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;,&#39;</span>):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Reads a CSV file in chunks with a progress bar.&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    chunk_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">50000</span>  <span style="color:#75715e"># Adjust based on memory and file size</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Estimate total number of lines for tqdm progress bar</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;Estimating file size and line count...&#34;</span>)
+</span></span><span style="display:flex;"><span>        file_size <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>getsize(file_path)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># A rough estimation for average line length to estimate line count</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># This can be inaccurate for very heterogeneous files, but gives a sense of progress</span>
+</span></span><span style="display:flex;"><span>        avg_line_length <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">with</span> open(file_path, <span style="color:#e6db74">&#39;r&#39;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># Sample a few lines to estimate average length</span>
+</span></span><span style="display:flex;"><span>            sample_lines <span style="color:#f92672">=</span> [f<span style="color:#f92672">.</span>readline() <span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(min(<span style="color:#ae81ff">100</span>, file_size <span style="color:#f92672">//</span> <span style="color:#ae81ff">1000</span> <span style="color:#66d9ef">if</span> file_size <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1000</span> <span style="color:#66d9ef">else</span> <span style="color:#ae81ff">1</span>))] <span style="color:#75715e"># Sample up to 100 lines or based on size</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> sample_lines:
+</span></span><span style="display:flex;"><span>                avg_line_length <span style="color:#f92672">=</span> sum(len(line) <span style="color:#66d9ef">for</span> line <span style="color:#f92672">in</span> sample_lines) <span style="color:#f92672">/</span> len(sample_lines)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        total_lines_estimated <span style="color:#f92672">=</span> int(file_size <span style="color:#f92672">/</span> avg_line_length) <span style="color:#66d9ef">if</span> avg_line_length <span style="color:#66d9ef">else</span> <span style="color:#ae81ff">10000</span> <span style="color:#75715e"># Fallback estimate</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Estimated total lines: </span><span style="color:#e6db74">{</span>total_lines_estimated<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        chunks <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">with</span> tqdm(total<span style="color:#f92672">=</span>total_lines_estimated, desc<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Reading CSV&#39;</span>) <span style="color:#66d9ef">as</span> pbar:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> chunk <span style="color:#f92672">in</span> pd<span style="color:#f92672">.</span>read_csv(file_path, chunksize<span style="color:#f92672">=</span>chunk_size, low_memory<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>, sep<span style="color:#f92672">=</span>sep):
+</span></span><span style="display:flex;"><span>                chunks<span style="color:#f92672">.</span>append(chunk)
+</span></span><span style="display:flex;"><span>                pbar<span style="color:#f92672">.</span>update(chunk<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">0</span>]) <span style="color:#75715e"># Update progress by number of rows in chunk</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">Concatenating chunks...&#34;</span>)
+</span></span><span style="display:flex;"><span>        df <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>concat(chunks, ignore_index<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;Concatenation complete.&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> df
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">FileNotFoundError</span>:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Error: File &#39;</span><span style="color:#e6db74">{</span>file_path<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39; not found.&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;An error occurred during progress-based reading: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Example usage:</span>
+</span></span><span style="display:flex;"><span>large_csv_file <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;your_large_file.csv&#39;</span>
+</span></span><span style="display:flex;"><span>processed_dataframe <span style="color:#f92672">=</span> read_csv_with_progress(large_csv_file, sep<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;,&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> processed_dataframe <span style="color:#f92672">is</span> <span style="color:#f92672">not</span> <span style="color:#66d9ef">None</span>:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Loaded DataFrame with shape: </span><span style="color:#e6db74">{</span>processed_dataframe<span style="color:#f92672">.</span>shape<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><h4 id="solution-11-using-sframe">Solution 11: Using <code>sframe</code></h4>
+<p><code>sframe</code> is a library that offers a pandas-like API for manipulating datasets larger than memory, suitable for big data applications.</p>
+<h4 id="solution-12-testing-with-nrows">Solution 12: Testing with <code>nrows</code></h4>
+<p>Before committing to a full chunking process, it&rsquo;s prudent to test your processing logic on a smaller subset of the data. The <code>nrows</code> parameter in <code>pd.read_csv</code> is perfect for this.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>filename <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;your_large_file.csv&#39;</span>
+</span></span><span style="display:flex;"><span>rows_to_test <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span> <span style="color:#75715e"># Read only the first 100 rows</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    small_df <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(filename, nrows<span style="color:#f92672">=</span>rows_to_test)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Successfully read the first </span><span style="color:#e6db74">{</span>rows_to_test<span style="color:#e6db74">}</span><span style="color:#e6db74"> rows into a DataFrame with shape: </span><span style="color:#e6db74">{</span>small_df<span style="color:#f92672">.</span>shape<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Now, test your processing logic on small_df</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Example: print the first 5 rows of the subset</span>
+</span></span><span style="display:flex;"><span>    print(small_df<span style="color:#f92672">.</span>head())
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">FileNotFoundError</span>:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Error: File &#39;</span><span style="color:#e6db74">{</span>filename<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39; not found.&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;An error occurred while reading with nrows: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><h4 id="solution-13-specific-chunk-processing-example">Solution 13: Specific Chunk Processing Example</h4>
+<p>This example shows how to process chunks, modify column names, and then either buffer them or perform specific filtering operations within each chunk.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>file <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;your_large_file.csv&#39;</span>
+</span></span><span style="display:flex;"><span>your_chunksize <span style="color:#f92672">=</span> <span style="color:#ae81ff">1000000</span> <span style="color:#75715e"># Define your chunk size</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>chunk_buffer <span style="color:#f92672">=</span> [] <span style="color:#75715e"># To buffer entire chunks if needed</span>
+</span></span><span style="display:flex;"><span>processed_chunk_buffer <span style="color:#f92672">=</span> [] <span style="color:#75715e"># To buffer results of processing</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Starting chunk processing...&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Using iterator=True is equivalent to chunksize in newer pandas versions</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> chunk <span style="color:#f92672">in</span> pd<span style="color:#f92672">.</span>read_csv(file, header<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, chunksize<span style="color:#f92672">=</span>your_chunksize, iterator<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, low_memory<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>):
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Clean column names (replace spaces)</span>
+</span></span><span style="display:flex;"><span>        chunk<span style="color:#f92672">.</span>columns <span style="color:#f92672">=</span> [c<span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39; &#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>) <span style="color:#66d9ef">for</span> c <span style="color:#f92672">in</span> chunk<span style="color:#f92672">.</span>columns]
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Option 1: Buffer entire chunk for later concatenation</span>
+</span></span><span style="display:flex;"><span>        chunk_buffer<span style="color:#f92672">.</span>append(chunk)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Option 2: Process chunk and buffer results</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Example: Filter rows where a specific column starts with a pattern</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Replace &#39;&lt;column_name&gt;&#39; and &#39;&lt;some_pattern&gt;&#39; with actual values</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># query_result = chunk[chunk[&#39;&lt;column_name&gt;&#39;].str.startswith(&#39;&lt;some_pattern&gt;&#39;)]   </span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># processed_chunk_buffer.append(query_result)</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># print(f&#34;Processed a chunk of size: {chunk.shape[0]}&#34;) # Optional: log chunk progress</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;Finished reading chunks.&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># NEVER do pd.concat or pd.DataFrame() inside a loop for buffering</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Concatenate buffered chunks if Option 1 was used</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> chunk_buffer:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;Concatenating buffered chunks into a single DataFrame...&#34;</span>)
+</span></span><span style="display:flex;"><span>        full_df <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>concat(chunk_buffer, ignore_index<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Full DataFrame loaded with shape: </span><span style="color:#e6db74">{</span>full_df<span style="color:#f92672">.</span>shape<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Now you can work with full_df</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Concatenate buffered processed results if Option 2 was used</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># if processed_chunk_buffer:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#     print(&#34;Concatenating processed chunk results...&#34;)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#     processed_df = pd.concat(processed_chunk_buffer, ignore_index=True)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#     print(&#34;Processed results:\n&#34;, processed_df)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">FileNotFoundError</span>:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Error: File &#39;</span><span style="color:#e6db74">{</span>file<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39; not found.&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;An error occurred during chunk processing: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><h4 id="solution-14-read_csv-with-iteratortrue">Solution 14: <code>read_csv</code> with <code>iterator=True</code></h4>
+<p>This is another way to achieve chunking, similar to using <code>chunksize</code>. <code>iterator=True</code> makes <code>read_csv</code> return a <code>TextFileReader</code> object, from which you can get chunks.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;your_large_file.csv&#39;</span>
+</span></span><span style="display:flex;"><span>chunk_rows <span style="color:#f92672">=</span> <span style="color:#ae81ff">1000</span> <span style="color:#75715e"># Number of rows per chunk</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>dfList <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;Reading CSV file using iterator...&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Use iterator=True to get a TextFileReader object</span>
+</span></span><span style="display:flex;"><span>    TextFileReader <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(path, chunksize<span style="color:#f92672">=</span>chunk_rows, iterator<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)  
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Iterate through the chunks and append to a list</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> chunk <span style="color:#f92672">in</span> TextFileReader:
+</span></span><span style="display:flex;"><span>        dfList<span style="color:#f92672">.</span>append(chunk)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># print(f&#34;Appended chunk of shape: {chunk.shape}&#34;) # Optional logging</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Concatenate all chunks from the list into a single DataFrame</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> dfList:
+</span></span><span style="display:flex;"><span>        df <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>concat(dfList, sort<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>) <span style="color:#75715e"># sort=False to avoid potential warnings</span>
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Successfully concatenated </span><span style="color:#e6db74">{</span>len(dfList)<span style="color:#e6db74">}</span><span style="color:#e6db74"> chunks. DataFrame shape: </span><span style="color:#e6db74">{</span>df<span style="color:#f92672">.</span>shape<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;No chunks were read.&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">FileNotFoundError</span>:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Error: File &#39;</span><span style="color:#e6db74">{</span>path<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39; not found.&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;An error occurred: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><h3 id="other-considerations">Other Considerations</h3>
+<ul>
+<li><strong>ETL Flow:</strong> Design your Extract, Transform, Load (ETL) pipeline carefully. Extract only necessary data, transform it efficiently, and load it into a suitable format. Libraries like Dask or PySpark are excellent for initial ETL on massive datasets.</li>
+<li><strong>Hardware:</strong> For extremely large datasets, consider increasing your RAM or utilizing cloud computing platforms that offer more powerful instances.</li>
+<li><strong>File Formats:</strong> For very large datasets, consider converting your data to more efficient formats like Parquet or ORC, which offer better compression and query performance compared to CSV.</li>
+</ul>
+<h3 id="faqs-on-handling-large-csv-files-in-python">FAQs on Handling Large CSV Files in Python</h3>
+<h3 id="faqs-on-handling-large-csv-files-in-python-1">FAQs on Handling Large CSV Files in Python</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the main reason for memory errors when reading large CSV files</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The primary reason is attempting to load the entire CSV file&rsquo;s content into your computer&rsquo;s RAM at once, which exceeds the available memory capacity.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How does the chunksize parameter help</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The <code>chunksize</code> parameter in <code>pandas.read_csv</code> allows you to read the file in smaller, manageable pieces (chunks) instead of loading the entire file into memory. This significantly reduces memory usage.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: When should I consider using Dask</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Dask is beneficial when your dataset is too large to fit into memory even with chunking, or when you need to leverage parallel processing for faster computations across multiple CPU cores or even distributed systems.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I optimize memory usage without chunking</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, by using the <code>usecols</code> parameter to load only necessary columns and by specifying efficient <code>dtype</code> options (like <code>category</code> or smaller integer/float types), you can reduce memory consumption before resorting to chunking.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the advantage of using Modin</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Modin offers a parallelized execution engine that can significantly speed up pandas operations with minimal code changes. It&rsquo;s a good option if you want to scale existing pandas workflows.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is it possible to read files row by row</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, you can implement a generator function to read the file line by line, splitting each line into its constituent parts. This is extremely memory-efficient as it processes one row at a time.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How can I track the progress of reading a large file</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Libraries like <code>tqdm</code> can be integrated with pandas chunking to display a progress bar, giving you visual feedback on how much of the file has been processed.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What are alternatives to CSV for large datasets</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: For better performance and memory efficiency with very large datasets, consider formats like Parquet or ORC, which are optimized for analytical workloads and often provide better compression and query speeds.</div>
+    </div>
+</div>
+<p>We’d love to hear your thoughts and experiences! Share your tips, challenges, or any questions you have in the comments below. Your feedback helps us refine these explanations.</p>
+<p>Check out more on <a href="https://www.sqlpey.com/python" target="_blank" rel="noopener">Python</a>
+ and <a href="https://www.sqlpey.com/python/what-is-pandas" target="_blank" rel="noopener">Pandas</a>
+ on SQLpey!</p>
+<h2 id="solutions">Solutions</h2>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1593 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Rust Globals: Safe Mutable Static Variable Techniques - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore various Rust patterns for managing mutable global static variables safely, covering std::sync, lazy_static, once_cell, atomics, and manual …">
+
+
+
+<meta name="keywords" content="Rust, static variables, global mutable variables, singleton pattern, Rust concurrency, std::sync, lazy_static, once_cell, atomics">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Rust Globals: Safe Mutable Static Variable Techniques - sqlpey">
+<meta name="DC.description" content="Explore various Rust patterns for managing mutable global static variables safely, covering std::sync, lazy_static, once_cell, atomics, and manual implementations.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-07-22">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Rust Globals: Safe Mutable Static Variable Techniques - sqlpey">
+<meta property="og:description" content="Explore various Rust patterns for managing mutable global static variables safely, covering std::sync, lazy_static, once_cell, atomics, and manual …">
+<meta property="og:url" content="https://sqlpey.com/rust/rust-mutable-globals/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-07-22T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-07-22T00:00:00Z">
+<meta property="article:modified_time" content="2025-07-22T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Rust">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Rust Globals: Safe Mutable Static Variable Techniques">
+<meta name="twitter:description" content="Explore various Rust patterns for managing mutable global static variables safely, covering std::sync, lazy_static, once_cell, atomics, and manual …">
+
+
+<link rel="canonical" href="https://sqlpey.com/rust/rust-mutable-globals/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Rust Globals: Safe Mutable Static Variable Techniques\"",
+  "description": "\"Explore various Rust patterns for managing mutable global static variables safely, covering std::sync, lazy_static, once_cell, atomics, and manual implementations.\"",
+  "url": "\"https://sqlpey.com/rust/rust-mutable-globals/\"",
+  "datePublished": "\"2025-07-22T00:00:00Z\"",
+  "dateModified": "\"2025-07-22T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/rust/rust-mutable-globals/\""
+  },
+  "articleSection": "\"Rust\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Rust Globals: Safe Mutable Static Variable Techniques</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Rust</span>
+              
+              <span class="tag">Programming</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              14 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 22, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#rust-globals-safe-mutable-static-variable-techniques">&ldquo;Rust Globals: Safe Mutable Static Variable Techniques&rdquo;</a>
+      <ul>
+        <li><a href="#avoiding-global-mutable-state">Avoiding Global Mutable State</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#techniques-for-global-mutable-state-in-rust">Techniques for Global Mutable State in Rust</a></li>
+        <li><a href="#controlling-global-access">Controlling Global Access</a></li>
+        <li><a href="#faqs-on-rust-global-mutable-variables">FAQs on Rust Global Mutable Variables</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="rust-globals-safe-mutable-static-variable-techniques">&ldquo;Rust Globals: Safe Mutable Static Variable Techniques&rdquo;</h2>
+<h3 id="avoiding-global-mutable-state">Avoiding Global Mutable State</h3>
+<p>Before diving into specific implementations, it&rsquo;s crucial to acknowledge that minimizing global mutable state is generally advisable. A more idiomatic Rust approach involves passing mutable references to objects that need to be modified. This pattern, often established early in the program&rsquo;s lifecycle (e.g., in <code>main</code>), promotes clearer code and reduces the need for complex synchronization. However, when global mutable state is deemed necessary, several methods offer robust solutions.</p>
+<h2 id="solutions">Solutions</h2>
+<h3 id="techniques-for-global-mutable-state-in-rust">Techniques for Global Mutable State in Rust</h3>
+<p>Here are several approaches to implementing global mutable variables in Rust, ranging from standard library features to popular crates and manual implementations.</p>
+<h4 id="solution-1-using-stdsynclazylock">Solution 1: Using <code>std::sync::LazyLock</code></h4>
+<p>Introduced in Rust 1.80.0, <code>LazyLock</code> provides a convenient way to initialize statics lazily without the boilerplate of helper functions.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::sync::{LazyLock, Mutex};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Initializes a Mutex-protected vector lazily.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">ARRAY_LAZYLOCK</span>: <span style="color:#a6e22e">LazyLock</span><span style="color:#f92672">&lt;</span>Mutex<span style="color:#f92672">&lt;</span>Vec<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">u8</span><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">=</span> LazyLock::new(<span style="color:#f92672">||</span> Mutex::new(<span style="color:#a6e22e">vec!</span>[]));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">perform_lazy_operation</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Lock the mutex to safely push an element.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">ARRAY_LAZYLOCK</span>.lock().expect(<span style="color:#e6db74">&#34;Mutex should not be poisoned&#34;</span>).push(<span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    perform_lazy_operation();
+</span></span><span style="display:flex;"><span>    perform_lazy_operation();
+</span></span><span style="display:flex;"><span>    perform_lazy_operation();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Print the number of elements added.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;LazyLock count: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, <span style="color:#66d9ef">ARRAY_LAZYLOCK</span>.lock().expect(<span style="color:#e6db74">&#34;Mutex should not be poisoned&#34;</span>).len());
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Tip:</strong> Replacing <code>Mutex</code> with <code>RwLock</code> allows multiple concurrent readers, enhancing performance for read-heavy workloads.</p>
+<h4 id="solution-2-using-stdsynconcelock">Solution 2: Using <code>std::sync::OnceLock</code></h4>
+<p>Stabilized in Rust 1.70.0, <code>OnceLock</code> offers a dependency-free mechanism for initializing statics.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::sync::{Mutex, OnceLock};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Function to get a lazily initialized Mutex-protected vector.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">get_once_array</span>() -&gt; <span style="color:#66d9ef">&amp;</span>&#39;static <span style="color:#a6e22e">Mutex</span><span style="color:#f92672">&lt;</span>Vec<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">u8</span><span style="color:#f92672">&gt;&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">ARRAY_ONCELOCK</span>: <span style="color:#a6e22e">OnceLock</span><span style="color:#f92672">&lt;</span>Mutex<span style="color:#f92672">&lt;</span>Vec<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">u8</span><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">=</span> OnceLock::new();
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Initialize if not already done, then return a reference.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">ARRAY_ONCELOCK</span>.get_or_init(<span style="color:#f92672">||</span> Mutex::new(<span style="color:#a6e22e">vec!</span>[]))
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">perform_once_operation</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Lock and push an element to the lazily initialized vector.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    get_once_array().lock().expect(<span style="color:#e6db74">&#34;Mutex should not be poisoned&#34;</span>).push(<span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    perform_once_operation();
+</span></span><span style="display:flex;"><span>    perform_once_operation();
+</span></span><span style="display:flex;"><span>    perform_once_operation();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Display the current size of the vector.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;OnceLock count: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, get_once_array().lock().expect(<span style="color:#e6db74">&#34;Mutex should not be poisoned&#34;</span>).len());
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-3-using-the-lazy_static-crate">Solution 3: Using the <code>lazy_static</code> Crate</h4>
+<p>The <code>lazy_static</code> crate simplifies the creation of global statics, abstracting away much of the manual initialization logic.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#75715e">// Add lazy_static = &#34;1.4.0&#34; to your Cargo.toml
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">use</span> lazy_static::lazy_static;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::sync::Mutex;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">lazy_static!</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Define a global mutable vector protected by a Mutex.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">ref</span> <span style="color:#66d9ef">LAZY_STATIC_ARRAY</span>: <span style="color:#a6e22e">Mutex</span><span style="color:#f92672">&lt;</span>Vec<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">u8</span><span style="color:#f92672">&gt;&gt;</span> <span style="color:#f92672">=</span> Mutex::new(<span style="color:#a6e22e">vec!</span>[]);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">call_lazy_static</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Safely modify the global vector.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">LAZY_STATIC_ARRAY</span>.lock().expect(<span style="color:#e6db74">&#34;Mutex should not be poisoned&#34;</span>).push(<span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    call_lazy_static();
+</span></span><span style="display:flex;"><span>    call_lazy_static();
+</span></span><span style="display:flex;"><span>    call_lazy_static();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Output the number of operations performed.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;lazy_static count: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, <span style="color:#66d9ef">LAZY_STATIC_ARRAY</span>.lock().expect(<span style="color:#e6db74">&#34;Mutex should not be poisoned&#34;</span>).len());
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-4-using-the-once_cell-crate">Solution 4: Using the <code>once_cell</code> Crate</h4>
+<p>Similar to <code>lazy_static</code>, the <code>once_cell</code> crate provides efficient lazy initialization utilities, notably its <code>Lazy</code> type.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#75715e">// Add once_cell = &#34;1.18.0&#34; to your Cargo.toml
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">use</span> once_cell::sync::Lazy;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::sync::Mutex;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">ONCE_CELL_ARRAY</span>: <span style="color:#a6e22e">Lazy</span><span style="color:#f92672">&lt;</span>Mutex<span style="color:#f92672">&lt;</span>Vec<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">u8</span><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">=</span> Lazy::new(<span style="color:#f92672">||</span> Mutex::new(<span style="color:#a6e22e">vec!</span>[]));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">access_once_cell_array</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Acquire the lock and modify the shared vector.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">ONCE_CELL_ARRAY</span>.lock().expect(<span style="color:#e6db74">&#34;Mutex should not be poisoned&#34;</span>).push(<span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    access_once_cell_array();
+</span></span><span style="display:flex;"><span>    access_once_cell_array();
+</span></span><span style="display:flex;"><span>    access_once_cell_array();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Print the total number of calls.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;once_cell count: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, <span style="color:#66d9ef">ONCE_CELL_ARRAY</span>.lock().expect(<span style="color:#e6db74">&#34;Mutex should not be poisoned&#34;</span>).len());
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-5-using-atomics-for-integer-values">Solution 5: Using Atomics for Integer Values</h4>
+<p>For simple integer counters or flags, Rust&rsquo;s atomic types offer a highly efficient and thread-safe solution without the need for explicit locking.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::sync::atomic::{AtomicUsize, Ordering};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// A simple atomic counter for tracking operations.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">ATOMIC_CALL_COUNT</span>: <span style="color:#a6e22e">AtomicUsize</span> <span style="color:#f92672">=</span> AtomicUsize::new(<span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">record_call</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Increment the counter atomically.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">ATOMIC_CALL_COUNT</span>.fetch_add(<span style="color:#ae81ff">1</span>, Ordering::SeqCst);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    record_call();
+</span></span><span style="display:flex;"><span>    record_call();
+</span></span><span style="display:flex;"><span>    record_call();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Retrieve and print the final count.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;Atomic call count: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, <span style="color:#66d9ef">ATOMIC_CALL_COUNT</span>.load(Ordering::SeqCst));
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-6-manual-dependency-free-implementation">Solution 6: Manual, Dependency-Free Implementation</h4>
+<p>For complete control, one can implement a lazy static manually, similar to how standard library components like <code>stdin</code> were historically managed. This involves <code>MaybeUninit</code> and <code>Once</code> for safe initialization.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::sync::{Mutex, Once};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::time::Duration;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::{mem::MaybeUninit, thread};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">ManualSingleton</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Protect internal data for concurrent access.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    inner: <span style="color:#a6e22e">Mutex</span><span style="color:#f92672">&lt;</span><span style="color:#66d9ef">u8</span><span style="color:#f92672">&gt;</span>,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">get_manual_singleton</span>() -&gt; <span style="color:#66d9ef">&amp;</span>&#39;static <span style="color:#a6e22e">ManualSingleton</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Use MaybeUninit for uninitialized static data.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">mut</span> <span style="color:#66d9ef">SINGLETON_DATA</span>: <span style="color:#a6e22e">MaybeUninit</span><span style="color:#f92672">&lt;</span>ManualSingleton<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> MaybeUninit::uninit();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">INITIALIZER</span>: <span style="color:#a6e22e">Once</span> <span style="color:#f92672">=</span> Once::new();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">unsafe</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Ensure initialization happens only once.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">INITIALIZER</span>.call_once(<span style="color:#f92672">||</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">let</span> singleton <span style="color:#f92672">=</span> ManualSingleton {
+</span></span><span style="display:flex;"><span>                inner: <span style="color:#a6e22e">Mutex</span>::new(<span style="color:#ae81ff">0</span>),
+</span></span><span style="display:flex;"><span>            };
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Write the initialized data into the static variable.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            <span style="color:#66d9ef">SINGLETON_DATA</span>.write(singleton);
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Safely provide a reference to the initialized data.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">SINGLETON_DATA</span>.assume_init_ref()
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> threads: Vec<span style="color:#f92672">&lt;</span>_<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> (<span style="color:#ae81ff">0</span><span style="color:#f92672">..</span><span style="color:#ae81ff">5</span>)
+</span></span><span style="display:flex;"><span>        .map(<span style="color:#f92672">|</span>i<span style="color:#f92672">|</span> {
+</span></span><span style="display:flex;"><span>            thread::spawn(<span style="color:#66d9ef">move</span> <span style="color:#f92672">||</span> {
+</span></span><span style="display:flex;"><span>                thread::sleep(Duration::from_millis(i <span style="color:#f92672">*</span> <span style="color:#ae81ff">20</span>));
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">let</span> singleton_ref <span style="color:#f92672">=</span> get_manual_singleton();
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> data <span style="color:#f92672">=</span> singleton_ref.inner.lock().unwrap();
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">*</span>data <span style="color:#f92672">=</span> i <span style="color:#66d9ef">as</span> <span style="color:#66d9ef">u8</span>;
+</span></span><span style="display:flex;"><span>            })
+</span></span><span style="display:flex;"><span>        })
+</span></span><span style="display:flex;"><span>        .collect();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Observe the singleton&#39;s state from the main thread.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">for</span> _ <span style="color:#66d9ef">in</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">..</span><span style="color:#ae81ff">10</span> {
+</span></span><span style="display:flex;"><span>        thread::sleep(Duration::from_millis(<span style="color:#ae81ff">10</span>));
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">let</span> singleton_ref <span style="color:#f92672">=</span> get_manual_singleton();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">let</span> data <span style="color:#f92672">=</span> singleton_ref.inner.lock().unwrap();
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;Manual singleton value: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, <span style="color:#f92672">*</span>data);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> thread <span style="color:#66d9ef">in</span> threads.into_iter() {
+</span></span><span style="display:flex;"><span>        thread.join().unwrap();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This manual approach, while powerful, requires careful handling of <code>unsafe</code> blocks. The output demonstrates how multiple threads might interact with the singleton. This method closely mirrors the functionality provided by crates like <code>once_cell</code> and <code>lazy_static</code>.</p>
+<h4 id="solution-7-global-mutex-with-const-initialization-rust-163">Solution 7: Global <code>Mutex</code> with <code>const</code> Initialization (Rust 1.63+)</h4>
+<p>Starting with Rust 1.63, <code>Mutex::new</code> and <code>Vec::new</code> (and other basic constructors) are <code>const</code>, enabling direct initialization of global mutable statics without lazy evaluation.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::sync::Mutex;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Directly initialize a Mutex-protected vector.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">GLOBAL_MUTABLE_VEC</span>: <span style="color:#a6e22e">Mutex</span><span style="color:#f92672">&lt;</span>Vec<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">i32</span><span style="color:#f92672">&gt;&gt;</span> <span style="color:#f92672">=</span> Mutex::new(Vec::new());
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Safely modify the global vector.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">GLOBAL_MUTABLE_VEC</span>.lock().unwrap().push(<span style="color:#ae81ff">42</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;V1: </span><span style="color:#e6db74">{:?}</span><span style="color:#e6db74">&#34;</span>, <span style="color:#66d9ef">GLOBAL_MUTABLE_VEC</span>.lock().unwrap());
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>For data structures not yet supporting <code>const</code> constructors, like <code>HashSet</code>, wrapping the data in an <code>Option</code> allows for initialization later.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::sync::Mutex;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::collections::HashSet;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Initialize with None, to be set later.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">GLOBAL_MUTABLE_OPTION_SET</span>: <span style="color:#a6e22e">Mutex</span><span style="color:#f92672">&lt;</span>Option<span style="color:#f92672">&lt;</span>HashSet<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">i32</span><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">=</span> Mutex::new(None);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Initialize the HashSet when first needed.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#f92672">*</span><span style="color:#66d9ef">GLOBAL_MUTABLE_OPTION_SET</span>.lock().unwrap() <span style="color:#f92672">=</span> Some(HashSet::from([<span style="color:#ae81ff">42</span>]));
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;V2: </span><span style="color:#e6db74">{:?}</span><span style="color:#e6db74">&#34;</span>, <span style="color:#66d9ef">GLOBAL_MUTABLE_OPTION_SET</span>.lock().unwrap());
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Alternative:</strong> Using <code>RwLock</code> instead of <code>Mutex</code> provides concurrent read access, which can be beneficial for performance. If non-<code>const</code> initialization is needed and <code>Option</code> is not preferred, consider <code>once_cell</code> or <code>lazy_static</code>.</p>
+<h4 id="solution-8-promoting-new-state-with-arc-and-rwlock">Solution 8: Promoting New State with <code>Arc</code> and <code>RwLock</code></h4>
+<p>An alternative to direct mutation is to manage versions of global state. New states are created, and consumers holding references to older states continue to use them, while new consumers get the updated state. This pattern uses <code>Arc</code> for shared ownership and <code>RwLock</code> for concurrent access.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::sync::{Arc, RwLock};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#[derive(Default, Debug, Clone)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">AppConfig</span> {
+</span></span><span style="display:flex;"><span>    debug_mode: <span style="color:#66d9ef">bool</span>,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">impl</span> AppConfig {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Get a clone of the current configuration.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">pub</span> <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">current</span>() -&gt; <span style="color:#a6e22e">Arc</span><span style="color:#f92672">&lt;</span>AppConfig<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">THREAD_LOCAL_CONFIG</span>.with(<span style="color:#f92672">|</span>c<span style="color:#f92672">|</span> c.read().unwrap().clone())
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Update the current configuration.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">pub</span> <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">set_current</span>(new_config: <span style="color:#a6e22e">Self</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">THREAD_LOCAL_CONFIG</span>.with(<span style="color:#f92672">|</span>c<span style="color:#f92672">|</span> <span style="color:#f92672">*</span>c.write().unwrap() <span style="color:#f92672">=</span> Arc::new(new_config));
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Thread-local storage for configuration, protected by RwLock.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">thread_local!</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">THREAD_LOCAL_CONFIG</span>: <span style="color:#a6e22e">RwLock</span><span style="color:#f92672">&lt;</span>Arc<span style="color:#f92672">&lt;</span>AppConfig<span style="color:#f92672">&gt;&gt;</span> <span style="color:#f92672">=</span> RwLock::new(Default::default());
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Set an initial configuration.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    AppConfig::set_current(AppConfig { debug_mode: <span style="color:#a6e22e">true</span> });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> AppConfig::current().debug_mode {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;Debug mode is enabled.&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Update the configuration.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    AppConfig::set_current(AppConfig { debug_mode: <span style="color:#a6e22e">false</span> });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">!</span>AppConfig::current().debug_mode {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;Debug mode is now disabled.&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-9-using-spinlock-for-global-access">Solution 9: Using <code>SpinLock</code> for Global Access</h4>
+<p><code>SpinLock</code> can be employed for global access, especially when contention is expected to be low or short-lived, as it avoids potential deadlocks associated with OS-level mutexes.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::collections::HashMap; <span style="color:#75715e">// Assuming HashMap is needed for thread registry logic
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Note: SpinLock is not in std, you&#39;d typically use a crate like `spin`.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// For demonstration, let&#39;s assume a hypothetical SpinLock:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// use spin::SpinLock;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Placeholder for SpinLock functionality
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">SpinLock</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span>(std::sync::Mutex<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span>); <span style="color:#75715e">// Simplified placeholder
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">impl</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> SpinLock<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">new</span>(data: <span style="color:#a6e22e">T</span>) -&gt; <span style="color:#a6e22e">Self</span> { SpinLock(std::sync::Mutex::new(data)) }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">lock</span>(<span style="color:#f92672">&amp;</span>self) -&gt; <span style="color:#a6e22e">std</span>::sync::MutexGuard<span style="color:#f92672">&lt;</span>&#39;_, T<span style="color:#f92672">&gt;</span> { self.<span style="color:#ae81ff">0.</span>lock().unwrap() }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#[derive(Default)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">ThreadRegistry</span> {
+</span></span><span style="display:flex;"><span>    enabled_for_new_threads: <span style="color:#66d9ef">bool</span>,
+</span></span><span style="display:flex;"><span>    threads: Option<span style="color:#f92672">&lt;</span>HashMap<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">u32</span>, <span style="color:#f92672">*</span><span style="color:#66d9ef">const</span> ()<span style="color:#f92672">&gt;&gt;</span>, <span style="color:#75715e">// Using *const () as a placeholder
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">impl</span> ThreadRegistry {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">threads</span>(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> self) -&gt; <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">mut</span> HashMap<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">u32</span>, <span style="color:#f92672">*</span><span style="color:#66d9ef">const</span> ()<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>        self.threads.get_or_insert_with(HashMap::new)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Hypothetical SpinLock usage for a global registry.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">GLOBAL_THREAD_REGISTRY</span>: <span style="color:#a6e22e">SpinLock</span><span style="color:#f92672">&lt;</span>ThreadRegistry<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> SpinLock::new(Default::default());
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">check_registry_state</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> registry <span style="color:#f92672">=</span> <span style="color:#66d9ef">GLOBAL_THREAD_REGISTRY</span>.lock();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> registry.enabled_for_new_threads {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;New threads are enabled.&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">modify_registry</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> registry <span style="color:#f92672">=</span> <span style="color:#66d9ef">GLOBAL_THREAD_REGISTRY</span>.lock();
+</span></span><span style="display:flex;"><span>    registry.threads().insert(<span style="color:#ae81ff">123</span>, std::ptr::null()); <span style="color:#75715e">// Example modification
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    check_registry_state();
+</span></span><span style="display:flex;"><span>    modify_registry();
+</span></span><span style="display:flex;"><span>    check_registry_state();
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Note:</strong> For mutable state that is <em>not</em> intended to be a singleton, refer to strategies for managing mutable data in Rust, as detailed in resources like &ldquo;What Not to Do in Rust.&rdquo;</p>
+<h4 id="solution-10-unsafe-global-initialization-maybeuninit-once-static-mut">Solution 10: Unsafe Global Initialization (<code>MaybeUninit</code>, <code>Once</code>, <code>static mut</code>)</h4>
+<p>This method involves directly using <code>static mut</code> with <code>MaybeUninit</code> and <code>Once</code> for manual initialization. This is highly unsafe and should only be used with extreme caution, as it bypasses many of Rust&rsquo;s safety guarantees.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#75715e">// Note: This code uses nightly features and is highly unsafe.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// #![feature(const_size_of_val)]
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// #![feature(const_ptr_write)]
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Assume StructThatIsNotSyncNorSend is defined and has a ::new() method.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// For this example, we&#39;ll use a simple struct.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#[derive(Debug)]</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">NotSyncOrSend</span> {
+</span></span><span style="display:flex;"><span>    value: <span style="color:#66d9ef">i32</span>,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">impl</span> NotSyncOrSend {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">new</span>() -&gt; <span style="color:#a6e22e">Self</span> {
+</span></span><span style="display:flex;"><span>        NotSyncOrSend { value: <span style="color:#ae81ff">0</span> }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// This is an example of an unsafe manual initialization.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// It is extremely dangerous if not handled with perfect care.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">/*
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">static mut DANGEROUS_GLOBAL_MUT: NotSyncOrSend = unsafe {
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    // This initialization is illustrative and highly prone to Undefined Behavior.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    // It attempts to bypass safety checks.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    let mut u: MaybeUninit&lt;NotSyncOrSend&gt; = MaybeUninit::uninit();
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    // A placeholder for actual unsafe initialization logic.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    // Real implementations would need careful memory management.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    let bytes_to_init = std::mem::size_of::&lt;NotSyncOrSend&gt;();
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    // write_bytes(u.as_ptr() as *mut u8, 0, bytes_to_init); // Hypothetical write
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    u.write(NotSyncOrSend::new()); // Simplified initialization
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    u.assume_init()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">};
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">fn main() {
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    unsafe {
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">        // Swapping with a temporary value to manage the global.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">        // This is still very unsafe.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">        let mut temp = NotSyncOrSend::new();
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">        std::mem::swap(&amp;mut DANGEROUS_GLOBAL_MUT, &amp;mut temp);
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">        std::mem::forget(temp); // Prevent dropping the initialized value.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    }
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    // Accessing DANGEROUS_GLOBAL_MUT here would require another unsafe block.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    // If accessed from multiple threads without synchronization, it&#39;s UB.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">}
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">*/</span>
+</span></span></code></pre></div><p><strong>Warning:</strong> This pattern is incredibly risky. It introduces <code>unsafe</code> operations that can lead to undefined behavior if not managed meticulously. If you&rsquo;re not entirely confident in handling raw pointers and memory initialization, avoid this approach and opt for the safer, documented methods.</p>
+<h4 id="solution-11-custom-type-within-stdsyncmutex">Solution 11: Custom Type within <code>std::sync::Mutex</code></h4>
+<p>A common and safe approach is to encapsulate your custom data structure within a <code>std::sync::Mutex</code>. This ensures that access to the data is synchronized across threads.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::sync::Mutex;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#[derive(Debug, Clone, Copy)]</span> <span style="color:#75715e">// Make it easily clonable for demonstration
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Point</span> {
+</span></span><span style="display:flex;"><span>    x: <span style="color:#66d9ef">i32</span>,
+</span></span><span style="display:flex;"><span>    y: <span style="color:#66d9ef">i32</span>,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Global static protected by a Mutex.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">GLOBAL_POINT</span>: <span style="color:#a6e22e">Mutex</span><span style="color:#f92672">&lt;</span>Point<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> Mutex::new(Point { x: <span style="color:#ae81ff">10</span>, y: <span style="color:#ae81ff">20</span> });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">update_global_point</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> Ok(<span style="color:#66d9ef">mut</span> point) <span style="color:#f92672">=</span> <span style="color:#66d9ef">GLOBAL_POINT</span>.lock() {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Modify the point safely.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        point.x <span style="color:#f92672">+=</span> <span style="color:#ae81ff">5</span>;
+</span></span><span style="display:flex;"><span>        point.y <span style="color:#f92672">-=</span> <span style="color:#ae81ff">10</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;Updated GLOBAL_POINT: </span><span style="color:#e6db74">{:?}</span><span style="color:#e6db74">&#34;</span>, point);
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">eprintln!</span>(<span style="color:#e6db74">&#34;Failed to lock GLOBAL_POINT&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">read_global_point</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> Ok(point) <span style="color:#f92672">=</span> <span style="color:#66d9ef">GLOBAL_POINT</span>.lock() {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Read the point&#39;s value.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;Current GLOBAL_POINT: </span><span style="color:#e6db74">{:?}</span><span style="color:#e6db74">&#34;</span>, point);
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">eprintln!</span>(<span style="color:#e6db74">&#34;Failed to lock GLOBAL_POINT for reading&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    read_global_point();
+</span></span><span style="display:flex;"><span>    update_global_point();
+</span></span><span style="display:flex;"><span>    read_global_point();
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="solution-12-enforcing-singleton-initialization-with-atomicbool">Solution 12: Enforcing Singleton Initialization with <code>AtomicBool</code></h4>
+<p>For singletons that require explicit initialization, an <code>AtomicBool</code> can enforce that the initialization logic is called only once.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::sync::atomic::{AtomicBool, Ordering};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">HAS_BEEN_INITIALIZED</span>: <span style="color:#a6e22e">AtomicBool</span> <span style="color:#f92672">=</span> AtomicBool::new(<span style="color:#66d9ef">false</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">MySingleton</span> {
+</span></span><span style="display:flex;"><span>    data: String,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">impl</span> MySingleton {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Attempts to initialize the singleton. Panics if already initialized.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">pub</span> <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">initialize</span>() -&gt; <span style="color:#a6e22e">Self</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">HAS_BEEN_INITIALIZED</span>.load(Ordering::Relaxed) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">panic!</span>(<span style="color:#e6db74">&#34;Singleton has already been initialized!&#34;</span>);
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">HAS_BEEN_INITIALIZED</span>.store(<span style="color:#66d9ef">true</span>, Ordering::Relaxed);
+</span></span><span style="display:flex;"><span>            MySingleton {
+</span></span><span style="display:flex;"><span>                data: String::from(<span style="color:#e6db74">&#34;Initial data&#34;</span>),
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> singleton_instance <span style="color:#f92672">=</span> MySingleton::initialize();
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;Singleton initialized with: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, singleton_instance.data);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// The following line would cause a panic:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// let another_instance = MySingleton::initialize();
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><h4 id="solution-13-manual-singleton-implementation-non-thread-safe">Solution 13: Manual Singleton Implementation (Non-Thread-Safe)</h4>
+<p>A direct, non-thread-safe singleton can be implemented using <code>static mut Option&lt;&amp;'static mut Manager&gt;</code>. This mirrors C++ singleton patterns but lacks Rust&rsquo;s inherent thread safety.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#66d9ef">use</span> std::{mem, ptr};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Manager</span> {
+</span></span><span style="display:flex;"><span>    count: <span style="color:#66d9ef">i32</span>,
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Non-thread-safe global instance.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">mut</span> <span style="color:#66d9ef">MANAGER_INSTANCE</span>: Option<span style="color:#f92672">&lt;&amp;</span>&#39;static <span style="color:#66d9ef">mut</span> Manager<span style="color:#f92672">&gt;</span> <span style="color:#f92672">=</span> None;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">impl</span> Drop <span style="color:#66d9ef">for</span> Manager {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">drop</span>(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> self) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;Manager instance is being dropped.&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">impl</span> Manager {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Retrieves or creates the singleton instance.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">pub</span> <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">instance</span>() -&gt; <span style="color:#66d9ef">&amp;</span>&#39;static <span style="color:#a6e22e">mut</span> Manager {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">unsafe</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">match</span> <span style="color:#66d9ef">MANAGER_INSTANCE</span> {
+</span></span><span style="display:flex;"><span>                Some(<span style="color:#66d9ef">ref</span> <span style="color:#66d9ef">mut</span> manager) <span style="color:#f92672">=&gt;</span> <span style="color:#f92672">*</span>manager,
+</span></span><span style="display:flex;"><span>                None <span style="color:#f92672">=&gt;</span> {
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;Creating new Manager instance.&#34;</span>);
+</span></span><span style="display:flex;"><span>                    <span style="color:#75715e">// Create instance on the heap and get a raw pointer.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                    <span style="color:#66d9ef">let</span> manager_box <span style="color:#f92672">=</span> Box::new(Manager { count: <span style="color:#ae81ff">0</span> });
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">let</span> manager_raw <span style="color:#f92672">=</span> Box::into_raw(manager_box);
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">MANAGER_INSTANCE</span> <span style="color:#f92672">=</span> Some(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> <span style="color:#f92672">*</span>manager_raw);
+</span></span><span style="display:flex;"><span>                    <span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> <span style="color:#f92672">*</span>manager_raw
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Explicitly destroys the singleton instance.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">pub</span> <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">destroy</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">unsafe</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> Some(raw_ptr) <span style="color:#f92672">=</span> mem::replace(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> <span style="color:#66d9ef">MANAGER_INSTANCE</span>, None) {
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">// Reclaim ownership and drop the manager.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                drop(Box::from_raw(raw_ptr));
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Example method on the Manager.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">pub</span> <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">increment_count</span>(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> self) {
+</span></span><span style="display:flex;"><span>        self.count <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">println!</span>(<span style="color:#e6db74">&#34;Manager count: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span>, self.count);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Example usage, requiring an async runtime for tokio::spawn.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// #[tokio::main]
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">run_manager_example</span>() {
+</span></span><span style="display:flex;"><span>    Manager::instance().increment_count();
+</span></span><span style="display:flex;"><span>    Manager::instance().increment_count();
+</span></span><span style="display:flex;"><span>    Manager::destroy(); <span style="color:#75715e">// Explicitly destroy
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    Manager::instance().increment_count();
+</span></span><span style="display:flex;"><span>    Manager::destroy();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Example of thread spawning (requires async context).
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">let</span> handle <span style="color:#f92672">=</span> tokio::spawn(<span style="color:#66d9ef">async</span> {
+</span></span><span style="display:flex;"><span>        Manager::destroy(); <span style="color:#75715e">// Can be called multiple times safely.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        Manager::instance().increment_count();
+</span></span><span style="display:flex;"><span>        Manager::destroy();
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>    handle.<span style="color:#66d9ef">await</span>.expect(<span style="color:#e6db74">&#34;Tokio task failed&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// To run this example, you would need tokio enabled.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// For a simple sync main:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Direct sync call without tokio
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    Manager::instance().increment_count();
+</span></span><span style="display:flex;"><span>    Manager::instance().increment_count();
+</span></span><span style="display:flex;"><span>    Manager::destroy();
+</span></span><span style="display:flex;"><span>    Manager::instance().increment_count();
+</span></span><span style="display:flex;"><span>    Manager::destroy();
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This implementation, while functional, relies heavily on <code>unsafe</code> and manual memory management. Thread safety is not guaranteed without explicit synchronization mechanisms.</p>
+<pre tabindex="0"><code>use std::sync::{LazyLock, Mutex};
+
+static ARRAY: LazyLock&amp;lt;Mutex&amp;lt;Vec&amp;lt;u8&amp;gt;&amp;gt;&amp;gt; = LazyLock::new(|| Mutex::new(vec![]));
+
+fn do_a_call() {
+    ARRAY.lock().unwrap().push(1);
+}
+
+fn main() {
+    do_a_call();
+    do_a_call();
+    do_a_call();
+
+    println!(&amp;quot;called {}&amp;quot;, ARRAY.lock().unwrap().len());
+}
+use std::sync::{Mutex, OnceLock};
+
+fn array() -&amp;gt; &amp;amp;&#39;static Mutex&amp;lt;Vec&amp;lt;u8&amp;gt;&amp;gt; {
+    static ARRAY: OnceLock&amp;lt;Mutex&amp;lt;Vec&amp;lt;u8&amp;gt;&amp;gt;&amp;gt; = OnceLock::new();
+    ARRAY.get_or_init(|| Mutex::new(vec![]))
+}
+
+fn do_a_call() {
+    array().lock().unwrap().push(1);
+}
+
+fn main() {
+    do_a_call();
+    do_a_call();
+    do_a_call();
+
+    println!(&amp;quot;called {}&amp;quot;, array().lock().unwrap().len());
+}
+use lazy_static::lazy_static; // 1.4.0
+use std::sync::Mutex;
+
+lazy_static! {
+    static ref ARRAY: Mutex&amp;lt;Vec&amp;lt;u8&amp;gt;&amp;gt; = Mutex::new(vec![]);
+}
+
+fn do_a_call() {
+    ARRAY.lock().unwrap().push(1);
+}
+
+fn main() {
+    do_a_call();
+    do_a_call();
+    do_a_call();
+
+    println!(&amp;quot;called {}&amp;quot;, ARRAY.lock().unwrap().len());
+}
+use once_cell::sync::Lazy; // 1.3.1
+use std::sync::Mutex;
+
+static ARRAY: Lazy&amp;lt;Mutex&amp;lt;Vec&amp;lt;u8&amp;gt;&amp;gt;&amp;gt; = Lazy::new(|| Mutex::new(vec![]));
+
+fn do_a_call() {
+    ARRAY.lock().unwrap().push(1);
+}
+
+fn main() {
+    do_a_call();
+    do_a_call();
+    do_a_call();
+
+    println!(&amp;quot;called {}&amp;quot;, ARRAY.lock().unwrap().len());
+}
+use std::sync::atomic::{AtomicUsize, Ordering};
+
+static CALL_COUNT: AtomicUsize = AtomicUsize::new(0);
+
+fn do_a_call() {
+    CALL_COUNT.fetch_add(1, Ordering::SeqCst);
+}
+
+fn main() {
+    do_a_call();
+    do_a_call();
+    do_a_call();
+
+    println!(&amp;quot;called {}&amp;quot;, CALL_COUNT.load(Ordering::SeqCst));
+}
+use std::sync::{Mutex, Once};
+use std::time::Duration;
+use std::{mem::MaybeUninit, thread};
+
+struct SingletonReader {
+    // Since we will be used in many threads, we need to protect
+    // concurrent access
+    inner: Mutex&amp;lt;u8&amp;gt;,
+}
+
+fn singleton() -&amp;gt; &amp;amp;&#39;static SingletonReader {
+    // Create an uninitialized static
+    static mut SINGLETON: MaybeUninit&amp;lt;SingletonReader&amp;gt; = MaybeUninit::uninit();
+    static ONCE: Once = Once::new();
+
+    unsafe {
+        ONCE.call_once(|| {
+            // Make it
+            let singleton = SingletonReader {
+                inner: Mutex::new(0),
+            };
+            // Store it to the static var, i.e. initialize it
+            SINGLETON.write(singleton);
+        });
+
+        // Now we give out a shared reference to the data, which is safe to use
+        // concurrently.
+        SINGLETON.assume_init_ref()
+    }
+}
+
+fn main() {
+    // Let&#39;s use the singleton in a few threads
+    let threads: Vec&amp;lt;_&amp;gt; = (0..10)
+        .map(|i| {
+            thread::spawn(move || {
+                thread::sleep(Duration::from_millis(i * 10));
+                let s = singleton();
+                let mut data = s.inner.lock().unwrap();
+                *data = i as u8;
+            })
+        })
+        .collect();
+
+    // And let&#39;s check the singleton every so often
+    for _ in 0u8..20 {
+        thread::sleep(Duration::from_millis(5));
+
+        let s = singleton();
+        let data = s.inner.lock().unwrap();
+        println!(&amp;quot;It is: {}&amp;quot;, *data);
+    }
+
+    for thread in threads.into_iter() {
+        thread.join().unwrap();
+    }
+}
+It is: 0
+It is: 1
+It is: 1
+It is: 2
+It is: 2
+It is: 3
+It is: 3
+It is: 4
+It is: 4
+It is: 5
+It is: 5
+It is: 6
+It is: 6
+It is: 7
+It is: 7
+It is: 8
+It is: 8
+It is: 9
+It is: 9
+It is: 9
+use lazy_static::lazy_static; // 1.2.0
+
+fn only_here() {
+    lazy_static! {
+        static ref NAME: String = String::from(&amp;quot;hello, world!&amp;quot;);
+    }
+    
+    println!(&amp;quot;{}&amp;quot;, &amp;amp;*NAME);
+}
+
+fn not_here() {
+    println!(&amp;quot;{}&amp;quot;, &amp;amp;*NAME);
+}
+error[E0425]: cannot find value `NAME` in this scope
+  --&amp;gt; src/lib.rs:12:22
+   |
+12 |     println!(&amp;quot;{}&amp;quot;, &amp;amp;*NAME);
+   |                      ^^^^ not found in this scope
+</code></pre><h3 id="controlling-global-access">Controlling Global Access</h3>
+<p>It&rsquo;s important to note that Rust&rsquo;s module system and privacy features allow you to control the scope of static variables. By declaring a static within a module or even a function, you can restrict its accessibility, ensuring it&rsquo;s only used where intended, even if it remains a global instance.</p>
+<pre tabindex="0"><code>use std::sync::Mutex;
+
+static GLOBAL_DATA: Mutex&amp;lt;Vec&amp;lt;i32&amp;gt;&amp;gt; = Mutex::new(Vec::new());
+
+fn main() {
+    GLOBAL_DATA.lock().unwrap().push(42);
+    println!(&amp;quot;{:?}&amp;quot;, GLOBAL_DATA.lock().unwrap());
+}
+use std::sync::Mutex;
+use std::collections::HashSet;
+
+static GLOBAL_DATA: Mutex&amp;lt;Option&amp;lt;HashSet&amp;lt;i32&amp;gt;&amp;gt;&amp;gt; = Mutex::new(None);
+
+fn main() {
+    *GLOBAL_DATA.lock().unwrap() = Some(HashSet::from([42]));
+    println!(&amp;quot;V2: {:?}&amp;quot;, GLOBAL_DATA.lock().unwrap());
+}
+</code></pre><h3 id="faqs-on-rust-global-mutable-variables">FAQs on Rust Global Mutable Variables</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the recommended way to handle global mutable state in Rust</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Prefer passing mutable references to objects. If global mutable state is necessary, use <code>std::sync::Mutex</code>, <code>std::sync::RwLock</code>, <code>std::sync::LazyLock</code>, <code>std::sync::OnceLock</code>, or crates like <code>once_cell</code> and <code>lazy_static</code> for safe, synchronized access. For simple counters, <code>AtomicUsize</code> is efficient.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I use global variables in Rust like in C&#43;&#43;</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, using <code>static</code> or <code>static mut</code> variables, but Rust&rsquo;s safety guarantees require careful handling. <code>static mut</code> is inherently unsafe and requires <code>unsafe</code> blocks for access, while <code>static</code> with synchronization primitives like <code>Mutex</code> provides safety.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the difference between Mutex and RwLock for global variables</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: <code>Mutex</code> allows only one thread to access the data at a time (exclusive access). <code>RwLock</code> allows multiple threads to read concurrently but only one thread to write (exclusive access for writes, shared access for reads). <code>RwLock</code> can offer better performance if reads are much more frequent than writes.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Are crates like lazy_static still necessary with std::sync::OnceLock</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: <code>std::sync::OnceLock</code> provides a standard, dependency-free solution for lazy initialization. While <code>lazy_static</code> and <code>once_cell</code> are still widely used and offer similar or even additional features, <code>OnceLock</code> reduces external dependencies for this specific task.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How does Rust prevent data races with global mutable variables</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Rust uses the type system and borrow checker, combined with synchronization primitives like <code>Mutex</code> and <code>RwLock</code>, to prevent data races. By ensuring exclusive access or managing shared access correctly, Rust guarantees memory safety even with concurrent access to shared mutable state.</div>
+    </div>
+</div>
+<pre tabindex="0"><code>use std::sync::{Arc, RwLock};
+
+#[derive(Default)]
+struct Config {
+    pub debug_mode: bool,
+}
+
+impl Config {
+    pub fn current() -&amp;gt; Arc&amp;lt;Config&amp;gt; {
+        CURRENT_CONFIG.with(|c| c.read().unwrap().clone())
+    }
+    pub fn make_current(self) {
+        CURRENT_CONFIG.with(|c| *c.write().unwrap() = Arc::new(self))
+    }
+}
+
+thread_local! {
+    static CURRENT_CONFIG: RwLock&amp;lt;Arc&amp;lt;Config&amp;gt;&amp;gt; = RwLock::new(Default::default());
+}
+
+fn main() {
+    Config { debug_mode: true }.make_current();
+    if Config::current().debug_mode {
+        // do something
+    }
+}
+</code></pre><p>We&rsquo;d love to hear your thoughts on these techniques! Share your experiences, questions, or alternative approaches in the comments below. Your feedback helps refine our collective knowledge on Rust development.</p>
+<p>For more on Rust programming concepts:</p>
+<ul>
+<li>Explore <a href="https://sqlpey.com/python/what-is-python" target="_blank" rel="noopener">What is Python</a>
+</li>
+<li>Discover <a href="https://sqlpey.com/mysql/introduction-to-mysql" target="_blank" rel="noopener">Introduction to MySQL</a>
+</li>
+<li>Learn about <a href="https://sqlpey.com/dotnet/what-is-dotnet" target="_blank" rel="noopener">What is .NET</a>
+</li>
+</ul>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

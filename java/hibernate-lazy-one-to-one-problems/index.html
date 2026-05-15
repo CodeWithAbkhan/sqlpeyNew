@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Hibernate JPA Lazy Loading Issues with Nullable @OneToOne Associations Explained - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore why nullable @OneToOne associations in Hibernate/JPA often force eager fetching and examine alternative solutions like @MapsId, bytecode enhancement, …">
+
+
+
+<meta name="keywords" content="@OneToOne, Lazy Loading, Bytecode Instrumentation, @MapsId">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Hibernate JPA Lazy Loading Issues with Nullable @OneToOne Associations Explained - sqlpey">
+<meta name="DC.description" content="Explore why nullable @OneToOne associations in Hibernate/JPA often force eager fetching and examine alternative solutions like @MapsId, bytecode enhancement, and relationship restructuring.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Hibernate JPA Lazy Loading Issues with Nullable @OneToOne Associations Explained - sqlpey">
+<meta property="og:description" content="Explore why nullable @OneToOne associations in Hibernate/JPA often force eager fetching and examine alternative solutions like @MapsId, bytecode enhancement, …">
+<meta property="og:url" content="https://sqlpey.com/java/hibernate-lazy-one-to-one-problems/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="JPA">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Hibernate JPA Lazy Loading Issues with Nullable @OneToOne Associations Explained">
+<meta name="twitter:description" content="Explore why nullable @OneToOne associations in Hibernate/JPA often force eager fetching and examine alternative solutions like @MapsId, bytecode enhancement, …">
+
+
+<link rel="canonical" href="https://sqlpey.com/java/hibernate-lazy-one-to-one-problems/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Hibernate JPA Lazy Loading Issues with Nullable @OneToOne Associations Explained\"",
+  "description": "\"Explore why nullable @OneToOne associations in Hibernate/JPA often force eager fetching and examine alternative solutions like @MapsId, bytecode enhancement, and relationship restructuring.\"",
+  "url": "\"https://sqlpey.com/java/hibernate-lazy-one-to-one-problems/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/java/hibernate-lazy-one-to-one-problems/\""
+  },
+  "articleSection": "\"JPA\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Hibernate JPA Lazy Loading Issues with Nullable @OneToOne Associations Explained</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">JPA</span>
+              
+              <span class="tag">Hibernate</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              6 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#hibernate-jpa-lazy-loading-issues-with-nullable-onetoone-associations-explained">&ldquo;Hibernate JPA Lazy Loading Issues with Nullable @OneToOne Associations Explained&rdquo;</a>
+      <ul>
+        <li><a href="#core-limitation-unconstrained-one-to-one-associations">Core Limitation: Unconstrained One-to-One Associations</a></li>
+        <li><a href="#recommended-solutions-for-lazy-loading">Recommended Solutions for Lazy Loading</a></li>
+        <li><a href="#advanced-considerations-and-context">Advanced Considerations and Context</a></li>
+        <li><a href="#faqs-on-hibernate-lazy-one-to-one-problems">FAQs on Hibernate Lazy One To One Problems</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a></li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="hibernate-jpa-lazy-loading-issues-with-nullable-onetoone-associations-explained">&ldquo;Hibernate JPA Lazy Loading Issues with Nullable @OneToOne Associations Explained&rdquo;</h2>
+<p>The default behavior of Hibernate regarding lazy loading for <code>@OneToOne</code> associations presents a common challenge, particularly when the association is unconstrained (nullable). Proxies, the mechanism typically used for lazy loading, cannot reliably resolve whether an association should contain a proxy object or <code>null</code> when looking only at the owner entity&rsquo;s table columns. This limitation often forces eager fetching, leading to performance issues when many such associations exist.</p>
+<p>What are the effective strategies to achieve lazy loading for a nullable <code>@OneToOne</code> relationship in JPA environments?</p>
+<h3 id="core-limitation-unconstrained-one-to-one-associations">Core Limitation: Unconstrained One-to-One Associations</h3>
+<p>The primary reason lazy loading fails on the <em>owner side</em> of an unconstrained (nullable) one-to-one association relates to proxy generation.</p>
+<ul>
+<li>The owner entity must determine if the associated object exists or if it should be <code>null</code>.</li>
+<li>When mapped via a shared primary key (common in 1:1), checking the foreign key column alone is insufficient to decide between a proxy instance and <code>null</code> without hitting the database. Consequently, eager fetching becomes the default to guarantee correct state resolution.</li>
+</ul>
+<p>Conversely, many-to-one and one-to-many associations do not face this dilemma. An owner entity can check its foreign key or initialize an empty collection proxy immediately, allowing for lazy loading. Replacing a 1:1 with a unique many-to-one is an architectural alteration, but often complex to implement.</p>
+<h3 id="recommended-solutions-for-lazy-loading">Recommended Solutions for Lazy Loading</h3>
+<p>Several approaches exist to circumvent this eager loading constraint:</p>
+<h4 id="1-enforcing-non-nullability-or-adjusting-fetch-directives">1. Enforcing Non-Nullability or Adjusting Fetch Directives</h4>
+<p>If the association is guaranteed not to be null, you can instruct JPA to use lazy fetching:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// Solution A: For @ManyToOne, @ManyToOne(fetch=FetchType.LAZY) usually suffices. Check for query overrides.</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@ManyToOne</span>(fetch<span style="color:#f92672">=</span>FetchType.<span style="color:#a6e22e">LAZY</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> SomeEntity manyToOneAssociation;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Solution B: For @OneToOne, explicitly set optional=false if the FK is constrained (NOT NULL)</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@OneToOne</span>(optional <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>, fetch <span style="color:#f92672">=</span> FetchType.<span style="color:#a6e22e">LAZY</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@JoinColumn</span>(name<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;other_entity_fk&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> OtherEntity <span style="color:#a6e22e">getOther</span>() { ... }
+</span></span></code></pre></div><p>If the association <em>must</em> remain nullable, and you prefer lazy loading without instrumentation, redesigning the mapping might be necessary. If you can alter the database schema by adding a foreign key column to the owner table, you can use a <strong>joined</strong> mapping:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// Owner Side (with FK column in owner table)</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@OneToOne</span>(fetch <span style="color:#f92672">=</span> FetchType.<span style="color:#a6e22e">LAZY</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@JoinColumn</span>(name<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;other_entity_fk&#34;</span>) <span style="color:#75715e">// FK column now resides in the Owner table</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> OtherEntity <span style="color:#a6e22e">getOther</span>() { ... }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Inverse Side</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@OneToOne</span>(mappedBy <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;other&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> OwnerEntity <span style="color:#a6e22e">getOwner</span>() { ... }
+</span></span></code></pre></div><p>If schema changes or eager fetching are not options, the next methods involve more advanced JPA configuration.</p>
+<h4 id="2-utilizing-mapsid-for-shared-primary-keys">2. Utilizing <code>@MapsId</code> for Shared Primary Keys</h4>
+<p>When the child entity&rsquo;s primary key is also its foreign key referencing the parent (often seen in entity hierarchies), using <code>@MapsId</code> simplifies fetching and inherently supports lazy loading on the owning side of the relationship. This avoids the N+1 query problems associated with lazy-loaded <code>mappedBy</code> associations on the parent side.</p>
+<p>Consider the <code>PostDetails</code> entity owning the relationship to <code>Post</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@Entity</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;PostDetails&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Table</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;post_details&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">PostDetails</span> {
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Id</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Long id; <span style="color:#75715e">// This &#39;id&#39; serves as PK and FK to Post</span>
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Column</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;created_on&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Date createdOn;
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Column</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;created_by&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> String createdBy;
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@OneToOne</span>(fetch <span style="color:#f92672">=</span> FetchType.<span style="color:#a6e22e">LAZY</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@MapsId</span> <span style="color:#75715e">// Tells JPA to use the ID field to derive the FK value</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Post post;
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Constructor and methods omitted for brevity</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>With this setup, fetching the child entity relies on the parent&rsquo;s ID:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// Assuming &#39;post&#39; object exists</span>
+</span></span><span style="display:flex;"><span>PostDetails details <span style="color:#f92672">=</span> entityManager.<span style="color:#a6e22e">find</span>(
+</span></span><span style="display:flex;"><span>    PostDetails.<span style="color:#a6e22e">class</span>,
+</span></span><span style="display:flex;"><span>    post.<span style="color:#a6e22e">getId</span>()
+</span></span><span style="display:flex;"><span>);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// This lookup is efficient and respects LAZY if configured correctly on the PostDetails side.</span>
+</span></span></code></pre></div><p>This strategy is highly favored when the relationship is 1:1 and identity-based. See detailed discussions on <a href="https://sqlpey.com/dotnet/implement-jwt-authentication-in-blazor/" target="_blank" rel="noopener">implementing JWT authentication in Blazor</a>
+ for related data persistence contexts.</p>
+<h4 id="3-bytecode-instrumentation-for-proxy-generation">3. Bytecode Instrumentation for Proxy Generation</h4>
+<p>To enable lazy loading on inherently eager relationships like nullable <code>@OneToOne</code>, Hibernate&rsquo;s bytecode enhancement capability is necessary. This process modifies the compiled <code>.class</code> files at build time or load time to insert necessary code for proxy generation, even for nullable fields.</p>
+<p>Apply the <code>@LazyToOne</code> annotation with <code>LazyToOneOption.NO_PROXY</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@OneToOne</span>(fetch <span style="color:#f92672">=</span> FetchType.<span style="color:#a6e22e">LAZY</span>)  
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@JoinColumn</span>(name<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;other_entity_fk&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@LazyToOne</span>(value <span style="color:#f92672">=</span> LazyToOneOption.<span style="color:#a6e22e">NO_PROXY</span>) <span style="color:#75715e">// Requires instrumentation</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> OtherEntity <span style="color:#a6e22e">getOther</span>() { ... }
+</span></span></code></pre></div><p>This requires configuring your build process (e.g., using Ant or Maven plugins) to run Hibernate&rsquo;s <code>InstrumentTask</code> after compilation but before deployment. For Ant build files, the configuration typically involves defining tasks to compile and then instrument the target domain objects directory.</p>
+<h4 id="4-alternative-mapping-reinterpreting-as-one-to-many">4. Alternative Mapping: Reinterpreting as One-to-Many</h4>
+<p>A less conventional, but workable, alternative avoids instrumentation by modeling the relationship as a unique <code>@OneToMany</code> on the side you wish to keep lazy, then &ldquo;translating&rdquo; the result back to a single object in the getter.</p>
+<p>If <code>Issue</code> has a self-referential <code>PREVIOUS</code> link:</p>
+<p><strong>Database Setup Example:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#f92672">`</span>TB_ISSUE<span style="color:#f92672">`</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">`</span>ID<span style="color:#f92672">`</span> INT(<span style="color:#ae81ff">9</span>) <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span> AUTO_INCREMENT,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">`</span>NAME<span style="color:#f92672">`</span> VARCHAR(<span style="color:#ae81ff">255</span>) <span style="color:#66d9ef">NULL</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">`</span>PREVIOUS<span style="color:#f92672">`</span> DECIMAL(<span style="color:#ae81ff">9</span>,<span style="color:#ae81ff">2</span>) <span style="color:#66d9ef">NULL</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">CONSTRAINT</span> <span style="color:#f92672">`</span>PK_ISSUE<span style="color:#f92672">`</span> <span style="color:#66d9ef">PRIMARY</span> <span style="color:#66d9ef">KEY</span> (<span style="color:#f92672">`</span>ID<span style="color:#f92672">`</span>)
+</span></span><span style="display:flex;"><span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">ALTER</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#f92672">`</span>TB_ISSUE<span style="color:#f92672">`</span> <span style="color:#66d9ef">ADD</span> <span style="color:#66d9ef">CONSTRAINT</span> <span style="color:#f92672">`</span>FK_ISSUE_ISSUE_PREVIOUS<span style="color:#f92672">`</span>
+</span></span><span style="display:flex;"><span>                 <span style="color:#66d9ef">FOREIGN</span> <span style="color:#66d9ef">KEY</span> (<span style="color:#f92672">`</span>PREVIOUS<span style="color:#f92672">`</span>) <span style="color:#66d9ef">REFERENCES</span> <span style="color:#f92672">`</span>TB_ISSUE<span style="color:#f92672">`</span> (<span style="color:#f92672">`</span>ID<span style="color:#f92672">`</span>);
+</span></span></code></pre></div><p><strong>Entity Mapping:</strong>
+The side holding the foreign key remains <code>@OneToOne(fetch=FetchType.LAZY)</code>. The inverse side is mapped as <code>@OneToMany</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@Entity</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Table</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;TB_ISSUE&#34;</span>) 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Issue</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Id</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@GeneratedValue</span>(strategy <span style="color:#f92672">=</span> GenerationType.<span style="color:#a6e22e">IDENTITY</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">protected</span> Integer id;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Column</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> String name;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// The side pointing directly to the FK column (can be lazy if constrained, or eager if nullable)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@OneToOne</span>(fetch<span style="color:#f92672">=</span>FetchType.<span style="color:#a6e22e">LAZY</span>) 
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@JoinColumn</span>(name<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;previous&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Issue previous;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Faking lazy loading by mapping the inverse side as OneToMany (will contain 0 or 1 item)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@OneToMany</span>(mappedBy<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;previous&#34;</span>, fetch<span style="color:#f92672">=</span>FetchType.<span style="color:#a6e22e">LAZY</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> List<span style="color:#f92672">&lt;</span>Issue<span style="color:#f92672">&gt;</span> next;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> Issue <span style="color:#a6e22e">getPrevious</span>() { <span style="color:#66d9ef">return</span> previous; }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Getter adapts the collection result to look like a 1:1 relationship</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> Issue <span style="color:#a6e22e">getNext</span>() { <span style="color:#66d9ef">return</span> next.<span style="color:#a6e22e">isEmpty</span>() <span style="color:#f92672">?</span> <span style="color:#66d9ef">null</span> : next.<span style="color:#a6e22e">get</span>(0); }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This setup ensures the <code>next</code> retrieval executes a select only when <code>getNext()</code> is called.</p>
+<h3 id="advanced-considerations-and-context">Advanced Considerations and Context</h3>
+<ul>
+<li><strong>XML Mappings:</strong> In older Hibernate XML configurations, the <code>constrained=&quot;true&quot;</code> attribute on the one-to-one mapping offered more direct control over this behavior, though annotations have largely superseded this.</li>
+<li><strong>Read-Only Children:</strong> If the associated child entity is strictly read-only, you might bypass the issue by setting <code>optional=false</code> on the lazy mapping and ensuring all access paths utilize <code>LEFT JOIN FETCH</code> in queries, forcing the data loading upfront when needed.</li>
+<li><strong>Kotlin Environments:</strong> For Kotlin developers, inheriting proxies requires entities to be marked as <code>open</code> or using the Kotlin compiler plugin (<code>allopen</code>) to process JPA annotations, as Kotlin classes are final by default.</li>
+</ul>
+<p>If your application is plagued by massive joins due to eager <code>@OneToOne</code> associations, addressing this lazy loading configuration is critical for performance optimization. For further insights on handling errors related to Python environments, see <a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">Fixing SSL Verification Failures in Python Requests</a>
+.</p>
+<p>We welcome your thoughts on which methods yield the best results in production environments, or if you have other patterns to share! Provide your comments or questions below.</p>
+<h3 id="faqs-on-hibernate-lazy-one-to-one-problems">FAQs on Hibernate Lazy One To One Problems</h3>
+<p><div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why does Hibernate default to eager loading for nullable OneToOne</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: When the association is nullable, Hibernate cannot determine if it should initialize a proxy or return null without querying the database, forcing an eager fetch to resolve this ambiguity immediately.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I use @MapsId on the non-owning side</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: No, <code>@MapsId</code> must be placed on the owning side of the relationship where the ID field mirrors the ID of the parent entity.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is bytecode instrumentation required for all lazy OneToOne relations</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: No, bytecode instrumentation is typically only required for <em>nullable</em> or <em>unconstrained</em> <code>@OneToOne</code> associations where the owner needs to distinguish between a proxy and null without a database lookup. Constrained (non-nullable) relations can often be lazy without it.</div>
+    </div>
+</div></p>
+<p>Check more solutions for common persistence challenges here:
+<a href="https://sqlpey.com/python/top-9-ways-to-solve-typeerror-is-not-json-serializable/" target="_blank" rel="noopener">Top 9 Ways to Solve TypeError is Not JSON Serializable</a>
+
+<a href="https://sqlpey.com/python/solved-how-to-fix-pip-install-access-denied-on-windows/" target="_blank" rel="noopener">Solved How to Fix Pip Install Access Denied on Windows</a>
+
+<a href="https://sqlpey.com/python/solved-how-to-fix-importerror-with-urllib3-and-openssl-compatibility/" target="_blank" rel="noopener">Solved How to Fix Importerror with Urllib3 and Openssl Compatibility</a>
+</p>
+<h2 id="solutions">Solutions</h2>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Optimizing File Upload Performance in FastAPI: Streaming vs. Standard Methods - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore three distinct methods for handling multipart/form-data uploads in FastAPI, focusing on performance implications of streaming raw requests versus using …">
+
+
+
+<meta name="keywords" content="FastAPI file upload, httpx streaming, streaming-form-data, UploadFile performance">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Optimizing File Upload Performance in FastAPI: Streaming vs. Standard Methods - sqlpey">
+<meta name="DC.description" content="Explore three distinct methods for handling multipart/form-data uploads in FastAPI, focusing on performance implications of streaming raw requests versus using UploadFile.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Optimizing File Upload Performance in FastAPI: Streaming vs. Standard Methods - sqlpey">
+<meta property="og:description" content="Explore three distinct methods for handling multipart/form-data uploads in FastAPI, focusing on performance implications of streaming raw requests versus using …">
+<meta property="og:url" content="https://sqlpey.com/python/optimizing-fastapi-file-uploads/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="FastAPI">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Optimizing File Upload Performance in FastAPI: Streaming vs. Standard Methods">
+<meta name="twitter:description" content="Explore three distinct methods for handling multipart/form-data uploads in FastAPI, focusing on performance implications of streaming raw requests versus using …">
+
+
+<link rel="canonical" href="https://sqlpey.com/python/optimizing-fastapi-file-uploads/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Optimizing File Upload Performance in FastAPI: Streaming vs. Standard Methods\"",
+  "description": "\"Explore three distinct methods for handling multipart/form-data uploads in FastAPI, focusing on performance implications of streaming raw requests versus using UploadFile.\"",
+  "url": "\"https://sqlpey.com/python/optimizing-fastapi-file-uploads/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/python/optimizing-fastapi-file-uploads/\""
+  },
+  "articleSection": "\"FastAPI\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Optimizing File Upload Performance in FastAPI: Streaming vs. Standard Methods</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">FastAPI</span>
+              
+              <span class="tag">Streaming</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              15 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#optimizing-file-upload-performance-in-fastapi-streaming-vs-standard-methods">&ldquo;Optimizing File Upload Performance in FastAPI: Streaming vs. Standard Methods&rdquo;</a></li>
+    <li><a href="#initial-considerations-for-file-uploads">Initial Considerations for File Uploads</a></li>
+    <li><a href="#option-1-efficient-single-file-uploads-via-raw-request-streaming">Option 1: Efficient Single File Uploads via Raw Request Streaming</a>
+      <ul>
+        <li><a href="#fastapi-endpoint-stream-only">FastAPI Endpoint (Stream Only)</a></li>
+        <li><a href="#client-example-javascript-fetch">Client Example (JavaScript Fetch)</a></li>
+        <li><a href="#client-example-python-httpx">Client Example (Python <code>httpx</code>)</a></li>
+      </ul>
+    </li>
+    <li><a href="#option-2-fast-multipart-parsing-with-streaming-form-data">Option 2: Fast Multipart Parsing with <code>streaming-form-data</code></a>
+      <ul>
+        <li><a href="#size-validation-integration">Size Validation Integration</a></li>
+        <li><a href="#client-example-python-httpx-with-form-and-file">Client Example (Python <code>httpx</code> with Form and File)</a></li>
+      </ul>
+    </li>
+    <li><a href="#option-2b-multiple-file-streaming-with-dynamic-headers">Option 2b: Multiple File Streaming with Dynamic Headers</a>
+      <ul>
+        <li><a href="#fastapi-endpoint-multiple-files">FastAPI Endpoint (Multiple Files)</a></li>
+        <li><a href="#client-example-javascript-fetch-for-multiple-files">Client Example (JavaScript Fetch for Multiple Files)</a></li>
+        <li><a href="#client-example-python-httpx-for-multiple-files">Client Example (Python <code>httpx</code> for Multiple Files)</a></li>
+      </ul>
+    </li>
+    <li><a href="#option-2c-handling-json-data-within-multipart-stream">Option 2c: Handling JSON Data within Multipart Stream</a></li>
+    <li><a href="#option-3-standard-uploadfile-and-form-slower-approach">Option 3: Standard <code>UploadFile</code> and <code>Form</code> (Slower Approach)</a>
+      <ul>
+        <li><a href="#client-timeout-adjustment-for-slow-uploads">Client Timeout Adjustment for Slow Uploads</a></li>
+      </ul>
+    </li>
+    <li><a href="#summary-of-approaches">Summary of Approaches</a></li>
+    <li><a href="#solutions">Solutions</a></li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="optimizing-file-upload-performance-in-fastapi-streaming-vs-standard-methods">&ldquo;Optimizing File Upload Performance in FastAPI: Streaming vs. Standard Methods&rdquo;</h2>
+<p>When dealing with large files in web applications built with frameworks like FastAPI, the default handling of <code>UploadFile</code> can introduce performance bottlenecks due to intermediate file spooling. This exploration details three primary techniques for processing multipart/form-data uploads, contrasting raw stream processing with built-in framework features.</p>
+<h2 id="initial-considerations-for-file-uploads">Initial Considerations for File Uploads</h2>
+<p>Before diving into the specialized solutions, it is worth noting that older libraries like <code>requests-toolbelt</code> require explicit setting of the <code>Content-Type</code> header with the correct boundary, which is crucial for correct multipart encoding.</p>
+<p>A basic example using <code>MultipartEncoder</code> from <code>requests-toolbelt</code> to ensure correct header setting:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> requests_toolbelt <span style="color:#f92672">import</span> MultipartEncoder
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> requests
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Note: requests-toolbelt has not seen a new release recently.</span>
+</span></span><span style="display:flex;"><span>filename <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;initial_data.bin&#39;</span>
+</span></span><span style="display:flex;"><span>multipart_data <span style="color:#f92672">=</span> MultipartEncoder(
+</span></span><span style="display:flex;"><span>    fields<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;upload_field&#39;</span>: (filename, open(filename, <span style="color:#e6db74">&#39;rb&#39;</span>))}
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>post(
+</span></span><span style="display:flex;"><span>    url<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;your_upload_url&#34;</span>, 
+</span></span><span style="display:flex;"><span>    data<span style="color:#f92672">=</span>multipart_data, 
+</span></span><span style="display:flex;"><span>    headers<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;Content-Type&#39;</span>: multipart_data<span style="color:#f92672">.</span>content_type}
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>print(response<span style="color:#f92672">.</span>request<span style="color:#f92672">.</span>headers)
+</span></span></code></pre></div><p>For modern Python HTTP clients, <code>httpx</code> offers superior asynchronous support and better handling of streaming data, often eliminating the need for external toolbelt libraries.</p>
+<h2 id="option-1-efficient-single-file-uploads-via-raw-request-streaming">Option 1: Efficient Single File Uploads via Raw Request Streaming</h2>
+<p>The standard FastAPI approach using <code>UploadFile</code> often relies on Starlette&rsquo;s internal mechanism, which utilizes a <code>SpooledTemporaryFile</code>. For files under 1MB (the default <code>max_size</code>), data resides in memory; exceeding this size triggers writing to a temporary file on disk. This disk I/O significantly slows down the upload process for large files.</p>
+<p>To bypass this spooling delay, we can access the request body directly as a stream using <code>request.stream()</code>. This allows processing incoming bytes chunk-by-chunk without memory accumulation or immediate disk writing until explicitly handled.</p>
+<p>This method is fast but only handles raw byte streams and cannot automatically parse traditional <code>multipart/form-data</code> fields (like text data); metadata must be passed via headers.</p>
+<h3 id="fastapi-endpoint-stream-only">FastAPI Endpoint (Stream Only)</h3>
+<p>This server example reads raw chunks and saves them to disk, utilizing <code>aiofiles</code> for asynchronous file operations. Filenames are passed via headers, requiring client-side URL encoding/decoding for safety.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># app_stream_only.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> fastapi <span style="color:#f92672">import</span> FastAPI, Request, HTTPException
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> fastapi.responses <span style="color:#f92672">import</span> HTMLResponse
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> fastapi.templating <span style="color:#f92672">import</span> Jinja2Templates
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> urllib.parse <span style="color:#f92672">import</span> unquote
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> aiofiles
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>app <span style="color:#f92672">=</span> FastAPI()
+</span></span><span style="display:flex;"><span>templates <span style="color:#f92672">=</span> Jinja2Templates(directory<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;templates&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.post</span>(<span style="color:#e6db74">&#39;/upload&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">upload</span>(request: Request):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Retrieve filename from headers and decode (must be encoded client-side)</span>
+</span></span><span style="display:flex;"><span>        filename <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>headers<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;filename&#39;</span>, <span style="color:#e6db74">&#39;default_file&#39;</span>)
+</span></span><span style="display:flex;"><span>        filename <span style="color:#f92672">=</span> unquote(filename)
+</span></span><span style="display:flex;"><span>        filepath <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#39;./uploads&#39;</span>, os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>basename(filename))
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Ensure upload directory exists</span>
+</span></span><span style="display:flex;"><span>        os<span style="color:#f92672">.</span>makedirs(<span style="color:#e6db74">&#39;./uploads&#39;</span>, exist_ok<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">async</span> <span style="color:#66d9ef">with</span> aiofiles<span style="color:#f92672">.</span>open(filepath, <span style="color:#e6db74">&#39;wb&#39;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">async</span> <span style="color:#66d9ef">for</span> chunk <span style="color:#f92672">in</span> request<span style="color:#f92672">.</span>stream():
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">await</span> f<span style="color:#f92672">.</span>write(chunk)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">raise</span> HTTPException(status_code<span style="color:#f92672">=</span><span style="color:#ae81ff">500</span>, detail<span style="color:#f92672">=</span><span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;Upload failure: </span><span style="color:#e6db74">{</span>e<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>     
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> {<span style="color:#e6db74">&#34;message&#34;</span>: <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Successfully streamed upload: </span><span style="color:#e6db74">{</span>filename<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>}
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.get</span>(<span style="color:#e6db74">&#34;/&#34;</span>, response_class<span style="color:#f92672">=</span>HTMLResponse)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>(request: Request):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> templates<span style="color:#f92672">.</span>TemplateResponse(request<span style="color:#f92672">=</span>request, name<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;index_stream.html&#34;</span>)
+</span></span></code></pre></div><h3 id="client-example-javascript-fetch">Client Example (JavaScript Fetch)</h3>
+<p>The client reads the file as an <code>ArrayBuffer</code> and sends the raw contents, passing the encoded filename in a custom header.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// templates/index_stream.html (Excerpt)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">uploadFile</span>(<span style="color:#a6e22e">contents</span>, <span style="color:#a6e22e">filename</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">headers</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Headers</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Encode URI component for safe header transmission
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">filename</span> <span style="color:#f92672">=</span> encodeURI(<span style="color:#a6e22e">filename</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">headers</span>.<span style="color:#a6e22e">append</span>(<span style="color:#e6db74">&#34;filename&#34;</span>, <span style="color:#a6e22e">filename</span>);
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fetch</span>(<span style="color:#e6db74">&#39;/upload&#39;</span>, {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;POST&#39;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">headers</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">body</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">contents</span>, <span style="color:#75715e">// ArrayBuffer contents
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    })
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">then</span>(<span style="color:#a6e22e">response</span> =&gt; <span style="color:#a6e22e">response</span>.<span style="color:#a6e22e">json</span>())
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">then</span>(<span style="color:#a6e22e">data</span> =&gt; {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Display success
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    })
+</span></span><span style="display:flex;"><span>    .<span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">error</span> =&gt; {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">error</span>(<span style="color:#e6db74">&#34;Upload failed:&#34;</span>, <span style="color:#a6e22e">error</span>);
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="client-example-python-httpx">Client Example (Python <code>httpx</code>)</h3>
+<p>Using <code>httpx</code> streaming capabilities provides a fast, memory-efficient way to upload a single file without loading it entirely:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># test_stream_single.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> httpx
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> urllib.parse <span style="color:#f92672">import</span> quote
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>URL <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;http://127.0.0.1:8000/upload&#39;</span>
+</span></span><span style="display:flex;"><span>FILE_TO_SEND <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;large_document.pdf&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create a dummy file for testing if needed</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>exists(FILE_TO_SEND):
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">with</span> open(FILE_TO_SEND, <span style="color:#e6db74">&#39;wb&#39;</span>) <span style="color:#66d9ef">as</span> f: f<span style="color:#f92672">.</span>write(os<span style="color:#f92672">.</span>urandom(<span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">10</span>)) <span style="color:#75715e"># 10MB dummy</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>start_time <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> open(FILE_TO_SEND, <span style="color:#e6db74">&#34;rb&#34;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># httpx streams the file data directly from the file handle</span>
+</span></span><span style="display:flex;"><span>    response <span style="color:#f92672">=</span> httpx<span style="color:#f92672">.</span>post(
+</span></span><span style="display:flex;"><span>        url<span style="color:#f92672">=</span>URL, 
+</span></span><span style="display:flex;"><span>        data<span style="color:#f92672">=</span>f, 
+</span></span><span style="display:flex;"><span>        headers<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;filename&#39;</span>: quote(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>basename(FILE_TO_SEND))}
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>end_time <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;Time elapsed: </span><span style="color:#e6db74">{</span>end_time <span style="color:#f92672">-</span> start_time<span style="color:#e6db74">:</span><span style="color:#e6db74">.2f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">s&#39;</span>)
+</span></span><span style="display:flex;"><span>print(response<span style="color:#f92672">.</span>json())
+</span></span></code></pre></div><p>To upload multiple files sequentially using this method:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Client side for multiple sequential uploads</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> glob
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>files_to_process <span style="color:#f92672">=</span> glob<span style="color:#f92672">.</span>glob(<span style="color:#e6db74">&#34;data_chunks/*&#34;</span>, recursive<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> path <span style="color:#f92672">in</span> files_to_process:
+</span></span><span style="display:flex;"><span>    filename <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>basename(path)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> open(path, <span style="color:#e6db74">&#34;rb&#34;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Send separate requests for each file</span>
+</span></span><span style="display:flex;"><span>        response <span style="color:#f92672">=</span> httpx<span style="color:#f92672">.</span>post(
+</span></span><span style="display:flex;"><span>            url<span style="color:#f92672">=</span>URL, 
+</span></span><span style="display:flex;"><span>            data<span style="color:#f92672">=</span>f, 
+</span></span><span style="display:flex;"><span>            headers<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;filename&#39;</span>: quote(filename)}
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Uploaded </span><span style="color:#e6db74">{</span>filename<span style="color:#e6db74">}</span><span style="color:#e6db74">: Status </span><span style="color:#e6db74">{</span>response<span style="color:#f92672">.</span>status_code<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><h2 id="option-2-fast-multipart-parsing-with-streaming-form-data">Option 2: Fast Multipart Parsing with <code>streaming-form-data</code></h2>
+<p>For scenarios requiring both files and accompanying form data (JSON-like payloads) processed efficiently without waiting for the entire request, the external <code>streaming-form-data</code> library is highly effective. It parses the incoming multipart stream in real-time as chunks arrive.</p>
+<p>This solution uses the raw <code>Request</code> object and integrates the parser with <code>FileTarget</code> (for files saved to disk) and <code>ValueTarget</code> (for form data kept in memory).</p>
+<h3 id="size-validation-integration">Size Validation Integration</h3>
+<p>A key advantage here is the ability to implement validation, such as limiting the total request body size, <em>before</em> the entire request completes—a capability missing when using <code>UploadFile</code>. We introduce custom validators for file size and total body size constraints.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># app_streaming_parser.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> fastapi <span style="color:#f92672">import</span> FastAPI, Request, HTTPException, status
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> streaming_form_data <span style="color:#f92672">import</span> StreamingFormDataParser
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> streaming_form_data.targets <span style="color:#f92672">import</span> FileTarget, ValueTarget
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> streaming_form_data.validators <span style="color:#f92672">import</span> MaxSizeValidator
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> streaming_form_data
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> starlette.requests <span style="color:#f92672">import</span> ClientDisconnect
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> urllib.parse <span style="color:#f92672">import</span> unquote
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Define limits: 4GB file size, slightly more for body overhead</span>
+</span></span><span style="display:flex;"><span>MAX_FILE_SIZE <span style="color:#f92672">=</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">4</span>  
+</span></span><span style="display:flex;"><span>MAX_REQUEST_BODY_SIZE <span style="color:#f92672">=</span> MAX_FILE_SIZE <span style="color:#f92672">+</span> <span style="color:#ae81ff">2048</span> 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>app <span style="color:#f92672">=</span> FastAPI()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">BodySizeExceeded</span>(<span style="color:#a6e22e">Exception</span>):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__init__</span>(self, current_length: int):
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>current_length <span style="color:#f92672">=</span> current_length
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">BodySizeValidator</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Checks total length of received bytes against a maximum.&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__init__</span>(self, max_size: int):
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>body_len <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>max_size <span style="color:#f92672">=</span> max_size
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">__call__</span>(self, chunk: bytes):
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>body_len <span style="color:#f92672">+=</span> len(chunk)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>body_len <span style="color:#f92672">&gt;</span> self<span style="color:#f92672">.</span>max_size:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">raise</span> BodySizeExceeded(body_len<span style="color:#f92672">=</span>self<span style="color:#f92672">.</span>body_len)
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.post</span>(<span style="color:#e6db74">&#39;/upload&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">upload_streamed_form</span>(request: Request):
+</span></span><span style="display:flex;"><span>    body_validator <span style="color:#f92672">=</span> BodySizeValidator(MAX_REQUEST_BODY_SIZE)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Assume filename is passed via header for file targeting</span>
+</span></span><span style="display:flex;"><span>    filename_header <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>headers<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;filename&#39;</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> filename_header:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">raise</span> HTTPException(status_code<span style="color:#f92672">=</span>status<span style="color:#f92672">.</span>HTTP_422_UNPROCESSABLE_ENTITY, 
+</span></span><span style="display:flex;"><span>            detail<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Filename header required&#39;</span>)
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        filename <span style="color:#f92672">=</span> unquote(filename_header)
+</span></span><span style="display:flex;"><span>        filepath <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#39;./uploads&#39;</span>, os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>basename(filename)) 
+</span></span><span style="display:flex;"><span>        os<span style="color:#f92672">.</span>makedirs(<span style="color:#e6db74">&#39;./uploads&#39;</span>, exist_ok<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Setup targets for parsing</span>
+</span></span><span style="display:flex;"><span>        file_target <span style="color:#f92672">=</span> FileTarget(filepath, validator<span style="color:#f92672">=</span>MaxSizeValidator(MAX_FILE_SIZE))
+</span></span><span style="display:flex;"><span>        data_target <span style="color:#f92672">=</span> ValueTarget() <span style="color:#75715e"># For accompanying form data field named &#39;data&#39;</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        parser <span style="color:#f92672">=</span> StreamingFormDataParser(headers<span style="color:#f92672">=</span>request<span style="color:#f92672">.</span>headers)
+</span></span><span style="display:flex;"><span>        parser<span style="color:#f92672">.</span>register(<span style="color:#e6db74">&#39;file&#39;</span>, file_target)
+</span></span><span style="display:flex;"><span>        parser<span style="color:#f92672">.</span>register(<span style="color:#e6db74">&#39;data&#39;</span>, data_target)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">async</span> <span style="color:#66d9ef">for</span> chunk <span style="color:#f92672">in</span> request<span style="color:#f92672">.</span>stream():
+</span></span><span style="display:flex;"><span>            body_validator(chunk)
+</span></span><span style="display:flex;"><span>            parser<span style="color:#f92672">.</span>data_received(chunk)
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> ClientDisconnect:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;Client Disconnected during streaming.&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> BodySizeExceeded <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">raise</span> HTTPException(status_code<span style="color:#f92672">=</span>status<span style="color:#f92672">.</span>HTTP_413_REQUEST_ENTITY_TOO_LARGE, 
+</span></span><span style="display:flex;"><span>           detail<span style="color:#f92672">=</span><span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;Request body limit (</span><span style="color:#e6db74">{</span>MAX_REQUEST_BODY_SIZE<span style="color:#e6db74">}</span><span style="color:#e6db74"> bytes) surpassed.&#39;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> streaming_form_data<span style="color:#f92672">.</span>validators<span style="color:#f92672">.</span>ValidationError:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">raise</span> HTTPException(status_code<span style="color:#f92672">=</span>status<span style="color:#f92672">.</span>HTTP_413_REQUEST_ENTITY_TOO_LARGE, 
+</span></span><span style="display:flex;"><span>            detail<span style="color:#f92672">=</span><span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;File size limit (</span><span style="color:#e6db74">{</span>MAX_FILE_SIZE<span style="color:#e6db74">}</span><span style="color:#e6db74"> bytes) exceeded.&#39;</span>) 
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">raise</span> HTTPException(status_code<span style="color:#f92672">=</span>status<span style="color:#f92672">.</span>HTTP_500_INTERNAL_SERVER_ERROR, 
+</span></span><span style="display:flex;"><span>            detail<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Error processing upload stream.&#39;</span>) 
+</span></span><span style="display:flex;"><span>   
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> file_target<span style="color:#f92672">.</span>multipart_filename:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">raise</span> HTTPException(status_code<span style="color:#f92672">=</span>status<span style="color:#f92672">.</span>HTTP_422_UNPROCESSABLE_ENTITY, detail<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;File part not found in stream.&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Access parsed form data and filename from targets</span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Form Data Received: </span><span style="color:#e6db74">{</span>data_target<span style="color:#f92672">.</span>value<span style="color:#f92672">.</span>decode() <span style="color:#66d9ef">if</span> data_target<span style="color:#f92672">.</span>value <span style="color:#66d9ef">else</span> <span style="color:#e6db74">&#39;None&#39;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Actual File Name: </span><span style="color:#e6db74">{</span>file_target<span style="color:#f92672">.</span>multipart_filename<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> {<span style="color:#e6db74">&#34;message&#34;</span>: <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Streamed form upload successful for </span><span style="color:#e6db74">{</span>filename<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>}
+</span></span></code></pre></div><h3 id="client-example-python-httpx-with-form-and-file">Client Example (Python <code>httpx</code> with Form and File)</h3>
+<p><code>httpx</code> excels here by supporting streaming file uploads natively within the <code>files</code> argument, which feeds perfectly into the streaming parser on the server side:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># test_stream_form.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> httpx
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> urllib.parse <span style="color:#f92672">import</span> quote
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>URL <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;http://127.0.0.1:8000/upload&#39;</span>
+</span></span><span style="display:flex;"><span>FILE_PATH <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;asset_to_send.dat&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>exists(FILE_PATH):
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">with</span> open(FILE_PATH, <span style="color:#e6db74">&#39;wb&#39;</span>) <span style="color:#66d9ef">as</span> f: f<span style="color:#f92672">.</span>write(os<span style="color:#f92672">.</span>urandom(<span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">5</span>)) <span style="color:#75715e"># 5MB dummy file</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>FILE_NAME <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>basename(FILE_PATH)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>start_time <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> httpx<span style="color:#f92672">.</span>Client() <span style="color:#66d9ef">as</span> client:
+</span></span><span style="display:flex;"><span>    response <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span>post(
+</span></span><span style="display:flex;"><span>        url<span style="color:#f92672">=</span>URL, 
+</span></span><span style="display:flex;"><span>        data<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;data&#39;</span>: <span style="color:#e6db74">&#39;Important metadata payload&#39;</span>}, <span style="color:#75715e"># Form data</span>
+</span></span><span style="display:flex;"><span>        files<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;file&#39;</span>: open(FILE_PATH, <span style="color:#e6db74">&#39;rb&#39;</span>)},       <span style="color:#75715e"># File data</span>
+</span></span><span style="display:flex;"><span>        headers<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;filename&#39;</span>: quote(FILE_NAME)}      <span style="color:#75715e"># Custom header for server-side targeting</span>
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>end_time <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;Time elapsed: </span><span style="color:#e6db74">{</span>end_time <span style="color:#f92672">-</span> start_time<span style="color:#e6db74">:</span><span style="color:#e6db74">.2f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">s&#39;</span>)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Status: </span><span style="color:#e6db74">{</span>response<span style="color:#f92672">.</span>status_code<span style="color:#e6db74">}</span><span style="color:#e6db74">, Response: </span><span style="color:#e6db74">{</span>response<span style="color:#f92672">.</span>json()<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><h2 id="option-2b-multiple-file-streaming-with-dynamic-headers">Option 2b: Multiple File Streaming with Dynamic Headers</h2>
+<p>Handling multiple files requires ensuring each file part in the multipart stream is uniquely identifiable, as the parser needs a pre-defined target path for each file. We achieve this by sending numbered headers (<code>filename0</code>, <code>filename1</code>, etc.) from the client and registering corresponding fields (<code>file0</code>, <code>file1</code>) on the parser.</p>
+<h3 id="fastapi-endpoint-multiple-files">FastAPI Endpoint (Multiple Files)</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># app_multi_stream.py (Excerpt of upload endpoint changes)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ... imports remain similar ...</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.post</span>(<span style="color:#e6db74">&#39;/upload_multi&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">upload_multiple_streamed</span>(request: Request):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        parser <span style="color:#f92672">=</span> StreamingFormDataParser(headers<span style="color:#f92672">=</span>request<span style="color:#f92672">.</span>headers)
+</span></span><span style="display:flex;"><span>        data_target <span style="color:#f92672">=</span> ValueTarget()
+</span></span><span style="display:flex;"><span>        parser<span style="color:#f92672">.</span>register(<span style="color:#e6db74">&#39;data&#39;</span>, data_target) <span style="color:#75715e"># Register form field</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        headers <span style="color:#f92672">=</span> dict(request<span style="color:#f92672">.</span>headers)
+</span></span><span style="display:flex;"><span>        received_filenames <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>        i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># Look for numbered filename headers sent by client</span>
+</span></span><span style="display:flex;"><span>            filename_header <span style="color:#f92672">=</span> headers<span style="color:#f92672">.</span>get(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;filename</span><span style="color:#e6db74">{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>, <span style="color:#66d9ef">None</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> filename_header <span style="color:#f92672">is</span> <span style="color:#66d9ef">None</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>            filename <span style="color:#f92672">=</span> unquote(filename_header)
+</span></span><span style="display:flex;"><span>            received_filenames<span style="color:#f92672">.</span>append(filename)
+</span></span><span style="display:flex;"><span>            filepath <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#39;./uploads&#39;</span>, os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>basename(filename)) 
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>            file_target <span style="color:#f92672">=</span> FileTarget(filepath)
+</span></span><span style="display:flex;"><span>            parser<span style="color:#f92672">.</span>register(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;file</span><span style="color:#e6db74">{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>, file_target) <span style="color:#75715e"># Register file target matching expected part name</span>
+</span></span><span style="display:flex;"><span>            i <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">async</span> <span style="color:#66d9ef">for</span> chunk <span style="color:#f92672">in</span> request<span style="color:#f92672">.</span>stream():
+</span></span><span style="display:flex;"><span>            parser<span style="color:#f92672">.</span>data_received(chunk)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">raise</span> HTTPException(status_code<span style="color:#f92672">=</span>status<span style="color:#f92672">.</span>HTTP_500_INTERNAL_SERVER_ERROR, 
+</span></span><span style="display:flex;"><span>            detail<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Error processing multi-file upload.&#39;</span>) 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Form Data: </span><span style="color:#e6db74">{</span>data_target<span style="color:#f92672">.</span>value<span style="color:#f92672">.</span>decode()<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> {<span style="color:#e6db74">&#34;message&#34;</span>: <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Successfully uploaded files: </span><span style="color:#e6db74">{</span>received_filenames<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>}
+</span></span></code></pre></div><h3 id="client-example-javascript-fetch-for-multiple-files">Client Example (JavaScript Fetch for Multiple Files)</h3>
+<p>The client must iterate over selected files, serialize form data, and add distinct headers for each file.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// templates/index_multi.html (Excerpt for submitUsingFetch)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">submitUsingFetch</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fileInput</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#39;fileInput&#39;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">fileInput</span>.<span style="color:#a6e22e">files</span>[<span style="color:#ae81ff">0</span>]) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">formData</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">FormData</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">headers</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Headers</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">formData</span>.<span style="color:#a6e22e">append</span>(<span style="color:#e6db74">&#34;data&#34;</span>, <span style="color:#e6db74">&#34;Batch upload metadata&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">file</span> <span style="color:#66d9ef">of</span> <span style="color:#a6e22e">fileInput</span>.<span style="color:#a6e22e">files</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">encoded_name</span> <span style="color:#f92672">=</span> encodeURI(<span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">name</span>);
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">headers</span>.<span style="color:#a6e22e">append</span>(<span style="color:#e6db74">`filename</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">i</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>, <span style="color:#a6e22e">encoded_name</span>);
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Append file part with a name matching the server registration (file0, file1, etc.)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            <span style="color:#a6e22e">formData</span>.<span style="color:#a6e22e">append</span>(<span style="color:#e6db74">`file</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">i</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>, <span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">name</span>); 
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">fetch</span>(<span style="color:#e6db74">&#39;/upload_multi&#39;</span>, {
+</span></span><span style="display:flex;"><span>              <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;POST&#39;</span>,
+</span></span><span style="display:flex;"><span>              <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">headers</span>, <span style="color:#75715e">// Send custom headers for filename metadata
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>              <span style="color:#a6e22e">body</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">formData</span>,   <span style="color:#75715e">// FormData handles correct multipart boundaries
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>           })
+</span></span><span style="display:flex;"><span>           <span style="color:#75715e">// ... promise handling
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="client-example-python-httpx-for-multiple-files">Client Example (Python <code>httpx</code> for Multiple Files)</h3>
+<p>The <code>httpx</code> client needs to structure its <code>files</code> argument as a list of tuples <code>(part_name, file_handle)</code> to correctly map to the server&rsquo;s field registrations (<code>file0</code>, <code>file1</code>).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># test_stream_multi_httpx.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> httpx
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> urllib.parse <span style="color:#f92672">import</span> quote
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>URL <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;http://127.0.0.1:8000/upload_multi&#39;</span>
+</span></span><span style="display:flex;"><span>FILE0_PATH <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;major_backup.tar.gz&#39;</span>
+</span></span><span style="display:flex;"><span>FILE1_PATH <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;config_log.txt&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create dummy files</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> path <span style="color:#f92672">in</span> [FILE0_PATH, FILE1_PATH]:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>exists(path):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">with</span> open(path, <span style="color:#e6db74">&#39;wb&#39;</span>) <span style="color:#66d9ef">as</span> f: f<span style="color:#f92672">.</span>write(os<span style="color:#f92672">.</span>urandom(<span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>)) <span style="color:#75715e"># 2MB dummy files</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>start_time <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> httpx<span style="color:#f92672">.</span>Client() <span style="color:#66d9ef">as</span> client:
+</span></span><span style="display:flex;"><span>    response <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span>post(
+</span></span><span style="display:flex;"><span>        url<span style="color:#f92672">=</span>URL, 
+</span></span><span style="display:flex;"><span>        data<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;data&#39;</span>: <span style="color:#e6db74">&#39;Batch process control&#39;</span>},
+</span></span><span style="display:flex;"><span>        files<span style="color:#f92672">=</span>[
+</span></span><span style="display:flex;"><span>            (<span style="color:#e6db74">&#39;file0&#39;</span>, open(FILE0_PATH, <span style="color:#e6db74">&#39;rb&#39;</span>)), 
+</span></span><span style="display:flex;"><span>            (<span style="color:#e6db74">&#39;file1&#39;</span>, open(FILE1_PATH, <span style="color:#e6db74">&#39;rb&#39;</span>))
+</span></span><span style="display:flex;"><span>        ],
+</span></span><span style="display:flex;"><span>        headers<span style="color:#f92672">=</span>{
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;filename0&#39;</span>: quote(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>basename(FILE0_PATH)), 
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;filename1&#39;</span>: quote(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>basename(FILE1_PATH))
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>end_time <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;Time elapsed: </span><span style="color:#e6db74">{</span>end_time <span style="color:#f92672">-</span> start_time<span style="color:#e6db74">:</span><span style="color:#e6db74">.2f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">s&#39;</span>)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Status: </span><span style="color:#e6db74">{</span>response<span style="color:#f92672">.</span>status_code<span style="color:#e6db74">}</span><span style="color:#e6db74">, Response: </span><span style="color:#e6db74">{</span>response<span style="color:#f92672">.</span>json()<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><h2 id="option-2c-handling-json-data-within-multipart-stream">Option 2c: Handling JSON Data within Multipart Stream</h2>
+<p>If the non-file data accompanying the file upload is expected to be JSON (rather than standard form URL-encoded data), the approach must be modified. The JSON string must be serialized and included as a field in the multipart request. On the server, we use <code>Form(...)</code> to retrieve the string payload, then attempt to deserialize and validate it using Pydantic.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># app_json_payload.py (Changes to Option 2 endpoint)</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> fastapi <span style="color:#f92672">import</span> Form, status
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ... other imports from Option 2 ...</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> pydantic <span style="color:#f92672">import</span> BaseModel, ValidationError
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> fastapi.encoders <span style="color:#f92672">import</span> jsonable_encoder
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">PayloadSchema</span>(BaseModel):
+</span></span><span style="display:flex;"><span>    name: str
+</span></span><span style="display:flex;"><span>    point: float <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.13</span>
+</span></span><span style="display:flex;"><span>    is_accepted: bool <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">validate_json_form_data</span>(data_str: str <span style="color:#f92672">=</span> Form(<span style="color:#f92672">...</span>)):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Expects the data field to contain a JSON string</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> PayloadSchema<span style="color:#f92672">.</span>model_validate_json(data_str)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> ValidationError <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">raise</span> HTTPException(detail<span style="color:#f92672">=</span>jsonable_encoder(e<span style="color:#f92672">.</span>errors()), 
+</span></span><span style="display:flex;"><span>                            status_code<span style="color:#f92672">=</span>status<span style="color:#f92672">.</span>HTTP_422_UNPROCESSABLE_ENTITY,
+</span></span><span style="display:flex;"><span>                            detail<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;JSON validation failed for payload.&#34;</span>)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.post</span>(<span style="color:#e6db74">&#39;/upload_json&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">upload_with_json</span>(request: Request):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># ... streaming setup (parser, targets, validation) as in Option 2 ...</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># After streaming loop finishes (parser.data_received(chunk) completes):</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Retrieve the &#39;data&#39; target value and pass it to the validator function</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> data_target<span style="color:#f92672">.</span>value:
+</span></span><span style="display:flex;"><span>        validated_model <span style="color:#f92672">=</span> validate_json_form_data(data_target<span style="color:#f92672">.</span>value<span style="color:#f92672">.</span>decode())
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Validated Model: </span><span style="color:#e6db74">{</span>validated_model<span style="color:#f92672">.</span>model_dump()<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> {<span style="color:#e6db74">&#34;message&#34;</span>: <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Successfuly uploaded </span><span style="color:#e6db74">{</span>filename<span style="color:#e6db74">}</span><span style="color:#e6db74"> with validated JSON.&#34;</span>}
+</span></span></code></pre></div><p>Client-side, the JSON data needs explicit JSON serialization before being appended to the <code>FormData</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// Client side update for sending JSON in a part named &#34;data&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">formData</span>.<span style="color:#a6e22e">append</span>(<span style="color:#e6db74">&#34;data&#34;</span>, <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>({<span style="color:#e6db74">&#34;name&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;WidgetA&#34;</span>, <span style="color:#e6db74">&#34;point&#34;</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">1.5</span>}));
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Note: The server expects the &#39;data&#39; part to contain a valid JSON string that Pydantic can parse.
+</span></span></span></code></pre></div><h2 id="option-3-standard-uploadfile-and-form-slower-approach">Option 3: Standard <code>UploadFile</code> and <code>Form</code> (Slower Approach)</h2>
+<p>This approach relies on FastAPI/Starlette’s default handling for <code>UploadFile</code> and <code>Form</code>. As previously discussed, this is typically slower for large files because the entire file must be fully read and spooled to disk before the endpoint logic executes.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># app_standard_slow.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> fastapi <span style="color:#f92672">import</span> FastAPI, File, UploadFile, Form, HTTPException, status
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> aiofiles
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>CHUNK_SIZE <span style="color:#f92672">=</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span> 
+</span></span><span style="display:flex;"><span>app <span style="color:#f92672">=</span> FastAPI()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.post</span>(<span style="color:#e6db74">&#34;/upload_standard&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">upload_standard</span>(file: UploadFile <span style="color:#f92672">=</span> File(<span style="color:#f92672">...</span>), data: str <span style="color:#f92672">=</span> Form(<span style="color:#f92672">...</span>)):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Execution begins only AFTER the entire request body (file + form data) is received</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        filepath <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#39;./uploads&#39;</span>, os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>basename(file<span style="color:#f92672">.</span>filename))
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">async</span> <span style="color:#66d9ef">with</span> aiofiles<span style="color:#f92672">.</span>open(filepath, <span style="color:#e6db74">&#39;wb&#39;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> chunk <span style="color:#f92672">:=</span> <span style="color:#66d9ef">await</span> file<span style="color:#f92672">.</span>read(CHUNK_SIZE):
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">await</span> f<span style="color:#f92672">.</span>write(chunk)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">raise</span> HTTPException(status_code<span style="color:#f92672">=</span>status<span style="color:#f92672">.</span>HTTP_500_INTERNAL_SERVER_ERROR, 
+</span></span><span style="display:flex;"><span>            detail<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;File system error during write.&#39;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">finally</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">await</span> file<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> {<span style="color:#e6db74">&#34;message&#34;</span>: <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Standard upload completed for </span><span style="color:#e6db74">{</span>file<span style="color:#f92672">.</span>filename<span style="color:#e6db74">}</span><span style="color:#e6db74">. Form data: </span><span style="color:#e6db74">{</span>data<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>}
+</span></span></code></pre></div><h3 id="client-timeout-adjustment-for-slow-uploads">Client Timeout Adjustment for Slow Uploads</h3>
+<p>Since this method waits for the entire upload before processing begins, large files can easily exceed default HTTP client timeouts (like <code>httpx</code>&rsquo;s 5-second default). You must configure a read timeout:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># test_standard_slow.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> httpx
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>URL <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;http://127.0.0.1:8000/upload_standard&#39;</span>
+</span></span><span style="display:flex;"><span>FILE_TO_SEND <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;huge_archive.zip&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>exists(FILE_TO_SEND):
+</span></span><span style="display:flex;"><span>     <span style="color:#66d9ef">with</span> open(FILE_TO_SEND, <span style="color:#e6db74">&#39;wb&#39;</span>) <span style="color:#66d9ef">as</span> f: f<span style="color:#f92672">.</span>write(os<span style="color:#f92672">.</span>urandom(<span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">20</span>)) <span style="color:#75715e"># 20MB dummy</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>data_payload <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#39;data&#39;</span>: <span style="color:#e6db74">&#39;Slow transfer test&#39;</span>}
+</span></span><span style="display:flex;"><span>files_payload <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#39;file&#39;</span>: open(FILE_TO_SEND, <span style="color:#e6db74">&#39;rb&#39;</span>)}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Increase read timeout significantly, or set to None for no timeout (use cautiously)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># We set read timeout to 180 seconds.</span>
+</span></span><span style="display:flex;"><span>custom_timeout <span style="color:#f92672">=</span> httpx<span style="color:#f92672">.</span>Timeout(<span style="color:#66d9ef">None</span>, read<span style="color:#f92672">=</span><span style="color:#ae81ff">180.0</span>) 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> httpx<span style="color:#f92672">.</span>Client(timeout<span style="color:#f92672">=</span>custom_timeout) <span style="color:#66d9ef">as</span> client:
+</span></span><span style="display:flex;"><span>    start_time <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>    r <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span>post(url<span style="color:#f92672">=</span>URL, data<span style="color:#f92672">=</span>data_payload, files<span style="color:#f92672">=</span>files_payload)
+</span></span><span style="display:flex;"><span>    end_time <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;Time elapsed: </span><span style="color:#e6db74">{</span>end_time <span style="color:#f92672">-</span> start_time<span style="color:#e6db74">:</span><span style="color:#e6db74">.2f</span><span style="color:#e6db74">}</span><span style="color:#e6db74">s&#39;</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Status: </span><span style="color:#e6db74">{</span>r<span style="color:#f92672">.</span>status_code<span style="color:#e6db74">}</span><span style="color:#e6db74">, Response: </span><span style="color:#e6db74">{</span>r<span style="color:#f92672">.</span>json()<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><h2 id="summary-of-approaches">Summary of Approaches</h2>
+<p>| Option | Server Handling | Form Data Support | Performance on Large Files | Complexity |
+| :</p>
+<h2 id="solutions">Solutions</h2>
+<p>| :</p>
+<pre tabindex="0"><code>filename = &#39;my_file.txt&#39;
+m = MultipartEncoder(fields={&#39;upload_file&#39;: (filename, open(filename, &#39;rb&#39;))})
+r = requests.post(url, data=m, headers={&#39;Content-Type&#39;: m.content_type})
+print(r.request.headers)  # confirm that the &#39;Content-Type&#39; header has been set
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from urllib.parse import unquote
+import aiofiles
+import os
+
+app = FastAPI()
+templates = Jinja2Templates(directory=&amp;quot;templates&amp;quot;)
+
+
+@app.post(&#39;/upload&#39;)
+async def upload(request: Request):
+    try:
+        filename = request.headers[&#39;filename&#39;]
+        filename = unquote(filename)
+        filepath = os.path.join(&#39;./&#39;, os.path.basename(filename))
+        async with aiofiles.open(filepath, &#39;wb&#39;) as f:
+            async for chunk in request.stream():
+                await f.write(chunk)
+    except Exception:
+        raise HTTPException(status_code=500, detail=&#39;Something went wrong&#39;)
+     
+    return {&amp;quot;message&amp;quot;: f&amp;quot;Successfuly uploaded: {filename}&amp;quot;}
+    
+    
+@app.get(&amp;quot;/&amp;quot;, response_class=HTMLResponse)
+async def main(request: Request):
+    return templates.TemplateResponse(request=request, name=&amp;quot;index.html&amp;quot;)
+&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+   &amp;lt;body&amp;gt;
+      &amp;lt;label for=&amp;quot;fileInput&amp;quot;&amp;gt;Choose file(s) to upload&amp;lt;/label&amp;gt;
+      &amp;lt;input type=&amp;quot;file&amp;quot; id=&amp;quot;fileInput&amp;quot; name=&amp;quot;fileInput&amp;quot; onchange=&amp;quot;reset()&amp;quot; multiple&amp;gt;&amp;lt;br&amp;gt;
+      &amp;lt;input type=&amp;quot;button&amp;quot; value=&amp;quot;Submit&amp;quot; onclick=&amp;quot;go()&amp;quot;&amp;gt;
+      &amp;lt;p id=&amp;quot;response&amp;quot;&amp;gt;&amp;lt;/p&amp;gt;
+      &amp;lt;script&amp;gt;
+         var resp = document.getElementById(&amp;quot;response&amp;quot;);
+         
+         function reset() {
+            resp.innerHTML = &amp;quot;&amp;quot;;
+         }
+         
+         function go() {
+            var fileInput = document.getElementById(&#39;fileInput&#39;);
+            if (fileInput.files[0]) {
+               for (const file of fileInput.files) {
+                  let reader = new FileReader();
+                  reader.onload = function () {
+                     uploadFile(reader.result, file.name);
+                  }
+                  reader.readAsArrayBuffer(file);
+               }
+            }
+         }
+         
+         function uploadFile(contents, filename) {
+            var headers = new Headers();
+            filename = encodeURI(filename);
+            headers.append(&amp;quot;filename&amp;quot;, filename);
+            fetch(&#39;/upload&#39;, {
+                  method: &#39;POST&#39;,
+                  headers: headers,
+                  body: contents,
+               })
+               .then(response =&amp;gt; response.json()) // or, response.text(), etc.
+               .then(data =&amp;gt; {
+                  resp.innerHTML += JSON.stringify(data); // data is a JSON object
+               })
+               .catch(error =&amp;gt; {
+                  console.error(error);
+               });
+         }
+      &amp;lt;/script&amp;gt;
+   &amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+import httpx
+import time
+from urllib.parse import quote
+
+url = &#39;http://127.0.0.1:8000/upload&#39;
+filename = &#39;bigFile.zip&#39;
+headers = {&#39;filename&#39;: quote(filename)}
+start = time.time()
+
+with open(filename, &amp;quot;rb&amp;quot;) as f:
+    r = httpx.post(url=url, data=f, headers=headers)
+    
+end = time.time()
+print(f&#39;Time elapsed: {end - start}s&#39;)
+print(r.json())
+# ...
+import glob, os
+
+paths = glob.glob(&amp;quot;big_files_dir/*&amp;quot;, recursive=True)
+for p in paths:
+    with open(p, &amp;quot;rb&amp;quot;) as f:
+        headers = {&#39;filename&#39;: quote(os.path.basename(p))}
+        # r = httpx...
+from fastapi import FastAPI, Request, HTTPException, status
+from streaming_form_data import StreamingFormDataParser
+from streaming_form_data.targets import FileTarget, ValueTarget
+from streaming_form_data.validators import MaxSizeValidator
+import streaming_form_data
+from starlette.requests import ClientDisconnect
+from urllib.parse import unquote
+import os
+
+MAX_FILE_SIZE = 1024 * 1024 * 1024 * 4  # = 4GB
+MAX_REQUEST_BODY_SIZE = MAX_FILE_SIZE + 1024
+
+app = FastAPI()
+
+class MaxBodySizeException(Exception):
+    def __init__(self, body_len: str):
+        self.body_len = body_len
+
+class MaxBodySizeValidator:
+    def __init__(self, max_size: int):
+        self.body_len = 0
+        self.max_size = max_size
+
+    def __call__(self, chunk: bytes):
+        self.body_len += len(chunk)
+        if self.body_len &amp;gt; self.max_size:
+            raise MaxBodySizeException(body_len=self.body_len)
+ 
+@app.post(&#39;/upload&#39;)
+async def upload(request: Request):
+    body_validator = MaxBodySizeValidator(MAX_REQUEST_BODY_SIZE)
+    filename = request.headers.get(&#39;filename&#39;)
+    
+    if not filename:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, 
+            detail=&#39;Filename header is missing&#39;)
+    try:
+        filename = unquote(filename)
+        filepath = os.path.join(&#39;./&#39;, os.path.basename(filename)) 
+        file_ = FileTarget(filepath, validator=MaxSizeValidator(MAX_FILE_SIZE))
+        data = ValueTarget()
+        parser = StreamingFormDataParser(headers=request.headers)
+        parser.register(&#39;file&#39;, file_)
+        parser.register(&#39;data&#39;, data)
+        
+        async for chunk in request.stream():
+            body_validator(chunk)
+            parser.data_received(chunk)
+    except ClientDisconnect:
+        print(&amp;quot;Client Disconnected&amp;quot;)
+    except MaxBodySizeException as e:
+        raise HTTPException(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, 
+           detail=f&#39;Maximum request body size limit ({MAX_REQUEST_BODY_SIZE} bytes) exceeded ({e.body_len} bytes read)&#39;)
+    except streaming_form_data.validators.ValidationError:
+        raise HTTPException(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, 
+            detail=f&#39;Maximum file size limit ({MAX_FILE_SIZE} bytes) exceeded&#39;) 
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+            detail=&#39;There was an error uploading the file&#39;) 
+   
+    if not file_.multipart_filename:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=&#39;File is missing&#39;)
+
+    print(data.value.decode())
+    print(file_.multipart_filename)
+        
+    return {&amp;quot;message&amp;quot;: f&amp;quot;Successfuly uploaded {filename}&amp;quot;}
+import httpx
+import time
+from urllib.parse import quote
+
+url =&#39;http://127.0.0.1:8000/upload&#39;
+filename = &#39;bigFile.zip&#39;
+files = {&#39;file&#39;: open(filename, &#39;rb&#39;)}
+headers = {&#39;filename&#39;: quote(filename)}
+data = {&#39;data&#39;: &#39;Hello World!&#39;}
+
+with httpx.Client() as client:
+    start = time.time()
+    r = client.post(url, data=data, files=files, headers=headers)
+    end = time.time()
+    print(f&#39;Time elapsed: {end - start}s&#39;)
+    print(r.status_code, r.json(), sep=&#39; &#39;)
+from fastapi import FastAPI, Request, HTTPException, status
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from starlette.requests import ClientDisconnect
+from urllib.parse import unquote
+import streaming_form_data
+from streaming_form_data import StreamingFormDataParser
+from streaming_form_data.targets import FileTarget, ValueTarget
+import os
+
+app = FastAPI()
+templates = Jinja2Templates(directory=&amp;quot;templates&amp;quot;)
+
+
+@app.get(&amp;quot;/&amp;quot;, response_class=HTMLResponse)
+async def main(request: Request):
+    return templates.TemplateResponse(request=request, name=&amp;quot;index.html&amp;quot;)
+
+
+@app.post(&#39;/upload&#39;)
+async def upload(request: Request):
+    try:
+        parser = StreamingFormDataParser(headers=request.headers)
+        data = ValueTarget()
+        parser.register(&#39;data&#39;, data)
+
+        headers = dict(request.headers)
+        filenames = []
+        i = 0
+        while True:
+            filename =  headers.get(f&#39;filename{i}&#39;, None)
+            if filename is None:
+                break
+            filename = unquote(filename)
+            filenames.append(filename)
+            filepath = os.path.join(&#39;./&#39;, os.path.basename(filename)) 
+            file_ = FileTarget(filepath)
+            parser.register(f&#39;file{i}&#39;, file_)
+            i += 1
+
+        async for chunk in request.stream():
+            parser.data_received(chunk)
+    except ClientDisconnect:
+        print(&amp;quot;Client Disconnected&amp;quot;)
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+            detail=&#39;There was an error uploading the file&#39;) 
+
+    print(data.value.decode())
+    return {&amp;quot;message&amp;quot;: f&amp;quot;Successfuly uploaded {filenames}&amp;quot;}
+&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+   &amp;lt;body&amp;gt;
+      &amp;lt;input type=&amp;quot;file&amp;quot; id=&amp;quot;fileInput&amp;quot; name=&amp;quot;files&amp;quot; onchange=&amp;quot;reset()&amp;quot; multiple&amp;gt;&amp;lt;br&amp;gt;
+      &amp;lt;input type=&amp;quot;button&amp;quot; value=&amp;quot;Submit&amp;quot; onclick=&amp;quot;submitUsingFetch()&amp;quot;&amp;gt;
+      &amp;lt;p id=&amp;quot;response&amp;quot;&amp;gt;&amp;lt;/p&amp;gt;
+      &amp;lt;script&amp;gt;
+         var resp = document.getElementById(&amp;quot;response&amp;quot;);
+         
+         function reset() {
+            resp.innerHTML = &amp;quot;&amp;quot;;
+         }
+         
+         function submitUsingFetch() {
+            var fileInput = document.getElementById(&#39;fileInput&#39;);
+            if (fileInput.files[0]) {
+               var formData = new FormData();
+               var headers = new Headers();
+               formData.append(&amp;quot;data&amp;quot;, &amp;quot;Hello World!&amp;quot;);
+         
+               var i = 0;
+               for (const file of fileInput.files) {
+                  filename = encodeURI(file.name);
+                  headers.append(`filename${i}`, filename);
+                  formData.append(`file${i}`, file, filename);
+                  i++;
+               }
+         
+               fetch(&#39;/upload&#39;, {
+                     method: &#39;POST&#39;,
+                     headers: headers,
+                     body: formData,
+                  })
+                  .then(response =&amp;gt; response.json())  // or, response.text(), etc.
+                  .then(data =&amp;gt; {
+                     resp.innerHTML = JSON.stringify(data);  // data is a JSON object
+                  })
+                  .catch(error =&amp;gt; {
+                     console.error(error);
+                  });
+            }
+         }
+      &amp;lt;/script&amp;gt;
+   &amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+import httpx
+import time
+from urllib.parse import quote
+
+url =&#39;http://127.0.0.1:8000/upload&#39;
+filename0 = &#39;bigFile.zip&#39;
+filename1 = &#39;otherBigFile.zip&#39;
+headers = {&#39;filename0&#39;: quote(filename0), &#39;filename1&#39;: quote(filename1)}
+files = [(&#39;file0&#39;, open(filename0, &#39;rb&#39;)), (&#39;file1&#39;, open(filename1, &#39;rb&#39;))]
+data = {&#39;data&#39;: &#39;Hello World!&#39;}
+
+with httpx.Client() as client:
+    start = time.time()
+    r = client.post(url, data=data, files=files, headers=headers)
+    end = time.time()
+    print(f&#39;Time elapsed: {end - start}s&#39;)
+    print(r.status_code, r.json(), sep=&#39; &#39;)
+#...
+from fastapi import Form
+from pydantic import BaseModel, ValidationError
+from typing import Optional
+from fastapi.encoders import jsonable_encoder
+
+#...
+
+class Base(BaseModel):
+    name: str
+    point: Optional[float] = None
+    is_accepted: Optional[bool] = False
+  
+def checker(data: str = Form(...)):
+    try:
+        return Base.model_validate_json(data)
+    except ValidationError as e:
+        raise HTTPException(detail=jsonable_encoder(e.errors()), status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        
+
+@app.post(&#39;/upload&#39;)
+async def upload(request: Request):
+    #...
+    
+    # place the below after the try-except block in the example given earlier
+    model = checker(data.value.decode())
+    print(dict(model))
+#...
+import json
+
+data = {&#39;data&#39;: json.dumps({&amp;quot;name&amp;quot;: &amp;quot;foo&amp;quot;, &amp;quot;point&amp;quot;: 0.13, &amp;quot;is_accepted&amp;quot;: False})}
+#...
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException, status
+import aiofiles
+import os
+
+CHUNK_SIZE = 1024 * 1024  # adjust the chunk size as desired
+app = FastAPI()
+
+@app.post(&amp;quot;/upload&amp;quot;)
+async def upload(file: UploadFile = File(...), data: str = Form(...)):
+    try:
+        filepath = os.path.join(&#39;./&#39;, os.path.basename(file.filename))
+        async with aiofiles.open(filepath, &#39;wb&#39;) as f:
+            while chunk := await file.read(CHUNK_SIZE):
+                await f.write(chunk)
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+            detail=&#39;There was an error uploading the file&#39;)
+    finally:
+        await file.close()
+
+    return {&amp;quot;message&amp;quot;: f&amp;quot;Successfuly uploaded {file.filename}&amp;quot;}
+import httpx
+import time
+
+url =&#39;http://127.0.0.1:8000/upload&#39;
+files = {&#39;file&#39;: open(&#39;bigFile.zip&#39;, &#39;rb&#39;)}
+data = {&#39;data&#39;: &#39;Hello World!&#39;}
+timeout = httpx.Timeout(None, read=180.0)
+
+with httpx.Client(timeout=timeout) as client:
+    start = time.time()
+    r = client.post(url, data=data, files=files)
+    end = time.time()
+    print(f&#39;Time elapsed: {end - start}s&#39;)
+    print(r.status_code, r.json(), sep=&#39; &#39;)
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

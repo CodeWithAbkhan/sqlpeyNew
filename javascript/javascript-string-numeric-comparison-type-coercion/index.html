@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>JavaScript String vs Numeric Comparison: When to Use Explicit Type Conversion - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Investigating JavaScript&#39;s implicit type coercion during relational comparisons (&lt;, &lt;=, &gt;, &gt;=) and evaluating explicit conversion methods like parseInt, parseFloat, and …&lt;/,&gt;">
+
+
+
+<meta name="keywords" content="JavaScript comparison, parseInt, implicit coercion, string comparison, JavaScript comparison operators, type conversion JavaScript">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="JavaScript String vs Numeric Comparison: When to Use Explicit Type Conversion - sqlpey">
+<meta name="DC.description" content="Investigating JavaScript&#39;s implicit type coercion during relational comparisons (&lt;, &lt;=, &gt;, &gt;=) and evaluating explicit conversion methods like parseInt, parseFloat, and unary plus.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="JavaScript String vs Numeric Comparison: When to Use Explicit Type Conversion - sqlpey">
+<meta property="og:description" content="Investigating JavaScript&#39;s implicit type coercion during relational comparisons (&lt;, &lt;=, &gt;, &gt;=) and evaluating explicit conversion methods like parseInt, parseFloat, and …&lt;/,&gt;">
+<meta property="og:url" content="https://sqlpey.com/javascript/javascript-string-numeric-comparison-type-coercion/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="JavaScript">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="JavaScript String vs Numeric Comparison: When to Use Explicit Type Conversion">
+<meta name="twitter:description" content="Investigating JavaScript&#39;s implicit type coercion during relational comparisons (&lt;, &lt;=, &gt;, &gt;=) and evaluating explicit conversion methods like parseInt, parseFloat, and …&lt;/,&gt;">
+
+
+<link rel="canonical" href="https://sqlpey.com/javascript/javascript-string-numeric-comparison-type-coercion/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"JavaScript String vs Numeric Comparison: When to Use Explicit Type Conversion\"",
+  "description": "\"Investigating JavaScript's implicit type coercion during relational comparisons (\\u003c, \\u003c=, \\u003e, \\u003e=) and evaluating explicit conversion methods like parseInt, parseFloat, and unary plus.\"",
+  "url": "\"https://sqlpey.com/javascript/javascript-string-numeric-comparison-type-coercion/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/javascript/javascript-string-numeric-comparison-type-coercion/\""
+  },
+  "articleSection": "\"JavaScript\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">JavaScript String vs Numeric Comparison: When to Use Explicit Type Conversion</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">JavaScript</span>
+              
+              <span class="tag">Type Coercion</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              6 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#javascript-string-vs-numeric-comparison-when-to-use-explicit-type-conversion">&ldquo;JavaScript String vs Numeric Comparison: When to Use Explicit Type Conversion&rdquo;</a>
+      <ul>
+        <li><a href="#the-default-behavior-string-vs-numeric-evaluation">The Default Behavior: String vs. Numeric Evaluation</a></li>
+      </ul>
+    </li>
+    <li><a href="#is-relying-on-implicit-coercion-acceptable">Is Relying on Implicit Coercion Acceptable?</a>
+      <ul>
+        <li><a href="#detailed-look-at-explicit-numeric-conversion-options">Detailed Look at Explicit Numeric Conversion Options</a></li>
+        <li><a href="#recommended-utility-function-for-reliable-parsing">Recommended Utility Function for Reliable Parsing</a></li>
+        <li><a href="#checking-for-nan-safely">Checking for <code>NaN</code> Safely</a></li>
+        <li><a href="#alternative-comparison-strategy-strict-comparison-after-explicit-conversion">Alternative Comparison Strategy: Strict Comparison After Explicit Conversion</a></li>
+        <li><a href="#faqs-on-javascript-string-numeric-comparison-type-coercion">FAQs on JavaScript String Numeric Comparison Type Coercion</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a></li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="javascript-string-vs-numeric-comparison-when-to-use-explicit-type-conversion">&ldquo;JavaScript String vs Numeric Comparison: When to Use Explicit Type Conversion&rdquo;</h2>
+<p>How does JavaScript handle comparisons using relational operators like <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, and <code>&gt;=</code> when operands might be of different types, particularly when comparing strings that look like numbers? Is relying on this implicit type coercion safe, or should explicit conversion functions like <code>parseInt()</code> or unary operators be employed for predictable behavior?</p>
+<p>The mechanism JavaScript employs for these relational operations involves abstract comparison rules defined in the specification (specifically Â§11.8.5 for <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code>).</p>
+<h3 id="the-default-behavior-string-vs-numeric-evaluation">The Default Behavior: String vs. Numeric Evaluation</h3>
+<p>When JavaScript encounters relational operators:</p>
+<ol>
+<li><strong>String Comparison:</strong> If both resulting operands are strings (after any initial coercion from objects), a lexicographical (string-based) comparison takes place.</li>
+<li><strong>Numeric Comparison:</strong> If at least one operand is not a string (or after coercion resolves to a non-string type), both operands are coerced into numbers, and a standard numeric comparison follows.</li>
+</ol>
+<p>This dichotomy leads to potentially surprising results, such as:</p>
+<ul>
+<li><code>&quot;90&quot; &gt; &quot;100&quot;</code> evaluates to <code>true</code> because, as strings, &lsquo;9&rsquo; comes after &lsquo;1&rsquo; lexicographically.</li>
+<li><code>&quot;90&quot; &lt; 100</code> evaluates to <code>true</code> because the string <code>&quot;90&quot;</code> is converted to the number 90 for a numeric comparison.</li>
+</ul>
+<h2 id="is-relying-on-implicit-coercion-acceptable">Is Relying on Implicit Coercion Acceptable?</h2>
+<p>Whether the implicit coercion is acceptable is often a matter of coding style and project requirements.</p>
+<p><strong>Arguments Against Reliance:</strong> Code that relies on implicit conversion might become brittle. If a variable that previously held a number starts receiving a string from an external source (like a form input), the comparison logic might still appear the same but suddenly switch from numeric evaluation to string evaluation, leading to subtle bugs.</p>
+<p><strong>Arguments For Reliance:</strong> If developers are certain about the data source and context, relying on the established specification behavior can result in more concise code.</p>
+<p>If a decision is made to enforce explicit numeric conversion before comparison, several methods exist, each with distinct characteristics concerning how they handle non-numeric characters and different number bases (radixes).</p>
+<h3 id="detailed-look-at-explicit-numeric-conversion-options">Detailed Look at Explicit Numeric Conversion Options</h3>
+<p>When moving away from implicit coercion, developers must select the appropriate conversion tool:</p>
+<h4 id="1-parseintstring-radix">1. <code>parseInt(string, [radix])</code></h4>
+<p>This function attempts to extract an integer from the beginning of a string.</p>
+<ul>
+<li><strong>Partial Parsing:</strong> It stops parsing when it encounters a non-numeric character. For example, <code>parseInt(&quot;10x&quot;)</code> results in <code>10</code>, ignoring the &lsquo;x&rsquo;.</li>
+<li><strong>Radix Support:</strong> It accepts an optional radix argument (base). If the radix is omitted, it typically assumes decimal, unless the string starts with <code>0x</code> (hexadecimal) or <code>0X</code>. ES5 disallowed treating strings starting with a leading <code>0</code> as octal by default.</li>
+<li><strong>Return Value:</strong> Returns <code>NaN</code> if no parseable digits are found at the start of the string.</li>
+</ul>
+<p><strong>Unique Code Example (Using Radix):</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">hexValue</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;1A&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">decimalEquivalent</span> <span style="color:#f92672">=</span> parseInt(<span style="color:#a6e22e">hexValue</span>, <span style="color:#ae81ff">16</span>); <span style="color:#75715e">// Result: 26
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`Hex </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">hexValue</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> is </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">decimalEquivalent</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> in base 10.`</span>);
+</span></span></code></pre></div><h4 id="2-numberparseintstring-radix">2. <code>Number.parseInt(string, [radix])</code></h4>
+<p>This is functionally identical to the global <code>parseInt</code>. In modern JavaScript, <code>Number.parseInt === parseInt</code> holds true.</p>
+<h4 id="3-parsefloatstring">3. <code>parseFloat(string)</code></h4>
+<p>Similar to <code>parseInt</code>, but tailored for floating-point values and <strong>only supporting decimal base</strong>.</p>
+<ul>
+<li><strong>Decimal Only:</strong> <code>parseFloat(&quot;0x15&quot;)</code> returns <code>0</code> because parsing terminates immediately at the &lsquo;x&rsquo;.</li>
+<li><strong>Partial Parsing:</strong> It ignores trailing characters, e.g., <code>parseFloat(&quot;10.5x&quot;)</code> yields <code>10.5</code>.</li>
+<li><strong>Return Value:</strong> Returns <code>NaN</code> if no parseable digits are found.</li>
+</ul>
+<h4 id="4-numberparsefloatstring">4. <code>Number.parseFloat(string)</code></h4>
+<p>Functionally identical to the global <code>parseFloat</code>.</p>
+<h4 id="5-unary-plus-operator-string">5. Unary Plus Operator (<code>+string</code>)</h4>
+<p>This utilizes JavaScript&rsquo;s implicit conversion mechanism but strictly enforces that the <em>entire</em> string must conform to standard numeric notation (decimal, <code>0x</code> for hex, <code>0b</code> for binary since ES2015, <code>0o</code> for octal since ES2015).</p>
+<ul>
+<li><strong>Strict Parsing:</strong> Unlike <code>parseInt</code>/<code>parseFloat</code>, the unary plus fails if extra characters exist. <code>+&quot;10x&quot;</code> results in <code>NaN</code>.</li>
+<li><strong>Base Conversion:</strong> It correctly interprets modern base prefixes. <code>+&quot;0x15&quot;</code> is 21; <code>+&quot;0b101&quot;</code> is 5.</li>
+<li><strong>Empty String Caveat:</strong> A known quirk is that <code>+&quot;&quot;</code> evaluates to <code>0</code>, not <code>NaN</code>.</li>
+</ul>
+<p><strong>Unique Code Example (Strict Numeric Check):</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">inputFromField</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;42abc&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">strictNum</span> <span style="color:#f92672">=</span> <span style="color:#f92672">+</span><span style="color:#a6e22e">inputFromField</span>; <span style="color:#75715e">// Result: NaN (because of &#39;abc&#39;)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Compare with parseInt
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">parsedNum</span> <span style="color:#f92672">=</span> parseInt(<span style="color:#a6e22e">inputFromField</span>); <span style="color:#75715e">// Result: 42
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`Unary Plus result for &#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">inputFromField</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">strictNum</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span></code></pre></div><h4 id="6-numberstring">6. <code>Number(string)</code></h4>
+<p>This function behaves identically to the unary plus operator (<code>+string</code>) for conversion purposes, though performance might vary slightly across older implementations.</p>
+<h4 id="7-bitwise-or-with-zero-string--0">7. Bitwise OR with Zero (<code>string | 0</code>)</h4>
+<p>This forces implicit conversion similar to unary plus, but it further coerces the result into a <strong>32-bit integer</strong>. It also coerces <code>NaN</code> resulting from the conversion into <code>0</code>.</p>
+<h3 id="recommended-utility-function-for-reliable-parsing">Recommended Utility Function for Reliable Parsing</h3>
+<p>To manage the empty string case (<code>+&quot;&quot;</code> being <code>0</code>) while using the strict parsing behavior of the unary plus, a utility function is often favored:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Attempts strict numeric conversion, returning NaN for empty strings or invalid formats.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {string} str The input string.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @returns {number} The numeric value or NaN.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">safeNumericCoerce</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">str</span>) =&gt; <span style="color:#a6e22e">str</span> <span style="color:#f92672">?</span> <span style="color:#f92672">+</span><span style="color:#a6e22e">str</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">NaN</span>; 
+</span></span></code></pre></div><h3 id="checking-for-nan-safely">Checking for <code>NaN</code> Safely</h3>
+<p>A critical point when dealing with conversion: direct comparison against <code>NaN</code> always fails (<code>NaN === NaN</code> is <code>false</code>). To reliably check if a conversion resulted in <code>NaN</code>, always use the global <code>isNaN()</code> function:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">=</span> parseFloat(<span style="color:#e6db74">&#34;hello&#34;</span>); <span style="color:#75715e">// value is NaN
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> (isNaN(<span style="color:#a6e22e">value</span>)) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Conversion failed to produce a valid number.&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="alternative-comparison-strategy-strict-comparison-after-explicit-conversion">Alternative Comparison Strategy: Strict Comparison After Explicit Conversion</h3>
+<p>If the goal is to ensure two variables are being compared numerically, forcing an explicit conversion before using a strict comparison (<code>===</code> or relational operators) avoids ambiguity entirely.</p>
+<p><strong>Example of explicit integer range check:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> <span style="color:#a6e22e">x</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;50&#34;</span>; <span style="color:#75715e">// Could be string or number
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">minimum</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">maximum</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">999</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Ensure x is treated as an integer before range check
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">xAsInt</span> <span style="color:#f92672">=</span> parseInt(<span style="color:#a6e22e">x</span>, <span style="color:#ae81ff">10</span>); 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">xAsInt</span> <span style="color:#f92672">&gt;=</span> <span style="color:#a6e22e">minimum</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">xAsInt</span> <span style="color:#f92672">&lt;=</span> <span style="color:#a6e22e">maximum</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">x</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> is within the valid range.`</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This explicit approach removes dependency on the abstract comparison rules for relational operators, ensuring a predictable numeric comparison path. Review the MDN documentation on <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Comparison" target="_blank" rel="noopener">Comparison Operators</a>
+ for deeper context on abstract equality versus strict equality.</p>
+<hr>
+<h3 id="faqs-on-javascript-string-numeric-comparison-type-coercion">FAQs on JavaScript String Numeric Comparison Type Coercion</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why is &#34;90&#34; greater than &#34;100&#34; in JavaScript</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: This occurs because JavaScript performs a lexicographical (string) comparison when both operands in a relational operation (<code>&gt;</code>, <code>&lt;</code>, etc.) are strings. In string comparison, &lsquo;9&rsquo; is considered greater than &lsquo;1&rsquo;.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What happens when comparing a string and a number with &lt;= operator</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: When comparing a string and a number using <code>&lt;=</code>, JavaScript coerces both operands to numbers and performs a numeric comparison. For instance, <code>&quot;90&quot; &lt;= 100</code> is treated as <code>90 &lt;= 100</code>, resulting in true.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the difference between parseInt and the unary plus operator for conversion</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: <code>parseInt</code> parses until it hits a non-numeric character (e.g., <code>parseInt(&quot;10x&quot;)</code> is 10), whereas the unary plus operator (<code>+str</code>) requires the entire string to be valid numeric notation or returns <code>NaN</code> (e.g., <code>+&quot;10x&quot;</code> is <code>NaN</code>).</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How do I correctly check if a converted variable is NaN</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: You must use the global function <code>isNaN(value)</code>. Direct comparison like <code>value === NaN</code> will always return false due to NaN&rsquo;s unique properties.</div>
+    </div>
+</div>
+<p>We welcome your perspectives on preferred JavaScript type coercion strategies. Share your thoughts or alternative code patterns in the comments below!</p>
+<p>For more advanced Python error resolution scenarios, check out articles like <a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">Solved How to Fix SSL Certificate Verify Failed Error in Python</a>
+. If you are working with .NET, explore topics such as <a href="https://sqlpey.com/dotnet/mudblazor-layouts-perfecting/" target="_blank" rel="noopener">MudBlazor Layouts Perfecting</a>
+.</p>
+<h2 id="solutions">Solutions</h2>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>C&#43;&#43; Template Specialization Resolution with Default Arguments and SFINAE - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Exploring how the C&#43;&#43; compiler resolves template specializations when default template arguments interact with SFINAE, using examples like checking for member …">
+
+
+
+<meta name="keywords" content="template specialization, SFINAE, void_t, template argument deduction">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="C&#43;&#43; Template Specialization Resolution with Default Arguments and SFINAE - sqlpey">
+<meta name="DC.description" content="Exploring how the C&#43;&#43; compiler resolves template specializations when default template arguments interact with SFINAE, using examples like checking for member existence.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-07-29">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="C&#43;&#43; Template Specialization Resolution with Default Arguments and SFINAE - sqlpey">
+<meta property="og:description" content="Exploring how the C&#43;&#43; compiler resolves template specializations when default template arguments interact with SFINAE, using examples like checking for member …">
+<meta property="og:url" content="https://sqlpey.com/c&#43;&#43;/cpp-template-specialization-resolution/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-07-29T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-07-29T00:00:00Z">
+<meta property="article:modified_time" content="2025-07-29T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="C&#43;&#43; Templates">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="C&#43;&#43; Template Specialization Resolution with Default Arguments and SFINAE">
+<meta name="twitter:description" content="Exploring how the C&#43;&#43; compiler resolves template specializations when default template arguments interact with SFINAE, using examples like checking for member …">
+
+
+<link rel="canonical" href="https://sqlpey.com/c&#43;&#43;/cpp-template-specialization-resolution/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"C++ Template Specialization Resolution with Default Arguments and SFINAE\"",
+  "description": "\"Exploring how the C++ compiler resolves template specializations when default template arguments interact with SFINAE, using examples like checking for member existence.\"",
+  "url": "\"https://sqlpey.com/c++/cpp-template-specialization-resolution/\"",
+  "datePublished": "\"2025-07-29T00:00:00Z\"",
+  "dateModified": "\"2025-07-29T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/c++/cpp-template-specialization-resolution/\""
+  },
+  "articleSection": "\"C++ Templates\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">C++ Template Specialization Resolution with Default Arguments and SFINAE</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">C&#43;&#43; Templates</span>
+              
+              <span class="tag">SFINAE</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              6 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 29, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#c-template-specialization-resolution-with-default-arguments-and-sfinae">&ldquo;C++ Template Specialization Resolution with Default Arguments and SFINAE&rdquo;</a></li>
+    <li><a href="#deconstructing-template-instantiation-and-specialization-matching">Deconstructing Template Instantiation and Specialization Matching</a>
+      <ul>
+        <li><a href="#scenario-1-primary-template-with-default-argument">Scenario 1: Primary Template with Default Argument</a></li>
+        <li><a href="#scenario-2-applying-partial-specialization">Scenario 2: Applying Partial Specialization</a></li>
+        <li><a href="#contrast-mismatched-default-argument">Contrast: Mismatched Default Argument</a></li>
+      </ul>
+    </li>
+    <li><a href="#practical-demonstration-with-type-traits">Practical Demonstration with Type Traits</a>
+      <ul>
+        <li><a href="#implementation-option-a-default-argument-unrelated-to-specialization">Implementation Option A: Default Argument Unrelated to Specialization</a></li>
+        <li><a href="#implementation-option-b-explicitly-matching-the-default">Implementation Option B: Explicitly Matching the Default</a></li>
+        <li><a href="#implementation-option-c-the-standard-approach-detecting-a-member-via-alias">Implementation Option C: The Standard Approach (Detecting a Member via Alias)</a></li>
+        <li><a href="#alternative-detecting-member-existence-directly-not-type-alias">Alternative: Detecting Member Existence Directly (Not Type Alias)</a></li>
+        <li><a href="#faqs-on-cpp-template-specialization-resolution-with-default-arguments-and-sfinae">FAQs on Cpp Template Specialization Resolution With Default Arguments And Sfinae</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a></li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="c-template-specialization-resolution-with-default-arguments-and-sfinae">&ldquo;C++ Template Specialization Resolution with Default Arguments and SFINAE&rdquo;</h2>
+<p>How does the C++ compiler determine which template specialization to select when an instantiation omits template arguments that have default values, particularly when dealing with <code>void_t</code> for SFINAE checks? This process involves template argument deduction, matching, and substitution failure rules.</p>
+<h2 id="deconstructing-template-instantiation-and-specialization-matching">Deconstructing Template Instantiation and Specialization Matching</h2>
+<p>Consider the pattern for checking the presence of a member, exemplified by a <code>has_member</code> trait:</p>
+<h3 id="scenario-1-primary-template-with-default-argument">Scenario 1: Primary Template with Default Argument</h3>
+<p>When the compiler encounters an instantiation like <code>has_member&lt;A&gt;</code>, and the primary template is defined as:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">T</span>, <span style="color:#66d9ef">class</span> <span style="color:#960050;background-color:#1e0010">= </span><span style="color:#a6e22e">void</span> <span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">has_member</span>; <span style="color:#75715e">// Primary template definition
+</span></span></span></code></pre></div><p>The template argument list <code>&lt;A&gt;</code> is presented. Since only one argument is supplied, the second parameter defaults to <code>void</code>. The effective instantiation becomes <code>has_member&lt;A, void&gt;</code>.</p>
+<h3 id="scenario-2-applying-partial-specialization">Scenario 2: Applying Partial Specialization</h3>
+<p>Next, the compiler inspects defined partial specializations. A specialization designed to detect a member named <code>member</code> might look like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">T</span> <span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">has_member</span><span style="color:#f92672">&lt;</span> T, void_t<span style="color:#f92672">&lt;</span> <span style="color:#66d9ef">decltype</span>( T<span style="color:#f92672">::</span>member ) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">&gt;</span> <span style="color:#f92672">:</span> true_type
+</span></span><span style="display:flex;"><span>{ };
+</span></span></code></pre></div><p>The compiler attempts template argument deduction by matching the supplied arguments (<code>A</code>, <code>void</code>) against the patterns in the partial specialization.</p>
+<ol>
+<li><strong>Deduction for T</strong>: The first pattern <code>T</code> successfully deduces <code>T</code> as <code>A</code>.</li>
+<li><strong>Pattern Matching with <code>decltype</code></strong>: The second pattern involves <code>void_t&lt; decltype( T::member ) &gt;</code>. Here, template argument deduction halts concerning the template parameters of the specialization itself. The expression inside <code>decltype</code> is explicitly excluded from deduction.</li>
+</ol>
+<p>The deduced arguments are then substituted back into the specialization signature:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">has_member</span><span style="color:#f92672">&lt;</span> A, void_t<span style="color:#f92672">&lt;</span> <span style="color:#66d9ef">decltype</span>( A<span style="color:#f92672">::</span>member ) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">&gt;</span> <span style="color:#f92672">:</span> true_type
+</span></span><span style="display:flex;"><span>{ };
+</span></span></code></pre></div><p>If <code>A::member</code> is valid (well-formed expression), <code>decltype( A::member )</code> resolves, <code>void_t</code> constructs a type, and substitution succeeds without failure. If substitution yields a type matching the supplied argument (which is <code>void</code> in this case, due to the deduction result), this specialization is chosen. If substitution fails (SFINAE), this specialization is discarded, and the primary template (defined with a default argument of <code>void</code>) is selected as a fallback.</p>
+<h3 id="contrast-mismatched-default-argument">Contrast: Mismatched Default Argument</h3>
+<p>If the primary template used <code>int</code> as the default argument instead of <code>void</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">T</span>, <span style="color:#66d9ef">class</span> <span style="color:#960050;background-color:#1e0010">= </span><span style="color:#a6e22e">int</span> <span style="color:#f92672">&gt;</span> <span style="color:#75715e">// &lt;-- int default
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">has_member</span> <span style="color:#f92672">:</span> false_type { };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">T</span> <span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">has_member</span><span style="color:#f92672">&lt;</span> T, void_t<span style="color:#f92672">&lt;</span> <span style="color:#66d9ef">decltype</span>( T<span style="color:#f92672">::</span>member ) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">&gt;</span> <span style="color:#f92672">:</span> true_type
+</span></span><span style="display:flex;"><span>{ };
+</span></span></code></pre></div><p>If <code>A</code> possesses <code>member</code>, the substitution process still generates a specialization equivalent to <code>has_member&lt;A, void&gt;</code>. However, the instantiation request was for <code>has_member&lt;A&gt;</code>, which resolves to <code>has_member&lt;A, int&gt;</code>. Since <code>&lt;A, void&gt;</code> (specialization signature) does not match <code>&lt;A, int&gt;</code> (instantiation arguments), the specialization is bypassed, and the primary template (<code>false_type</code>) is chosen.</p>
+<h2 id="practical-demonstration-with-type-traits">Practical Demonstration with Type Traits</h2>
+<p>We can illustrate specialization selection using a trait to check for a nested type member, perhaps named <code>type</code>.</p>
+<p>We define test structures:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">TypeA</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">using</span> type <span style="color:#f92672">=</span> <span style="color:#66d9ef">int</span>;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">TypeB</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">using</span> type <span style="color:#f92672">=</span> <span style="color:#66d9ef">void</span>;
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><p>We test three types against a trait <code>has_type_member&lt;T, DefaultArg&gt;</code>: <code>float</code> (no <code>type</code>), <code>TypeA</code>, and <code>TypeB</code>.</p>
+<h3 id="implementation-option-a-default-argument-unrelated-to-specialization">Implementation Option A: Default Argument Unrelated to Specialization</h3>
+<p>This setup uses <code>int</code> as the default, and a specialization that resolves to <code>void</code> when successful.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;type_traits&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Primary template handles types that have no nested ::type member or failure case
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">T</span>, <span style="color:#66d9ef">class</span> <span style="color:#960050;background-color:#1e0010">= </span><span style="color:#a6e22e">int</span> <span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">has_type_member</span> <span style="color:#f92672">:</span> std<span style="color:#f92672">::</span>false_type { };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Specialization recognizes types that do have a nested ::type member
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">T</span> <span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">has_type_member</span><span style="color:#f92672">&lt;</span>T, std<span style="color:#f92672">::</span>void_t<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span> T<span style="color:#f92672">::</span>type<span style="color:#f92672">&gt;&gt;</span> <span style="color:#f92672">:</span> std<span style="color:#f92672">::</span>true_type { };
+</span></span></code></pre></div><p>Testing with <code>has_type_member&lt;Type&gt;::value</code>:</p>
+<ul>
+<li><code>has_type_member&lt;float&gt;</code> becomes <code>has_type_member&lt;float, int&gt;</code>. The specialization requires <code>void_t&lt;float::type&gt;</code>, which fails substitution (<code>float::type</code> doesn&rsquo;t exist). Primary template wins: <strong>false</strong>.</li>
+<li><code>has_type_member&lt;TypeA&gt;</code> becomes <code>has_type_member&lt;TypeA, int&gt;</code>. Specialization substitution yields <code>has_type_member&lt;TypeA, void&gt;</code>. Arguments mismatch (<code>int</code> vs <code>void</code>). Primary template wins: <strong>false</strong>.</li>
+<li><code>has_type_member&lt;TypeB&gt;</code> becomes <code>has_type_member&lt;TypeB, int&gt;</code>. Specialization substitution yields <code>has_type_member&lt;TypeB, void&gt;</code>. Arguments mismatch (<code>int</code> vs <code>void</code>). Primary template wins: <strong>false</strong>.</li>
+</ul>
+<h3 id="implementation-option-b-explicitly-matching-the-default">Implementation Option B: Explicitly Matching the Default</h3>
+<p>If the specialization explicitly matches the default argument when successful, it is chosen:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;type_traits&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Primary template handles types that have no nested ::type member
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">T</span>, <span style="color:#66d9ef">class</span> <span style="color:#960050;background-color:#1e0010">= </span><span style="color:#a6e22e">void</span> <span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">has_type_member</span> <span style="color:#f92672">:</span> std<span style="color:#f92672">::</span>false_type { };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Specialization matches the default argument (void) when type member exists
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">T</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">has_type_member</span><span style="color:#f92672">&lt;</span>T, <span style="color:#66d9ef">void</span><span style="color:#f92672">&gt;</span> <span style="color:#f92672">:</span> std<span style="color:#f92672">::</span>true_type { };
+</span></span></code></pre></div><p>Testing with <code>has_type_member&lt;Type&gt;::value</code>:</p>
+<ul>
+<li><code>has_type_member&lt;float&gt;</code> becomes <code>has_type_member&lt;float, void&gt;</code>. The specialization <code>has_type_member&lt;T, void&gt;</code> matches directly: <strong>true</strong> (Incorrect for this use case, as it doesn&rsquo;t check for <code>type</code>).</li>
+</ul>
+<h3 id="implementation-option-c-the-standard-approach-detecting-a-member-via-alias">Implementation Option C: The Standard Approach (Detecting a Member via Alias)</h3>
+<p>To use SFINAE correctly to detect <code>T::type</code>, the specialization must use <code>void_t</code> on the attempt to access the member, and the primary template must provide the mechanism for the one-argument call:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;type_traits&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Primary template handles all cases by defaulting to false_type
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">T</span>, <span style="color:#66d9ef">class</span> <span style="color:#960050;background-color:#1e0010">= </span><span style="color:#a6e22e">void</span> <span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">has_type_member</span> <span style="color:#f92672">:</span> std<span style="color:#f92672">::</span>false_type { };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Specialization uses void_t to ensure substitution succeeds only if T::type exists.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// The second argument of the specialization *must* be deduced or explicitly specified.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">T</span> <span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">has_type_member</span><span style="color:#f92672">&lt;</span>T, std<span style="color:#f92672">::</span>void_t<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span> T<span style="color:#f92672">::</span>type<span style="color:#f92672">&gt;&gt;</span> <span style="color:#f92672">:</span> std<span style="color:#f92672">::</span>true_type { };
+</span></span></code></pre></div><p>Testing with <code>has_type_member&lt;Type&gt;::value</code>:</p>
+<ul>
+<li><code>has_type_member&lt;float&gt;</code> becomes <code>has_type_member&lt;float, void&gt;</code>. Specialization attempt: <code>std::void_t&lt;float::type&gt;</code> fails. Specialization discarded. Primary template wins: <strong>false</strong>.</li>
+<li><code>has_type_member&lt;TypeA&gt;</code> becomes <code>has_type_member&lt;TypeA, void&gt;</code>. Specialization attempt: <code>std::void_t&lt;TypeA::type&gt;</code> resolves to <code>std::void_t&lt;int&gt;</code> which is <code>void</code>. Match found: <code>has_type_member&lt;TypeA, void&gt;</code>. Specialization wins: <strong>true</strong>.</li>
+<li><code>has_type_member&lt;TypeB&gt;</code> becomes <code>has_type_member&lt;TypeB, void&gt;</code>. Specialization attempt: <code>std::void_t&lt;TypeB::type&gt;</code> resolves to <code>std::void_t&lt;void&gt;</code> which is <code>void</code>. Match found: <code>has_type_member&lt;TypeB, void&gt;</code>. Specialization wins: <strong>true</strong>.</li>
+</ul>
+<p>This final approach demonstrates how the combination of the default argument (<code>void</code>) and the SFINAE expression inside <code>void_t</code> dictates which specialization is selected based on the validity of the internal expression.</p>
+<h3 id="alternative-detecting-member-existence-directly-not-type-alias">Alternative: Detecting Member Existence Directly (Not Type Alias)</h3>
+<p>If we return to the original context of detecting a non-type member named <code>member</code>, the principle is identical:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span> <span style="color:#66d9ef">class</span><span style="color:#960050;background-color:#1e0010">, </span><span style="color:#a6e22e">class</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">void</span> <span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">has_member_property</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">T</span> <span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">has_member_property</span><span style="color:#f92672">&lt;</span> T, std<span style="color:#f92672">::</span>void_t<span style="color:#f92672">&lt;</span> <span style="color:#66d9ef">decltype</span>( T<span style="color:#f92672">::</span>member ) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">&gt;</span> <span style="color:#f92672">:</span> std<span style="color:#f92672">::</span>true_type
+</span></span><span style="display:flex;"><span>{ };
+</span></span></code></pre></div><p>When invoking <code>has_member_property&lt;SomeClass&gt;</code>, the compiler checks if <code>SomeClass::member</code> is accessible and valid within <code>decltype</code>. If it is, the specialization resolves, inheriting <code>true_type</code>. Otherwise, the primary template is used, inheriting <code>false_type</code> (assuming the primary template defaults to <code>false_type</code>).</p>
+<p>For more details on template argument deduction rules, refer to the C++ standard references on [temp.class.spec.match] or explore guides on advanced C++ metaprogramming techniques.</p>
+<p>We’d love to hear your feedback! Drop your comments or questions below.</p>
+<p>Check out related topics for further C++ investigation:</p>
+<ul>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">Fixing Common Python SSL Verification Issues</a>
+ (For general debugging context)</li>
+<li><a href="https://sqlpey.com/dotnet/resolve-blazor-server-timeout-issues/" target="_blank" rel="noopener">Resolving Blazor Server Timeout Problems</a>
+</li>
+<li><a href="https://sqlpey.com/question/querying-clob-columns-in-oracle-a-guide/" target="_blank" rel="noopener">Querying CLOB Columns in Oracle</a>
+</li>
+</ul>
+<h3 id="faqs-on-cpp-template-specialization-resolution-with-default-arguments-and-sfinae">FAQs on Cpp Template Specialization Resolution With Default Arguments And Sfinae</h3>
+<p><div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why does substituting T in void_t(decltype(T::member)) prevent deduction</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Template argument deduction for partial specializations is distinct from substitution. The pattern inside <code>decltype</code> prevents the compiler from deducing the template parameter T from that specific slot, as the standard excludes expressions within <code>decltype</code> from being used to deduce template arguments in that context. Deduction happens first based on pattern matching, and then substitution occurs to check for validity.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What happens if the deduced specialization results in a type mismatch with the primary template&#39;s default argument</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: If the instantiation provides one argument, say <code>MyTrait&lt;Arg1&gt;</code>, it resolves to <code>MyTrait&lt;Arg1, DefaultArgA&gt;</code>. If the specialization resolves to <code>MyTrait&lt;Arg1, ResolvedArgB&gt;</code>, and <code>ResolvedArgB</code> is not equal to <code>DefaultArgA</code>, the specialization is not selected, and the compiler falls back to the primary template definition.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is void_t necessary when using SFINAE to check for a member</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: <code>void_t</code> (or <code>std::enable_if_t</code>) is crucial. It ensures that if the expression inside it (<code>decltype(T::member)</code>) is invalid, the substitution fails <em>silently</em> (SFINAE), allowing the compiler to discard that specialization and potentially check the next available candidate, typically the primary template which returns <code>false_type</code>.</div>
+    </div>
+</div></p>
+<h2 id="solutions">Solutions</h2>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

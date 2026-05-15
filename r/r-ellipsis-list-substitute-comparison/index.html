@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>R Language Ellipsis (...) Usage: list() vs substitute() Differences - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore the core differences between using list(...) and as.list(substitute(list(...)))[-1L] for handling the ellipsis (...) argument in R functions, with …">
+
+
+
+<meta name="keywords" content="R ellipsis, substitute, list(...), unevaluated expression">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="R Language Ellipsis (...) Usage: list() vs substitute() Differences - sqlpey">
+<meta name="DC.description" content="Explore the core differences between using list(...) and as.list(substitute(list(...)))[-1L] for handling the ellipsis (...) argument in R functions, with practical examples.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="R Language Ellipsis (...) Usage: list() vs substitute() Differences - sqlpey">
+<meta property="og:description" content="Explore the core differences between using list(...) and as.list(substitute(list(...)))[-1L] for handling the ellipsis (...) argument in R functions, with …">
+<meta property="og:url" content="https://sqlpey.com/r/r-ellipsis-list-substitute-comparison/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="R Programming">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="R Language Ellipsis (...) Usage: list() vs substitute() Differences">
+<meta name="twitter:description" content="Explore the core differences between using list(...) and as.list(substitute(list(...)))[-1L] for handling the ellipsis (...) argument in R functions, with …">
+
+
+<link rel="canonical" href="https://sqlpey.com/r/r-ellipsis-list-substitute-comparison/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"R Language Ellipsis (...) Usage: list() vs substitute() Differences\"",
+  "description": "\"Explore the core differences between using list(...) and as.list(substitute(list(...)))[-1L] for handling the ellipsis (...) argument in R functions, with practical examples.\"",
+  "url": "\"https://sqlpey.com/r/r-ellipsis-list-substitute-comparison/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/r/r-ellipsis-list-substitute-comparison/\""
+  },
+  "articleSection": "\"R Programming\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">R Language Ellipsis (&hellip;) Usage: list() vs substitute() Differences</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">R Programming</span>
+              
+              <span class="tag">Function Arguments</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              7 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#r-language-ellipsis--usage-list-vs-substitute-differences">&ldquo;R Language Ellipsis (&hellip;) Usage: list() vs substitute() Differences&rdquo;</a>
+      <ul>
+        <li><a href="#the-evaluated-approach-list">The Evaluated Approach: <code>list(...)</code></a></li>
+        <li><a href="#the-unevaluated-approach-aslistsubstitutelist-1l">The Unevaluated Approach: <code>as.list(substitute(list(...)))[-1L]</code></a></li>
+        <li><a href="#passing-arguments-to-sub-functions-the-forwarding-use-case">Passing Arguments to Sub-Functions: The Forwarding Use Case</a></li>
+        <li><a href="#alternative-perspective-on-ellipsis-usage">Alternative Perspective on Ellipsis Usage</a></li>
+        <li><a href="#faqs-on-r-ellipsis-list-substitute-comparison">FAQs on R Ellipsis List Substitute Comparison</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="r-language-ellipsis--usage-list-vs-substitute-differences">&ldquo;R Language Ellipsis (&hellip;) Usage: list() vs substitute() Differences&rdquo;</h2>
+<p>When creating flexible functions in R, the ellipsis operator (<code>...</code>) allows a function to accept a variable number of arguments. However, how these arguments are captured—whether evaluated or unevaluated—is critical for the function&rsquo;s behavior. Two primary methods emerge for extracting these arguments: the straightforward <code>list(...)</code> and the more intricate <code>as.list(substitute(list(...)))[-1L]</code>. This detailed breakdown examines the mechanics and practical implications of each approach.</p>
+<h3 id="the-evaluated-approach-list">The Evaluated Approach: <code>list(...)</code></h3>
+<p>The most direct way to capture the arguments passed via <code>...</code> is by wrapping them in <code>list(...)</code>. This captures the <em>evaluated</em> values of the arguments passed to the function.</p>
+<p>Consider a scenario where you expect named arguments that will be immediately used as data:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>process_evaluated_args <span style="color:#f92672">&lt;-</span> <span style="color:#66d9ef">function</span>(<span style="color:#66d9ef">...</span>) {
+</span></span><span style="display:flex;"><span>  input_evaluated_list <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">list</span>(<span style="color:#66d9ef">...</span>)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Applying a function like summary to the actual data structures</span>
+</span></span><span style="display:flex;"><span>  output_analysis <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lapply</span>(X <span style="color:#f92672">=</span> input_evaluated_list, FUN <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(x) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cat</span>(<span style="color:#e6db74">&#34;Type structure:\n&#34;</span>); <span style="color:#a6e22e">str</span>(x); 
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cat</span>(<span style="color:#e6db74">&#34;Summary statistics:\n&#34;</span>); <span style="color:#a6e22e">summary</span>(x);
+</span></span><span style="display:flex;"><span>  })
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span>(output_analysis)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Example call with named arguments containing vectors</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">process_evaluated_args</span>(data_series_a <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">10</span>, data_series_b <span style="color:#f92672">=</span> <span style="color:#ae81ff">11</span><span style="color:#f92672">:</span><span style="color:#ae81ff">20</span>, data_series_c <span style="color:#f92672">=</span> <span style="color:#ae81ff">21</span><span style="color:#f92672">:</span><span style="color:#ae81ff">30</span>)
+</span></span></code></pre></div><p>The output from this demonstrates that <code>list(...)</code> directly yields the data objects (integer vectors in this case), allowing immediate statistical review:</p>
+<pre tabindex="0"><code>Type structure:
+ int [1:10] 1 2 3 4 5 6 7 8 9 10
+Summary statistics:
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   1.00    3.25    5.50    5.50    7.75   10.00 
+Type structure:
+ int [1:10] 11 12 13 14 15 16 17 18 19 20
+Summary statistics:
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   11.0    13.2    15.5    15.5    17.8    20.0 
+Type structure:
+ int [1:10] 21 22 23 24 25 26 27 28 29 30
+Summary statistics:
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   21.0    23.2    25.5    25.5    27.8    30.0 
+</code></pre><p>When using <code>list(...)</code>, the function signature clearly communicates what the caller supplies, which is generally preferred for clarity unless specific meta-programming or delayed evaluation is required.</p>
+<h3 id="the-unevaluated-approach-aslistsubstitutelist-1l">The Unevaluated Approach: <code>as.list(substitute(list(...)))[-1L]</code></h3>
+<p>This technique captures the arguments <em>unevaluated</em>, meaning it captures the structure of the expression itself, often resulting in <code>language</code> objects or calls. This is the mechanism employed internally by functions like <code>data.frame()</code> to preserve column definitions.</p>
+<p>The process involves three steps:</p>
+<ol>
+<li><code>list(...)</code>: Captures the arguments as if they were inside a list definition.</li>
+<li><code>substitute()</code>: Intercepts this structure before evaluation.</li>
+<li><code>as.list()</code>: Converts the result into a list.</li>
+<li><code>[-1L]</code>: Removes the first element, which is typically the symbol <code>list</code> itself.</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>inspect_unevaluated_args <span style="color:#f92672">&lt;-</span> <span style="color:#66d9ef">function</span>(<span style="color:#66d9ef">...</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Captures the expression tree of the arguments</span>
+</span></span><span style="display:flex;"><span>  input_unevaluated_list <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">as.list</span>(<span style="color:#a6e22e">substitute</span>(<span style="color:#a6e22e">list</span>(<span style="color:#66d9ef">...</span>)))[<span style="color:#ae81ff">-1L</span>]
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">str</span>(input_unevaluated_list)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Attempting summary on these language objects yields structure info, not data summary</span>
+</span></span><span style="display:flex;"><span>  output_analysis <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lapply</span>(X <span style="color:#f92672">=</span> input_unevaluated_list, FUN <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(x) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cat</span>(<span style="color:#e6db74">&#34;Element Class:&#34;</span>, <span style="color:#a6e22e">class</span>(x), <span style="color:#e6db74">&#34;\n&#34;</span>); <span style="color:#a6e22e">summary</span>(x)
+</span></span><span style="display:flex;"><span>  })
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span>(output_analysis)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Example call</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">inspect_unevaluated_args</span>(definition_A <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">10</span>, definition_B <span style="color:#f92672">=</span> <span style="color:#ae81ff">11</span><span style="color:#f92672">:</span><span style="color:#ae81ff">20</span>, definition_C <span style="color:#f92672">=</span> <span style="color:#ae81ff">21</span><span style="color:#f92672">:</span><span style="color:#ae81ff">30</span>)
+</span></span></code></pre></div><p>Output from the <code>substitute</code> method reveals the unevaluated expressions:</p>
+<pre tabindex="0"><code>List of 4
+ $ : symbol list
+ $ definition_A: language 1:10
+ $ definition_B: language 11:20
+ $ definition_C: language 21:30
+Element Class: symbol 
+   Length Class Mode 
+        1   name   name 
+Element Class: call 
+   Length Class Mode 
+        3  call call 
+Element Class: call 
+   Length Class Mode 
+        3  call call 
+Element Class: call 
+   Length Class Mode 
+        3  call call 
+</code></pre><p>Notice that the elements corresponding to <code>definition_A</code>, <code>B</code>, and <code>C</code> are of class <code>call</code> or <code>language</code>, holding the expression (e.g., <code>1:10</code>) rather than the resulting vector of numbers. Extra manipulation, similar to techniques used in base R functions like <code>write.csv</code>, is needed to evaluate these expressions if the actual data values are required.</p>
+<h3 id="passing-arguments-to-sub-functions-the-forwarding-use-case">Passing Arguments to Sub-Functions: The Forwarding Use Case</h3>
+<p>A valuable application for the <code>...</code> operator, typically used with <code>list(...)</code>, is forwarding arguments to another function, especially when you don&rsquo;t want to explicitly list every possible argument in your wrapper function&rsquo;s signature.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>forward_to_cat <span style="color:#f92672">&lt;-</span> <span style="color:#66d9ef">function</span>(prefix_msg, data_vector, <span style="color:#66d9ef">...</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Concatenate the required message first</span>
+</span></span><span style="display:flex;"><span>  full_data <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">c</span>(prefix_msg, data_vector)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Pass remaining arguments (...) directly to cat()</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">cat</span>(full_data, <span style="color:#66d9ef">...</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Example 1: Using &#39;sep&#39; argument explicitly passed through</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">forward_to_cat</span>(<span style="color:#e6db74">&#34;Data Points:&#34;</span>, <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Alpha&#34;</span>, <span style="color:#e6db74">&#34;Beta&#34;</span>, <span style="color:#e6db74">&#34;Gamma&#34;</span>), sep <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">## Solutions
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Example 2: Using default argument from &#39;cat&#39; (e.g., fill) if not supplied</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">forward_to_cat</span>(<span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Report:&#34;</span>), <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">15</span>, fill <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>)
+</span></span></code></pre></div><p>Running the first example yields:
+`Data Points:</p>
+<pre tabindex="0"><code>object &amp;lt;- as.list(substitute(list(...)))[-1L]
+mrn &amp;lt;- is.null(row.names)
+x &amp;lt;- list(...)
+List of 4
+$  : symbol list
+$ a: language 1:10
+$ b: language 11:20
+$ c: language 21:30
+my_ellipsis_function &amp;lt;- function(...) {
+  input_list &amp;lt;- as.list(substitute(list(...)))
+  str(input_list)
+  NULL
+}
+my_ellipsis_function(a=1:10,b=11:20,c=21:30)
+my_ellipsis_function &amp;lt;- function(...) {
+    input_list &amp;lt;- list(...)
+    output_list &amp;lt;- lapply(X=input_list, function(x) {str(x);summary(x)})
+    return(output_list)
+}
+my_ellipsis_function(a=1:10,b=11:20,c=21:30)
+ int [1:10] 1 2 3 4 5 6 7 8 9 10
+ int [1:10] 11 12 13 14 15 16 17 18 19 20
+ int [1:10] 21 22 23 24 25 26 27 28 29 30
+$a
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   1.00    3.25    5.50    5.50    7.75   10.00 
+$b
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   11.0    13.2    15.5    15.5    17.8    20.0 
+$c
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   21.0    23.2    25.5    25.5    27.8    30.0
+my_ellipsis_function &amp;lt;- function(...) {
+       input_list &amp;lt;- as.list(substitute(list(...)))
+       output_list &amp;lt;- lapply(X=input_list, function(x) {str(x);summary(x)})
+       return(output_list)
+   }
+   my_ellipsis_function(a=1:10,b=11:20,c=21:30)
+    symbol list
+    language 1:10
+    language 11:20
+    language 21:30
+   [[1]]
+   Length  Class   Mode 
+        1   name   name 
+   $a
+   Length  Class   Mode 
+        3   call   call 
+   $b
+   Length  Class   Mode 
+        3   call   call 
+   $c
+   Length  Class   Mode 
+        3   call   call
+</code></pre><p>Alpha</p>
+<pre tabindex="0"><code>&amp;gt; test.func &amp;lt;- function(...) { lapply(list(...), class) }
+&amp;gt; test.func(a=&#34;b&#34;, b=1)
+$a
+[1] &#34;character&#34;
+
+$b
+[1] &#34;numeric&#34;
+</code></pre><p>Beta</p>
+<pre tabindex="0"><code>get_list_from_ellipsis1 &amp;lt;- function(...)
+{
+  list(...)
+}
+get_list_from_ellipsis1(a = 1:10, b = 2:20) # returns a list of integer vectors
+
+$a
+ [1]  1  2  3  4  5  6  7  8  9 10
+
+$b
+ [1]  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20
+get_list_from_ellipsis2 &amp;lt;- function(...)
+{
+  as.list(substitute(list(...)))[-1L]
+}
+get_list_from_ellipsis2(a = 1:10, b = 2:20) # returns a list of calls
+
+$a
+1:10
+
+$b
+2:20
+</code></pre><p>Gamma`</p>
+<p>This demonstrates how <code>list(...)</code> simplifies passing arbitrary options down the call stack, enhancing function composition.</p>
+<h3 id="alternative-perspective-on-ellipsis-usage">Alternative Perspective on Ellipsis Usage</h3>
+<p>The simplest approach, <code>list(...)</code>, is sufficient for the vast majority of cases where the goal is simply to aggregate all passed arguments into a list for immediate use. Using <code>substitute()</code> is reserved for advanced tasks requiring access to the code <em>before</em> it is run, such as building dynamic expressions or mimicking core data manipulation functions. For building a standard list of inputs, stick to simplicity:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>simple_list_collector <span style="color:#f92672">&lt;-</span> <span style="color:#66d9ef">function</span>(<span style="color:#66d9ef">...</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Direct and clear collection of evaluated arguments</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span>(<span style="color:#a6e22e">list</span>(<span style="color:#66d9ef">...</span>))
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>result <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">simple_list_collector</span>(name<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Test&#34;</span>, values<span style="color:#f92672">=</span><span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">15</span>))
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># result will contain a list with evaluated &#39;name&#39; and &#39;values&#39;</span>
+</span></span></code></pre></div><p>The complexity introduced by <code>substitute()</code> often makes functions harder to read unless the capability to access unevaluated expressions is a functional requirement.</p>
+<h3 id="faqs-on-r-ellipsis-list-substitute-comparison">FAQs on R Ellipsis List Substitute Comparison</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the primary difference between list and substitute for ellipsis</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: <code>list(...)</code> captures the evaluated values of the arguments passed through the ellipsis, while <code>as.list(substitute(list(...)))[-1L]</code> captures the arguments as unevaluated language objects or calls, preserving their structure.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why does substitute(list(...)) return a list element named &#39;list&#39;</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: When <code>substitute</code> processes <code>list(...)</code>, it retains the symbol <code>list</code> as the first element of the resulting expression tree, which is why <code>[-1L]</code> is necessary to isolate only the caller-provided arguments.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: When should I use list(...) instead of substitute</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: You should use <code>list(...)</code> when you need the actual data or objects passed to the function immediately. Use <code>substitute</code> only when you need to manipulate the code/expression passed by the user before evaluation.</div>
+    </div>
+</div>
+<p>We encourage you to share your experiences or pose further questions regarding function argument handling in R below!</p>
+<pre tabindex="0"><code>R&amp;gt; my_ellipsis_function &amp;lt;- function(...) {
++   input_list &amp;lt;- as.list(substitute(list(...)))
++ }
+R&amp;gt; print(my_ellipsis_function(a=1:10, b=2:20))
+[[1]]
+list
+
+$a
+1:10
+
+$b
+11:20
+
+R&amp;gt;
+</code></pre><p>For more insights into R programming techniques, check out solutions for common Python errors that might surface if you are integrating R with data pipelines, such as <a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">fixing SSL verification issues in Python requests</a>
+ or exploring <a href="https://sqlpey.com/python/how-to-properly-configure-pythonpath/" target="_blank" rel="noopener">how to properly configure the Python path</a>
+. Also, see discussions on <a href="https://sqlpey.com/python/top-5-methods-to-ping-servers-in-python/" target="_blank" rel="noopener">passing arguments through wrapper functions</a>
+ if your context involves nested function calls.</p>
+<pre tabindex="0"><code>&amp;gt; talk &amp;lt;- function(func, msg, ...){
++     func(msg, ...);
++ }
+&amp;gt; talk(cat, c(&#34;this&#34;, &#34;is&#34;, &#34;a&#34;,&#34;message.&#34;), sep=&#34;:&#34;)
+this:is:a:message.
+&amp;gt;
+&amp;gt; talk &amp;lt;- function(func, msg=c(&#34;Hello&#34;,&#34;World!&#34;), ...){
++     func(msg, ...);
++ }
+&amp;gt; talk(cat,sep=&#34;:&#34;)
+Hello:World!
+&amp;gt; talk(cat,sep=&#34;,&#34;, fill=1)
+Hello,
+World!
+&amp;gt;
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

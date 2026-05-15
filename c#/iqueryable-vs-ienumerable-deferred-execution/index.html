@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>IQueryable vs IEnumerable: Deferred Execution and Performance Differences - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore the distinctions between IQueryable and IEnumerable in LINQ, focusing on deferred execution, expression trees, and their impact on database query …">
+
+
+
+<meta name="keywords" content="IQueryable, IEnumerable, LINQ deferred execution, LINQ performance, expression trees, LINQ to SQL, LINQ to Objects">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="IQueryable vs IEnumerable: Deferred Execution and Performance Differences - sqlpey">
+<meta name="DC.description" content="Explore the distinctions between IQueryable and IEnumerable in LINQ, focusing on deferred execution, expression trees, and their impact on database query performance.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="IQueryable vs IEnumerable: Deferred Execution and Performance Differences - sqlpey">
+<meta property="og:description" content="Explore the distinctions between IQueryable and IEnumerable in LINQ, focusing on deferred execution, expression trees, and their impact on database query …">
+<meta property="og:url" content="https://sqlpey.com/c%23/iqueryable-vs-ienumerable-deferred-execution/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="LINQ">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="IQueryable vs IEnumerable: Deferred Execution and Performance Differences">
+<meta name="twitter:description" content="Explore the distinctions between IQueryable and IEnumerable in LINQ, focusing on deferred execution, expression trees, and their impact on database query …">
+
+
+<link rel="canonical" href="https://sqlpey.com/c%23/iqueryable-vs-ienumerable-deferred-execution/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"IQueryable vs IEnumerable: Deferred Execution and Performance Differences\"",
+  "description": "\"Explore the distinctions between IQueryable and IEnumerable in LINQ, focusing on deferred execution, expression trees, and their impact on database query performance.\"",
+  "url": "\"https://sqlpey.com/c%23/iqueryable-vs-ienumerable-deferred-execution/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/c%23/iqueryable-vs-ienumerable-deferred-execution/\""
+  },
+  "articleSection": "\"LINQ\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">IQueryable vs IEnumerable: Deferred Execution and Performance Differences</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">LINQ</span>
+              
+              <span class="tag">C#</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              9 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#iqueryable-vs-ienumerable-deferred-execution-and-performance-differences">&ldquo;IQueryable vs IEnumerable: Deferred Execution and Performance Differences&rdquo;</a></li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#faqs-on-iqueryable-vs-ienumerable">FAQs on IQueryable vs IEnumerable</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="iqueryable-vs-ienumerable-deferred-execution-and-performance-differences">&ldquo;IQueryable vs IEnumerable: Deferred Execution and Performance Differences&rdquo;</h2>
+<p>When working with LINQ in .NET, two fundamental interfaces are frequently encountered: <code>IEnumerable&lt;T&gt;</code> and <code>IQueryable&lt;T&gt;</code>. While both support deferred execution, their underlying mechanisms and how they interact with data sources, particularly databases, differ significantly. This can lead to substantial performance implications. Understanding these differences is crucial for writing efficient data retrieval code.</p>
+<p><strong>What is Deferred Execution and How Do Both Interfaces Handle It?</strong></p>
+<p>Yes, both <code>IQueryable&lt;T&gt;</code> and <code>IEnumerable&lt;T&gt;</code> provide deferred execution. This means that the query logic is not executed immediately when the query is defined. Instead, it&rsquo;s delayed until the results are actually needed, typically when you iterate over the collection (e.g., using <code>foreach</code>) or call methods like <code>ToList()</code>, <code>Count()</code>, or <code>First()</code>.</p>
+<p><strong>The Core Difference: Where the Filtering Happens</strong></p>
+<p>The primary distinction lies in <em>where</em> the query&rsquo;s filtering and manipulation logic is processed.</p>
+<ul>
+<li>
+<p><strong><code>IEnumerable&lt;T&gt;</code>:</strong> When you operate on an <code>IEnumerable&lt;T&gt;</code>, you are essentially engaging in LINQ to Objects. This means that the entire dataset matching the initial query is loaded into memory, and <em>then</em> subsequent filtering or operations are applied to these in-memory objects.</p>
+</li>
+<li>
+<p><strong><code>IQueryable&lt;T&gt;</code>:</strong> This interface is designed to work with providers that can translate your LINQ queries into other query languages, most commonly SQL for database interactions (e.g., LINQ to SQL, Entity Framework). When you use <code>IQueryable&lt;T&gt;</code>, the LINQ expressions are converted into an expression tree. This expression tree is then sent to the underlying data source (like a database) which translates it into an efficient, native query (e.g., SQL). The filtering and manipulation occur at the data source level, before the data is even retrieved into memory.</p>
+</li>
+</ul>
+<p><strong>Illustrating the Performance Impact</strong></p>
+<p>Consider a scenario where you have a large <code>WebLog</code> table with a million records, and you need to find active users.</p>
+<p><strong>Using <code>IEnumerable&lt;WebLog&gt;</code>:</strong></p>
+<p>If you start with an <code>IEnumerable&lt;WebLog&gt;</code> and apply multiple <code>Where</code> clauses, the process looks like this:</p>
+<ol>
+<li>The entire <code>WebLog</code> table (1 million records) is fetched from the database.</li>
+<li>The first <code>Where</code> clause (<code>c.DurationSeconds &gt; 10</code>) filters these records in memory.</li>
+<li>The second <code>Where</code> clause (<code>c.WebLogID &gt; 100</code>) further filters the in-memory results.</li>
+<li>The final <code>Where</code> clause (<code>c.EmailAddress.Length &gt; 11</code>) applies the last in-memory filter.</li>
+<li>Finally, <code>result.First()</code> retrieves the first matching record.</li>
+</ol>
+<p>This approach can be very slow, potentially taking around 90 seconds, as all data is pulled into memory first.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">// Assuming &#39;db&#39; is your database context</span>
+</span></span><span style="display:flex;"><span>IEnumerable&lt;WebLog&gt; first = db.WebLogs;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> second = first.Where(c =&gt; c.DurationSeconds &gt; <span style="color:#ae81ff">10</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> third = second.Where(c =&gt; c.WebLogID &gt; <span style="color:#ae81ff">100</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> result = third.Where(c =&gt; c.EmailAddress.Length &gt; <span style="color:#ae81ff">11</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// This is where the query actually executes</span>
+</span></span><span style="display:flex;"><span>Console.Write(result.First().UserName);
+</span></span></code></pre></div><p><strong>Using <code>IQueryable&lt;WebLog&gt;</code>:</strong></p>
+<p>When you use <code>IQueryable&lt;WebLog&gt;</code>, the LINQ expression tree is translated into SQL. For the same filtering criteria, the database executes a single, optimized query:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> TOP <span style="color:#ae81ff">1</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> [dbo].[WebLog] <span style="color:#66d9ef">WHERE</span> [DurationSeconds] <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">10</span> <span style="color:#66d9ef">AND</span> [WebLogID] <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">100</span> <span style="color:#66d9ef">AND</span> LEN([EmailAddress]) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">11</span>
+</span></span></code></pre></div><p>This optimized query retrieves only the necessary data directly from the database, significantly reducing execution time to approximately 4 seconds.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">// Assuming &#39;db&#39; is your database context</span>
+</span></span><span style="display:flex;"><span>IQueryable&lt;WebLog&gt; first = db.WebLogs;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> second = first.Where(c =&gt; c.DurationSeconds &gt; <span style="color:#ae81ff">10</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> third = second.Where(c =&gt; c.WebLogID &gt; <span style="color:#ae81ff">100</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> result = third.Where(c =&gt; c.EmailAddress.Length &gt; <span style="color:#ae81ff">11</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// This is where the query actually executes</span>
+</span></span><span style="display:flex;"><span>Console.Write(result.First().UserName);
+</span></span></code></pre></div><p><strong>Expression Trees: The &ldquo;How&rdquo; Behind the Difference</strong></p>
+<p>The key to <code>IQueryable</code>&rsquo;s power lies in expression trees. LINQ extension methods have two primary overloads:</p>
+<ul>
+<li><strong><code>IEnumerable</code> version:</strong> Accepts a <code>Func&lt;TSource, bool&gt;</code> delegate. This is a compiled function executed in memory.</li>
+<li><strong><code>IQueryable</code> version:</strong> Accepts an <code>Expression&lt;Func&lt;TSource, bool&gt;&gt;</code> delegate. This defines an expression tree, a data structure that represents code.</li>
+</ul>
+<p>When you write <code>x =&gt; x.City == &quot;New York&quot;</code>, the compiler converts this into an expression tree for <code>IQueryable</code>. This tree is then interpretable by providers like Entity Framework, allowing them to translate it into SQL.</p>
+<p><strong>When to Use <code>IQueryable&lt;T&gt;</code> vs. <code>IEnumerable&lt;T&gt;</code></strong></p>
+<ul>
+<li>
+<p><strong>Return <code>IQueryable&lt;T&gt;</code>:</strong> When you want to allow the consumer of your method to further refine the query before execution. This is common in repository patterns where you want to add more filtering, sorting, or paging at the data source level. It keeps the query as a &ldquo;query&rdquo; until it&rsquo;s absolutely necessary to execute.</p>
+</li>
+<li>
+<p><strong>Return <code>IEnumerable&lt;T&gt;</code>:</strong> When you intend to transport a set of objects that have already been retrieved or created in memory. You want to enumerate over this existing collection.</p>
+</li>
+</ul>
+<p><strong>Best Practices and Considerations</strong></p>
+<ul>
+<li>
+<p><strong>Preserve <code>IQueryable</code>:</strong> Generally, keep your query as an <code>IQueryable&lt;T&gt;</code> for as long as possible. This allows the query provider to optimize the entire operation, including tasks like paging (<code>Take</code>, <code>Skip</code>) and filtering, directly on the data source.</p>
+</li>
+<li>
+<p><strong><code>var</code> for Clarity:</strong> Using <code>var</code> can help maintain the original type, but be mindful of what the compiler infers.</p>
+</li>
+<li>
+<p><strong><code>AsEnumerable()</code> vs. <code>ToList()</code>:</strong> While <code>IQueryable</code> extends <code>IEnumerable</code>, simply assigning an <code>IQueryable</code> to an <code>IEnumerable</code> variable doesn&rsquo;t force execution. Methods like <code>ToList()</code> or explicitly calling <code>AsEnumerable()</code> will materialize the query.</p>
+</li>
+<li>
+<p><strong>Context Expiration:</strong> If you pass an <code>IQueryable</code> to a method that expects <code>IEnumerable</code> and the underlying data context expires before enumeration, you can encounter errors. Materializing the results with <code>ToList()</code> often mitigates this by ensuring data is loaded into memory.</p>
+</li>
+<li>
+<p><strong><code>IQueryable</code> and Testability:</strong> Returning <code>IQueryable</code> from repositories can sometimes blur the lines of separation of concerns, as consumers might interact directly with the persistence layer. However, it offers significant performance advantages.</p>
+</li>
+<li>
+<p><strong><code>Skip</code> with Negative Values:</strong> Be aware that certain LINQ methods, like <code>Skip</code>, can behave differently. If an <code>IQueryable</code> is being translated to SQL, a negative value for <code>Skip</code> might result in a database error (e.g., &ldquo;The offset specified in a OFFSET clause may not be negative.&rdquo;) because the SQL <code>OFFSET</code> clause does not support negative values.</p>
+</li>
+</ul>
+<p><strong>Example: Paging with <code>IQueryable</code></strong></p>
+<p>Paging is a prime example of <code>IQueryable</code>&rsquo;s efficiency.</p>
+<ul>
+<li>
+<p><strong><code>IQueryable.Skip(10).Take(5)</code>:</strong> This translates to SQL <code>OFFSET 10 ROWS FETCH NEXT 5 ROWS ONLY</code>, retrieving only the desired 5 records after skipping the first 10.</p>
+</li>
+<li>
+<p><strong><code>IEnumerable.Skip(10).Take(5)</code>:</strong> This first loads all records into memory, then applies <code>Skip(10)</code> and <code>Take(5)</code> to the in-memory collection, which is much less efficient for large datasets.</p>
+</li>
+</ul>
+<p><strong>Are <code>IEnumerable</code> Collections Always in Memory?</strong></p>
+<p>While it&rsquo;s common to think of <code>IEnumerable</code> as in-memory collections, the reality is more nuanced. LINQ to Objects <em>does</em> load data into memory once retrieved. However, <code>IQueryable</code> relies on an abstract provider. This provider <em>could</em> be an in-memory provider, but more commonly it&rsquo;s a remote provider like a database. The key is that <code>IQueryable</code> <em>represents</em> a query, not necessarily the data itself, until execution.</p>
+<p><strong>Summary of Differences:</strong></p>
+<p>| Feature             | <code>IEnumerable&lt;T&gt;</code>                                     | <code>IQueryable&lt;T&gt;</code>                                                               |
+| :</p>
+<h2 id="solutions">Solutions</h2>
+<p>| :</p>
+<pre tabindex="0"><code>IQueryable&amp;lt;Customer&amp;gt; custs = ...;
+// Later on...
+var goldCustomers = custs.Where(c =&amp;gt; c.IsGold);
+IEnumerable&amp;lt;Customer&amp;gt; custs = ...;
+// Later on...
+var goldCustomers = custs.Where(c =&amp;gt; c.IsGold);
+</code></pre><p>| :</p>
+<ul>
+<li>|
+| <strong>Execution</strong>       | LINQ to Objects (client-side, in memory)             | LINQ to Providers (database-side, or other remote sources)                  |
+| <strong>Query Translation</strong> | Executes compiled <code>Func</code> delegates                   | Translates <code>Expression</code> trees into native queries (e.g., SQL)                 |
+| <strong>Data Fetching</strong>   | Loads all matching records into memory, then filters | Fetches only filtered/projected data from the source                        |
+| <strong>Performance</strong>     | Can be inefficient for large datasets, memory-heavy  | Generally more efficient for database operations, optimized data retrieval    |
+| <strong>Purpose</strong>         | Enumerate over in-memory collections                 | Build and execute queries against external data sources                       |
+| <strong>Inheritance</strong>     | Base interface for enumerating sequences             | Inherits <code>IEnumerable&lt;T&gt;</code>, enabling enumeration of query results              |</li>
+</ul>
+<p><strong>Choosing the Right Interface</strong></p>
+<p>The optimal choice depends on your specific needs:</p>
+<ul>
+<li>For operations where the entire dataset is required or you are already working with in-memory collections, <code>IEnumerable&lt;T&gt;</code> is suitable.</li>
+<li>For querying external data sources like databases, where you want to push filtering, sorting, and paging logic to the source for maximum efficiency, <code>IQueryable&lt;T&gt;</code> is the preferred choice.</li>
+</ul>
+<h3 id="faqs-on-iqueryable-vs-ienumerable">FAQs on IQueryable vs IEnumerable</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the main difference between IQueryable and IEnumerable</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The core difference is where the query logic is executed. <code>IEnumerable</code> processes queries in memory (LINQ to Objects), loading all relevant data first. <code>IQueryable</code> translates queries into an expression tree that a provider (like Entity Framework) can convert into efficient database queries, executing the logic at the data source level.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Does IQueryable always execute on the database</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Not necessarily. <code>IQueryable</code> relies on a query provider. While typically used with databases (LINQ to SQL, Entity Framework), it could also be used with an in-memory data provider. The key is that it allows for the translation of expressions into a format the provider can execute.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: When should I use IEnumerable instead of IQueryable</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Use <code>IEnumerable</code> when you are already working with data in memory, or when you explicitly need to load the entire dataset into memory before performing operations. It’s also suitable if you are working with custom collections that do not have a translation provider.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can IQueryable help improve database query performance</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, significantly. By translating LINQ queries into optimized SQL statements that are executed directly on the database server, <code>IQueryable</code> ensures that only the necessary data is retrieved, reducing network traffic and memory consumption.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What are expression trees in the context of IQueryable</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Expression trees are data structures that represent code. <code>IQueryable</code> uses expression trees to define the query operations. These trees can then be interpreted by a query provider to translate the LINQ query into another language, such as SQL.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What happens if an IQueryable query involves a method not supported by the database provider</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: If a LINQ method used with an <code>IQueryable</code> cannot be translated into a database query, the provider might throw an error or fall back to executing the rest of the query in memory after retrieving data. This is why it’s important to test your queries or convert to <code>IEnumerable</code> using <code>AsEnumerable()</code> or <code>ToList()</code> before calling such methods if you anticipate this issue.</div>
+    </div>
+</div>
+<p>We&rsquo;d love to hear your thoughts! Share your experiences or any additional questions you might have in the comments below.</p>
+<p>For more on related topics, explore our articles on <a href="https://sqlpey.com/python/what-is-python" target="_blank" rel="noopener">What is Python</a>
+, <a href="https://sqlpey.com/sql/what-is-sql" target="_blank" rel="noopener">What is SQL</a>
+, and <a href="https://sqlpey.com/mysql/introduction-to-mysql" target="_blank" rel="noopener">Introduction to MySQL</a>
+.</p>
+<pre tabindex="0"><code>MarketDevEntities db = new MarketDevEntities();
+
+IEnumerable&amp;lt;WebLog&amp;gt; first = db.WebLogs;
+var second = first.Where(c =&amp;gt; c.DurationSeconds &amp;gt; 10);
+var third = second.Where(c =&amp;gt; c.WebLogID &amp;gt; 100);
+var result = third.Where(c =&amp;gt; c.EmailAddress.Length &amp;gt; 11);
+
+Console.Write(result.First().UserName);
+&#34;SELECT * FROM [dbo].[WebLog]&#34;
+&#34;SELECT TOP 1 * FROM [dbo].[WebLog] WHERE [DurationSeconds] &amp;gt; 10 AND [WebLogID] &amp;gt; 100 AND LEN([EmailAddress]) &amp;gt; 11&#34;
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

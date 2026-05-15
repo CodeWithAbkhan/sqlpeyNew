@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>R: Selecting Rows with Maximum Values per Group - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Discover multiple R methods to extract rows with the highest &#39;pt&#39; value for each &#39;Subject&#39;, using dplyr, data.table, and base R.">
+
+
+
+<meta name="keywords" content="R, dplyr, data.table, max value, group by, subsetting">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="R: Selecting Rows with Maximum Values per Group - sqlpey">
+<meta name="DC.description" content="Discover multiple R methods to extract rows with the highest &#39;pt&#39; value for each &#39;Subject&#39;, using dplyr, data.table, and base R.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2024-05-16">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="R: Selecting Rows with Maximum Values per Group - sqlpey">
+<meta property="og:description" content="Discover multiple R methods to extract rows with the highest &#39;pt&#39; value for each &#39;Subject&#39;, using dplyr, data.table, and base R.">
+<meta property="og:url" content="https://sqlpey.com/r/r-max-value-per-group/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2024-05-16T00:00:00Z">
+
+
+<meta property="article:published_time" content="2024-05-16T00:00:00Z">
+<meta property="article:modified_time" content="2024-05-16T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="R">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="R: Selecting Rows with Maximum Values per Group">
+<meta name="twitter:description" content="Discover multiple R methods to extract rows with the highest &#39;pt&#39; value for each &#39;Subject&#39;, using dplyr, data.table, and base R.">
+
+
+<link rel="canonical" href="https://sqlpey.com/r/r-max-value-per-group/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"R: Selecting Rows with Maximum Values per Group\"",
+  "description": "\"Discover multiple R methods to extract rows with the highest 'pt' value for each 'Subject', using dplyr, data.table, and base R.\"",
+  "url": "\"https://sqlpey.com/r/r-max-value-per-group/\"",
+  "datePublished": "\"2024-05-16T00:00:00Z\"",
+  "dateModified": "\"2024-05-16T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/r/r-max-value-per-group/\""
+  },
+  "articleSection": "\"R\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">R: Selecting Rows with Maximum Values per Group</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">R</span>
+              
+              <span class="tag">dplyr</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              8 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              May 16, 2024
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#r-selecting-rows-with-maximum-values-per-group">&ldquo;R: Selecting Rows with Maximum Values per Group&rdquo;</a>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#faqs-on-selecting-max-value-rows-per-group-in-r">FAQs on Selecting Max Value Rows per Group in R</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="r-selecting-rows-with-maximum-values-per-group">&ldquo;R: Selecting Rows with Maximum Values per Group&rdquo;</h2>
+<p>When working with data in R, a common task involves identifying and isolating specific rows based on a condition applied within groups. For instance, you might want to find the record with the highest numerical value for a particular metric, segmented by a categorical variable. This scenario frequently arises in data analysis, whether you&rsquo;re examining experimental results, sales figures, or time-series data.</p>
+<p>Let&rsquo;s consider a sample R data frame named <code>group</code> with columns <code>Subject</code>, <code>pt</code>, and <code>Event</code>. The goal is to extract the row(s) that correspond to the maximum value of <code>pt</code> for each unique <code>Subject</code>.</p>
+<p>Here&rsquo;s how you can achieve this using various popular R packages and base R functions.</p>
+<h4 id="solution-1-using-datatable-for-max-value-rows">Solution 1: Using <code>data.table</code> for Max Value Rows</h4>
+<p>The <code>data.table</code> package is highly efficient for data manipulation. One approach is to find the index of the maximum <code>pt</code> value within each <code>Subject</code> group.</p>
+<p>If you want to keep all entries that correspond to the maximum <code>pt</code> within each group:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-R" data-lang="R"><span style="display:flex;"><span><span style="color:#75715e"># Ensure data.table is installed and loaded</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># install.packages(&#34;data.table&#34;)</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">library</span>(data.table)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Assuming &#39;group&#39; is your data.frame or data.table</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Convert to data.table if it&#39;s not already</span>
+</span></span><span style="display:flex;"><span>group <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">as.data.table</span>(group)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Select rows where &#39;pt&#39; equals the maximum &#39;pt&#39; within each &#39;Subject&#39; group</span>
+</span></span><span style="display:flex;"><span>group[group[, .I[pt <span style="color:#f92672">==</span> <span style="color:#a6e22e">max</span>(pt)], by <span style="color:#f92672">=</span> Subject]<span style="color:#f92672">$</span>V1]
+</span></span></code></pre></div><p>The output would look like this, showing the row(s) with the maximum <code>pt</code> for each <code>Subject</code>:</p>
+<pre tabindex="0"><code>   Subject pt Event
+1:       1  5     2
+2:       2 17     2
+3:       3  5     2
+</code></pre><p>Alternatively, if you specifically need only the <em>first</em> occurrence of the maximum <code>pt</code> value (useful if there are ties for the maximum):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-R" data-lang="R"><span style="display:flex;"><span>group[group[, .I<span style="color:#a6e22e">[which.max</span>(pt)], by <span style="color:#f92672">=</span> Subject]<span style="color:#f92672">$</span>V1]
+</span></span></code></pre></div><p>This will produce the same result if there are no ties for the maximum value, as in the example.</p>
+<h4 id="solution-2-using-dplyrs-group_by-and-top_n">Solution 2: Using <code>dplyr</code>&rsquo;s <code>group_by</code> and <code>top_n</code></h4>
+<p>The <code>dplyr</code> package offers an intuitive syntax for data manipulation. The <code>group_by()</code> function combined with <code>top_n()</code> is a straightforward way to achieve this.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-R" data-lang="R"><span style="display:flex;"><span><span style="color:#75715e"># Ensure dplyr is installed and loaded</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># install.packages(&#34;dplyr&#34;)</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">library</span>(dplyr)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Group by Subject and select the top 1 row based on pt</span>
+</span></span><span style="display:flex;"><span>group <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">group_by</span>(Subject) <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">top_n</span>(<span style="color:#ae81ff">1</span>, pt)
+</span></span></code></pre></div><p>The result is presented as a tibble:</p>
+<pre tabindex="0"><code># A tibble: 3 x 3
+# Groups:   Subject [3]
+  Subject    pt Event
+    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1       1     5     2
+2       2    17     2
+3       3     5     2
+</code></pre><h4 id="solution-3-a-concise-datatable-approach">Solution 3: A Concise <code>data.table</code> Approach</h4>
+<p><code>data.table</code> provides an even more compact method using <code>setDT</code> and <code>.SD</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-R" data-lang="R"><span style="display:flex;"><span><span style="color:#a6e22e">library</span>(data.table)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Convert to data.table in place</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">setDT</span>(group)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Select the subset of data.table with the maximum &#39;pt&#39; for each &#39;Subject&#39;</span>
+</span></span><span style="display:flex;"><span>group[, .SD<span style="color:#a6e22e">[which.max</span>(pt)], by <span style="color:#f92672">=</span> Subject]
+</span></span></code></pre></div><p>This yields:</p>
+<pre tabindex="0"><code>   Subject pt Event
+1:       1  5     2
+2:       2 17     2
+3:       3  5     2
+</code></pre><h4 id="solution-4-utilizing-dplyrs-slice-or-slice_max">Solution 4: Utilizing <code>dplyr</code>&rsquo;s <code>slice</code> or <code>slice_max</code></h4>
+<p><code>dplyr</code> also offers <code>slice</code> with <code>which.max</code> or the more recent <code>slice_max</code> function for this purpose.</p>
+<p>Using <code>slice</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-R" data-lang="R"><span style="display:flex;"><span><span style="color:#a6e22e">library</span>(dplyr)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>group <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">group_by</span>(Subject) <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">slice</span>(<span style="color:#a6e22e">which.max</span>(pt))
+</span></span></code></pre></div><p>This will output:</p>
+<pre tabindex="0"><code># A tibble: 3 x 3
+# Groups:   Subject [3]
+  Subject    pt Event
+    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1       1     5     2
+2       2    17     2
+3       3     5     2
+</code></pre><p>For <code>dplyr</code> version 1.1.0 and later, <code>slice_max</code> is the preferred method:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-R" data-lang="R"><span style="display:flex;"><span><span style="color:#a6e22e">library</span>(dplyr)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># For dplyr &gt;= 1.1.0</span>
+</span></span><span style="display:flex;"><span>group <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">slice_max</span>(pt, n <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>, by <span style="color:#f92672">=</span> Subject)
+</span></span></code></pre></div><p>The output remains consistent:</p>
+<pre tabindex="0"><code>  Subject pt Event
+1       1  5     2
+2       2 17     2
+3       3  5     2
+</code></pre><h4 id="solution-5-dplyrs-summarise-with-across">Solution 5: <code>dplyr</code>&rsquo;s <code>summarise</code> with <code>across</code></h4>
+<p>If you need to aggregate multiple columns by finding their maximums within groups, <code>summarise</code> with <code>across</code> is beneficial.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-R" data-lang="R"><span style="display:flex;"><span><span style="color:#a6e22e">library</span>(dplyr)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Sample data creation for clarity</span>
+</span></span><span style="display:flex;"><span>ID <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>Value <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">5</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">5</span>,<span style="color:#ae81ff">8</span>,<span style="color:#ae81ff">17</span>,<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">5</span>)
+</span></span><span style="display:flex;"><span>Event <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>group <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">data.frame</span>(Subject<span style="color:#f92672">=</span>ID, pt<span style="color:#f92672">=</span>Value, Event<span style="color:#f92672">=</span>Event)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Summarise to find the max pt and Event for each Subject</span>
+</span></span><span style="display:flex;"><span>group <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">group_by</span>(Subject) <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">summarise</span>(pt <span style="color:#f92672">=</span> <span style="color:#a6e22e">max</span>(pt, na.rm <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>),
+</span></span><span style="display:flex;"><span>            Event <span style="color:#f92672">=</span> <span style="color:#a6e22e">max</span>(Event, na.rm <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>))
+</span></span></code></pre></div><p>This produces a summary tibble:</p>
+<pre tabindex="0"><code># A tibble: 3 x 3
+  Subject    pt Event
+    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1       1     5     2
+2       2    17     2
+3       3     5     2
+</code></pre><p>For tables with many columns, <code>across</code> can be more efficient:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-R" data-lang="R"><span style="display:flex;"><span>group <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">group_by</span>(Subject) <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">summarise</span>(<span style="color:#a6e22e">across</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#a6e22e">ncol</span>(group)<span style="color:#ae81ff">-1</span>, max, na.rm <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>, .names <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;{.col}&#34;</span>))
+</span></span></code></pre></div><p>Note: Adjust <code>1:ncol(group)-1</code> based on your actual column structure.</p>
+<h4 id="solution-6-base-r-by-function">Solution 6: Base R <code>by</code> Function</h4>
+<p>Base R&rsquo;s <code>by</code> function can also be used for this task, iterating over groups and applying a function.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-R" data-lang="R"><span style="display:flex;"><span><span style="color:#75715e"># Apply a function to find the row with max &#39;pt&#39; for each &#39;Subject&#39;</span>
+</span></span><span style="display:flex;"><span>res <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">by</span>(group, group<span style="color:#f92672">$</span>Subject, FUN <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(df) df<span style="color:#a6e22e">[which.max</span>(df<span style="color:#f92672">$</span>pt), ])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Combine the results back into a data frame</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">do.call</span>(rbind, res)
+</span></span></code></pre></div><p>The result is:</p>
+<pre tabindex="0"><code>  Subject pt Event
+1       1  5     2
+2       2 17     2
+3       3  5     2
+</code></pre><h4 id="solution-7-base-r-ave-for-conditional-selection">Solution 7: Base R <code>ave</code> for Conditional Selection</h4>
+<p>The <code>ave</code> function in base R is powerful for group-wise calculations and can be used to create a logical vector for subsetting.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-R" data-lang="R"><span style="display:flex;"><span><span style="color:#75715e"># Find the maximum &#39;pt&#39; for each &#39;Subject&#39; and compare with the actual &#39;pt&#39;</span>
+</span></span><span style="display:flex;"><span>group[group<span style="color:#f92672">$</span>pt <span style="color:#f92672">==</span> <span style="color:#a6e22e">ave</span>(group<span style="color:#f92672">$</span>pt, group<span style="color:#f92672">$</span>Subject, FUN <span style="color:#f92672">=</span> max), ]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Alternative using &#39;with&#39; for cleaner syntax</span>
+</span></span><span style="display:flex;"><span>group<span style="color:#a6e22e">[with</span>(group, pt <span style="color:#f92672">==</span> <span style="color:#a6e22e">ave</span>(pt, Subject, FUN <span style="color:#f92672">=</span> max)), ]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Another variant directly within the function</span>
+</span></span><span style="display:flex;"><span>group<span style="color:#a6e22e">[as.logical</span>(<span style="color:#a6e22e">ave</span>(group<span style="color:#f92672">$</span>pt, group<span style="color:#f92672">$</span>Subject, FUN <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(x) x <span style="color:#f92672">==</span> <span style="color:#a6e22e">max</span>(x))), ]
+</span></span></code></pre></div><p>These approaches yield the same output as previous methods.</p>
+<h4 id="solution-8-base-r-split-lapply-and-rbind">Solution 8: Base R <code>split</code>, <code>lapply</code>, and <code>rbind</code></h4>
+<p>A more explicit base R approach involves splitting the data frame, processing each split, and then combining the results.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-R" data-lang="R"><span style="display:flex;"><span><span style="color:#a6e22e">do.call</span>(rbind, <span style="color:#a6e22e">lapply</span>(<span style="color:#a6e22e">split</span>(group, <span style="color:#a6e22e">as.factor</span>(group<span style="color:#f92672">$</span>Subject)), <span style="color:#66d9ef">function</span>(x) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span>(x<span style="color:#a6e22e">[which.max</span>(x<span style="color:#f92672">$</span>pt), ])
+</span></span><span style="display:flex;"><span>}))
+</span></span></code></pre></div><p>This also returns the desired rows.</p>
+<h4 id="solution-9-base-r-order-and-duplicated">Solution 9: Base R <code>order</code> and <code>duplicated</code></h4>
+<p>Sorting the data frame and then removing duplicates based on the grouping column is another effective strategy.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-R" data-lang="R"><span style="display:flex;"><span><span style="color:#75715e"># Order by Subject and then by pt in descending order</span>
+</span></span><span style="display:flex;"><span>group_sorted <span style="color:#f92672">&lt;-</span> group<span style="color:#a6e22e">[order</span>(group<span style="color:#f92672">$</span>Subject, <span style="color:#f92672">-</span>group<span style="color:#f92672">$</span>pt), ]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Remove duplicates based on Subject, keeping the first (which has the max pt)</span>
+</span></span><span style="display:flex;"><span>group_sorted[<span style="color:#f92672">!</span><span style="color:#a6e22e">duplicated</span>(group_sorted<span style="color:#f92672">$</span>Subject), ]
+</span></span></code></pre></div><p>The output is:</p>
+<pre tabindex="0"><code>  Subject pt Event
+1       1  5     2
+2       2 17     2
+3       3  5     2
+</code></pre><h4 id="solution-10-datatable-sorting-and-unique">Solution 10: <code>data.table</code> Sorting and <code>unique</code></h4>
+<p><code>data.table</code> offers similar efficiency with sorting and <code>unique</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-R" data-lang="R"><span style="display:flex;"><span><span style="color:#a6e22e">library</span>(data.table)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">setDT</span>(group)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Order by Subject and descending pt, then get unique by Subject</span>
+</span></span><span style="display:flex;"><span>group<span style="color:#a6e22e">[order</span>(Subject, <span style="color:#f92672">-</span>pt), <span style="color:#a6e22e">head</span>(.SD, <span style="color:#ae81ff">1</span>), by <span style="color:#f92672">=</span> Subject]
+</span></span></code></pre></div><p>This also returns the expected result.</p>
+<h4 id="performance-considerations-with-datatable">Performance Considerations with <code>data.table</code></h4>
+<p>For very large datasets, <code>data.table</code> often demonstrates superior performance. The benchmark below illustrates this.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-R" data-lang="R"><span style="display:flex;"><span><span style="color:#a6e22e">library</span>(data.table)
+</span></span><span style="display:flex;"><span>nr <span style="color:#f92672">&lt;-</span> <span style="color:#ae81ff">1e7L</span> <span style="color:#75715e"># Number of rows</span>
+</span></span><span style="display:flex;"><span>ng <span style="color:#f92672">&lt;-</span> nr<span style="color:#f92672">/</span><span style="color:#ae81ff">4L</span> <span style="color:#75715e"># Number of groups</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">set.seed</span>(<span style="color:#ae81ff">0L</span>)
+</span></span><span style="display:flex;"><span>DT <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">data.table</span>(Subject<span style="color:#f92672">=</span><span style="color:#a6e22e">sample</span>(ng, nr, <span style="color:#66d9ef">TRUE</span>), pt<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>nr) <span style="color:#75715e"># Using a sequence for &#39;pt&#39;</span>
+</span></span><span style="display:flex;"><span>DT2 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">copy</span>(DT)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Load microbenchmark if not already loaded</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># install.packages(&#34;microbenchmark&#34;)</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">library</span>(microbenchmark)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">microbenchmark</span>(times<span style="color:#f92672">=</span><span style="color:#ae81ff">3L</span>,
+</span></span><span style="display:flex;"><span>    mtd0 <span style="color:#f92672">=</span> {a0 <span style="color:#f92672">&lt;-</span> DT[DT[, .I<span style="color:#a6e22e">[which.max</span>(pt)], by<span style="color:#f92672">=</span>Subject]<span style="color:#f92672">$</span>V1]},
+</span></span><span style="display:flex;"><span>    mtd1 <span style="color:#f92672">=</span> {a1 <span style="color:#f92672">&lt;-</span> DT[DT<span style="color:#a6e22e">[order</span>(<span style="color:#f92672">-</span>pt), .I[1L], Subject]<span style="color:#f92672">$</span>V1]},
+</span></span><span style="display:flex;"><span>    mtd2 <span style="color:#f92672">=</span> {a2 <span style="color:#f92672">&lt;-</span> DT2[DT2[, rn <span style="color:#f92672">:=</span> .I][
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">order</span>(Subject, <span style="color:#f92672">-</span>pt), rn<span style="color:#a6e22e">[c</span>(<span style="color:#66d9ef">TRUE</span>, <span style="color:#a6e22e">diff</span>(Subject)<span style="color:#f92672">&gt;</span><span style="color:#ae81ff">0L</span>)]
+</span></span><span style="display:flex;"><span>    ]]},
+</span></span><span style="display:flex;"><span>    mtd3 <span style="color:#f92672">=</span> {a3 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">unique</span>(DT<span style="color:#a6e22e">[order</span>(Subject, <span style="color:#f92672">-</span>pt)], by<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Subject&#34;</span>)}
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Verify results are the same</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># fsetequal(a0[order(Subject)], a1[order(Subject)]) # TRUE</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># fsetequal(a0[order(Subject)], a2[, rn := NULL][order(Subject)]) # TRUE</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># fsetequal(a0[order(Subject)], a3[order(Subject)]) # TRUE</span>
+</span></span></code></pre></div><p>The timings indicate that methods <code>mtd2</code> and <code>mtd3</code> (using <code>data.table</code>&rsquo;s efficient ordering and duplicate removal) are generally faster for large datasets.</p>
+<h2 id="solutions">Solutions</h2>
+<h3 id="faqs-on-selecting-max-value-rows-per-group-in-r">FAQs on Selecting Max Value Rows per Group in R</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q How to get the row with maximum value for each group in R</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: You can use packages like <code>dplyr</code> with <code>group_by()</code> and <code>slice_max()</code>, or <code>data.table</code> with its efficient grouping and ordering capabilities. Base R functions like <code>ave</code> or <code>split</code> with <code>lapply</code> also work.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q What is the best way to find the maximum pt for each Subject in R</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: For large datasets, <code>data.table</code> methods like <code>setDT(group)[order(Subject, -pt), head(.SD, 1), by = Subject]</code> or <code>setDT(group)[, .SD[which.max(pt)], by = Subject]</code> are typically the most performant and concise. <code>dplyr</code>&rsquo;s <code>slice_max</code> is also a very readable option.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q How to select top N rows per group in R</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: For the top N rows, <code>dplyr</code>&rsquo;s <code>slice_max(pt, n = N, by = Subject)</code> or <code>top_n(N, pt)</code> are excellent choices. <code>data.table</code> can also achieve this by combining ordering with indexing.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q Can I use base R to select max value rows by group</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, base R functions such as <code>ave</code> with <code>which.max</code> or combining <code>split</code>, <code>lapply</code>, and <code>do.call(rbind, ...)</code> can accomplish this task, though they might be less performant on very large data compared to specialized packages.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q What if there are multiple rows with the same maximum value for pt in a Subject group</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Methods like <code>group[group[, .I[pt == max(pt)], by=Subject]$V1]</code> in <code>data.table</code> or <code>group %&gt;% group_by(Subject) %&gt;% filter(pt == max(pt))</code> in <code>dplyr</code> will return all rows that share the maximum <code>pt</code> value. If you only want one, functions like <code>which.max</code> (which returns the index of the first maximum) are useful.</div>
+    </div>
+</div>
+<p>For more advanced R data manipulation techniques, explore resources on <a href="https://www.sqlpey.com/" target="_blank" rel="noopener">SQLpey.com</a>
+. You might find topics on <a href="https://sqlpey.com/postgresql/what-is-postgresql" target="_blank" rel="noopener">PostgreSQL</a>
+, <a href="https://sqlpey.com/python/what-is-python" target="_blank" rel="noopener">Python</a>
+, or <a href="https://sqlpey.com/sql/what-is-sql" target="_blank" rel="noopener">SQL basics</a>
+ relevant. If you encounter specific errors, articles on <a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">fixing SSL certificate verification</a>
+ or <a href="https://sqlpey.com/python/how-to-fix-externally-managed-environment-error/" target="_blank" rel="noopener">Python environment issues</a>
+ could be helpful.</p>
+<p>We&rsquo;d love to hear your feedback! Drop your comments or questions below.</p>
+<pre tabindex="0"><code>require(data.table) ## 1.9.2
+group &amp;lt;- as.data.table(group)
+group[group[, .I[pt == max(pt)], by=Subject]$V1]
+#    Subject pt Event
+# 1:       1  5     2
+# 2:       2 17     2
+# 3:       3  5     2
+group[group[, .I[which.max(pt)], by=Subject]$V1]
+#    Subject pt Event
+# 1:       1  5     2
+# 2:       2 17     2
+# 3:       3  5     2
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

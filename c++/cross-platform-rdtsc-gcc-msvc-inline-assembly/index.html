@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Cross-Platform RDTSC: GCC, MSVC, and Inline Assembly Techniques - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore cross-platform methods for using the RDTSC instruction in C/C&#43;&#43;, covering GCC, MSVC, inline assembly, and Linux perf_event_open.">
+
+
+
+<meta name="keywords" content="RDTSC, GCC, MSVC, inline assembly, performance counters, C&#43;&#43; timing">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Cross-Platform RDTSC: GCC, MSVC, and Inline Assembly Techniques - sqlpey">
+<meta name="DC.description" content="Explore cross-platform methods for using the RDTSC instruction in C/C&#43;&#43;, covering GCC, MSVC, inline assembly, and Linux perf_event_open.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-07-22">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Cross-Platform RDTSC: GCC, MSVC, and Inline Assembly Techniques - sqlpey">
+<meta property="og:description" content="Explore cross-platform methods for using the RDTSC instruction in C/C&#43;&#43;, covering GCC, MSVC, inline assembly, and Linux perf_event_open.">
+<meta property="og:url" content="https://sqlpey.com/c&#43;&#43;/cross-platform-rdtsc-gcc-msvc-inline-assembly/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-07-22T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-07-22T00:00:00Z">
+<meta property="article:modified_time" content="2025-07-22T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="C&#43;&#43;">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Cross-Platform RDTSC: GCC, MSVC, and Inline Assembly Techniques">
+<meta name="twitter:description" content="Explore cross-platform methods for using the RDTSC instruction in C/C&#43;&#43;, covering GCC, MSVC, inline assembly, and Linux perf_event_open.">
+
+
+<link rel="canonical" href="https://sqlpey.com/c&#43;&#43;/cross-platform-rdtsc-gcc-msvc-inline-assembly/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Cross-Platform RDTSC: GCC, MSVC, and Inline Assembly Techniques\"",
+  "description": "\"Explore cross-platform methods for using the RDTSC instruction in C/C++, covering GCC, MSVC, inline assembly, and Linux perf_event_open.\"",
+  "url": "\"https://sqlpey.com/c++/cross-platform-rdtsc-gcc-msvc-inline-assembly/\"",
+  "datePublished": "\"2025-07-22T00:00:00Z\"",
+  "dateModified": "\"2025-07-22T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/c++/cross-platform-rdtsc-gcc-msvc-inline-assembly/\""
+  },
+  "articleSection": "\"C++\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Cross-Platform RDTSC: GCC, MSVC, and Inline Assembly Techniques</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">C&#43;&#43;</span>
+              
+              <span class="tag">Assembly</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              8 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 22, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#cross-platform-rdtsc-gcc-msvc-and-inline-assembly-techniques">&ldquo;Cross-Platform RDTSC: GCC, MSVC, and Inline Assembly Techniques&rdquo;</a>
+      <ul>
+        <li><a href="#cross-platform-rdtsc-implementation-strategies">Cross-Platform RDTSC Implementation Strategies</a></li>
+        <li><a href="#advanced-considerations-for-rdtsc-usage">Advanced Considerations for RDTSC Usage</a></li>
+        <li><a href="#faqs-on-cross-platform-rdtsc-usage">FAQs on Cross-Platform RDTSC Usage</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a></li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="cross-platform-rdtsc-gcc-msvc-and-inline-assembly-techniques">&ldquo;Cross-Platform RDTSC: GCC, MSVC, and Inline Assembly Techniques&rdquo;</h2>
+<p>The <code>RDTSC</code> instruction provides a high-resolution timestamp, crucial for performance analysis and precise timing. However, its implementation and usage can vary significantly between compilers and operating systems, leading to potential inaccuracies or portability issues.</p>
+<h3 id="cross-platform-rdtsc-implementation-strategies">Cross-Platform RDTSC Implementation Strategies</h3>
+<h4 id="solution-1-gcc-and-msvc-intrinsics-gcc-45">Solution 1: GCC and MSVC Intrinsics (GCC 4.5+)</h4>
+<p>Starting with GCC 4.5 and later, <code>__rdtsc()</code> intrinsic is supported by both GCC and MSVC. The primary difference lies in the required include file.</p>
+<ul>
+<li><strong>GCC/Clang:</strong> <code>#include &lt;x86intrin.h&gt;</code></li>
+<li><strong>MSVC:</strong> <code>#include &lt;intrin.h&gt;</code></li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#75715e">#ifdef _WIN32
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;intrin.h&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For MSVC
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#else
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;x86intrin.h&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For GCC/Clang
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#endif
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdint.h&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For uint64_t
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Function to read the Time-Stamp Counter
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">uint64_t</span> <span style="color:#a6e22e">get_time_stamp_counter</span>() {
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#ifdef _WIN32
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> __rdtsc();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#else
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// For GCC/Clang, __rdtsc() is also available if &lt;x86intrin.h&gt; is included
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// Alternatively, use inline assembly as shown below for older GCC versions
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> __rdtsc();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#endif
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><h4 id="solution-2-inline-assembly-pre-gcc-45-and-general-understanding">Solution 2: Inline Assembly (Pre-GCC 4.5 and General Understanding)</h4>
+<p>For compilers or scenarios where intrinsics might not be directly available or for understanding legacy code, inline assembly provides a direct way to interface with the <code>RDTSC</code> instruction.</p>
+<p><strong>Understanding GNU C Extended <code>__asm__</code>:</strong></p>
+<p>The <code>__asm__ __volatile__</code> directive tells the compiler to insert assembly code.</p>
+<ul>
+<li><code>volatile</code>: Ensures the assembly code is executed every time and not optimized away or reused.</li>
+<li><code>&quot;=a&quot;(lo)</code> and <code>&quot;=d&quot;(hi)</code>: Specifies output operands. The <code>rdtsc</code> instruction places its 64-bit result in the EDX:EAX registers. The <code>&quot;a&quot;</code> and <code>&quot;d&quot;</code> are x86 machine constraints, fixing outputs to EAX and EDX respectively.</li>
+<li><code>((uint64_t)hi &lt;&lt; 32) | lo</code>: This expression combines the high (EDX) and low (EAX) 32-bit parts into a single 64-bit <code>uint64_t</code> variable.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdint.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Function using inline assembly for RDTSC
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">uint64_t</span> <span style="color:#a6e22e">read_tsc_asm</span>() {
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#ifdef _WIN32
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// MSVC inline assembly syntax (for 32-bit, 64-bit MSVC does not support inline asm)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// In 64-bit MSVC, __rdtsc() intrinsic is the way to go.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// For illustration, this is 32-bit specific inline assembly if needed.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">#ifdef _M_IX86
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">__int64</span> tsc;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">__asm</span> {
+</span></span><span style="display:flex;"><span>        rdtsc
+</span></span><span style="display:flex;"><span>        mov tsc, rax
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> tsc;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#else
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// Fallback for 64-bit MSVC if not using intrinsic
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> __rdtsc();
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#endif
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#else </span><span style="color:#75715e">// GCC/Clang
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> lo, hi;
+</span></span><span style="display:flex;"><span>    __asm__ __volatile__(<span style="color:#e6db74">&#34;rdtsc&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;=a&#34;</span>(lo), <span style="color:#e6db74">&#34;=d&#34;</span>(hi));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> ((<span style="color:#66d9ef">uint64_t</span>)hi <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">32</span>) <span style="color:#f92672">|</span> lo;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#endif
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p><strong>Note on <code>unsigned long</code>:</strong> Using <code>unsigned long</code> instead of <code>unsigned int</code> for <code>lo</code> and <code>hi</code> can sometimes lead to better compiler optimizations, as the compiler might infer zero-extension more readily.</p>
+<h4 id="solution-3-inline-assembly-for-64-bit-msvc-and-cross-compiler-compatibility">Solution 3: Inline Assembly for 64-bit MSVC and Cross-Compiler Compatibility</h4>
+<p>While the 64-bit MSVC compiler does not support inline assembly, GCC and Clang do. The following snippet demonstrates a more unified approach, leveraging intrinsics where available and falling back to inline assembly if necessary. It also highlights the construction of the 64-bit result.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#75715e">// Valid C99 and C++
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdint.h&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For int64_t, uint64_t. Use &lt;cstdint&gt; in C++.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#ifdef _MSC_VER
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;intrin.h&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For MSVC&#39;s __rdtsc
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#else
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;x86intrin.h&gt;</span><span style="color:#75715e"> </span><span style="color:#75715e">// For GCC/Clang&#39;s __rdtsc and other intrinsics
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#endif
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Wrapper function for reading the Time-Stamp Counter
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">inline</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">uint64_t</span> <span style="color:#a6e22e">read_tsc_wrapper</span>() {
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#ifdef _MSC_VER
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// MSVC intrinsic for RDTSC
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> __rdtsc();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#else
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// GCC/Clang intrinsic for RDTSC
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> __rdtsc();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#endif
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Example of timing a short interval
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">uint64_t</span> <span style="color:#a6e22e">time_execution_interval</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">uint64_t</span> start_time <span style="color:#f92672">=</span> read_tsc_wrapper();
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Placeholder for the code you want to time
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// Example: a loop, a function call, etc.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// For demonstration, this is an empty block.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// Back-to-back __rdtsc() calls generally do not optimize away.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> read_tsc_wrapper() <span style="color:#f92672">-</span> start_time;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// GCC/Clang inline assembly for potentially better optimization in some cases
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">uint64_t</span> <span style="color:#a6e22e">read_tsc_optimized_asm</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Using unsigned long can help compilers recognize zero-extension implicitly
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span> low_part, high_part;
+</span></span><span style="display:flex;"><span>    __asm__ __volatile__(<span style="color:#e6db74">&#34;rdtsc&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;=a&#34;</span>(low_part), <span style="color:#e6db74">&#34;=d&#34;</span>(high_part));
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Using &#39;+&#39; for addition can sometimes be optimized better than &#39;|&#39; (OR)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> ((<span style="color:#66d9ef">uint64_t</span>)high_part <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">32</span>) <span style="color:#f92672">+</span> low_part;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Considerations for Inline Assembly:</strong></p>
+<ul>
+<li><strong>64-bit MSVC:</strong> Does not support inline assembly. Rely on <code>__rdtsc()</code>.</li>
+<li><strong>GCC/Clang:</strong> Inline assembly is supported. The syntax <code>&quot;=a&quot;(lo), &quot;=d&quot;(hi)</code> is crucial for correctly capturing the <code>EDX:EAX</code> output of <code>RDTSC</code>.</li>
+<li><strong>Compiler Optimizations:</strong> While inline assembly offers direct control, compilers are often adept at optimizing intrinsic functions. Using <code>unsigned long</code> for parts of the <code>RDTSC</code> result can sometimes improve the generated assembly.</li>
+</ul>
+<h4 id="solution-4-msvc-specific-intrinsic">Solution 4: MSVC Specific Intrinsic</h4>
+<p>Microsoft Visual C++ provides a direct intrinsic function for the <code>RDTSC</code> instruction.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#75715e">// For Windows using Visual Studio
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">__int64</span> <span style="color:#a6e22e">__rdtsc</span>(<span style="color:#66d9ef">void</span>);
+</span></span></code></pre></div><p>This intrinsic simplifies the process significantly when targeting Windows with MSVC.</p>
+<h4 id="solution-5-linux-perf_event_open-system-call">Solution 5: Linux <code>perf_event_open</code> System Call</h4>
+<p>For Linux systems, the <code>perf_event_open</code> system call offers a robust and portable way to access performance counters, including CPU cycles. This is often preferred over direct <code>RDTSC</code> for more complex benchmarking scenarios.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">#define _GNU_SOURCE
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;asm/unistd.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;linux/perf_event.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdlib.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;string.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;sys/ioctl.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;unistd.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;inttypes.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;sys/types.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Helper function to call the perf_event_open syscall
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">long</span> <span style="color:#a6e22e">perf_event_open_syscall</span>(<span style="color:#66d9ef">struct</span> perf_event_attr <span style="color:#f92672">*</span>hw_event, <span style="color:#66d9ef">pid_t</span> pid,
+</span></span><span style="display:flex;"><span>                                    <span style="color:#66d9ef">int</span> cpu, <span style="color:#66d9ef">int</span> group_fd, <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span> flags) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">syscall</span>(__NR_perf_event_open, hw_event, pid, cpu, group_fd, flags);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">char</span> <span style="color:#f92672">**</span>argv) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">struct</span> perf_event_attr pe;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">long</span> <span style="color:#66d9ef">long</span> cycle_count;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> fd;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Target number of iterations for the workload
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">uint64_t</span> iterations <span style="color:#f92672">=</span> (argc <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">?</span> <span style="color:#a6e22e">strtoll</span>(argv[<span style="color:#ae81ff">1</span>], NULL, <span style="color:#ae81ff">0</span>) <span style="color:#f92672">:</span> <span style="color:#ae81ff">10000</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Initialize performance event attributes
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">memset</span>(<span style="color:#f92672">&amp;</span>pe, <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">struct</span> perf_event_attr));
+</span></span><span style="display:flex;"><span>    pe.type <span style="color:#f92672">=</span> PERF_TYPE_HARDWARE;                <span style="color:#75715e">// Hardware event
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    pe.size <span style="color:#f92672">=</span> <span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">struct</span> perf_event_attr);
+</span></span><span style="display:flex;"><span>    pe.config <span style="color:#f92672">=</span> PERF_COUNT_HW_CPU_CYCLES;       <span style="color:#75715e">// Count CPU cycles
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    pe.disabled <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;                            <span style="color:#75715e">// Start disabled
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    pe.exclude_kernel <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;                      <span style="color:#75715e">// Exclude kernel mode events
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    pe.exclude_hv <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;                          <span style="color:#75715e">// Exclude hypervisor events
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Open the performance event file descriptor
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    fd <span style="color:#f92672">=</span> <span style="color:#a6e22e">perf_event_open_syscall</span>(<span style="color:#f92672">&amp;</span>pe, <span style="color:#ae81ff">0</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (fd <span style="color:#f92672">==</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">fprintf</span>(stderr, <span style="color:#e6db74">&#34;Error opening performance event for config %llx</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, pe.config);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">exit</span>(EXIT_FAILURE);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Reset and enable the counter
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">ioctl</span>(fd, PERF_EVENT_IOC_RESET, <span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ioctl</span>(fd, PERF_EVENT_IOC_ENABLE, <span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Example workload: a simple loop
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// Using inline assembly for a tight loop to ensure consistent behavior for measurement
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    __asm__ <span style="color:#66d9ef">volatile</span> (
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;1:;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;sub $1, %[iter_count];&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;jne 1b;&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">:</span> [iter_count] <span style="color:#e6db74">&#34;+r&#34;</span> (iterations) <span style="color:#75715e">// Input/output operand for iteration count
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#f92672">:</span> <span style="color:#75715e">// No additional inputs
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#f92672">:</span> <span style="color:#75715e">// Clobbered registers (none explicitly here, but compiler knows)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    );
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Disable the counter and read the value
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">ioctl</span>(fd, PERF_EVENT_IOC_DISABLE, <span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">read</span>(fd, <span style="color:#f92672">&amp;</span>cycle_count, <span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">long</span> <span style="color:#66d9ef">long</span>));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">printf</span>(<span style="color:#e6db74">&#34;CPU Cycles: %lld</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, cycle_count);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">close</span>(fd); <span style="color:#75715e">// Close the file descriptor
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Key <code>perf_event_open</code> Attributes:</strong></p>
+<ul>
+<li><code>PERF_TYPE_HARDWARE</code>: Indicates a hardware performance event.</li>
+<li><code>PERF_COUNT_HW_CPU_CYCLES</code>: Specifically requests CPU cycle counts.</li>
+<li><code>PERF_COUNT_HW_REF_CPU_CYCLES</code>: Similar to CPU cycles but is not affected by CPU frequency scaling, offering a measure closer to real wall-clock time.</li>
+</ul>
+<h3 id="advanced-considerations-for-rdtsc-usage">Advanced Considerations for RDTSC Usage</h3>
+<ul>
+<li><strong>Instruction Reordering:</strong> <code>RDTSC</code> can be reordered by the CPU. To ensure accurate timing of short code segments, it&rsquo;s crucial to serialize execution. Instructions like <code>CPUID</code> act as serializing points, preventing out-of-order execution across them.</li>
+<li><strong>Multi-Core Synchronization:</strong> On multi-core systems, <code>RDTSC</code> values can be inconsistent if measured on different cores. Using CPU affinity (pinning threads to specific cores) and serializing instructions (<code>CPUID</code>, <code>LFENCE</code>, <code>MFENCE</code>) can mitigate this.</li>
+<li><strong>TSC Invariance:</strong> Modern CPUs often feature an &ldquo;invariant TSC&rdquo; where the Time-Stamp Counter increments at a constant rate, regardless of CPU frequency scaling. This makes it a more reliable measure of elapsed time. Check CPU flags like <code>constant_tsc</code> and <code>nonstop_tsc</code> (via <code>/proc/cpuinfo</code> or CPUID) to determine support.</li>
+<li><strong>Virtualization:</strong> In virtualized environments, <code>RDTSC</code> behavior can be altered. Hypervisors may intercept or modify <code>RDTSC</code> instructions.</li>
+<li><strong>Microbenchmarking Pitfalls:</strong> For precise microbenchmarking, consider factors like cache effects, branch prediction, out-of-order execution, and the need for warm-up phases. Directly using <code>RDTSC</code> might require careful assembly tuning.</li>
+<li><strong>Alternatives:</strong> For high-precision timing, especially in complex scenarios or across different architectures, consider platform-specific high-resolution timers (e.g., <code>QueryPerformanceCounter</code> on Windows, <code>clock_gettime</code> with <code>CLOCK_MONOTONIC</code> on Linux) or libraries abstracting these.</li>
+</ul>
+<h3 id="faqs-on-cross-platform-rdtsc-usage">FAQs on Cross-Platform RDTSC Usage</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the primary challenge when using RDTSC across different compilers like GCC and MSVC</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The main challenge lies in the differing syntax for inline assembly and the specific header files required for compiler intrinsics, particularly between GCC/Clang and MSVC.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I use inline assembly for RDTSC on 64-bit MSVC</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: No, the 64-bit MSVC compiler does not support inline assembly. You should use the <code>__rdtsc()</code> intrinsic instead.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How does the CPUID instruction relate to RDTSC for timing code</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: CPUID is a serializing instruction. Executing CPUID before and after <code>RDTSC</code> calls helps ensure that the instructions within the timed interval are executed in order, preventing reordering issues that can lead to inaccurate timing.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is invariant TSC and why is it important for RDTSC</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Invariant TSC means the Time-Stamp Counter increments at a constant rate, unaffected by CPU frequency scaling. This makes it a more predictable and accurate measure of elapsed time compared to TSCs that change with clock speed.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Are there alternatives to RDTSC for precise timing</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, platform-specific high-resolution timers like <code>QueryPerformanceCounter</code> on Windows and <code>clock_gettime(CLOCK_MONOTONIC)</code> on Linux, or cross-platform libraries, are often more robust and portable alternatives for precise timing.</div>
+    </div>
+</div>
+<h2 id="solutions">Solutions</h2>
+<p>We’d love to hear your feedback! Drop your comments or questions below. What are your experiences with timing code execution? Do you have any preferred methods or encountered specific challenges?</p>
+<pre tabindex="0"><code>#ifdef _WIN32
+#include &amp;lt;intrin.h&amp;gt;
+#else
+#include &amp;lt;x86intrin.h&amp;gt;
+#endif
+#include &amp;lt;stdint.h&amp;gt;
+
+//  Windows
+#ifdef _WIN32
+
+#include &amp;lt;intrin.h&amp;gt;
+uint64_t rdtsc(){
+    return __rdtsc();
+}
+
+//  Linux/GCC
+#else
+
+uint64_t rdtsc(){
+    unsigned int lo,hi;
+    __asm__ __volatile__ (&#34;rdtsc&#34; : &#34;=a&#34; (lo), &#34;=d&#34; (hi));
+    return ((uint64_t)hi &amp;lt;&amp;lt; 32) | lo;
+}
+
+#endif
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Optimizing File Reading Speed: Benchmarking .NET Line Processing Techniques - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Examine the performance trade-offs between StreamReader.ReadLine, File.ReadLines, File.ReadAllLines, and custom buffering for reading files line by line in …">
+
+
+
+<meta name="keywords" content="StreamReader, File.ReadLines, File.ReadAllLines, File I/O performance">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Optimizing File Reading Speed: Benchmarking .NET Line Processing Techniques - sqlpey">
+<meta name="DC.description" content="Examine the performance trade-offs between StreamReader.ReadLine, File.ReadLines, File.ReadAllLines, and custom buffering for reading files line by line in .NET.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Optimizing File Reading Speed: Benchmarking .NET Line Processing Techniques - sqlpey">
+<meta property="og:description" content="Examine the performance trade-offs between StreamReader.ReadLine, File.ReadLines, File.ReadAllLines, and custom buffering for reading files line by line in …">
+<meta property="og:url" content="https://sqlpey.com/c%23/optimizing-file-reading-speed/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="File I/O">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Optimizing File Reading Speed: Benchmarking .NET Line Processing Techniques">
+<meta name="twitter:description" content="Examine the performance trade-offs between StreamReader.ReadLine, File.ReadLines, File.ReadAllLines, and custom buffering for reading files line by line in …">
+
+
+<link rel="canonical" href="https://sqlpey.com/c%23/optimizing-file-reading-speed/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Optimizing File Reading Speed: Benchmarking .NET Line Processing Techniques\"",
+  "description": "\"Examine the performance trade-offs between StreamReader.ReadLine, File.ReadLines, File.ReadAllLines, and custom buffering for reading files line by line in .NET.\"",
+  "url": "\"https://sqlpey.com/c%23/optimizing-file-reading-speed/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/c%23/optimizing-file-reading-speed/\""
+  },
+  "articleSection": "\"File I/O\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Optimizing File Reading Speed: Benchmarking .NET Line Processing Techniques</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">File I/O</span>
+              
+              <span class="tag">Performance</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              7 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#optimizing-file-reading-speed-benchmarking-net-line-processing-techniques">&ldquo;Optimizing File Reading Speed: Benchmarking .NET Line Processing Techniques&rdquo;</a></li>
+    <li><a href="#evaluating-core-file-reading-strategies">Evaluating Core File Reading Strategies</a>
+      <ul>
+        <li><a href="#1-customizing-streamreaderreadline-with-optimal-buffering">1. Customizing <code>StreamReader.ReadLine</code> with Optimal Buffering</a></li>
+        <li><a href="#2-leveraging-deferred-execution-with-filereadlines">2. Leveraging Deferred Execution with <code>File.ReadLines</code></a></li>
+        <li><a href="#3-eager-loading-with-filereadalllines">3. Eager Loading with <code>File.ReadAllLines</code></a></li>
+        <li><a href="#4-the-inefficient-path-readtoend-and-stringsplit">4. The Inefficient Path: <code>ReadToEnd</code> and <code>String.Split</code></a></li>
+      </ul>
+    </li>
+    <li><a href="#advanced-performance-considerations">Advanced Performance Considerations</a>
+      <ul>
+        <li><a href="#high-performance-byte-level-scanning">High-Performance Byte-Level Scanning</a></li>
+        <li><a href="#reading-in-large-chunks-block-processing">Reading in Large Chunks (Block Processing)</a></li>
+      </ul>
+    </li>
+    <li><a href="#synthesis-and-recommendation">Synthesis and Recommendation</a></li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#faqs-on-optimizing-file-reading-speed">FAQs on Optimizing File Reading Speed</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="optimizing-file-reading-speed-benchmarking-net-line-processing-techniques">&ldquo;Optimizing File Reading Speed: Benchmarking .NET Line Processing Techniques&rdquo;</h2>
+<p>When dealing with file input, especially large datasets, determining the most efficient method to read content line by line is crucial for performance. Different approaches in the .NET framework offer distinct trade-offs concerning speed, memory footprint, and ease of use. How do techniques like custom <code>StreamReader</code> configuration, utilizing <code>File.ReadLines</code>, or employing <code>File.ReadAllLines</code> compare?</p>
+<h2 id="evaluating-core-file-reading-strategies">Evaluating Core File Reading Strategies</h2>
+<p>Several accepted techniques exist for iterating through file lines, each with underlying mechanical differences. Performance results are inherently dependent on the specific hardware and file characteristics, necessitating local benchmarking for definitive optimization.</p>
+<h3 id="1-customizing-streamreaderreadline-with-optimal-buffering">1. Customizing <code>StreamReader.ReadLine</code> with Optimal Buffering</h3>
+<p>The standard approach often involves using <code>StreamReader</code> over a <code>FileStream</code>. A critical factor here is the <code>BufferSize</code>. Setting it too low, like the default tested value of 128 bytes, can degrade performance. Increasing this size, perhaps to 1024 (the default), 512 (aligned with Windows sectors), or 4096 (NTFS cluster size), generally improves throughput, though the absolute optimum requires testing in your environment.</p>
+<p>Furthermore, the <code>FileStream</code> constructor permits setting <code>FileOptions</code>, such as <code>FileOptions.SequentialScan</code> for large, contiguous reads, which might offer gains.</p>
+<p><strong>Example of Configured StreamReader:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> Int32 OptimizedBufferSize = <span style="color:#ae81ff">4096</span>; <span style="color:#75715e">// Test with larger values</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">string</span> fileName = <span style="color:#e6db74">&#34;large_data.txt&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> (<span style="color:#66d9ef">var</span> fileStream = File.OpenRead(fileName))
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">using</span> (<span style="color:#66d9ef">var</span> streamReader = <span style="color:#66d9ef">new</span> StreamReader(fileStream, Encoding.UTF8, <span style="color:#66d9ef">true</span>, OptimizedBufferSize)) {
+</span></span><span style="display:flex;"><span>    String currentLine;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Reads one line at a time, allocating a new string for each read</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> ((currentLine = streamReader.ReadLine()) != <span style="color:#66d9ef">null</span>)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">// Execute line processing logic here</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span></code></pre></div><h3 id="2-leveraging-deferred-execution-with-filereadlines">2. Leveraging Deferred Execution with <code>File.ReadLines</code></h3>
+<p>The <code>File.ReadLines(path)</code> method offers a clean syntax, similar to a custom <code>StreamReader</code> implementation but using a fixed, typically larger, buffer size (e.g., 1024). It leverages iterator blocks (<code>yield return</code>), meaning it does not load the entire file into memory at once. This is excellent for massive files or when you only need to process the start of a file.</p>
+<p><strong>Example using <code>File.ReadLines</code>:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">string</span> path = <span style="color:#e6db74">&#34;application_log.txt&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Returns IEnumerable&lt;String&gt;, processing happens lazily</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> linesSequence = File.ReadLines(path); 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">foreach</span> (<span style="color:#66d9ef">var</span> line <span style="color:#66d9ef">in</span> linesSequence)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Process line incrementally; memory use remains low</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="3-eager-loading-with-filereadalllines">3. Eager Loading with <code>File.ReadAllLines</code></h3>
+<p><code>File.ReadAllLines(path)</code> executes immediately, reading everything and storing all lines into a <code>String[]</code> array. This incurs higher initial memory consumption but provides the benefit of random access capability via array indexing, which is impossible with <code>IEnumerable&lt;string&gt;</code> returned by <code>ReadLines</code>. For smaller files where random access is needed, this can be preferable.</p>
+<p><strong>Example using <code>File.ReadAllLines</code>:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">string</span> sourceFile = <span style="color:#e6db74">&#34;small_config.dat&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Loads everything into an array immediately</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> allLinesArray = File.ReadAllLines(sourceFile); 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Allows indexed access:</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> i = <span style="color:#ae81ff">0</span>; i &lt; allLinesArray.Length; i += <span style="color:#ae81ff">1</span>) 
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> lineContent = allLinesArray[i];
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Perform work using index i</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="4-the-inefficient-path-readtoend-and-stringsplit">4. The Inefficient Path: <code>ReadToEnd</code> and <code>String.Split</code></h3>
+<p>Reading the entire file content into a single string using <code>streamReader.ReadToEnd()</code> and then calling <code>Split()</code> is generally the slowest method, particularly for large files. This approach requires substantial memory allocation for the single large string and the resulting array of substrings.</p>
+<p><strong>Inefficient Example (Avoid for large files):</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">using</span> (<span style="color:#66d9ef">var</span> streamReader = File.OpenText(fileName)) {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// High memory overhead: one massive string followed by an array of strings</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> linesSet = streamReader.ReadToEnd().Split(<span style="color:#e6db74">&#34;\r\n&#34;</span>.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">foreach</span> (<span style="color:#66d9ef">var</span> entry <span style="color:#66d9ef">in</span> linesSet)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Slow processing path</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="advanced-performance-considerations">Advanced Performance Considerations</h2>
+<p>For scenarios requiring extreme speed, especially in competitive programming or high-throughput logging systems, bypassing string allocation per line offers the largest gains.</p>
+<h3 id="high-performance-byte-level-scanning">High-Performance Byte-Level Scanning</h3>
+<p>The fundamental bottleneck in <code>StreamReader.ReadLine</code> is the allocation of a new string for every line encountered. A technique for significant speed improvement involves reading raw byte chunks and manually scanning for the line feed character (<code>ASC_LF</code> or 0x0A) within the buffer, processing the data in its byte form before any string conversion.</p>
+<p>Modern approaches leverage optimized framework functions:</p>
+<ul>
+<li><strong><code>Array.IndexOf</code>:</strong> In recent .NET versions, using <code>Array.IndexOf(m_buffer, ASC_LF, startIndex, count)</code> for finding the newline character can outperform hand-rolled loops due to underlying vectorization capabilities.</li>
+</ul>
+<p>If you must avoid string allocation entirely, processing the data while it remains in byte arrays (or using constructs like <code>ValueTask</code> for asynchronous operations) yields the fastest results, though complexity rises significantly.</p>
+<h3 id="reading-in-large-chunks-block-processing">Reading in Large Chunks (Block Processing)</h3>
+<p>For extremely large files where memory pressure from loading all lines is an issue, but <code>ReadLines</code> is deemed too slow due to string processing overhead, reading fixed-size character blocks (<code>BUFFER_SIZE</code> of 100MB, for instance) and manually stitching potential line breaks across block boundaries can minimize disk I/O while managing memory better than <code>ReadAllLines</code>. This requires custom logic to handle remainders from the previous block.</p>
+<p><strong>Conceptual Custom Block Reader (Focusing on Disk I/O Minimization):</strong></p>
+<p>This custom reader aims to reduce disk reads by fetching large chunks, though the string manipulation after reading still impacts CPU time.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">// Simplified representation of a custom class managing block reads:</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">LinePortionTextReader</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ... (Implementation involving sr.Read(char[], 0, BUFFER_SIZE))</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">string</span>[] ReadBlock() {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Read BUFFER_SIZE characters, manage &#39;remainder&#39; from previous call</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Split the block, prepend remainder to the first element</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// The last element becomes the new remainder for the next block</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>When processing data within these blocks, if the subsequent work involves heavy string manipulation (like <code>string.Contains</code> or <code>int.Parse</code>), the speed benefit gained from faster initial reading diminishes rapidly.</p>
+<h2 id="synthesis-and-recommendation">Synthesis and Recommendation</h2>
+<p>| Method | Memory Footprint | Speed (General Case) | Use Case |
+| :</p>
+<h2 id="solutions">Solutions</h2>
+<p>| :</p>
+<pre tabindex="0"><code>const Int32 BufferSize = 128;
+using (var fileStream = File.OpenRead(fileName))
+  using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true, BufferSize)) {
+    String line;
+    while ((line = streamReader.ReadLine()) != null)
+    {
+      // Process line
+    }
+  }
+var lines = File.ReadLines(fileName);
+foreach (var line in lines)
+  // Process line
+var lines = File.ReadAllLines(fileName);
+for (var i = 0; i &amp;lt; lines.Length; i += 1) {
+  var line = lines[i];
+  // Process line
+}
+using (var streamReader = File.OpenText(fileName)) {
+  var lines = streamReader.ReadToEnd().Split(&amp;quot;\r\n&amp;quot;.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+  foreach (var line in lines)
+    // Process line
+}
+</code></pre><p>| :</p>
+<p>| :</p>
+<pre tabindex="0"><code>using (StreamReader sr = File.OpenText(fileName))
+{
+        string s = String.Empty;
+        while ((s = sr.ReadLine()) != null)
+        {
+               //do minimal amount of work here
+        }
+}
+AllLines = new string[MAX]; //only allocate memory here
+
+using (StreamReader sr = File.OpenText(fileName))
+{
+        int x = 0;
+        while (!sr.EndOfStream)
+        {
+               AllLines[x] = sr.ReadLine();
+               x += 1;
+        }
+} //Finished. Close the file
+
+//Now parallel process each line in the file
+Parallel.For(0, AllLines.Length, x =&amp;gt;
+{
+    DoYourStuff(AllLines[x]); //do your work here
+});
+</code></pre><p>|
+| <code>StreamReader.ReadLine</code> (Optimal Buffer) | Low (Line by line) | Fast | General purpose, custom sharing needed. |
+| <code>File.ReadLines</code> | Low (Lazy/Streamed) | Fast | Large files, simple iteration, low memory. |
+| <code>File.ReadAllLines</code> | High (Full file in memory) | Moderate/Fast | Small files requiring random line access. |
+| Custom Byte Scanning | Very Low (Buffer only) | Fastest (If avoiding string conversion) | Extreme performance needs, coding challenges. |
+| <code>ReadToEnd().Split()</code> | Very High | Slowest | Only for tiny files where simplicity outweighs speed. |</p>
+<p>For most practical applications requiring efficient reading without undue complexity, <strong><code>File.ReadLines</code></strong> provides the best balance of low memory use and good speed because it streams data lazily. If random access is mandatory, use <code>File.ReadAllLines</code>, acknowledging the memory cost. For the absolute pinnacle of speed, byte-level manipulation is required, as detailed in Solution 9.</p>
+<h3 id="faqs-on-optimizing-file-reading-speed">FAQs on Optimizing File Reading Speed</h3>
+<p><div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Which method is inherently slower for reading large files</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Reading the entire file content into one string via <code>ReadToEnd()</code> and subsequently calling <code>Split()</code> is generally the slowest due to high memory allocation and string operation overhead on large inputs.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Does increasing the StreamReader buffer size always improve performance</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Increasing the buffer size usually increases performance up to a point, as it reduces the number of I/O calls. However, the optimal size is system-dependent and needs empirical testing via benchmarking.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the key advantage of FileReadLines over FileReadAllLines</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: <code>File.ReadLines</code> uses deferred execution (streaming) which keeps memory usage low, whereas <code>File.ReadAllLines</code> loads the entire file content into memory as a <code>String[]</code> array immediately.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How can I achieve the fastest possible line reading speed</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The fastest approach involves processing data directly in byte buffers, avoiding the overhead of string allocation for every line. This often requires manual buffer management and scanning for line feed characters using optimized methods like <code>Array.IndexOf</code>.</div>
+    </div>
+</div></p>
+<p>For further deep dives into performance topics, check out these resources:</p>
+<ul>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">Fixing SSL Certificate Verification Issues in Python Requests</a>
+</li>
+<li><a href="https://sqlpey.com/dotnet/resolve-blazor-server-timeout-issues/" target="_blank" rel="noopener">Resolving Blazor Server Timeout Issues</a>
+</li>
+<li><a href="https://sqlpey.com/python/top-4-ways-to-resolve-syntaxwarning-invalid-escape-sequence-in-python/" target="_blank" rel="noopener">Top 4 Ways to Resolve SyntaxWarning: Invalid Escape Sequence in Python</a>
+</li>
+</ul>
+<p>We welcome your experiences! Share your benchmarking results or alternative techniques for ultra-fast file processing in the comments below.</p>
+<pre tabindex="0"><code>foreach (string line in File.ReadAllLines(fileName))
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

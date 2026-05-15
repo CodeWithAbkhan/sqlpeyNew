@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>InnoDB vs MyISAM: Which MySQL Storage Engine Is Right for You? - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore the key differences between InnoDB and MyISAM storage engines in MySQL, covering transactions, locking, performance, and reliability to help you choose …">
+
+
+
+<meta name="keywords" content="MySQL storage engines, InnoDB vs MyISAM, database performance, SQL transactions, row locking, table locking, referential integrity, full-text search">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="InnoDB vs MyISAM: Which MySQL Storage Engine Is Right for You? - sqlpey">
+<meta name="DC.description" content="Explore the key differences between InnoDB and MyISAM storage engines in MySQL, covering transactions, locking, performance, and reliability to help you choose the best fit for your application.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-07-22">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="InnoDB vs MyISAM: Which MySQL Storage Engine Is Right for You? - sqlpey">
+<meta property="og:description" content="Explore the key differences between InnoDB and MyISAM storage engines in MySQL, covering transactions, locking, performance, and reliability to help you choose …">
+<meta property="og:url" content="https://sqlpey.com/mysql/innodb-vs-myisam-mysql-storage-engine-choice/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-07-22T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-07-22T00:00:00Z">
+<meta property="article:modified_time" content="2025-07-22T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="MySQL">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="InnoDB vs MyISAM: Which MySQL Storage Engine Is Right for You?">
+<meta name="twitter:description" content="Explore the key differences between InnoDB and MyISAM storage engines in MySQL, covering transactions, locking, performance, and reliability to help you choose …">
+
+
+<link rel="canonical" href="https://sqlpey.com/mysql/innodb-vs-myisam-mysql-storage-engine-choice/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"InnoDB vs MyISAM: Which MySQL Storage Engine Is Right for You?\"",
+  "description": "\"Explore the key differences between InnoDB and MyISAM storage engines in MySQL, covering transactions, locking, performance, and reliability to help you choose the best fit for your application.\"",
+  "url": "\"https://sqlpey.com/mysql/innodb-vs-myisam-mysql-storage-engine-choice/\"",
+  "datePublished": "\"2025-07-22T00:00:00Z\"",
+  "dateModified": "\"2025-07-22T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/mysql/innodb-vs-myisam-mysql-storage-engine-choice/\""
+  },
+  "articleSection": "\"MySQL\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+
+      <header class="article-header">
+        <h1 class="article-title">InnoDB vs MyISAM: Which MySQL Storage Engine Is Right for You?</h1>
+
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">MySQL</span>
+              
+              <span class="tag">Database Performance</span>
+              
+            </div>
+            
+          </div>
+
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              14 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 22, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#innodb-vs-myisam-which-mysql-storage-engine-is-right-for-you">&ldquo;InnoDB vs MyISAM: Which MySQL Storage Engine Is Right for You?&rdquo;</a>
+      <ul>
+        <li><a href="#key-differentiating-factors-a-comparative-overview">Key Differentiating Factors: A Comparative Overview</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#in-depth-analysis-of-engine-capabilities">In-Depth Analysis of Engine Capabilities</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#when-to-choose-which-engine">When to Choose Which Engine</a></li>
+        <li><a href="#alternatives-and-modern-considerations">Alternatives and Modern Considerations</a></li>
+        <li><a href="#faqs-on-innodb-vs-myisam">FAQs on InnoDB vs MyISAM</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="innodb-vs-myisam-which-mysql-storage-engine-is-right-for-you">&ldquo;InnoDB vs MyISAM: Which MySQL Storage Engine Is Right for You?&rdquo;</h2>
+<p>When working with MySQL, selecting the appropriate storage engine is a critical decision that significantly impacts application performance, data integrity, and overall reliability. The two most prevalent engines, InnoDB and MyISAM, offer distinct features and trade-offs. This discussion aims to dissect these differences to assist you in making an informed choice for your specific workload.</p>
+<h3 id="key-differentiating-factors-a-comparative-overview">Key Differentiating Factors: A Comparative Overview</h3>
+<p>To provide a clear comparison, let&rsquo;s examine the core functionalities and performance characteristics of InnoDB and MyISAM.</p>
+<p>| Feature                   | MyISAM                                     | InnoDB                                                               | Scenario                                                                                                  |
+| :</p>
+<h2 id="solutions">Solutions</h2>
+<p>| :</p>
+<p>&ndash; | :</p>
+<ul>
+<li>| :</li>
+</ul>
+<p>&ndash; |
+| <strong>Transactions</strong>          | No                                         | Yes (ACID compliant)                                                 | Critical for operations requiring atomicity, where partial failures must be avoided.                      |
+| <strong>Referential Integrity</strong> | No                                         | Yes (Foreign Keys)                                                   | Essential for maintaining consistent relationships between tables, preventing orphaned records.         |
+| <strong>Locking Mechanism</strong>     | Table-level locking                        | Row-level locking                                                    | Row-level locking in InnoDB enhances concurrency, allowing multiple operations on different rows in the same table simultaneously. |
+| <strong>Concurrency</strong>           | Lower due to table-level locking           | Higher due to row-level locking                                      | Crucial for high-traffic applications with many concurrent users performing read and write operations.    |
+| <strong>Data Reliability</strong>      | Prone to corruption on crashes/interruptions | High, with crash recovery features (transactional logs, double-write buffer) | Ensures data safety and availability even in the event of unexpected shutdowns or hardware failures.    |
+| <strong>Full-Text Search</strong>      | Supported (prior to MySQL 5.6.4 for InnoDB) | Supported from MySQL 5.6.4 onwards                                   | Important for applications requiring efficient text-based searching capabilities.                         |
+| <strong>COUNT(*) Performance</strong>  | Faster (O(1) when no WHERE clause)         | Slower (scales with table size without WHERE clause)                 | MyISAM can be faster for simple count operations on large tables without specific filtering.              |
+| <strong>Writes (INSERT/UPDATE/DELETE)</strong> | Slower under heavy concurrent load due to table locks | Generally better performance for frequent writes and concurrent updates | InnoDB&rsquo;s row-level locking handles mixed workloads more efficiently.                                      |
+| <strong>Reads (SELECT)</strong>        | Can be faster for pure read workloads      | Performance is competitive, especially with concurrency             | MyISAM may offer a speed advantage for read-heavy scenarios without significant write contention.         |
+| <strong>Data Footprint</strong>        | Generally smaller                          | Can be larger, as data and indexes are in a single file              | Disk space considerations may be a factor for very large datasets.                                      |</p>
+<h3 id="in-depth-analysis-of-engine-capabilities">In-Depth Analysis of Engine Capabilities</h3>
+<p><strong>Transactions and Atomic Updates:</strong>
+InnoDB&rsquo;s primary advantage lies in its support for ACID (Atomicity, Consistency, Isolation, Durability) transactions. This means that a series of database operations are treated as a single unit: either all operations succeed and are committed, or if any part fails, the entire transaction is rolled back, leaving the database in its original state. This is vital for data integrity, especially in scenarios like financial transactions or inventory management.</p>
+<p>Consider an event registration system where a limited number of spots are available. If adding a guest to a <code>GUESTS</code> table and decrementing the <code>available_seats</code> count in another table were two separate operations, a system crash between these two could lead to inconsistent data – a guest is added, but the seat count isn&rsquo;t updated. InnoDB&rsquo;s transactional nature ensures both operations either complete successfully or neither takes effect, maintaining data accuracy.</p>
+<p><strong>Locking Mechanisms and Concurrency:</strong>
+MyISAM&rsquo;s use of table-level locking means that any operation on a table locks the entire table. During an update, for example, no other read or write operations can occur on that table. This can severely bottleneck applications with high write concurrency. In contrast, InnoDB&rsquo;s row-level locking allows multiple transactions to access different rows within the same table concurrently, significantly improving throughput for mixed read/write workloads.</p>
+<p>For instance, if your application handles around 200 writes per second, MyISAM&rsquo;s table-level lock would serialize these operations, potentially causing significant delays. InnoDB, by locking only the affected rows, would allow these writes to proceed much more efficiently.</p>
+<p><strong>Data Reliability and Crash Recovery:</strong>
+MyISAM tables are more susceptible to corruption during unexpected shutdowns or power failures. Recovering a corrupted MyISAM table often involves running <code>REPAIR TABLE</code> commands, which can be time-consuming and may not always fully recover the data. InnoDB, on the other hand, employs a robust transactional log and a double-write buffer. If a crash occurs, InnoDB can replay the log to restore data to a consistent state, providing a higher level of data durability.</p>
+<p><strong>Full-Text Search Capabilities:</strong>
+Historically, MyISAM offered superior full-text search capabilities compared to older versions of InnoDB. However, since MySQL 5.6.4, InnoDB has implemented robust full-text indexing, making this a less distinguishing factor for modern applications. If you are using an older MySQL version, MyISAM might be preferred for full-text search, though upgrading to a newer version with InnoDB support is generally recommended.</p>
+<p><strong>Performance Benchmarking and Considerations:</strong>
+While some benchmarks suggest MyISAM can be faster for specific scenarios like <code>COUNT(*)</code> without a <code>WHERE</code> clause, or pure read operations on simpler datasets, InnoDB often excels in more complex and concurrent environments. The key takeaway from extensive testing is that the &ldquo;best&rdquo; engine is workload-dependent. Benchmarking your specific queries and data patterns with both engines is the most reliable way to determine optimal performance.</p>
+<p>A Python script using <code>timeit</code> can be invaluable for this. For example, to compare <code>COUNT(*)</code> performance:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> timeit
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> MySQLdb
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> MySQLdb.cursors
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> random
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Database Connection Details (Replace <span style="color:#66d9ef">with</span> your actual credentials)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>DB_CONFIG <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;host&#34;</span>: <span style="color:#e6db74">&#34;your_db_host&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;user&#34;</span>: <span style="color:#e6db74">&#34;your_db_user&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;passwd&#34;</span>: <span style="color:#e6db74">&#34;your_db_password&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;db&#34;</span>: <span style="color:#e6db74">&#34;your_db_name&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;cursorclass&#34;</span>: MySQLdb<span style="color:#f92672">.</span>cursors<span style="color:#f92672">.</span>DictCursor
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Table Setup
+</span></span></code></pre></div><p>CREATE TABLE
+data_interrogation.test_table_myisam
+(
+index_col BIGINT NOT NULL AUTO_INCREMENT,
+value1 DOUBLE,
+value2 DOUBLE,
+value3 DOUBLE,
+value4 DOUBLE,
+PRIMARY KEY (index_col)
+)
+ENGINE=MyISAM DEFAULT CHARSET=utf8
+import timeit
+import MySQLdb
+import MySQLdb.cursors
+import random
+from random import randint</p>
+<p>db = MySQLdb.connect(host=&quot;&hellip;&quot;, user=&quot;&hellip;&quot;, passwd=&quot;&hellip;&quot;, db=&quot;&hellip;&quot;, cursorclass=MySQLdb.cursors.DictCursor)
+cur = db.cursor()</p>
+<p>lengthOfTable = 100000</p>
+<h1 id="fill-up-the-tables-with-random-data">Fill up the tables with random data</h1>
+<p>for x in xrange(lengthOfTable):
+rand1 = random.random()
+rand2 = random.random()
+rand3 = random.random()
+rand4 = random.random()</p>
+<pre><code>insertString = &amp;quot;INSERT INTO test_table_innodb (value1,value2,value3,value4) VALUES (&amp;quot; + str(rand1) + &amp;quot;,&amp;quot; + str(rand2) + &amp;quot;,&amp;quot; + str(rand3) + &amp;quot;,&amp;quot; + str(rand4) + &amp;quot;)&amp;quot;
+insertString2 = &amp;quot;INSERT INTO test_table_myisam (value1,value2,value3,value4) VALUES (&amp;quot; + str(rand1) + &amp;quot;,&amp;quot; + str(rand2) + &amp;quot;,&amp;quot; + str(rand3) + &amp;quot;,&amp;quot; + str(rand4) + &amp;quot;)&amp;quot;
+insertString3 = &amp;quot;INSERT INTO test_table_memory (value1,value2,value3,value4) VALUES (&amp;quot; + str(rand1) + &amp;quot;,&amp;quot; + str(rand2) + &amp;quot;,&amp;quot; + str(rand3) + &amp;quot;,&amp;quot; + str(rand4) + &amp;quot;)&amp;quot;
+
+cur.execute(insertString)
+cur.execute(insertString2)
+cur.execute(insertString3)
+</code></pre>
+<p>db.commit()</p>
+<h1 id="define-a-function-to-pull-a-certain-number-of-records-from-these-tables">Define a function to pull a certain number of records from these tables</h1>
+<p>def selectRandomRecords(testTable,numberOfRecords):</p>
+<pre><code>for x in xrange(numberOfRecords):
+    rand1 = randint(0,lengthOfTable)
+
+    selectString = &amp;quot;SELECT * FROM &amp;quot; + testTable + &amp;quot; WHERE index_col = &amp;quot; + str(rand1)
+    cur.execute(selectString)
+</code></pre>
+<p>setupString = &quot;from <strong>main</strong> import selectRandomRecords&quot;</p>
+<h1 id="test-time-taken-using-timeit">Test time taken using timeit</h1>
+<p>myisam_times = []
+innodb_times = []
+memory_times = []</p>
+<p>for theLength in [3,10,30,100,300,1000,3000,10000]:</p>
+<pre><code>innodb_times.append( timeit.timeit('selectRandomRecords(&amp;quot;test_table_innodb&amp;quot;,' + str(theLength) + ')', number=100, setup=setupString) )
+myisam_times.append( timeit.timeit('selectRandomRecords(&amp;quot;test_table_myisam&amp;quot;,' + str(theLength) + ')', number=100, setup=setupString) )
+memory_times.append( timeit.timeit('selectRandomRecords(&amp;quot;test_table_memory&amp;quot;,' + str(theLength) + ')', number=100, setup=setupString) )
+</code></pre>
+<p>myisam_times = []
+innodb_times = []
+memory_times = []</p>
+<h1 id="define-a-function-to-count-the-records">Define a function to count the records</h1>
+<p>def countRecords(testTable):</p>
+<pre><code>selectString = &amp;quot;SELECT count(*) FROM &amp;quot; + testTable
+cur.execute(selectString)
+</code></pre>
+<p>setupString = &quot;from <strong>main</strong> import countRecords&quot;</p>
+<h1 id="truncate-the-tables-and-re-fill-with-a-set-amount-of-data">Truncate the tables and re-fill with a set amount of data</h1>
+<p>for theLength in [3,10,30,100,300,1000,3000,10000,30000,100000]:</p>
+<pre><code>truncateString = &amp;quot;TRUNCATE test_table_innodb&amp;quot;
+truncateString2 = &amp;quot;TRUNCATE test_table_myisam&amp;quot;
+truncateString3 = &amp;quot;TRUNCATE test_table_memory&amp;quot;
+
+cur.execute(truncateString)
+cur.execute(truncateString2)
+cur.execute(truncateString3)
+
+for x in xrange(theLength):
+    rand1 = random.random()
+    rand2 = random.random()
+    rand3 = random.random()
+    rand4 = random.random()
+
+    insertString = &amp;quot;INSERT INTO test_table_innodb (value1,value2,value3,value4) VALUES (&amp;quot; + str(rand1) + &amp;quot;,&amp;quot; + str(rand2) + &amp;quot;,&amp;quot; + str(rand3) + &amp;quot;,&amp;quot; + str(rand4) + &amp;quot;)&amp;quot;
+    insertString2 = &amp;quot;INSERT INTO test_table_myisam (value1,value2,value3,value4) VALUES (&amp;quot; + str(rand1) + &amp;quot;,&amp;quot; + str(rand2) + &amp;quot;,&amp;quot; + str(rand3) + &amp;quot;,&amp;quot; + str(rand4) + &amp;quot;)&amp;quot;
+    insertString3 = &amp;quot;INSERT INTO test_table_memory (value1,value2,value3,value4) VALUES (&amp;quot; + str(rand1) + &amp;quot;,&amp;quot; + str(rand2) + &amp;quot;,&amp;quot; + str(rand3) + &amp;quot;,&amp;quot; + str(rand4) + &amp;quot;)&amp;quot;
+
+    cur.execute(insertString)
+    cur.execute(insertString2)
+    cur.execute(insertString3)
+
+db.commit()
+
+# Count and time the query
+innodb_times.append( timeit.timeit('countRecords(&amp;quot;test_table_innodb&amp;quot;)', number=100, setup=setupString) )
+myisam_times.append( timeit.timeit('countRecords(&amp;quot;test_table_myisam&amp;quot;)', number=100, setup=setupString) )
+memory_times.append( timeit.timeit('countRecords(&amp;quot;test_table_memory&amp;quot;)', number=100, setup=setupString) )
+</code></pre>
+<p>myisam_times = []
+innodb_times = []
+memory_times = []</p>
+<h1 id="define-a-function-to-perform-conditional-selects">Define a function to perform conditional selects</h1>
+<p>def conditionalSelect(testTable):
+selectString = &quot;SELECT * FROM &quot; + testTable + &quot; WHERE value1 &lt; 0.5 AND value2 &lt; 0.5 AND value3 &lt; 0.5 AND value4 &lt; 0.5&quot;
+cur.execute(selectString)</p>
+<p>setupString = &quot;from <strong>main</strong> import conditionalSelect&quot;</p>
+<h1 id="truncate-the-tables-and-re-fill-with-a-set-amount-of-data-1">Truncate the tables and re-fill with a set amount of data</h1>
+<p>for theLength in [3,10,30,100,300,1000,3000,10000,30000,100000]:</p>
+<pre><code>truncateString = &amp;quot;TRUNCATE test_table_innodb&amp;quot;
+truncateString2 = &amp;quot;TRUNCATE test_table_myisam&amp;quot;
+truncateString3 = &amp;quot;TRUNCATE test_table_memory&amp;quot;
+
+cur.execute(truncateString)
+cur.execute(truncateString2)
+cur.execute(truncateString3)
+
+for x in xrange(theLength):
+    rand1 = random.random()
+    rand2 = random.random()
+    rand3 = random.random()
+    rand4 = random.random()
+
+    insertString = &amp;quot;INSERT INTO test_table_innodb (value1,value2,value3,value4) VALUES (&amp;quot; + str(rand1) + &amp;quot;,&amp;quot; + str(rand2) + &amp;quot;,&amp;quot; + str(rand3) + &amp;quot;,&amp;quot; + str(rand4) + &amp;quot;)&amp;quot;
+    insertString2 = &amp;quot;INSERT INTO test_table_myisam (value1,value2,value3,value4) VALUES (&amp;quot; + str(rand1) + &amp;quot;,&amp;quot; + str(rand2) + &amp;quot;,&amp;quot; + str(rand3) + &amp;quot;,&amp;quot; + str(rand4) + &amp;quot;)&amp;quot;
+    insertString3 = &amp;quot;INSERT INTO test_table_memory (value1,value2,value3,value4) VALUES (&amp;quot; + str(rand1) + &amp;quot;,&amp;quot; + str(rand2) + &amp;quot;,&amp;quot; + str(rand3) + &amp;quot;,&amp;quot; + str(rand4) + &amp;quot;)&amp;quot;
+
+    cur.execute(insertString)
+    cur.execute(insertString2)
+    cur.execute(insertString3)
+
+db.commit()
+
+# Count and time the query
+innodb_times.append( timeit.timeit('conditionalSelect(&amp;quot;test_table_innodb&amp;quot;)', number=100, setup=setupString) )
+myisam_times.append( timeit.timeit('conditionalSelect(&amp;quot;test_table_myisam&amp;quot;)', number=100, setup=setupString) )
+memory_times.append( timeit.timeit('conditionalSelect(&amp;quot;test_table_memory&amp;quot;)', number=100, setup=setupString) )
+</code></pre>
+<p>CREATE TABLE
+subselect_myisam
+(
+index_col bigint NOT NULL,
+non_index_col bigint,
+PRIMARY KEY (index_col)
+)
+ENGINE=MyISAM DEFAULT CHARSET=utf8;
+myisam_times = []
+innodb_times = []
+myisam_times_2 = []
+innodb_times_2 = []</p>
+<p>def subSelectRecordsIndexed(testTable,testSubSelect):
+selectString = &quot;SELECT * FROM &quot; + testTable + &quot; WHERE index_col in ( SELECT index_col FROM &quot; + testSubSelect + &quot; )&quot;
+cur.execute(selectString)</p>
+<p>setupString = &quot;from <strong>main</strong> import subSelectRecordsIndexed&quot;</p>
+<p>def subSelectRecordsNotIndexed(testTable,testSubSelect):
+selectString = &quot;SELECT * FROM &quot; + testTable + &quot; WHERE index_col in ( SELECT non_index_col FROM &quot; + testSubSelect + &quot; )&quot;
+cur.execute(selectString)</p>
+<p>setupString2 = &quot;from <strong>main</strong> import subSelectRecordsNotIndexed&quot;</p>
+<h1 id="truncate-the-old-tables-and-re-fill-with-1000000-records">Truncate the old tables, and re-fill with 1000000 records</h1>
+<p>truncateString = &quot;TRUNCATE test_table_innodb&quot;
+truncateString2 = &quot;TRUNCATE test_table_myisam&quot;</p>
+<p>cur.execute(truncateString)
+cur.execute(truncateString2)</p>
+<p>lengthOfTable = 1000000</p>
+<h1 id="fill-up-the-tables-with-random-data-1">Fill up the tables with random data</h1>
+<p>for x in xrange(lengthOfTable):
+rand1 = random.random()
+rand2 = random.random()
+rand3 = random.random()
+rand4 = random.random()</p>
+<pre><code>insertString = &amp;quot;INSERT INTO test_table_innodb (value1,value2,value3,value4) VALUES (&amp;quot; + str(rand1) + &amp;quot;,&amp;quot; + str(rand2) + &amp;quot;,&amp;quot; + str(rand3) + &amp;quot;,&amp;quot; + str(rand4) + &amp;quot;)&amp;quot;
+insertString2 = &amp;quot;INSERT INTO test_table_myisam (value1,value2,value3,value4) VALUES (&amp;quot; + str(rand1) + &amp;quot;,&amp;quot; + str(rand2) + &amp;quot;,&amp;quot; + str(rand3) + &amp;quot;,&amp;quot; + str(rand4) + &amp;quot;)&amp;quot;
+
+cur.execute(insertString)
+cur.execute(insertString2)
+</code></pre>
+<p>for theLength in [3,10,30,100,300,1000,3000,10000,30000,100000]:</p>
+<pre><code>truncateString = &amp;quot;TRUNCATE subselect_innodb&amp;quot;
+truncateString2 = &amp;quot;TRUNCATE subselect_myisam&amp;quot;
+
+cur.execute(truncateString)
+cur.execute(truncateString2)
+
+# For each length, empty the table and re-fill it with random data
+rand_sample = sorted(random.sample(xrange(lengthOfTable), theLength))
+rand_sample_2 = random.sample(xrange(lengthOfTable), theLength)
+
+for (the_value_1,the_value_2) in zip(rand_sample,rand_sample_2):
+    insertString = &amp;quot;INSERT INTO subselect_innodb (index_col,non_index_col) VALUES (&amp;quot; + str(the_value_1) + &amp;quot;,&amp;quot; + str(the_value_2) + &amp;quot;)&amp;quot;
+    insertString2 = &amp;quot;INSERT INTO subselect_myisam (index_col,non_index_col) VALUES (&amp;quot; + str(the_value_1) + &amp;quot;,&amp;quot; + str(the_value_2) + &amp;quot;)&amp;quot;
+
+    cur.execute(insertString)
+    cur.execute(insertString2)
+
+db.commit()
+
+# Finally, time the queries
+innodb_times.append( timeit.timeit('subSelectRecordsIndexed(&amp;quot;test_table_innodb&amp;quot;,&amp;quot;subselect_innodb&amp;quot;)', number=100, setup=setupString) )
+myisam_times.append( timeit.timeit('subSelectRecordsIndexed(&amp;quot;test_table_myisam&amp;quot;,&amp;quot;subselect_myisam&amp;quot;)', number=100, setup=setupString) )
+    
+innodb_times_2.append( timeit.timeit('subSelectRecordsNotIndexed(&amp;quot;test_table_innodb&amp;quot;,&amp;quot;subselect_innodb&amp;quot;)', number=100, setup=setupString2) )
+myisam_times_2.append( timeit.timeit('subSelectRecordsNotIndexed(&amp;quot;test_table_myisam&amp;quot;,&amp;quot;subselect_myisam&amp;quot;)', number=100, setup=setupString2) )
+</code></pre>
+<pre tabindex="0"><code>
+TABLE_INNODB = &#34;test_table_innodb_benchmark&#34;
+TABLE_MYISAM = &#34;test_table_myisam_benchmark&#34;
+TABLE_MEMORY = &#34;test_table_memory_benchmark&#34; # For comparison
+
+def setup_database():
+    &#34;&#34;&#34;Connects to the database and creates necessary tables.&#34;&#34;&#34;
+    try:
+        db = MySQLdb.connect(**DB_CONFIG)
+        cur = db.cursor()
+
+        # Create tables if they don&#39;t exist
+        cur.execute(f&#34;&#34;&#34;
+            CREATE TABLE IF NOT EXISTS {TABLE_INNODB} (
+                id BIGINT NOT NULL AUTO_INCREMENT,
+                data_value VARCHAR(255),
+                PRIMARY KEY (id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        &#34;&#34;&#34;)
+        cur.execute(f&#34;&#34;&#34;
+            CREATE TABLE IF NOT EXISTS {TABLE_MYISAM} (
+                id BIGINT NOT NULL AUTO_INCREMENT,
+                data_value VARCHAR(255),
+                PRIMARY KEY (id)
+            ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+        &#34;&#34;&#34;)
+        cur.execute(f&#34;&#34;&#34;
+            CREATE TABLE IF NOT EXISTS {TABLE_MEMORY} (
+                id BIGINT NOT NULL AUTO_INCREMENT,
+                data_value VARCHAR(255),
+                PRIMARY KEY (id)
+            ) ENGINE=MEMORY DEFAULT CHARSET=utf8;
+        &#34;&#34;&#34;)
+        db.commit()
+        print(&#34;Database setup complete.&#34;)
+        return db, cur
+    except MySQLdb.Error as e:
+        print(f&#34;Error during database setup: {e}&#34;)
+        return None, None
+
+def populate_table(cur, db, table_name, num_rows=10000):
+    &#34;&#34;&#34;Populates a given table with random data.&#34;&#34;&#34;
+    print(f&#34;Populating {table_name} with {num_rows} rows...&#34;)
+    for i in range(num_rows):
+        random_data = f&#34;data_{random.randint(1000, 9999)}&#34;
+        insert_sql = f&#34;INSERT INTO {table_name} (data_value) VALUES (&#39;{random_data}&#39;)&#34;
+        try:
+            cur.execute(insert_sql)
+            if i % 5000 == 0: # Commit in batches for larger inserts
+                db.commit()
+        except MySQLdb.Error as e:
+            print(f&#34;Error inserting into {table_name}: {e}&#34;)
+            db.rollback()
+            break
+    db.commit()
+    print(f&#34;Finished populating {table_name}.&#34;)
+
+def benchmark_count_all(cur, db, table_name):
+    &#34;&#34;&#34;Benchmarks the COUNT(*) operation on a table.&#34;&#34;&#34;
+    select_sql = f&#34;SELECT COUNT(*) FROM {table_name}&#34;
+    start_time = timeit.default_timer()
+    cur.execute(select_sql)
+    # Fetching the result is part of the timing
+    cur.fetchall()
+    end_time = timeit.default_timer()
+    return end_time - start_time
+
+if __name__ == &#34;__main__&#34;:
+    db_connection, cursor = setup_database()
+
+    if db_connection and cursor:
+        rows_to_insert = 50000
+        print(&#34;
+
+Benchmarking COUNT(*) Operations
+</code></pre><p>ACID transactions
+row-level locking
+foreign key constraints
+automatic crash recovery
+table compression (read/write)
+spatial data types (no spatial indexes)
+fast COUNT(*)s (when WHERE, GROUP BY, or JOIN is not used)
+full text indexing
+smaller disk footprint
+very high table compression (read only)
+spatial data types and indexes (R-tree)</p>
+<pre tabindex="0"><code>
+&#34;)
+
+        # Populate tables
+        populate_table(cursor, db_connection, TABLE_INNODB, rows_to_insert)
+        populate_table(cursor, db_connection, TABLE_MYISAM, rows_to_insert)
+        populate_table(cursor, db_connection, TABLE_MEMORY, rows_to_insert)
+
+        num_executions = 50 # Number of times to run the query for timing
+
+        # Benchmark InnoDB
+        innodb_time = sum(timeit.repeat(
+            lambda: benchmark_count_all(cursor, db_connection, TABLE_INNODB),
+            repeat=num_executions, number=1
+        )) / num_executions
+        print(f&#34;InnoDB COUNT(*) Average Time: {innodb_time:.6f} seconds&#34;)
+
+        # Benchmark MyISAM
+        myisam_time = sum(timeit.repeat(
+            lambda: benchmark_count_all(cursor, db_connection, TABLE_MYISAM),
+            repeat=num_executions, number=1
+        )) / num_executions
+        print(f&#34;MyISAM COUNT(*) Average Time: {myisam_time:.6f} seconds&#34;)
+
+        # Benchmark MEMORY (for reference)
+        memory_time = sum(timeit.repeat(
+            lambda: benchmark_count_all(cursor, db_connection, TABLE_MEMORY),
+            repeat=num_executions, number=1
+        )) / num_executions
+        print(f&#34;MEMORY COUNT(*) Average Time: {memory_time:.6f} seconds&#34;)
+
+        # Clean up (optional)
+        # cursor.execute(f&#34;DROP TABLE IF EXISTS {TABLE_INNODB};&#34;)
+        # cursor.execute(f&#34;DROP TABLE IF EXISTS {TABLE_MYISAM};&#34;)
+        # cursor.execute(f&#34;DROP TABLE IF EXISTS {TABLE_MEMORY};&#34;)
+        # db_connection.commit()
+
+        db_connection.close()
+    else:
+        print(&#34;Failed to connect to the database or set up tables.&#34;)
+</code></pre><p>This Python script demonstrates how to set up tables, populate them with data, and then benchmark the <code>COUNT(*)</code> operation for different storage engines. Remember to replace placeholder credentials and adjust <code>rows_to_insert</code> and <code>num_executions</code> as needed for your testing environment. For more complex query analysis, you might explore tools like <code>pt-query-digest</code> or MySQL&rsquo;s slow query log.</p>
+<h3 id="when-to-choose-which-engine">When to Choose Which Engine</h3>
+<ul>
+<li>
+<p><strong>Choose InnoDB when:</strong></p>
+<ul>
+<li>Your application requires transactions, foreign key constraints, or atomic updates.</li>
+<li>You anticipate high concurrency with a mix of read and write operations.</li>
+<li>Data integrity and crash recovery are paramount.</li>
+<li>You need robust support for features like <code>INSERT DELAYED</code> is not a priority.</li>
+<li>Modern MySQL versions (8.0+) are used, as InnoDB is the default and has seen significant advancements.</li>
+</ul>
+</li>
+<li>
+<p><strong>Consider MyISAM when:</strong></p>
+<ul>
+<li>Your application is primarily read-heavy with minimal writes.</li>
+<li>You require fast <code>COUNT(*)</code> operations on large tables without complex conditions.</li>
+<li>Full-text search is essential on older MySQL versions (though upgrading is advised).</li>
+<li>Simplicity and a smaller disk footprint are prioritized over advanced features.</li>
+<li>You are performing large offline data manipulations where table locks are not a hindrance.</li>
+</ul>
+</li>
+</ul>
+<h3 id="alternatives-and-modern-considerations">Alternatives and Modern Considerations</h3>
+<p>It&rsquo;s worth noting that other storage engines exist, and projects like MariaDB and Percona Server offer enhanced versions of MySQL with their own optimized storage engines. For instance, MariaDB&rsquo;s Aria engine is designed for better crash safety than MyISAM.</p>
+<p>The landscape of database technology evolves rapidly. Oracle has, in fact, heavily favored InnoDB, even going so far as to significantly reduce MyISAM&rsquo;s prominence in MySQL 8.0. This trend underscores the industry&rsquo;s shift towards engines that offer greater reliability and concurrency.</p>
+<h3 id="faqs-on-innodb-vs-myisam">FAQs on InnoDB vs MyISAM</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is MyISAM always slower than InnoDB</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Not necessarily. MyISAM can be faster for specific read-heavy operations, especially <code>COUNT(*)</code> without a WHERE clause, or for certain types of large offline data manipulations where table locking is not a bottleneck. However, for mixed workloads and high concurrency, InnoDB generally offers superior performance due to its row-level locking and transactional capabilities.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What are the main benefits of using InnoDB</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: InnoDB&rsquo;s main benefits include support for ACID transactions, row-level locking for better concurrency, referential integrity through foreign keys, and automatic crash recovery. These features contribute to higher data integrity and application stability.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: When would I still choose MyISAM</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: You might still opt for MyISAM in specific niche scenarios such as read-heavy applications with very simple queries where transaction support and advanced data integrity features are not critical, or for certain legacy systems where migration is not feasible. It can also be considered for tasks involving large-scale offline data processing where read performance is paramount and write contention is minimal.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How does locking differ between InnoDB and MyISAM</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: MyISAM uses table-level locking, meaning an entire table is locked for read or write operations. InnoDB, on the other hand, uses row-level locking, which locks only the specific rows being accessed, allowing for much higher concurrency as other operations can proceed on different rows of the same table.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can MyISAM tables become corrupt</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, MyISAM tables are more prone to corruption than InnoDB tables, especially during unexpected server shutdowns, power outages, or abrupt termination of processes. InnoDB&rsquo;s transactional logging and double-write buffer provide better resilience against data corruption.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is it difficult to switch between MyISAM and InnoDB</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Switching between MyISAM and InnoDB is generally straightforward. You can alter existing tables using <code>ALTER TABLE table_name ENGINE=InnoDB;</code> or <code>ALTER TABLE table_name ENGINE=MyISAM;</code>. However, it is always recommended to perform such changes during low-traffic periods and to back up your data beforehand.</div>
+    </div>
+</div>
+<p>We hope this detailed exploration helps you select the most suitable storage engine for your MySQL database. Your experiences and insights are invaluable to the community.</p>
+<p>We’d love to hear your feedback! Drop your comments or questions below to share your thoughts on InnoDB versus MyISAM.</p>
+<p>Check out more on <a href="https://sqlpey.com/sql/what-is-sql" target="_blank" rel="noopener">What is SQL</a>
+ and <a href="https://sqlpey.com/postgresql/what-is-postgresql" target="_blank" rel="noopener">What is PostgreSQL</a>
+ for related database topics.</p>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      
+
+
+
+<section class="flex flex-col w-full  mt-6 text-slate-800 dark:text-slate-200">
+  <div class=" items-center start-0">
+    <form class="search-form" action="https://sqlpey.com/search/" method="get">
+  <label for="search-input" class="sr-only">Search</label>
+  <div class="search-wrapper">
+    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    <input 
+      type="text" 
+      name="query" 
+      id="search-input" 
+      class="search-input" 
+      placeholder="Search articles..." 
+      required
+    >
+    <button type="submit" class="search-button" aria-label="Submit Search">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+    </button>
+  </div>
+</form>
+
+<style>
+  .search-form {
+    margin-bottom: var(--space-xl);
+  }
+  
+  .search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: var(--space-lg);
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: var(--space-md) var(--space-lg);
+    padding-left: 3rem;
+    padding-right: 4rem;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+  }
+  
+  .search-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(232, 93, 59, 0.1);
+  }
+  
+  .search-input::placeholder {
+    color: var(--text-muted);
+  }
+  
+  .dark .search-input {
+    background: var(--bg-card-dark);
+    border-color: var(--border-dark);
+    color: var(--text-primary-dark);
+  }
+  
+  .search-button {
+    position: absolute;
+    right: var(--space-md);
+    padding: var(--space-sm);
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius-md);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .search-button:hover {
+    background: var(--accent-hover);
+    transform: translateX(2px);
+  }
+</style>
+  </div>
+  <div class="flex flex-row">
+    
+    <div
+      class="flex flex-row my-2  rounded  text-xl font-bold  w-full block mx-0 px-2 py-1 text-md bg-yellow-100 dark:bg-gray-700">
+      <i class="h-1 w-1 flex-none">
+        <svg viewBox="-9.12 0 70 70" width="24" height="24" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <metadata> <rdf:rdf> <cc:work> <dc:subject> Data </dc:subject> <dc:identifier> mysql-database </dc:identifier> <dc:title> MySQL Database </dc:title> <dc:format> image/svg+xml </dc:format> <dc:publisher> Amido Limited </dc:publisher> <dc:creator> Richard Slater </dc:creator> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type> </cc:work> </rdf:rdf> </metadata> <path d="m -67.406406,538.07743 c -0.2647,-0.0302 -1.0691,-0.12027 -1.7876,-0.20021 -6.0416,-0.67227 -11.714,-2.53145 -15.8138,-5.18313 -1.5028,-0.97196 -3.3696,-2.85578 -3.9191,-3.95479 l -0.4125,-0.82507 -0.036,-25.18995 c -0.035,-24.92421 -0.033,-25.19766 0.24,-25.92092 1.2438,-3.29606 7.2858,-6.43815 15.1284,-7.86732 3.7431,-0.68212 5.5332,-0.82674 10.3133,-0.83324 4.5553,-0.006 5.7833,0.0779 9.1446,0.62625 4.0338,0.65805 7.7625,1.76193 10.6247,3.14544 3.0535,1.47595 4.9883,3.10155 5.8455,4.91131 l 0.4437,0.93674 0,24.95833 c 0,24.14181 -0.01,24.98082 -0.26,25.6459 -1.2752,3.37285 -6.403,6.56077 -13.4928,8.3884 -3.9318,1.01356 -6.4342,1.31408 -11.4118,1.37043 -2.269,0.0257 -4.342,0.022 -4.6067,-0.008 z m 21.351,-20.7286 c 1.8314,-0.52417 3.1733,-1.56169 3.5859,-2.77262 0.1983,-0.58212 0.2277,-1.4461 0.2277,-6.6944 l 0,-6.02601 -2.5417,0 -2.5417,0 -0.037,3.67844 -0.037,3.67843 -2.69,-0.01 c -1.4795,-0.005 -2.7944,-0.0498 -2.9221,-0.0988 -0.2097,-0.0804 -0.2322,-0.43626 -0.2322,-3.66869 l 0,-3.57962 -3.4721,0.004 -3.4722,0.004 0.6526,0.37421 0.6526,0.37421 0,3.37845 c 0,3.84757 0.092,4.37914 0.9217,5.34815 0.6755,0.78917 2.0761,1.4425 3.5236,1.6436 0.5916,0.0822 2.0248,0.14943 3.1849,0.14943 1.7085,0 2.2737,-0.0512 2.975,-0.26947 0.4762,-0.14821 0.8901,-0.24517 0.9198,-0.21548 0.03,0.0297 -0.019,0.27452 -0.1078,0.54407 -0.3039,0.9208 -0.191,0.90345 -5.878,0.90345 l -5.1261,0 0,1.80026 0,1.80024 5.8099,-0.0595 c 4.8605,-0.0498 5.9394,-0.0966 6.6028,-0.28648 z m -24.6888,-4.40431 c 0.3894,-0.19735 0.8659,-0.56581 1.0589,-0.81879 0.193,-0.25299 1.0368,-1.97106 1.8751,-3.81795 0.8383,-1.84688 1.5815,-3.41675 1.6516,-3.4886 0.078,-0.0802 0.1273,1.52506 0.1273,4.15972 l 0,4.29035 2.544,0 2.544,0 0,-5.77548 c 0,-4.52292 0.037,-5.77783 0.1719,-5.78633 0.1375,-0.009 0.1375,-0.0247 0,-0.0802 -0.1206,-0.0487 -0.1728,-0.46626 -0.175,-1.39864 0,-1.5523 -0.2263,-2.18811 -1.0073,-2.87379 -1.0188,-0.89453 -3.7205,-1.22888 -5.0616,-0.6264 -1.3866,0.6229 -1.5894,0.9788 -5.254,9.21838 -0.3112,0.69959 -0.606,1.27198 -0.6551,1.27198 -0.049,0 -0.8775,-1.84093 -1.8408,-4.09097 -2.0997,-4.90432 -2.1398,-4.98594 -2.7514,-5.59753 -0.9702,-0.97024 -2.1085,-1.27605 -3.8488,-1.034 -1.4993,0.20852 -2.2515,0.59877 -2.6455,1.37241 l -0.3094,0.60763 0,7.39648 0,7.39648 2.3377,0 2.3377,0 0,-4.29035 c 0,-2.55609 0.05,-4.23755 0.1241,-4.15972 0.068,0.0719 0.7531,1.52293 1.5219,3.22464 1.6516,3.65585 1.9163,4.13408 2.5609,4.6257 1.084,0.8268 3.3436,0.95918 4.6938,0.275 z m 11.2447,-30.07121 c 6.4813,-0.47906 11.6041,-1.92526 13.4859,-3.80715 0.7998,-0.79972 1.0049,-1.46903 0.6971,-2.27488 -0.7826,-2.04915 -4.9332,-3.71751 -11.4327,-4.5954 -2.6305,-0.3553 -11.0465,-0.35411 -13.6824,0.002 -5.1138,0.69073 -8.9114,1.92553 -10.5406,3.42732 -1.052,0.96969 -1.2522,1.70308 -0.7393,2.70839 0.3794,0.74379 1.0914,1.29421 2.6854,2.07607 2.6442,1.29693 6.6701,2.13865 12.0323,2.51559 1.5223,0.10701 5.7397,0.0778 7.4943,-0.0519 z" fill="#00a0cc" transform="translate(89.391 -468.103)"></path> </g></svg>
+      </i>
+      <h2 class="pl-8 uppercase">
+        Learn MySQL
+      </h2>
+    </div>
+  </div>
+
+  <ul class="flex flex-col w-full">
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <li class="mr-2 w-full">
+      <a href="https://sqlpey.com/mysql/mysql-between-operation-vs-code/" id="https//sqlpey.com/mysql/mysql-between-operation-vs-code/" class="rounded border-l-8 w-full block mx-0 px-2 py-1 text-md
+            
+               border-slate-50/5 dark:border-slate-800 
+           
+            
+               text-blue-800 dark:text-slate-200 
+           ">
+        MySQL BETWEEN Operator
+      </a>
+    </li>
+    
+    
+    
+    <li class="mr-2 w-full">
+      <a href="https://sqlpey.com/mysql/mysql-distinct-vs-code/" id="https//sqlpey.com/mysql/mysql-distinct-vs-code/" class="rounded border-l-8 w-full block mx-0 px-2 py-1 text-md
+            
+               border-slate-50/5 dark:border-slate-800 
+           
+            
+               text-blue-800 dark:text-slate-200 
+           ">
+        MySQL DISTINCT Clause
+      </a>
+    </li>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <li class="mr-2 w-full">
+      <a href="https://sqlpey.com/mysql/getting-started-with-mysql-vscode/" id="https//sqlpey.com/mysql/getting-started-with-mysql-vscode/" class="rounded border-l-8 w-full block mx-0 px-2 py-1 text-md
+            
+               border-slate-50/5 dark:border-slate-800 
+           
+            
+               text-blue-800 dark:text-slate-200 
+           ">
+        Get Started with MySQL
+      </a>
+    </li>
+    
+    
+    
+    <li class="mr-2 w-full">
+      <a href="https://sqlpey.com/mysql/mysql-not-in-operator-vs-code/" id="https//sqlpey.com/mysql/mysql-not-in-operator-vs-code/" class="rounded border-l-8 w-full block mx-0 px-2 py-1 text-md
+            
+               border-slate-50/5 dark:border-slate-800 
+           
+            
+               text-blue-800 dark:text-slate-200 
+           ">
+        MySQL NOT IN Operator
+      </a>
+    </li>
+    
+    
+    
+    <li class="mr-2 w-full">
+      <a href="https://sqlpey.com/mysql/mysql-limit-vs-code/" id="https//sqlpey.com/mysql/mysql-limit-vs-code/" class="rounded border-l-8 w-full block mx-0 px-2 py-1 text-md
+            
+               border-slate-50/5 dark:border-slate-800 
+           
+            
+               text-blue-800 dark:text-slate-200 
+           ">
+        MySQL LIMIT Clause
+      </a>
+    </li>
+    
+    
+    
+    <li class="mr-2 w-full">
+      <a href="https://sqlpey.com/mysql/mysql-like-operator-vs-code/" id="https//sqlpey.com/mysql/mysql-like-operator-vs-code/" class="rounded border-l-8 w-full block mx-0 px-2 py-1 text-md
+            
+               border-slate-50/5 dark:border-slate-800 
+           
+            
+               text-blue-800 dark:text-slate-200 
+           ">
+        MySQL LIKE Operator
+      </a>
+    </li>
+    
+    
+    
+    <li class="mr-2 w-full">
+      <a href="https://sqlpey.com/mysql/mysql-joins-vs-code/" id="https//sqlpey.com/mysql/mysql-joins-vs-code/" class="rounded border-l-8 w-full block mx-0 px-2 py-1 text-md
+            
+               border-slate-50/5 dark:border-slate-800 
+           
+            
+               text-blue-800 dark:text-slate-200 
+           ">
+        MySQL Joins
+      </a>
+    </li>
+    
+    
+    
+    <li class="mr-2 w-full">
+      <a href="https://sqlpey.com/mysql/mysql-is-null-operator-vs-code/" id="https//sqlpey.com/mysql/mysql-is-null-operator-vs-code/" class="rounded border-l-8 w-full block mx-0 px-2 py-1 text-md
+            
+               border-slate-50/5 dark:border-slate-800 
+           
+            
+               text-blue-800 dark:text-slate-200 
+           ">
+        MySQL IS NULL Operator
+      </a>
+    </li>
+    
+    
+    
+    <li class="mr-2 w-full">
+      <a href="https://sqlpey.com/mysql/mysql-in-operator-vs-code/" id="https//sqlpey.com/mysql/mysql-in-operator-vs-code/" class="rounded border-l-8 w-full block mx-0 px-2 py-1 text-md
+            
+               border-slate-50/5 dark:border-slate-800 
+           
+            
+               text-blue-800 dark:text-slate-200 
+           ">
+        MySQL IN Operator
+      </a>
+    </li>
+    
+    
+    
+    <li class="mr-2 w-full">
+      <a href="https://sqlpey.com/mysql/mysql-as-aliases-vs-code/" id="https//sqlpey.com/mysql/mysql-as-aliases-vs-code/" class="rounded border-l-8 w-full block mx-0 px-2 py-1 text-md
+            
+               border-slate-50/5 dark:border-slate-800 
+           
+            
+               text-blue-800 dark:text-slate-200 
+           ">
+        MySQL AS Aliases
+      </a>
+    </li>
+    
+    
+    
+    
+    
+    <li class="mr-2 w-full">
+      <a href="https://sqlpey.com/mysql/mysql-and-operator-vs-code/" id="https//sqlpey.com/mysql/mysql-and-operator-vs-code/" class="rounded border-l-8 w-full block mx-0 px-2 py-1 text-md
+            
+               border-slate-50/5 dark:border-slate-800 
+           
+            
+               text-blue-800 dark:text-slate-200 
+           ">
+        MySQL AND Operator
+      </a>
+    </li>
+    
+    
+    
+    
+    
+    <li class="mr-2 w-full">
+      <a href="https://sqlpey.com/mysql/load-sample-database-employees-db-vs-code/" id="https//sqlpey.com/mysql/load-sample-database-employees-db-vs-code/" class="rounded border-l-8 w-full block mx-0 px-2 py-1 text-md
+            
+               border-slate-50/5 dark:border-slate-800 
+           
+            
+               text-blue-800 dark:text-slate-200 
+           ">
+        MySQL Load Sample Database
+      </a>
+    </li>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <li class="mr-2 w-full">
+      <a href="https://sqlpey.com/mysql/mysql-where-vs-code/" id="https//sqlpey.com/mysql/mysql-where-vs-code/" class="rounded border-l-8 w-full block mx-0 px-2 py-1 text-md
+            
+               border-slate-50/5 dark:border-slate-800 
+           
+            
+               text-blue-800 dark:text-slate-200 
+           ">
+        MySQL WHERE Clause
+      </a>
+    </li>
+    
+    
+    
+    <li class="mr-2 w-full">
+      <a href="https://sqlpey.com/mysql/mysql-order-by-vs-code/" id="https//sqlpey.com/mysql/mysql-order-by-vs-code/" class="rounded border-l-8 w-full block mx-0 px-2 py-1 text-md
+            
+               border-slate-50/5 dark:border-slate-800 
+           
+            
+               text-blue-800 dark:text-slate-200 
+           ">
+        MySQL ORDER BY
+      </a>
+    </li>
+    
+    
+    
+    
+    
+    
+    
+    <li class="mr-2 w-full">
+      <a href="https://sqlpey.com/mysql/mysql-or-operator-vs-code/" id="https//sqlpey.com/mysql/mysql-or-operator-vs-code/" class="rounded border-l-8 w-full block mx-0 px-2 py-1 text-md
+            
+               border-slate-50/5 dark:border-slate-800 
+           
+            
+               text-blue-800 dark:text-slate-200 
+           ">
+        MySQL OR Operator
+      </a>
+    </li>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <li class="mr-2 w-full">
+      <a href="https://sqlpey.com/mysql/connect-mysql-server-vscode/" id="https//sqlpey.com/mysql/connect-mysql-server-vscode/" class="rounded border-l-8 w-full block mx-0 px-2 py-1 text-md
+            
+               border-slate-50/5 dark:border-slate-800 
+           
+            
+               text-blue-800 dark:text-slate-200 
+           ">
+        Connect to MySQL
+      </a>
+    </li>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  </ul>
+
+
+
+</section>
+
+
+    </aside>
+  </div>
+</article>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

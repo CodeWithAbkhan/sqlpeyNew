@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Docker Build Context Explained: Accessing Files Outside Your Project - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore effective strategies for managing Docker build contexts and accessing files located outside your project directory. Learn practical solutions and code …">
+
+
+
+<meta name="keywords" content="Docker build context, Dockerfile copy outside context, Docker ADD external files, Docker compose build context, Docker build arguments">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Docker Build Context Explained: Accessing Files Outside Your Project - sqlpey">
+<meta name="DC.description" content="Explore effective strategies for managing Docker build contexts and accessing files located outside your project directory. Learn practical solutions and code examples.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-07-22">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Docker Build Context Explained: Accessing Files Outside Your Project - sqlpey">
+<meta property="og:description" content="Explore effective strategies for managing Docker build contexts and accessing files located outside your project directory. Learn practical solutions and code …">
+<meta property="og:url" content="https://sqlpey.com/docker/docker-build-context-outside-project/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-07-22T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-07-22T00:00:00Z">
+<meta property="article:modified_time" content="2025-07-22T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Docker">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Docker Build Context Explained: Accessing Files Outside Your Project">
+<meta name="twitter:description" content="Explore effective strategies for managing Docker build contexts and accessing files located outside your project directory. Learn practical solutions and code …">
+
+
+<link rel="canonical" href="https://sqlpey.com/docker/docker-build-context-outside-project/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Docker Build Context Explained: Accessing Files Outside Your Project\"",
+  "description": "\"Explore effective strategies for managing Docker build contexts and accessing files located outside your project directory. Learn practical solutions and code examples.\"",
+  "url": "\"https://sqlpey.com/docker/docker-build-context-outside-project/\"",
+  "datePublished": "\"2025-07-22T00:00:00Z\"",
+  "dateModified": "\"2025-07-22T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/docker/docker-build-context-outside-project/\""
+  },
+  "articleSection": "\"Docker\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Docker Build Context Explained: Accessing Files Outside Your Project</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Docker</span>
+              
+              <span class="tag">Build Context</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              12 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 22, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#docker-build-context-explained-accessing-files-outside-your-project">&ldquo;Docker Build Context Explained: Accessing Files Outside Your Project&rdquo;</a>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#faqs-on-docker-build-context">FAQs on Docker Build Context</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="docker-build-context-explained-accessing-files-outside-your-project">&ldquo;Docker Build Context Explained: Accessing Files Outside Your Project&rdquo;</h2>
+<p>When building Docker images, the &ldquo;build context&rdquo; refers to the set of files at a specified location that the Docker daemon has access to. Often, your <code>Dockerfile</code> needs to include files or directories that reside outside this immediate build context. This can lead to &ldquo;forbidden path&rdquo; errors or unexpected behavior. How can you effectively manage this situation and ensure your builds incorporate necessary external resources?</p>
+<p>This question delves into various techniques and workarounds to successfully access files and directories located outside the standard Docker build context.</p>
+<h4 id="solution-1-explicitly-specifying-the-dockerfile-location">Solution 1: Explicitly Specifying the Dockerfile Location</h4>
+<p>One of the most straightforward methods is to tell Docker exactly where your <code>Dockerfile</code> is located and what directory to use as the build context.</p>
+<p>You can achieve this by using the <code>-f</code> flag with the <code>docker build</code> command, followed by the path to your <code>Dockerfile</code>, and then specifying the desired build context directory.</p>
+<p>For instance, if your <code>Dockerfile</code> is in <code>docker-files/</code> and you want to grant it access to your current directory (the parent), you would use:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker build -f docker-files/Dockerfile .
+</span></span></code></pre></div><p>This command tells Docker to use the <code>Dockerfile</code> within the <code>docker-files</code> subdirectory and to consider the current directory (<code>.</code>) as the build context.</p>
+<p>An update to Docker (version 18.03.0-ce and later) allows for more flexibility, enabling you to specify a <code>Dockerfile</code> located even further up the directory tree:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker build -f ../Dockerfile .
+</span></span></code></pre></div><h4 id="solution-2-understanding-dockerfile-and-build-context-relationship">Solution 2: Understanding Dockerfile and Build Context Relationship</h4>
+<p>It&rsquo;s crucial to grasp the distinct roles of the <code>Dockerfile</code> and the build context.</p>
+<ul>
+<li><strong>Dockerfile:</strong> Contains the instructions for building your image. It dictates what commands to run and how to structure the final image.</li>
+<li><strong>Context:</strong> This is the &ldquo;space&rdquo; where the files you intend to share with your <code>Dockerfile</code> reside. When you execute <code>docker build</code>, Docker sends the entire context directory to the Docker daemon.</li>
+</ul>
+<p>Your <code>Dockerfile</code> can only reference files relative to its own location within that context. For example, if you have a <code>start.sh</code> script that your <code>Dockerfile</code> needs to copy:</p>
+<p><strong>Dockerfile:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#75715e"># start.sh is in the same directory as the Dockerfile</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> start.sh /runtime/start.sh<span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>Consider a project structure like this:</p>
+<pre tabindex="0"><code>./all-services/
+   /start.sh
+   /service-X/Dockerfile
+   /service-Y/Dockerfile
+   /service-Z/Dockerfile
+./docker-compose.yaml
+</code></pre><p>When using <code>docker-compose</code>, you define the <code>context</code> and <code>dockerfile</code> for each service. Here&rsquo;s an example:</p>
+<p><strong>docker-compose.yaml:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#34;3.3&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">service-A</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">build</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">context</span>: <span style="color:#ae81ff">./all-services </span> <span style="color:#75715e"># The shared context directory</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">dockerfile</span>: <span style="color:#ae81ff">./service-A/Dockerfile</span> <span style="color:#75715e"># The specific Dockerfile for this service</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">service-B</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">build</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">context</span>: <span style="color:#ae81ff">./all-services</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">dockerfile</span>: <span style="color:#ae81ff">./service-B/Dockerfile</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">service-C</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">build</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">context</span>: <span style="color:#ae81ff">./all-services</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">dockerfile</span>: <span style="color:#ae81ff">./service-C/Dockerfile</span>
+</span></span></code></pre></div><p>In this setup, <code>./all-services</code> is the context. Both <code>start.sh</code> and the individual <code>Dockerfile</code>s are sent to the daemon. Each service&rsquo;s <code>Dockerfile</code> can then copy <code>start.sh</code> relative to its own location within the context.</p>
+<h4 id="solution-3-leveraging-build-arguments-for-external-files">Solution 3: Leveraging Build Arguments for External Files</h4>
+<p>You can pass external file content into your Docker build using build arguments. This is particularly useful for sensitive data or configuration files not meant to be directly in the repository.</p>
+<p>First, define an <code>ARG</code> in your <code>Dockerfile</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">ARG</span> SSH_KEY<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> echo <span style="color:#e6db74">&#34;</span>$SSH_KEY<span style="color:#e6db74">&#34;</span> &gt; /root/.ssh/id_rsa<span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>Then, when building, pass the content of your external file as a build argument:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker build -t some-app --build-arg SSH_KEY<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">$(</span>cat ~/file/outside/build/context/id_rsa<span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span> .
+</span></span></code></pre></div><p><strong>Important Warning:</strong> As documented by Docker, using build-time variables for secrets like API keys or SSH keys is <strong>not recommended</strong>. The values of these variables are visible to anyone who inspects the image history using <code>docker history</code>.</p>
+<h4 id="solution-4-utilizing-bind-mounts-on-linux">Solution 4: Utilizing Bind Mounts on Linux</h4>
+<p>On Linux systems, you can use bind mounts to make directories outside the build context accessible to the Docker daemon.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mount --bind olddir newdir
+</span></span></code></pre></div><p>Refer to <a href="https://superuser.com/questions/842642" target="_blank" rel="noopener">Super User</a>
+ for more details. Similar functionality might be available on other operating systems, or you could explore network file sharing solutions like Samba.</p>
+<h4 id="solution-5-employing-buildx-with-additional-build-contexts">Solution 5: Employing <code>buildx</code> with Additional Build Contexts</h4>
+<p>Modern Docker versions, especially with <code>buildx</code> (version 0.8+) and Dockerfile 1.4+, support multiple build contexts. This allows you to specify external sources directly.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker buildx build --build-context othersource<span style="color:#f92672">=</span> ../something/something .
+</span></span></code></pre></div><p>Within your <code>Dockerfile</code>, you can then reference these additional contexts using <code>ADD --from</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">ADD</span> --from<span style="color:#f92672">=</span>othersource . /stuff<span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>Consult the <a href="https://docs.docker.com/buildx/working-with-buildx/" target="_blank" rel="noopener">Docker documentation on <code>buildx</code></a>
+ for more advanced configurations.</p>
+<h4 id="solution-6-changing-the-build-context-directory">Solution 6: Changing the Build Context Directory</h4>
+<p>A simple workaround is to change the directory from which you initiate the <code>docker build</code> command. If your <code>Dockerfile</code> is in the root of your project and you need to access files in the parent directory, you can build from the parent:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># If you are in the project directory:</span>
+</span></span><span style="display:flex;"><span>docker build -t hello-demo-app .
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># If you need to build with parent directory as context:</span>
+</span></span><span style="display:flex;"><span>docker build -t hello-demo-app ..
+</span></span></code></pre></div><h4 id="solution-7-design-philosophy-and-version-controlled-builds">Solution 7: Design Philosophy and Version-Controlled Builds</h4>
+<p>Some argue that Docker&rsquo;s design philosophy favors explicitly including all necessary files within the build context for repeatable builds. As noted by SvenDowideit from Docker Inc., &ldquo;fundamentally, no&hellip;&rdquo; for adding files outside the context without explicit inclusion.</p>
+<p>Consider these strategic approaches:</p>
+<ul>
+<li><strong>Separate Code and Docker Repositories:</strong> This allows containers to be more generic, pulling code versions at runtime.</li>
+<li><strong>Dockerfile in Code Repository Root:</strong> Treat Docker as your primary deployment artifact. You might use a parent Docker image for system-level details and a child image for code-specific configurations.</li>
+</ul>
+<h4 id="solution-8-using-tarball-contexts">Solution 8: Using Tarball Contexts</h4>
+<p>You can create a tarball of the necessary files and use that as your build context. This bundles external dependencies into a single unit for Docker.</p>
+<p>Refer to the <a href="https://docs.docker.com/engine/reference/commandline/build/#/tarball-contexts" target="_blank" rel="noopener">Docker documentation on tarball contexts</a>
+.</p>
+<h4 id="solution-9-dynamically-specifying-the-context-directory">Solution 9: Dynamically Specifying the Context Directory</h4>
+<p>You can explicitly define the context directory when running the <code>docker build</code> or <code>podman build</code> command. This tells the build process which directory to consider as the source for files.</p>
+<p><strong>Using Docker:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker build -t imageName:tag -f /path/to/the/Dockerfile /mysrc/path
+</span></span></code></pre></div><p>Here, <code>/mysrc/path</code> becomes the build context, allowing files within it to be accessed by the <code>Dockerfile</code>. Ensure the user running the command has read permissions for the context directory and its contents.</p>
+<p><strong>Using Podman:</strong></p>
+<p>Podman offers a similar capability, often without the same client-server overhead as Docker.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Assuming Dockerfile is in /home/user/myCoolProject and needs files from /opt/externalFile</span>
+</span></span><span style="display:flex;"><span>cd /home/user/myCoolProject
+</span></span><span style="display:flex;"><span>podman build -t imageName:tag -f Dockerfile /
+</span></span></code></pre></div><p>In this <code>podman build</code> command, <code>/</code> is specified as the context, making files from the root directory accessible.</p>
+<p>If your <code>Dockerfile</code> uses <code>COPY /opt/externalFile ./</code> and <code>ADD /home/user/AnotherProject/anotherExternalFile ./</code>, and your <code>Dockerfile</code> is located in <code>/home/user/myCoolProject</code>, you can set the context to <code>/opt</code> if both external files are under <code>/opt</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>podman build -t imageName:tag -f ./Dockerfile /opt
+</span></span></code></pre></div><p><strong>Important Considerations for Context:</strong></p>
+<ul>
+<li><strong>Permissions:</strong> The user running the build command needs appropriate read permissions on all directories and files within the specified context.</li>
+<li><strong>Performance:</strong> Streaming a large context directory to the Docker daemon can impact build times. Podman&rsquo;s approach may offer performance benefits in such scenarios.</li>
+</ul>
+<p>See <a href="https://docs.docker.com/engine/reference/commandline/build/" target="_blank" rel="noopener">Docker build documentation</a>
+ and <a href="https://docs.podman.io/en/latest/markdown/podman-build.1.html" target="_blank" rel="noopener">Podman build documentation</a>
+.</p>
+<h4 id="solution-10-utilizing-additional_contexts-in-docker-compose">Solution 10: Utilizing <code>additional_contexts</code> in Docker Compose</h4>
+<p>When using <code>docker-compose</code>, you can define multiple build contexts for a service, allowing you to reference files from different locations.</p>
+<p><strong>docker-compose.yaml:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#34;3.3&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">frontend</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">build</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">context</span>: <span style="color:#ae81ff">./frontend         </span> <span style="color:#75715e"># Primary build context</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">additional_contexts</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#ae81ff">configs=./configs      </span> <span style="color:#75715e"># An additional context named &#39;configs&#39;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">dockerfile</span>: <span style="color:#ae81ff">Dockerfile</span>
+</span></span></code></pre></div><p><strong>Dockerfile:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">node:18.16.1-alpine3.17</span> <span style="color:#66d9ef">as</span> <span style="color:#e6db74">builder</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> mkdir /frontend<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">WORKDIR</span> <span style="color:#e6db74">/frontend</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#75715e"># Copy a file from the &#39;configs&#39; build context</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> --from<span style="color:#f92672">=</span>configs ./.env.prod .<span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>This allows you to organize your build inputs more granularly. You can find more details in the <a href="https://docs.docker.com/compose/compose-file/build/#additional_contexts" target="_blank" rel="noopener">Docker Compose file format documentation</a>
+ and on <a href="https://www.docker.com/blog/dockerfiles-now-support-multiple-build-contexts/" target="_blank" rel="noopener">Docker&rsquo;s blog about multiple build contexts</a>
+.</p>
+<h4 id="solution-11-understanding-the-builds-temporary-directory">Solution 11: Understanding the Build&rsquo;s Temporary Directory</h4>
+<p>Docker&rsquo;s build process often unpacks the context into a temporary directory (e.g., <code>/tmp/docker-12345</code>). Relative paths in your <code>Dockerfile</code> (like <code>../relative-add/some-file</code>) are resolved relative to this temporary location. If the actual file is not there, you&rsquo;ll encounter errors.</p>
+<h4 id="solution-12-staging-and-committing-images">Solution 12: Staging and Committing Images</h4>
+<p>A more involved approach involves using a staging service to copy external files into a container, committing that container&rsquo;s state to a new image, and then using that new image in your final service.</p>
+<p><strong>docker-compose.yml:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">version</span>: <span style="color:#e6db74">&#39;3&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">stage</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">alpine</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">volumes</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">/host/machine/path:/tmp/container/path </span> <span style="color:#75715e"># Mount host directory into container</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">command</span>: <span style="color:#ae81ff">bash -c &#34;cp -r /tmp/container/path /final/container/path&#34;</span> <span style="color:#75715e"># Copy files</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">setup</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">stage</span> <span style="color:#75715e"># Use the committed image from the &#39;stage&#39; service</span>
+</span></span></code></pre></div><p><strong>Workflow:</strong></p>
+<ol>
+<li>Start the <code>stage</code> service to copy files: <code>docker-compose up stage</code></li>
+<li>Commit the <code>stage</code> container to an image: <code>docker commit $(docker-compose ps -q stage) stage</code></li>
+<li>Start the <code>setup</code> service, which now has access to the copied files within its image: <code>docker-compose up setup</code></li>
+</ol>
+<p>While this requires extra steps, it effectively brings external data into your build pipeline.</p>
+<h4 id="solution-13-wrapper-scripts-for-file-management">Solution 13: Wrapper Scripts for File Management</h4>
+<p>A practical workaround is to create a shell script that temporarily copies necessary external files into the current directory before invoking <code>docker build</code>, and then cleans them up afterward.</p>
+<p>This method avoids security risks associated with directly embedding sensitive keys and doesn&rsquo;t require elevated permissions like <code>sudo bind</code>.</p>
+<h4 id="solution-14-explicitly-passing-the-context-path">Solution 14: Explicitly Passing the Context Path</h4>
+<p>When using commands like <code>COPY . .</code> in your <code>Dockerfile</code>, the first <code>.</code> refers to the build context, and the second <code>.</code> refers to the working directory within the container. Ensure the context you specify in the <code>docker build</code> command aligns with where your <code>Dockerfile</code> expects files to be.</p>
+<p><strong>Example:</strong></p>
+<p>If your structure is:</p>
+<pre tabindex="0"><code>sample-project/
+  docker/
+    Dockerfile
+</code></pre><p>And you are in <code>/full-path/sample-project/</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Build using the &#39;docker&#39; subdirectory as the context</span>
+</span></span><span style="display:flex;"><span>docker build -f docker/Dockerfile .
+</span></span></code></pre></div><p>If you are in <code>/full-path/sample-project/docker/</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Build using the parent directory as the context</span>
+</span></span><span style="display:flex;"><span>docker build -f Dockerfile ../
+</span></span></code></pre></div><h4 id="solution-15-automated-build-scripts">Solution 15: Automated Build Scripts</h4>
+<p>Create a bash script to automate the process of copying external directories, running the Docker build, and then cleaning up the copied files.</p>
+<p><strong>build-docker.sh:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Check if a tag argument is provided</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$#<span style="color:#e6db74">&#34;</span> -ne <span style="color:#ae81ff">1</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>    echo <span style="color:#e6db74">&#34;Usage: </span>$0<span style="color:#e6db74"> &lt;tag&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>    exit <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>TAG<span style="color:#f92672">=</span>$1
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Copy the source-code directory to a temporary location</span>
+</span></span><span style="display:flex;"><span>cp -R ../source-code ./temp-source-code
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Run the Docker build command</span>
+</span></span><span style="display:flex;"><span>docker build -t <span style="color:#e6db74">&#34;</span>$TAG<span style="color:#e6db74">&#34;</span> .
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Clean up the temporary directory if the build was successful</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> $? -eq <span style="color:#ae81ff">0</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>    echo <span style="color:#e6db74">&#34;Docker build successful, removing temp-source-code directory...&#34;</span>
+</span></span><span style="display:flex;"><span>    rm -rf ./temp-source-code
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>    echo <span style="color:#e6db74">&#34;Docker build failed, temp-source-code directory not removed.&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span></code></pre></div><p><strong>Dockerfile:</strong></p>
+<p>In your <code>Dockerfile</code>, you&rsquo;ll need to handle the copied source code, potentially replacing a symlink or copying into a specific location.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#75715e"># Copy the rest of your application&#39;s source code</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> . .<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#75715e"># Remove any existing symlink to source-code</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> rm -f ./src/source-code<span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#75715e"># Copy the temp-source-code into its final destination</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> ./temp-source-code ./src/source-code<span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>Run the script with your desired image tag, and it will manage the copying, building, and cleanup.</p>
+<h4 id="solution-16-using-symlinks-locally">Solution 16: Using Symlinks Locally</h4>
+<p>You can create symbolic links in your build context that point to files or directories outside of it.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Create a symlink named &#39;file_to_copy&#39; pointing to a file outside the context</span>
+</span></span><span style="display:flex;"><span>ln path/to/file/outside/context/file_to_copy ./file_to_copy
+</span></span></code></pre></div><p>Then, in your <code>Dockerfile</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-dockerfile" data-lang="dockerfile"><span style="display:flex;"><span><span style="color:#66d9ef">COPY</span> file_to_copy /path/to/file<span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><h4 id="solution-17-mounting-volumes-at-runtime">Solution 17: Mounting Volumes at Runtime</h4>
+<p>An alternative is to avoid including external files directly in the build image. Instead, mount them as volumes when you run the container.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker run -v /path/to/file/on/host:/desired/path/to/file/in/container/ image_name
+</span></span></code></pre></div><p>This approach keeps the image cleaner and allows you to manage external data separately. Refer to <a href="https://docs.docker.com/storage/volumes/" target="_blank" rel="noopener">Docker volume documentation</a>
+ for more.</p>
+<h4 id="solution-18-utilizing-multiple-dockerfiles">Solution 18: Utilizing Multiple Dockerfiles</h4>
+<p>For complex scenarios, consider using two <code>Dockerfile</code>s. The first builds the core application, publishing it to an internal registry. The second <code>Dockerfile</code> pulls this image and adds the necessary external data, creating a final deployable image. This can be useful for separating sensitive data from your code repositories.</p>
+<h4 id="solution-19-piping-dockerfile-content">Solution 19: Piping Dockerfile Content</h4>
+<p>You can dynamically modify your <code>Dockerfile</code> using tools like <code>sed</code> and then pipe the modified content directly to the <code>docker build</code> command.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sed <span style="color:#e6db74">&#34;s/%email_address%/</span>$EMAIL_ADDRESS<span style="color:#e6db74">/;&#34;</span> ./Dockerfile | docker build -t katzda/bookings:latest . -f -
+</span></span></code></pre></div><p>The <code>-f -</code> flag tells Docker to read the <code>Dockerfile</code> from standard input. Be aware that <code>COPY</code> commands might behave differently when the <code>Dockerfile</code> is piped.</p>
+<h4 id="solution-20-organizing-shared-code-with-multiple-contexts">Solution 20: Organizing Shared Code with Multiple Contexts</h4>
+<p>When sharing code between different services or <code>Dockerfile</code>s, organizing your project with a shared directory and adjusting build contexts can be effective.</p>
+<p><strong>Example Project Structure:</strong></p>
+<pre tabindex="0"><code>api/
+  Dockerfile
+  src/
+    models/
+      index.ts
+frontend/
+  Dockerfile
+  src/
+    models/
+      index.ts
+shared/
+  model1.ts
+  model2.ts
+  index.ts
+.dockerignore
+</code></pre><p><strong>Key Adjustments:</strong></p>
+<ul>
+<li><strong>Build Command:</strong> Update to use a higher-level context: <code>docker build -f api/Dockerfile ../</code></li>
+<li><strong><code>COPY</code> Commands:</strong> Prefix with the service directory: <code>COPY api/package*.json ./</code></li>
+<li><strong>Shared Code:</strong> Copy the shared directory: <code>COPY shared usr/src/shared</code></li>
+</ul>
+<p>This approach preserves relative import paths within your projects while managing external dependencies.</p>
+<h4 id="solution-21-configuring-dockerfilecontext-in-csproj-for-net-core">Solution 21: Configuring <code>DockerfileContext</code> in .csproj (for .NET Core)</h4>
+<p>For .NET Core projects using Visual Studio, you can define the <code>DockerfileContext</code> within your <code>.csproj</code> file to specify the root directory for your Docker build.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;Project</span> <span style="color:#a6e22e">Sdk=</span><span style="color:#e6db74">&#34;Microsoft.NET.Sdk.Web&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&lt;PropertyGroup&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;TargetFramework&gt;</span>net6.0<span style="color:#f92672">&lt;/TargetFramework&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;DockerDefaultTargetOS&gt;</span>Linux<span style="color:#f92672">&lt;/DockerDefaultTargetOS&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;DockerfileContext&gt;</span>..\..\.<span style="color:#f92672">&lt;/DockerfileContext&gt;</span> <span style="color:#75715e">&lt;!-- Sets the build context --&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&lt;/PropertyGroup&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  ...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/Project&gt;</span>
+</span></span></code></pre></div><p>Remember to adjust paths within your <code>Dockerfile</code> to match the new context.</p>
+<h4 id="solution-22-flexible-contexts-in-microservice-architectures">Solution 22: Flexible Contexts in Microservice Architectures</h4>
+<p>In microservice architectures, you might need to reference code or data from other repositories.</p>
+<ul>
+<li>
+<p><strong>Broad Context:</strong> Setting the build context to a high-level parent directory (e.g., <code>./Code</code>) allows access to all sub-repositories. However, this can significantly slow down builds if many repositories are involved.</p>
+</li>
+<li>
+<p><strong>Scripted Copying:</strong> A more efficient method involves creating a shell script within the target repository (e.g., <code>./Code/Repo2</code>) that copies necessary files from another repository (e.g., <code>../Repo1/db/schema</code>) before initiating the Docker build.</p>
+<p><strong>Example Script:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>rm -r ./db/schema
+</span></span><span style="display:flex;"><span>mkdir ./db/schema
+</span></span><span style="display:flex;"><span>cp -r ../Repo1/db/schema ./db/schema
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>docker-compose -f docker-compose.yml down
+</span></span><span style="display:flex;"><span>docker container prune -f
+</span></span><span style="display:flex;"><span>docker-compose -f docker-compose.yml up --build
+</span></span></code></pre></div><p>Your <code>docker-compose.yml</code> would then specify <code>Repo2</code>&rsquo;s root as the context. This approach requires careful scripting for cleanup and version control.</p>
+</li>
+</ul>
+<h2 id="solutions">Solutions</h2>
+<h3 id="faqs-on-docker-build-context">FAQs on Docker Build Context</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is a Docker build context</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The build context is the set of files located in the specified PATH or URL that Docker can access during the build process. It&rsquo;s the directory containing your Dockerfile and any other files needed for the build.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why do I get &#39;COPY failed: forbidden path outside the context&#39; error</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: This error occurs when your Dockerfile attempts to copy a file or directory that is not within the specified build context. Docker security policies prevent accessing files outside the provided context.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I copy files from a different directory into my Docker image</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, you can. Common methods include changing the build context, using <code>additional_contexts</code> in Docker Compose, or employing wrapper scripts to copy files before building.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is it safe to pass secrets via build arguments</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: No, it is not recommended. Build argument values are visible in the image history (<code>docker history</code>), posing a security risk. Consider using Docker secrets or environment variables for sensitive data at runtime.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How does changing the build context affect my Dockerfile</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: When you change the build context, all relative paths in your Dockerfile (e.g., for <code>COPY</code> or <code>ADD</code> commands) are resolved relative to the new context directory. You may need to adjust these paths accordingly.</div>
+    </div>
+</div>
+<p>We’d love to hear your feedback! Drop your comments or questions below.</p>
+<pre tabindex="0"><code>docker build -f docker-files/Dockerfile .
+docker build -f ../Dockerfile .
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

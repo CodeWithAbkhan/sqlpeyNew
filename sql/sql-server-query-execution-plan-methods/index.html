@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>SQL Server Query Execution Plan: Methods and Analysis - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore various methods to obtain SQL Server query execution plans, including SSMS, SHOWPLAN, Profiler, DMVs, Extended Events, and third-party tools for …">
+
+
+
+<meta name="keywords" content="SQL Server execution plan, query plan, performance analysis, SSMS, SHOWPLAN, SQL Server Profiler, DMVs, Extended Events, SQL Sentry, ApexSQL Plan, Query Store">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="SQL Server Query Execution Plan: Methods and Analysis - sqlpey">
+<meta name="DC.description" content="Explore various methods to obtain SQL Server query execution plans, including SSMS, SHOWPLAN, Profiler, DMVs, Extended Events, and third-party tools for performance tuning.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2024-07-22">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="SQL Server Query Execution Plan: Methods and Analysis - sqlpey">
+<meta property="og:description" content="Explore various methods to obtain SQL Server query execution plans, including SSMS, SHOWPLAN, Profiler, DMVs, Extended Events, and third-party tools for …">
+<meta property="og:url" content="https://sqlpey.com/sql/sql-server-query-execution-plan-methods/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2024-07-22T00:00:00Z">
+
+
+<meta property="article:published_time" content="2024-07-22T00:00:00Z">
+<meta property="article:modified_time" content="2024-07-22T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="SQL Server">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="SQL Server Query Execution Plan: Methods and Analysis">
+<meta name="twitter:description" content="Explore various methods to obtain SQL Server query execution plans, including SSMS, SHOWPLAN, Profiler, DMVs, Extended Events, and third-party tools for …">
+
+
+<link rel="canonical" href="https://sqlpey.com/sql/sql-server-query-execution-plan-methods/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"SQL Server Query Execution Plan: Methods and Analysis\"",
+  "description": "\"Explore various methods to obtain SQL Server query execution plans, including SSMS, SHOWPLAN, Profiler, DMVs, Extended Events, and third-party tools for performance tuning.\"",
+  "url": "\"https://sqlpey.com/sql/sql-server-query-execution-plan-methods/\"",
+  "datePublished": "\"2024-07-22T00:00:00Z\"",
+  "dateModified": "\"2024-07-22T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/sql/sql-server-query-execution-plan-methods/\""
+  },
+  "articleSection": "\"SQL Server\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">SQL Server Query Execution Plan: Methods and Analysis</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">SQL Server</span>
+              
+              <span class="tag">Performance Tuning</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              9 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 22, 2024
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#sql-server-query-execution-plan-methods-and-analysis">&ldquo;SQL Server Query Execution Plan: Methods and Analysis&rdquo;</a>
+      <ul>
+        <li><a href="#methods-for-obtaining-execution-plans">Methods for Obtaining Execution Plans</a></li>
+        <li><a href="#actual-vs-estimated-execution-plans">&ldquo;Actual&rdquo; vs. &ldquo;Estimated&rdquo; Execution Plans</a></li>
+        <li><a href="#key-considerations-for-execution-plans">Key Considerations for Execution Plans</a></li>
+        <li><a href="#faqs-on-sql-server-query-execution-plans">FAQs on SQL Server Query Execution Plans</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a></li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="sql-server-query-execution-plan-methods-and-analysis">&ldquo;SQL Server Query Execution Plan: Methods and Analysis&rdquo;</h2>
+<p>Understanding how SQL Server processes queries is crucial for identifying and resolving performance bottlenecks. Execution plans provide a detailed roadmap of the operations SQL Server undertakes to retrieve or modify data. Several methods exist to capture these plans, ranging from built-in tools to advanced techniques.</p>
+<h3 id="methods-for-obtaining-execution-plans">Methods for Obtaining Execution Plans</h3>
+<p>There are multiple ways to capture query execution plans in SQL Server. The choice often depends on your environment, access privileges, and whether you need an estimated or actual plan.</p>
+<h4 id="1-using-sql-server-management-studio-ssms">1. Using SQL Server Management Studio (SSMS)</h4>
+<p>SSMS offers a user-friendly graphical interface for obtaining execution plans.</p>
+<ul>
+<li>
+<p><strong>Estimated Execution Plan:</strong></p>
+<ul>
+<li>Press <code>Ctrl + L</code>.</li>
+<li>Click the &ldquo;Display Estimated Execution Plan&rdquo; button in the query toolbar.</li>
+<li>This generates a plan without actually running the query, useful for initial analysis.</li>
+</ul>
+</li>
+<li>
+<p><strong>Actual Execution Plan:</strong></p>
+<ul>
+<li>Press <code>Ctrl + M</code>.</li>
+<li>Click the &ldquo;Include Actual Execution Plan&rdquo; button in the query toolbar <em>before</em> executing your query.</li>
+<li>The actual execution plan runs the query and shows what <em>actually</em> happened, including resource consumption and row counts, making it invaluable for diagnosing performance issues.</li>
+</ul>
+</li>
+<li>
+<p><strong>Live Query Plan (SSMS 2016+):</strong></p>
+<ul>
+<li>Click the &ldquo;Include Live Query Plan&rdquo; button in the query toolbar <em>before</em> executing your query.</li>
+<li>This provides a real-time, dynamic view of the query&rsquo;s execution as it progresses, updating statistics dynamically.</li>
+</ul>
+</li>
+</ul>
+<p>When using SSMS, after executing a query with the actual execution plan enabled, an additional &ldquo;Execution plan&rdquo; tab will appear in the results pane, displaying the graphical representation of the plan. You can right-click this plan to save it as an XML file.</p>
+<h4 id="2-using-showplan-options">2. Using <code>SHOWPLAN</code> Options</h4>
+<p>For scenarios where SSMS might not be available or for scripting purposes, T-SQL commands can be used. These are connection-level settings.</p>
+<ul>
+<li><strong><code>SET SHOWPLAN_TEXT ON</code></strong>: Provides a basic text-based estimated execution plan without executing the query.</li>
+<li><strong><code>SET SHOWPLAN_ALL ON</code></strong>: Offers a text-based estimated execution plan with cost estimations, also without execution.</li>
+<li><strong><code>SET SHOWPLAN_XML ON</code></strong>: Generates an XML-based estimated execution plan with cost estimations. This is equivalent to SSMS&rsquo;s &ldquo;Display Estimated Execution Plan.&rdquo;</li>
+<li><strong><code>SET STATISTICS PROFILE ON</code></strong>: Executes the query and displays a text-based actual execution plan.</li>
+<li><strong><code>SET STATISTICS XML ON</code></strong>: Executes the query and provides an XML-based actual execution plan, mirroring SSMS&rsquo;s &ldquo;Include Actual Execution Plan.&rdquo; This is generally the recommended option due to its richness of information.</li>
+</ul>
+<p>To disable these options, use <code>SET &lt;option&gt; OFF</code>. For example, <code>SET SHOWPLAN_ALL OFF</code>.</p>
+<p><strong>Example using <code>SET STATISTICS XML ON</code>:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SET</span> <span style="color:#66d9ef">STATISTICS</span> XML <span style="color:#66d9ef">ON</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">GO</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Your SQL Query here
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">SELECT</span>
+</span></span><span style="display:flex;"><span>    p.Name <span style="color:#66d9ef">AS</span> ProductName,
+</span></span><span style="display:flex;"><span>    NonDiscountSales <span style="color:#f92672">=</span> (OrderQty <span style="color:#f92672">*</span> UnitPrice),
+</span></span><span style="display:flex;"><span>    Discounts <span style="color:#f92672">=</span> ((OrderQty <span style="color:#f92672">*</span> UnitPrice) <span style="color:#f92672">*</span> UnitPriceDiscount)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> Production.Product <span style="color:#66d9ef">AS</span> p
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">INNER</span> <span style="color:#66d9ef">JOIN</span> Sales.SalesOrderDetail <span style="color:#66d9ef">AS</span> sod
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">ON</span> p.ProductID <span style="color:#f92672">=</span> sod.ProductID
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> ProductName <span style="color:#66d9ef">DESC</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">GO</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SET</span> <span style="color:#66d9ef">STATISTICS</span> XML <span style="color:#66d9ef">OFF</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">GO</span>
+</span></span></code></pre></div><p>The output will include the XML representation of the actual execution plan.</p>
+<h4 id="3-using-sql-server-profiler">3. Using SQL Server Profiler</h4>
+<p>SQL Server Profiler can capture execution plans by tracing specific events. This is useful if you cannot directly run the query or want to monitor plans in a production environment with caution.</p>
+<ol>
+<li>Open SQL Server Profiler and create a new trace.</li>
+<li>On the &ldquo;Events Selection&rdquo; tab, check &ldquo;Show all events.&rdquo;</li>
+<li>Under &ldquo;Performance,&rdquo; select &ldquo;Showplan XML.&rdquo;</li>
+<li>Run the trace.</li>
+<li>Execute your slow-running query.</li>
+<li>Stop the trace. You can then right-click the captured plan XML and select &ldquo;Extract event data&hellip;&rdquo; to save it.</li>
+</ol>
+<p><strong>Caveats:</strong> Profiler can introduce performance overhead. Careful filtering is necessary in busy environments. Always consult your DBA before using Profiler on production systems.</p>
+<h4 id="4-inspecting-the-query-plan-cache-dmvs">4. Inspecting the Query Plan Cache (DMVs)</h4>
+<p>You can query Dynamic Management Views (DMVs) to retrieve cached query plans. This is helpful if a query has run recently and you cannot re-execute it.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span>
+</span></span><span style="display:flex;"><span>    qs.creation_time,
+</span></span><span style="display:flex;"><span>    qs.last_execution_time,
+</span></span><span style="display:flex;"><span>    qs.execution_count,
+</span></span><span style="display:flex;"><span>    st.text <span style="color:#66d9ef">AS</span> SQL_Text,
+</span></span><span style="display:flex;"><span>    qp.query_plan <span style="color:#66d9ef">AS</span> Query_Plan
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> sys.dm_exec_query_stats <span style="color:#66d9ef">AS</span> qs
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">CROSS</span> APPLY sys.dm_exec_sql_text(qs.sql_handle) <span style="color:#66d9ef">AS</span> st
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">CROSS</span> APPLY sys.dm_exec_query_plan(qs.plan_handle) <span style="color:#66d9ef">AS</span> qp
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> st.text <span style="color:#66d9ef">LIKE</span> <span style="color:#e6db74">&#39;%your_query_text%&#39;</span>; <span style="color:#75715e">-- Filter for your specific query
+</span></span></span></code></pre></div><p>You can also use <code>sys.dm_exec_text_query_plan</code> to get the plan as text, which can be more manageable for complex plans or for selecting specific statements within a batch.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span>
+</span></span><span style="display:flex;"><span>    r.session_id,
+</span></span><span style="display:flex;"><span>    r.status,
+</span></span><span style="display:flex;"><span>    r.command,
+</span></span><span style="display:flex;"><span>    r.wait_type,
+</span></span><span style="display:flex;"><span>    r.wait_time,
+</span></span><span style="display:flex;"><span>    st.text <span style="color:#66d9ef">AS</span> SQL_Text,
+</span></span><span style="display:flex;"><span>    qp.query_plan <span style="color:#66d9ef">AS</span> Query_Plan
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> sys.dm_exec_requests <span style="color:#66d9ef">AS</span> r
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">OUTER</span> APPLY sys.dm_exec_text_query_plan(r.plan_handle, r.statement_start_offset, r.statement_end_offset) <span style="color:#66d9ef">AS</span> qp
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">LEFT</span> <span style="color:#66d9ef">JOIN</span> sys.dm_exec_sql_text(r.plan_handle) <span style="color:#66d9ef">AS</span> st <span style="color:#66d9ef">ON</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> r.session_id <span style="color:#f92672">=</span> <span style="color:#f92672">@@</span>SPID; <span style="color:#75715e">-- Get plan for the current session
+</span></span></span></code></pre></div><p>To display the XML plan directly in SSMS from a single row result, a specific <code>FOR XML EXPLICIT</code> format can be used:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- Assuming @plan_handle, @statement_start_offset, @statement_end_offset are set
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">SELECT</span>
+</span></span><span style="display:flex;"><span>    Tag <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>    Parent <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>,
+</span></span><span style="display:flex;"><span>    [ShowPlanXML<span style="color:#f92672">!</span><span style="color:#ae81ff">1</span><span style="color:#f92672">!!</span>XMLTEXT] <span style="color:#f92672">=</span> query_plan
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> sys.dm_exec_text_query_plan(
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">@</span>plan_handle,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">@</span>statement_start_offset,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">@</span>statement_end_offset)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FOR</span> XML EXPLICIT;
+</span></span></code></pre></div><h4 id="5-using-extended-events-xevents">5. Using Extended Events (XEvents)</h4>
+<p>Extended Events provide a more flexible and lightweight way to capture performance data, including execution plans.</p>
+<p><strong>Example XEvent Session to capture query plans:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> EVENT <span style="color:#66d9ef">SESSION</span> [GetExecutionPlan] <span style="color:#66d9ef">ON</span> SERVER
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">ADD</span> EVENT sqlserver.query_post_execution_showplan(
+</span></span><span style="display:flex;"><span>    ACTION(package0.event_sequence, sqlserver.plan_handle, sqlserver.query_hash, sqlserver.query_plan_hash, sqlserver.session_id, sqlserver.sql_text, sqlserver.tsql_frame, sqlserver.tsql_stack)),
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">ADD</span> EVENT sqlserver.sql_batch_completed(
+</span></span><span style="display:flex;"><span>    ACTION(package0.event_sequence, sqlserver.client_app_name, sqlserver.database_id, sqlserver.plan_handle, sqlserver.query_hash, sqlserver.query_plan_hash, sqlserver.session_id, sqlserver.sql_text, sqlserver.tsql_frame, sqlserver.tsql_stack))
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Add other relevant events as needed
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">ADD</span> TARGET package0.ring_buffer
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WITH</span> (
+</span></span><span style="display:flex;"><span>    MAX_MEMORY <span style="color:#f92672">=</span> <span style="color:#ae81ff">4096</span> KB,
+</span></span><span style="display:flex;"><span>    EVENT_RETENTION_MODE <span style="color:#f92672">=</span> ALLOW_SINGLE_EVENT_LOSS,
+</span></span><span style="display:flex;"><span>    MAX_DISPATCH_LATENCY <span style="color:#f92672">=</span> <span style="color:#ae81ff">30</span> SECONDS,
+</span></span><span style="display:flex;"><span>    MAX_EVENT_SIZE <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span> KB,
+</span></span><span style="display:flex;"><span>    MEMORY_PARTITION_MODE <span style="color:#f92672">=</span> <span style="color:#66d9ef">NONE</span>,
+</span></span><span style="display:flex;"><span>    TRACK_CAUSALITY <span style="color:#f92672">=</span> <span style="color:#66d9ef">ON</span>,
+</span></span><span style="display:flex;"><span>    STARTUP_STATE <span style="color:#f92672">=</span> <span style="color:#66d9ef">OFF</span>
+</span></span><span style="display:flex;"><span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">GO</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Start the session
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">ALTER</span> EVENT <span style="color:#66d9ef">SESSION</span> [GetExecutionPlan] <span style="color:#66d9ef">ON</span> SERVER <span style="color:#66d9ef">STATE</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">START</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">GO</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Watch live data in SSMS
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- Right-click session -&gt; Watch Live Data
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Execute your query
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>USE AdventureWorks;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">GO</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> p.Name <span style="color:#66d9ef">AS</span> ProductName,
+</span></span><span style="display:flex;"><span>    NonDiscountSales <span style="color:#f92672">=</span> (OrderQty <span style="color:#f92672">*</span> UnitPrice),
+</span></span><span style="display:flex;"><span>    Discounts <span style="color:#f92672">=</span> ((OrderQty <span style="color:#f92672">*</span> UnitPrice) <span style="color:#f92672">*</span> UnitPriceDiscount)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> Production.Product <span style="color:#66d9ef">AS</span> p
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">INNER</span> <span style="color:#66d9ef">JOIN</span> Sales.SalesOrderDetail <span style="color:#66d9ef">AS</span> sod
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">ON</span> p.ProductID <span style="color:#f92672">=</span> sod.ProductID
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> ProductName <span style="color:#66d9ef">DESC</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">GO</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- Stop the session
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">ALTER</span> EVENT <span style="color:#66d9ef">SESSION</span> [GetExecutionPlan] <span style="color:#66d9ef">ON</span> SERVER <span style="color:#66d9ef">STATE</span> <span style="color:#f92672">=</span> STOP;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">GO</span>
+</span></span></code></pre></div><p>In SSMS, you can navigate to &ldquo;Management&rdquo; -&gt; &ldquo;Extended Events&rdquo; -&gt; &ldquo;Sessions,&rdquo; right-click the created session, and select &ldquo;Watch Live Data&rdquo; to view captured events and their associated query plans.</p>
+<h4 id="6-third-party-tools">6. Third-Party Tools</h4>
+<p>Several external tools enhance the process of obtaining and analyzing execution plans:</p>
+<ul>
+<li><strong>ApexSQL Plan</strong>: Integrates with SSMS to provide enhanced visualization and analysis of estimated and actual execution plans.</li>
+<li><strong>SQL Sentry Plan Explorer</strong>: A popular free tool known for its user-friendly interface and detailed analysis capabilities, offering more insights than SSMS alone.</li>
+</ul>
+<h4 id="7-query-store-sql-server-2016">7. Query Store (SQL Server 2016+)</h4>
+<p>Query Store is a database-level feature that tracks query performance, plan changes, and execution statistics over time. It&rsquo;s excellent for identifying performance regressions after schema or data changes.</p>
+<ul>
+<li><strong>Enabling Query Store:</strong> It&rsquo;s database-specific and not enabled by default for new databases. You can enable it via SSMS or T-SQL.</li>
+<li><strong>DMVs for Query Store:</strong> Use DMVs like <code>sys.query_store_query</code>, <code>sys.query_store_plan</code>, and <code>sys.query_store_runtime_stats</code> to retrieve historical performance data, including execution plans.</li>
+</ul>
+<h4 id="8-using-powershell">8. Using PowerShell</h4>
+<p>PowerShell can be scripted to capture actual execution plans using <code>SET STATISTICS XML ON</code>. This is particularly useful for automating the capture of plans for stored procedures or complex scripts.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Script Variables</span>
+</span></span><span style="display:flex;"><span>[<span style="color:#66d9ef">string</span>]$server = <span style="color:#e6db74">&#39;.\SQLServerInstance&#39;</span>
+</span></span><span style="display:flex;"><span>[<span style="color:#66d9ef">string</span>]$database = <span style="color:#e6db74">&#39;YourDatabase&#39;</span>
+</span></span><span style="display:flex;"><span>[<span style="color:#66d9ef">string</span>]$sqlCommand = <span style="color:#e6db74">&#39;EXEC YourStoredProcedure&#39;</span>
+</span></span><span style="display:flex;"><span>[<span style="color:#66d9ef">string</span>]$XMLOutputFileName = <span style="color:#e6db74">&#39;YourStoredProcedure&#39;</span>
+</span></span><span style="display:flex;"><span>[<span style="color:#66d9ef">string</span>]$XMLOutputPath = <span style="color:#e6db74">&#39;C:\SQLDumps\ActualPlans\&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Connection setup</span>
+</span></span><span style="display:flex;"><span>$connectionString = <span style="color:#e6db74">&#34;Persist Security Info=False;Integrated Security=true;Connection Timeout=0;Initial Catalog=</span>$database<span style="color:#e6db74">;Server=</span>$server<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>$connection = New-Object System.Data.SqlClient.SQLConnection($connectionString)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Commands</span>
+</span></span><span style="display:flex;"><span>$command = New-Object System.Data.SqlClient.SQLCommand($sqlCommand, $connection)
+</span></span><span style="display:flex;"><span>$command.CommandTimeout = <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>$commandXMLActPlanOn = New-Object System.Data.SqlClient.SQLCommand(<span style="color:#e6db74">&#34;SET STATISTICS XML ON&#34;</span>, $connection)
+</span></span><span style="display:flex;"><span>$commandXMLActPlanOff = New-Object System.Data.SqlClient.SQLCommand(<span style="color:#e6db74">&#34;SET STATISTICS XML OFF&#34;</span>, $connection)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$connection.Open()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Enable XML plan</span>
+</span></span><span style="display:flex;"><span>$commandXMLActPlanOn.ExecuteNonQuery()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Execute SP and get results</span>
+</span></span><span style="display:flex;"><span>$adapter = New-Object System.Data.sqlclient.sqlDataAdapter $command
+</span></span><span style="display:flex;"><span>$dataset = New-Object System.Data.DataSet
+</span></span><span style="display:flex;"><span>$adapter.Fill($dataset) | Out-Null
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Save XML plans</span>
+</span></span><span style="display:flex;"><span>[<span style="color:#66d9ef">string</span>]$fileNameDateStamp = Get-Date <span style="color:#f92672">-f</span> yyyyMMdd_HHmmss
+</span></span><span style="display:flex;"><span>[<span style="color:#66d9ef">string</span>]$XMLOutputFilePath = <span style="color:#e6db74">&#34;</span>$XMLOutputPath$XMLOutputFileName<span style="color:#e6db74">`_</span>$fileNameDateStamp<span style="color:#e6db74">.sqlplan&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[<span style="color:#66d9ef">int</span>]$cntr = <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">ForEach</span> ($table <span style="color:#66d9ef">in</span> $dataset.Tables) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> ($table.Columns[<span style="color:#ae81ff">0</span>].ColumnName <span style="color:#f92672">-eq</span> <span style="color:#e6db74">&#34;Microsoft SQL Server 2005 XML Showplan&#34;</span>) {
+</span></span><span style="display:flex;"><span>        [<span style="color:#66d9ef">string</span>]$fullXMLPlan = $table.rows[<span style="color:#ae81ff">0</span>].<span style="color:#e6db74">&#34;Microsoft SQL Server 2005 XML Showplan&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> ($cntr <span style="color:#f92672">-eq</span> <span style="color:#ae81ff">1</span>) {
+</span></span><span style="display:flex;"><span>            [<span style="color:#66d9ef">regex</span>]$rxStart = <span style="color:#e6db74">&#34;\&lt;ShowPlanXML xmlns\=.{1,}\&lt;Statements\&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>            [<span style="color:#66d9ef">string</span>]$startXMLPlan = $rxStart.Match($fullXMLPlan).Value
+</span></span><span style="display:flex;"><span>            [<span style="color:#66d9ef">regex</span>]$rxEnd = <span style="color:#e6db74">&#34;\&lt;\/Statements\&gt;.{1,}\&lt;\/ShowPlanXML\&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>            [<span style="color:#66d9ef">string</span>]$endXMLPlan = $rxEnd.Match($fullXMLPlan).Value
+</span></span><span style="display:flex;"><span>            $startXMLPlan | Out-File -Append -FilePath $XMLOutputFilePath
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        [<span style="color:#66d9ef">regex</span>]$rxBody = <span style="color:#e6db74">&#34;\&lt;StmtSimple.{1,}\&lt;\/StmtSimple\&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>        [<span style="color:#66d9ef">string</span>]$bodyXMLPlan = $rxBody.Match($fullXMLPlan).Value
+</span></span><span style="display:flex;"><span>        $bodyXMLPlan | Out-File -Append -FilePath $XMLOutputFilePath
+</span></span><span style="display:flex;"><span>        $cntr++
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>$endXMLPlan | Out-File -Append -FilePath $XMLOutputFilePath
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Disable XML plan</span>
+</span></span><span style="display:flex;"><span>$commandXMLActPlanOff.ExecuteNonQuery()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$connection.Close()
+</span></span></code></pre></div><h4 id="9-other-tools">9. Other Tools</h4>
+<ul>
+<li><strong>DataGrip</strong>: Offers an &ldquo;Explain Plan&rdquo; feature. Right-click an SQL statement, select &ldquo;Explain Plan,&rdquo; then click &ldquo;Plan&rdquo; in the output pane. A visualization can be accessed via <code>Ctrl+Shift+Alt+U</code>.</li>
+</ul>
+<h3 id="actual-vs-estimated-execution-plans">&ldquo;Actual&rdquo; vs. &ldquo;Estimated&rdquo; Execution Plans</h3>
+<ul>
+<li><strong>Estimated Plan</strong>: Generated without running the query. It&rsquo;s based on SQL Server&rsquo;s statistics and cost-based optimization. Useful for initial checks and understanding the <em>intended</em> execution path.</li>
+<li><strong>Actual Plan</strong>: Generated after running the query. It reflects the <em>real</em> operations performed, including actual row counts, I/O, and CPU costs. This is far more valuable for diagnosing performance issues where estimations might be inaccurate due to stale statistics or other factors.</li>
+</ul>
+<h3 id="key-considerations-for-execution-plans">Key Considerations for Execution Plans</h3>
+<ul>
+<li><strong>Environment Specificity</strong>: Always capture execution plans from the environment experiencing performance issues, as factors like data volume, indexing, and server load can significantly alter plans.</li>
+<li><strong>Encrypted Stored Procedures</strong>: You cannot capture execution plans for encrypted stored procedures.</li>
+<li><strong>Plan Interpretation</strong>: Analyzing execution plans is a deep topic. Look for high-cost operators (e.g., table scans, key lookups), large row counts processed, and significant I/O or CPU usage. Tools like SQL Sentry Plan Explorer offer advanced visualization and analysis features.</li>
+</ul>
+<h3 id="faqs-on-sql-server-query-execution-plans">FAQs on SQL Server Query Execution Plans</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is an execution plan in SQL Server</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: An execution plan is a detailed representation of how SQL Server intends to execute a given SQL query. It outlines the steps, operations, and their associated costs, helping to identify performance bottlenecks.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How to view an estimated execution plan in SSMS</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: In SQL Server Management Studio (SSMS), you can generate an estimated execution plan by pressing Ctrl+L or clicking the &ldquo;Display Estimated Execution Plan&rdquo; icon in the query toolbar before running your query.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How to view an actual execution plan in SSMS</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: To view an actual execution plan in SSMS, press Ctrl+M or click the &ldquo;Include Actual Execution Plan&rdquo; icon in the query toolbar <em>before</em> executing your query. The plan will appear in a separate tab after execution.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the difference between estimated and actual execution plans</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: An estimated execution plan is generated without running the query, based on statistics. An actual execution plan is generated after the query runs and shows what actually occurred, including actual row counts and resource usage, making it more accurate for problem diagnosis.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can I get execution plans programmatically</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, you can obtain execution plans programmatically using T-SQL commands like <code>SET SHOWPLAN_XML ON</code> or <code>SET STATISTICS XML ON</code>, querying DMVs such as <code>sys.dm_exec_query_plan</code>, or by using Extended Events.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Which method is best for capturing execution plans</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: For most cases, using SSMS to generate an actual execution plan (Ctrl+M) is the most straightforward and informative. For automated or advanced scenarios, DMVs or Extended Events are powerful options.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What are some tools for analyzing execution plans</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Besides SSMS, tools like SQL Sentry Plan Explorer and ApexSQL Plan offer enhanced visualization and analysis features that can provide deeper insights into query performance.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How does Query Store help with execution plans</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Query Store, available in SQL Server 2016+, tracks query performance history, including execution plans. It&rsquo;s useful for identifying performance regressions and comparing plans over time.</div>
+    </div>
+</div>
+<p>We’d love to hear your feedback! Do you have any specific challenges with obtaining or interpreting SQL Server execution plans? Share your thoughts or questions in the comments below.</p>
+<p>For more on SQL Server performance, check out related topics like <a href="https://sqlpey.com/sql/what-is-sql" target="_blank" rel="noopener">what is SQL</a>
+ and <a href="https://sqlpey.com/postgresql/what-is-postgresql" target="_blank" rel="noopener">what is PostgreSQL</a>
+. If you&rsquo;re working with Python, you might find our articles on <a href="https://sqlpey.com/python/what-is-python" target="_blank" rel="noopener">what is Python</a>
+ and <a href="https://sqlpey.com/python/what-is-pandas" target="_blank" rel="noopener">what is Pandas</a>
+ helpful.</p>
+<h2 id="solutions">Solutions</h2>
+
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

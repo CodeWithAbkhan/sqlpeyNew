@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title> Safely Manage Global Data in Flask Applications - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore robust methods for managing global data in Flask, avoiding common pitfalls of global variables and ensuring thread/process safety.">
+
+
+
+<meta name="keywords" content="Flask global variables, Flask thread safety, Flask process safety, Python web development, Flask data management, Flask sessions, Flask caching, multiprocessing Manager Flask">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content=" Safely Manage Global Data in Flask Applications - sqlpey">
+<meta name="DC.description" content="Explore robust methods for managing global data in Flask, avoiding common pitfalls of global variables and ensuring thread/process safety.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-07-23">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content=" Safely Manage Global Data in Flask Applications - sqlpey">
+<meta property="og:description" content="Explore robust methods for managing global data in Flask, avoiding common pitfalls of global variables and ensuring thread/process safety.">
+<meta property="og:url" content="https://sqlpey.com/flask/are-global-variables-thread-safe-in-flask-how-do-i-share-data-between-requests/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-07-23T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-07-23T00:00:00Z">
+<meta property="article:modified_time" content="2025-07-23T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Flask">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content=" Safely Manage Global Data in Flask Applications">
+<meta name="twitter:description" content="Explore robust methods for managing global data in Flask, avoiding common pitfalls of global variables and ensuring thread/process safety.">
+
+
+<link rel="canonical" href="https://sqlpey.com/flask/are-global-variables-thread-safe-in-flask-how-do-i-share-data-between-requests/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\" Safely Manage Global Data in Flask Applications\"",
+  "description": "\"Explore robust methods for managing global data in Flask, avoiding common pitfalls of global variables and ensuring thread/process safety.\"",
+  "url": "\"https://sqlpey.com/flask/are-global-variables-thread-safe-in-flask-how-do-i-share-data-between-requests/\"",
+  "datePublished": "\"2025-07-23T00:00:00Z\"",
+  "dateModified": "\"2025-07-23T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/flask/are-global-variables-thread-safe-in-flask-how-do-i-share-data-between-requests/\""
+  },
+  "articleSection": "\"Flask\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Safely Manage Global Data in Flask Applications</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Flask</span>
+              
+              <span class="tag">Python</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              9 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 23, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#faqs-on-solved-how-to-safely-manage-global-data-in-flask-applications">FAQs on Solved How to Safely Manage Global Data in Flask Applications</a></li>
+        <li><a href="#solved-how-to-safely-manage-global-data-in-flask-applications">Solved: How to Safely Manage Global Data in Flask Applications</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h3 id="faqs-on-solved-how-to-safely-manage-global-data-in-flask-applications">FAQs on Solved How to Safely Manage Global Data in Flask Applications</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q How to Avoid Issues with Global Variables in Flask</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Global variables in Flask are problematic for several reasons, especially in production environments. WSGI servers often spawn multiple processes and threads to handle requests concurrently. Using global variables directly can lead to race conditions, incorrect data counts, and data corruption because these variables are not thread-safe or process-safe. What&rsquo;s stored in a global variable might be modified by one worker while another is reading it, leading to unpredictable results. For instance, if one worker reads a value, gets preempted, another worker modifies it, and then the first worker resumes and also modifies it, the final state will be inaccurate. This behavior is often not apparent when using Flask&rsquo;s development server, which may run in a single thread or process, but it will manifest in production with multi-threaded or multi-process WSGI servers like Gunicorn or uWSGI. Even with asynchronous workers like gevent, global variables remain vulnerable to race conditions due to the lack of explicit protection mechanisms.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q What Are Recommended Alternatives to Global Variables in Flask</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: To manage data that needs to be accessible across requests or shared between workers, it&rsquo;s highly recommended to use external data sources. Databases, key-value stores like Redis, or caching systems like Memcached are excellent choices, depending on your specific needs. For Python-specific data sharing, the <code>multiprocessing.Manager</code> can be a viable option. Flask also provides the <code>g</code> object, which is a great way to store data that is specific to a single request. This object is unique to each request and is managed by Flask, ensuring proper setup and teardown. For data that needs to persist across requests but is unique to each user, Flask&rsquo;s session management is ideal.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q How Can Flask Sessions Help Manage User-Specific Data</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Flask sessions, particularly when enhanced with extensions like <a href="https://flask-session.readthedocs.io/en/latest/" target="_blank" rel="noopener">Flask-Session</a>
+, provide a robust way to store client-specific data. Each connected client gets its own isolated data store, accessible across different routes within the application. This data behaves like a dictionary and is managed server-side, ensuring thread-safe access. This means that data stored in a user&rsquo;s session is not visible or modifiable by other users, preventing data leakage and conflicts. This is particularly useful for maintaining user preferences, shopping cart contents, or temporary user states without relying on less secure client-side storage.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q What is Flask-Caching and How Can It Be Used</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Flask-Caching is an extension that provides a flexible caching layer for your Flask applications. You can integrate it to store frequently accessed data or computed results, reducing the need for repeated expensive operations. You can define a separate module, for example <code>common.py</code>, to instantiate the cache and then initialize it within your Flask app, specifying the caching type (e.g., &lsquo;filesystem&rsquo;) and directory. This allows you to easily set and get values from the cache, acting as a temporary, fast storage for global or frequently used data.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q When is Using a Global Dictionary Acceptable in Flask</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: While generally discouraged for production, a global Python dictionary can be acceptable for prototyping or very simple local task-oriented servers running under Flask&rsquo;s development server. Python&rsquo;s built-in data types, including dictionaries, are generally thread-safe for basic operations like insertions and lookups, meaning concurrent Flask sessions running on the development server won&rsquo;t corrupt the dictionary itself. If you key your global dictionary with a unique session identifier, it can serve as a simple way to store session-specific data that exceeds cookie limits. However, you must implement careful management to prevent the dictionary from growing indefinitely, perhaps by expiring old key-value pairs during request processing. It&rsquo;s crucial to remember this is not a scalable or production-ready solution.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q How Does Multiprocessing Manager Help Share Data Between Flask Workers</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The <code>multiprocessing.Manager</code> from Python&rsquo;s standard library is an effective tool for sharing state between processes, which is relevant when your Flask application is run with multiple worker processes. It allows you to create shared objects, such as lists or dictionaries, that can be accessed and modified by different processes. To ensure thread-safe access to these shared objects, especially when multiple threads within a worker process might interact with them, using a <code>Lock</code> is essential. For example, you can use <code>manager.list()</code> to create a shared list that holds a status message, and wrap all read/write operations with a <code>Lock</code> to prevent race conditions and ensure data integrity, particularly when dealing with data that needs to be serialized, like JSON.</div>
+    </div>
+</div>
+<h3 id="solved-how-to-safely-manage-global-data-in-flask-applications">Solved: How to Safely Manage Global Data in Flask Applications</h3>
+<p>When building web applications with Flask, the need to share data across different parts of your application or between concurrent requests is common. Often, developers might consider using global variables for this purpose. However, in production environments, especially with WSGI servers that employ multiple processes or threads, direct use of global variables can lead to significant issues related to safety and data integrity.</p>
+<h4 id="the-pitfalls-of-global-variables-in-flask">The Pitfalls of Global Variables in Flask</h4>
+<p>Global variables are declared outside of any function or class, making them accessible from anywhere within your application&rsquo;s scope. While this seems convenient, it presents several challenges in a web server context:</p>
+<ul>
+<li><strong>Not Thread-Safe:</strong> In a multi-threaded server, multiple threads might try to read or write to a global variable simultaneously. This can result in race conditions, where the outcome depends on the unpredictable timing of thread execution, leading to incorrect data.</li>
+<li><strong>Not Process-Safe:</strong> WSGI servers often spawn multiple independent processes to handle requests. Each process has its own memory space and its own copy of global variables. Changes made to a global variable in one process are not reflected in others, leading to inconsistent application behavior.</li>
+<li><strong>Production vs. Development Discrepancies:</strong> Flask&rsquo;s built-in development server might run in a single thread or process, masking the issues that arise with concurrent access. When you deploy to a production WSGI server (e.g., Gunicorn, uWSGI) configured with multiple workers, these problems become apparent. Enabling <code>threaded=True</code> or <code>processes=N</code> in <code>app.run()</code> during development can help surface these issues earlier.</li>
+<li><strong>Asynchronous Workers:</strong> Even with asynchronous frameworks like gevent, which manage concurrency differently, global variables are still susceptible to race conditions if not properly protected.</li>
+</ul>
+<h4 id="recommended-strategies-for-global-data-management">Recommended Strategies for Global Data Management</h4>
+<p>To overcome these limitations, several robust alternatives exist for managing data that needs to be shared or persist across requests:</p>
+<p><strong>1. Utilize External Data Sources:</strong></p>
+<p>For persistent and scalable global data, relying on systems designed for this purpose is the best approach.</p>
+<ul>
+<li><strong>Databases:</strong> Relational databases (like <a href="https://sqlpey.com/postgresql/what-is-postgresql" target="_blank" rel="noopener">PostgreSQL</a>
+, <a href="https://sqlpey.com/mysql/introduction-to-mysql" target="_blank" rel="noopener">MySQL</a>
+, or <a href="https://sqlpey.com/azure-sql-database/what-is-azure-sql" target="_blank" rel="noopener">Azure SQL Database</a>
+) or NoSQL databases are ideal for storing shared application state.</li>
+<li><strong>Caching Systems:</strong> In-memory data stores like <a href="https://redis.io/" target="_blank" rel="noopener">Redis</a>
+ or <a href="https://memcached.org/" target="_blank" rel="noopener">Memcached</a>
+ offer extremely fast access to data and are excellent for frequently accessed global information or session data.</li>
+</ul>
+<p><strong>2. Leverage Flask&rsquo;s <code>g</code> Object:</strong></p>
+<p>Flask provides a special object, <code>flask.g</code>, which acts as a namespace for storing data during a single request.</p>
+<ul>
+<li><strong>Request-Scoped Storage:</strong> The <code>g</code> object is unique to each incoming request. It&rsquo;s perfect for holding data that is relevant only within the lifecycle of that specific request, such as database connection pools that should be initialized at the start of a request and cleaned up at the end.</li>
+<li><strong>Setup and Teardown:</strong> You can use Flask&rsquo;s <code>@app.before_request</code> and <code>@app.teardown_request</code> decorators to manage the setup and cleanup of resources associated with the <code>g</code> object.</li>
+</ul>
+<p><strong>3. Implement Server-Side Sessions:</strong></p>
+<p>For data that needs to be associated with a specific user across multiple requests, Flask sessions are invaluable.</p>
+<ul>
+<li>
+<p><strong>Client-Specific Data:</strong> Using extensions like <a href="https://flask-session.readthedocs.io/en/latest/" target="_blank" rel="noopener">Flask-Session</a>
+, you can configure server-side sessions. This stores session data on the server (e.g., in files, Redis, or a database), keyed by a session ID cookie sent to the client.</p>
+</li>
+<li>
+<p><strong>Thread-Safe Access:</strong> Server-side sessions are designed to be thread-safe, ensuring that each user&rsquo;s data is isolated and protected from other users and concurrent requests.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> flask <span style="color:#f92672">import</span> Flask, session
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> flask_session <span style="color:#f92672">import</span> Session
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>app <span style="color:#f92672">=</span> Flask(__name__)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Configure session type, e.g., &#39;filesystem&#39;, &#39;redis&#39;, &#39;sqlalchemy&#39;</span>
+</span></span><span style="display:flex;"><span>app<span style="color:#f92672">.</span>config[<span style="color:#e6db74">&#39;SESSION_TYPE&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;filesystem&#39;</span>
+</span></span><span style="display:flex;"><span>app<span style="color:#f92672">.</span>config[<span style="color:#e6db74">&#39;SECRET_KEY&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;your_super_secret_key&#39;</span> <span style="color:#75715e"># Important for session security</span>
+</span></span><span style="display:flex;"><span>Session(app)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">index</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;counter&#39;</span> <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> session:
+</span></span><span style="display:flex;"><span>        session[<span style="color:#e6db74">&#39;counter&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Counter: </span><span style="color:#e6db74">{</span>session[<span style="color:#e6db74">&#39;counter&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/increment&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">increment</span>():
+</span></span><span style="display:flex;"><span>    session[<span style="color:#e6db74">&#39;counter&#39;</span>] <span style="color:#f92672">=</span> session<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;counter&#39;</span>, <span style="color:#ae81ff">0</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Counter incremented to: </span><span style="color:#e6db74">{</span>session[<span style="color:#e6db74">&#39;counter&#39;</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/reset&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">reset</span>():
+</span></span><span style="display:flex;"><span>    session<span style="color:#f92672">.</span>pop(<span style="color:#e6db74">&#39;counter&#39;</span>, <span style="color:#66d9ef">None</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Counter reset.&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;__main__&#39;</span>:
+</span></span><span style="display:flex;"><span>    app<span style="color:#f92672">.</span>run(debug<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span></code></pre></div><p>To use this example, you would first install Flask and Flask-Session: <code>pip install Flask Flask-Session</code>.</p>
+</li>
+</ul>
+<p><strong>4. Employ Caching Mechanisms:</strong></p>
+<p>Caching can store computed results or frequently accessed data for quicker retrieval, reducing load on your primary data sources.</p>
+<ul>
+<li>
+<p><strong>Flask-Caching:</strong> This extension provides a unified interface for various caching backends. You can configure it to use file-based caching, Redis, or other supported stores.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> flask <span style="color:#f92672">import</span> Flask
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> flask_caching <span style="color:#f92672">import</span> Cache
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> pathlib <span style="color:#f92672">import</span> Path
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>app <span style="color:#f92672">=</span> Flask(__name__)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Configure caching</span>
+</span></span><span style="display:flex;"><span>cache <span style="color:#f92672">=</span> Cache(app, config<span style="color:#f92672">=</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;CACHE_TYPE&#39;</span>: <span style="color:#e6db74">&#39;filesystem&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;CACHE_DIR&#39;</span>: str(Path(<span style="color:#e6db74">&#39;/tmp/flask_cache&#39;</span>)), <span style="color:#75715e"># Ensure this directory is writable</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;CACHE_DEFAULT_TIMEOUT&#39;</span>: <span style="color:#ae81ff">300</span> <span style="color:#75715e"># Cache items for 5 minutes</span>
+</span></span><span style="display:flex;"><span>})
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/expensive_calculation/&lt;int:value&gt;&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@cache.cached</span>(key_prefix<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;calc_result&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">expensive_calculation</span>(value):
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Performing expensive calculation for </span><span style="color:#e6db74">{</span>value<span style="color:#e6db74">}</span><span style="color:#e6db74">...&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Simulate an expensive operation</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span>    time<span style="color:#f92672">.</span>sleep(<span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Result for </span><span style="color:#e6db74">{</span>value<span style="color:#e6db74">}</span><span style="color:#e6db74">: </span><span style="color:#e6db74">{</span>value <span style="color:#f92672">*</span> <span style="color:#ae81ff">123</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;__main__&#39;</span>:
+</span></span><span style="display:flex;"><span>    app<span style="color:#f92672">.</span>run(debug<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span></code></pre></div><p>Install Flask-Caching: <code>pip install Flask-Caching</code>. The <code>@cache.cached()</code> decorator automatically caches the function&rsquo;s output.</p>
+</li>
+</ul>
+<p><strong>5. Utilize <code>multiprocessing.Manager</code> for Inter-Process Communication:</strong></p>
+<p>When you absolutely need to share Python objects directly between processes spawned by your WSGI server, the <code>multiprocessing.Manager</code> is a powerful tool.</p>
+<ul>
+<li>
+<p><strong>Shared Objects:</strong> It allows you to create shared data structures like lists or dictionaries that can be accessed and modified by multiple processes.</p>
+</li>
+<li>
+<p><strong>Thread Safety with Locks:</strong> Crucially, you must use <code>multiprocessing.Lock</code> to synchronize access to these shared objects to prevent race conditions.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> flask <span style="color:#f92672">import</span> Flask
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> multiprocessing <span style="color:#f92672">import</span> Manager, Lock
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>app <span style="color:#f92672">=</span> Flask(__name__)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Initialize a Manager and shared objects</span>
+</span></span><span style="display:flex;"><span>manager <span style="color:#f92672">=</span> Manager()
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Using a list to hold a single string status for simplicity</span>
+</span></span><span style="display:flex;"><span>shared_status <span style="color:#f92672">=</span> manager<span style="color:#f92672">.</span>list([<span style="color:#e6db74">&#39;Initial Status&#39;</span>])
+</span></span><span style="display:flex;"><span>status_lock <span style="color:#f92672">=</span> manager<span style="color:#f92672">.</span>Lock()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/get_status&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_status</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> status_lock:
+</span></span><span style="display:flex;"><span>        current_status <span style="color:#f92672">=</span> shared_status[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Current Status: </span><span style="color:#e6db74">{</span>current_status<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/update_status/&lt;string:new_status&gt;&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update_status</span>(new_status):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> status_lock:
+</span></span><span style="display:flex;"><span>        shared_status[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> new_status
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;Status updated to: </span><span style="color:#e6db74">{</span>new_status<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;__main__&#39;</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Note: Running with app.run() might not perfectly simulate</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># multiple processes in all environments. For true testing,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># use a production WSGI server like Gunicorn.</span>
+</span></span><span style="display:flex;"><span>    app<span style="color:#f92672">.</span>run(debug<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span></code></pre></div><p>This approach ensures that if your Flask app is run with multiple worker processes, they can all safely access and update the <code>shared_status</code>.</p>
+</li>
+</ul>
+<h4 id="prototyping-exception-global-dictionaries">Prototyping Exception: Global Dictionaries</h4>
+<p>For simple prototypes or internal tools running under the development server, a global dictionary <em>might</em> be acceptable for storing session-specific data if managed carefully. Python dictionaries are generally thread-safe for atomic operations. However, this is not a substitute for proper production-level state management. Always guard against unbounded growth of such dictionaries.</p>
+<p>Choosing the right method depends on your application&rsquo;s specific requirements for data persistence, scope, and performance. Prioritizing external data sources, sessions, or managed caching is key to building scalable and reliable Flask applications.</p>
+<p>We’d love to hear your feedback! Drop your comments or questions below.</p>
+<pre tabindex="0"><code></code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

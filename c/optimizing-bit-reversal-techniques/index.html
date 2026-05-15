@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Optimizing 32-bit and 64-bit Integer Bit Reversal Techniques in C - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Exploring high-performance bit reversal algorithms for unsigned integers in C, comparing bitwise operations, lookup tables, and AVX2 intrinsics for speed.">
+
+
+
+<meta name="keywords" content="bit reversal, bitwise algorithms, lookup table, AVX2, C performance">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Optimizing 32-bit and 64-bit Integer Bit Reversal Techniques in C - sqlpey">
+<meta name="DC.description" content="Exploring high-performance bit reversal algorithms for unsigned integers in C, comparing bitwise operations, lookup tables, and AVX2 intrinsics for speed.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Optimizing 32-bit and 64-bit Integer Bit Reversal Techniques in C - sqlpey">
+<meta property="og:description" content="Exploring high-performance bit reversal algorithms for unsigned integers in C, comparing bitwise operations, lookup tables, and AVX2 intrinsics for speed.">
+<meta property="og:url" content="https://sqlpey.com/c/optimizing-bit-reversal-techniques/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Bit Manipulation">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Optimizing 32-bit and 64-bit Integer Bit Reversal Techniques in C">
+<meta name="twitter:description" content="Exploring high-performance bit reversal algorithms for unsigned integers in C, comparing bitwise operations, lookup tables, and AVX2 intrinsics for speed.">
+
+
+<link rel="canonical" href="https://sqlpey.com/c/optimizing-bit-reversal-techniques/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Optimizing 32-bit and 64-bit Integer Bit Reversal Techniques in C\"",
+  "description": "\"Exploring high-performance bit reversal algorithms for unsigned integers in C, comparing bitwise operations, lookup tables, and AVX2 intrinsics for speed.\"",
+  "url": "\"https://sqlpey.com/c/optimizing-bit-reversal-techniques/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/c/optimizing-bit-reversal-techniques/\""
+  },
+  "articleSection": "\"Bit Manipulation\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Optimizing 32-bit and 64-bit Integer Bit Reversal Techniques in C</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Bit Manipulation</span>
+              
+              <span class="tag">Performance</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              15 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#optimizing-32-bit-and-64-bit-integer-bit-reversal-techniques-in-c">&ldquo;Optimizing 32-bit and 64-bit Integer Bit Reversal Techniques in C&rdquo;</a></li>
+    <li><a href="#method-1-iterative-bit-by-bit-swapping-simple-approach">Method 1: Iterative Bit-by-Bit Swapping (Simple Approach)</a>
+      <ul>
+        <li><a href="#simple-iterative-reversal-c-example">Simple Iterative Reversal (C Example)</a></li>
+      </ul>
+    </li>
+    <li><a href="#method-2-binary-partitioning-divide-and-conquer">Method 2: Binary Partitioning (Divide and Conquer)</a>
+      <ul>
+        <li><a href="#32-bit-binary-partitioning-example">32-bit Binary Partitioning Example</a></li>
+        <li><a href="#64-bit-extension-using-bswap-hardware-assisted">64-bit Extension using BSWAP (Hardware Assisted)</a></li>
+      </ul>
+    </li>
+    <li><a href="#method-3-lookup-table-fastest-portablecpu-specific-method">Method 3: Lookup Table (Fastest Portable/CPU-Specific Method)</a>
+      <ul>
+        <li><a href="#8-bit-lookup-table-definition">8-bit Lookup Table Definition</a></li>
+        <li><a href="#32-bit-reversal-using-8-bit-lookups-option-1">32-bit Reversal Using 8-bit Lookups (Option 1)</a></li>
+        <li><a href="#32-bit-reversal-using-pointer-arithmetic-option-2">32-bit Reversal Using Pointer Arithmetic (Option 2)</a></li>
+      </ul>
+    </li>
+    <li><a href="#method-4-hardware-intrinsics-peak-performance">Method 4: Hardware Intrinsics (Peak Performance)</a>
+      <ul>
+        <li><a href="#arm-architecture-rbit">ARM Architecture (<code>rbit</code>)</a></li>
+        <li><a href="#x86-avx2-vectorized-solution">x86 AVX2 Vectorized Solution</a></li>
+        <li><a href="#byte-swapping-integration">Byte Swapping Integration</a></li>
+      </ul>
+    </li>
+    <li><a href="#performance-observations-from-benchmarks">Performance Observations from Benchmarks</a></li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#faqs-on-bit-reversal-techniques">FAQs on Bit Reversal Techniques</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="optimizing-32-bit-and-64-bit-integer-bit-reversal-techniques-in-c">&ldquo;Optimizing 32-bit and 64-bit Integer Bit Reversal Techniques in C&rdquo;</h2>
+<p>Reversing the order of bits within an integer (e.g., turning $b_0b_1&hellip;b_{31}$ into $b_{31}b_{30}&hellip;b_0$) is a frequent requirement in low-level programming, cryptography, and digital signal processing. Achieving high performance for this operation demands careful selection of the algorithm based on target hardware and constraints like memory usage.</p>
+<p>What are the principal methods for reversing bits in an unsigned integer, and how do their performance characteristics compare?</p>
+<p>This exploration presents several C-based approaches, ranging from simple iterative methods to highly optimized, hardware-specific implementations.</p>
+<h2 id="method-1-iterative-bit-by-bit-swapping-simple-approach">Method 1: Iterative Bit-by-Bit Swapping (Simple Approach)</h2>
+<p>A straightforward way to reverse bits involves iterating through each bit of the input value, extracting it, and placing it into the reversed position.</p>
+<p>This method is simple to implement and requires minimal memory, but it is generally the slowest due to the loop overhead and numerous operations per bit.</p>
+<h3 id="simple-iterative-reversal-c-example">Simple Iterative Reversal (C Example)</h3>
+<p>This example reverses bits for a generic integer type by checking bits sequentially.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">/* Generic iteration method for bit reversal */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">reverse_bits_iterative</span>(<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> input_val) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> reversed_val <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> num_bits <span style="color:#f92672">=</span> <span style="color:#66d9ef">sizeof</span>(input_val) <span style="color:#f92672">*</span> <span style="color:#ae81ff">8</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> mask <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>; <span style="color:#75715e">// Start mask for LSB
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> num_bits; <span style="color:#f92672">++</span>i) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Check the i-th bit from the right of input_val
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> (input_val <span style="color:#f92672">&amp;</span> mask) {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Set the corresponding bit on the left side of reversed_val
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            reversed_val <span style="color:#f92672">|=</span> (<span style="color:#ae81ff">1u</span> <span style="color:#f92672">&lt;&lt;</span> (num_bits <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> i));
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        mask <span style="color:#f92672">&lt;&lt;=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> reversed_val;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>An alternative iterative structure can terminate early if the remaining input bits are zero, though the performance gain might be negligible compared to lookup methods.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">/* Faster iterative variant exiting when input is exhausted */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">reverse_bits_fast_iterative</span>(<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> v) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> r <span style="color:#f92672">=</span> v <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">1</span>; <span style="color:#75715e">// Initialize result with LSB of v
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">int</span> s <span style="color:#f92672">=</span> <span style="color:#66d9ef">sizeof</span>(v) <span style="color:#f92672">*</span> <span style="color:#ae81ff">8</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>; <span style="color:#75715e">// Remaining shift needed
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (v <span style="color:#f92672">&gt;&gt;=</span> <span style="color:#ae81ff">1</span>; v; v <span style="color:#f92672">&gt;&gt;=</span> <span style="color:#ae81ff">1</span>) {   
+</span></span><span style="display:flex;"><span>      r <span style="color:#f92672">&lt;&lt;=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>      r <span style="color:#f92672">|=</span> v <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>      s<span style="color:#f92672">--</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    r <span style="color:#f92672">&lt;&lt;=</span> s; <span style="color:#75715e">// Apply remaining shift for leading zeros in original input
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> r;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="method-2-binary-partitioning-divide-and-conquer">Method 2: Binary Partitioning (Divide and Conquer)</h2>
+<p>This technique works by successively swapping larger and larger chunks of bits (pairs, then nibbles, then bytes, etc.). This avoids looping over every single bit. The method derived from &ldquo;Bit Twiddling Hacks&rdquo; is highly efficient when compiler optimizations are enabled.</p>
+<h3 id="32-bit-binary-partitioning-example">32-bit Binary Partitioning Example</h3>
+<p>This is often cited as a very fast, portable, CPU-independent solution.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">reverse_bitwise</span>(<span style="color:#66d9ef">register</span> <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> x)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Swap adjacent bits (1-bit groups)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    x <span style="color:#f92672">=</span> (((x <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xaaaaaaaa</span>) <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">|</span> ((x <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0x55555555</span>) <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">1</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Swap adjacent 2-bit groups
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    x <span style="color:#f92672">=</span> (((x <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xcccccccc</span>) <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">2</span>) <span style="color:#f92672">|</span> ((x <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0x33333333</span>) <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">2</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Swap adjacent 4-bit groups (nibbles)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    x <span style="color:#f92672">=</span> (((x <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xf0f0f0f0</span>) <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">4</span>) <span style="color:#f92672">|</span> ((x <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0x0f0f0f0f</span>) <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">4</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Swap adjacent 8-bit groups (bytes)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    x <span style="color:#f92672">=</span> (((x <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xff00ff00</span>) <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">8</span>) <span style="color:#f92672">|</span> ((x <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0x00ff00ff</span>) <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">8</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Swap adjacent 16-bit groups (half-words)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span>((x <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">16</span>) <span style="color:#f92672">|</span> (x <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">16</span>));
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="64-bit-extension-using-bswap-hardware-assisted">64-bit Extension using BSWAP (Hardware Assisted)</h3>
+<p>For 64-bit operations on modern x86 processors, using the <code>BSWAP</code> instruction (which swaps bytes) combined with bit-level swapping can yield significant speed improvements over pure bitwise operations.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">// Requires GCC/Clang inline assembly syntax for 64-bit architectures
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span> <span style="color:#66d9ef">long</span> <span style="color:#a6e22e">reverse_with_bswap</span>(<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span> <span style="color:#66d9ef">long</span> val)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// BSWAP swaps byte order (b7b6b5b4b3b2b1b0 -&gt; b0b1b2b3b4b5b6b7)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">__asm__</span>(<span style="color:#e6db74">&#34;BSWAP %0&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;=r&#34;</span>(val) <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;0&#34;</span>(val));
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Since only bytes are swapped, we must still reverse bits within each byte.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// This involves the binary partitioning logic, adapted for 64-bit masks.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    val <span style="color:#f92672">=</span> (((val <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">32</span>) <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0x00000000FFFFFFFFULL</span>) <span style="color:#f92672">|</span> ((val <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0x00000000FFFFFFFFULL</span>) <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">32</span>));
+</span></span><span style="display:flex;"><span>    val <span style="color:#f92672">=</span> (((val <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">16</span>) <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0x0000FFFF0000FFFFULL</span>) <span style="color:#f92672">|</span> ((val <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xFFFF0000FFFF0000ULL</span>) <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">16</span>));
+</span></span><span style="display:flex;"><span>    val <span style="color:#f92672">=</span> (((val <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">8</span>)  <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0x00FF00FF00FF00FFULL</span>) <span style="color:#f92672">|</span> ((val <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xFF00FF00FF00FF00ULL</span>) <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">8</span>));
+</span></span><span style="display:flex;"><span>    val <span style="color:#f92672">=</span> (((val <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">4</span>)  <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0x0F0F0F0F0F0F0F0FULL</span>) <span style="color:#f92672">|</span> ((val <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xF0F0F0F0F0F0F0F0ULL</span>) <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">4</span>));
+</span></span><span style="display:flex;"><span>    val <span style="color:#f92672">=</span> (((val <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">2</span>)  <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0x3333333333333333ULL</span>) <span style="color:#f92672">|</span> ((val <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xCCCCCCCCCCCCCCCCULL</span>) <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">2</span>));
+</span></span><span style="display:flex;"><span>    val <span style="color:#f92672">=</span> (((val <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">1</span>)  <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0x5555555555555555ULL</span>) <span style="color:#f92672">|</span> ((val <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xAAAAAAAAAAAAAAAAULL</span>) <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">1</span>));
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> val;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="method-3-lookup-table-fastest-portablecpu-specific-method">Method 3: Lookup Table (Fastest Portable/CPU-Specific Method)</h2>
+<p>For reversing bits in small units (like a byte), lookup tables offer the best performance by trading memory for execution speed, often outperforming even heavily optimized bitwise methods, especially when processing large arrays of data.</p>
+<p>A 256-entry table can pre-calculate the reversal for every possible 8-bit value. For a 32-bit integer, this requires four lookups and some shifting/OR operations.</p>
+<h3 id="8-bit-lookup-table-definition">8-bit Lookup Table Definition</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">// Precomputed table for reversing bits in an 8-bit value (0-255)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">char</span> BitReverseTable256[] <span style="color:#f92672">=</span> 
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#ae81ff">0x00</span>, <span style="color:#ae81ff">0x80</span>, <span style="color:#ae81ff">0x40</span>, <span style="color:#ae81ff">0xC0</span>, <span style="color:#ae81ff">0x20</span>, <span style="color:#ae81ff">0xA0</span>, <span style="color:#ae81ff">0x60</span>, <span style="color:#ae81ff">0xE0</span>, <span style="color:#ae81ff">0x10</span>, <span style="color:#ae81ff">0x90</span>, <span style="color:#ae81ff">0x50</span>, <span style="color:#ae81ff">0xD0</span>, <span style="color:#ae81ff">0x30</span>, <span style="color:#ae81ff">0xB0</span>, <span style="color:#ae81ff">0x70</span>, <span style="color:#ae81ff">0xF0</span>, 
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// ... (Full 256-entry table omitted for brevity, see original source)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// ...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#ae81ff">0x0F</span>, <span style="color:#ae81ff">0x8F</span>, <span style="color:#ae81ff">0x4F</span>, <span style="color:#ae81ff">0xCF</span>, <span style="color:#ae81ff">0x2F</span>, <span style="color:#ae81ff">0xAF</span>, <span style="color:#ae81ff">0x6F</span>, <span style="color:#ae81ff">0xEF</span>, <span style="color:#ae81ff">0x1F</span>, <span style="color:#ae81ff">0x9F</span>, <span style="color:#ae81ff">0x5F</span>, <span style="color:#ae81ff">0xDF</span>, <span style="color:#ae81ff">0x3F</span>, <span style="color:#ae81ff">0xBF</span>, <span style="color:#ae81ff">0x7F</span>, <span style="color:#ae81ff">0xFF</span>
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><h3 id="32-bit-reversal-using-8-bit-lookups-option-1">32-bit Reversal Using 8-bit Lookups (Option 1)</h3>
+<p>This method fetches the reversed value for each byte and assembles them in reverse order.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">reverse_lookup_32</span>(<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> v) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> (BitReverseTable256[v <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xff</span>] <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">24</span>) <span style="color:#f92672">|</span> 
+</span></span><span style="display:flex;"><span>           (BitReverseTable256[(v <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">8</span>) <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xff</span>] <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">16</span>) <span style="color:#f92672">|</span> 
+</span></span><span style="display:flex;"><span>           (BitReverseTable256[(v <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">16</span>) <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xff</span>] <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">8</span>) <span style="color:#f92672">|</span>
+</span></span><span style="display:flex;"><span>           (BitReverseTable256[(v <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">24</span>) <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xff</span>]);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="32-bit-reversal-using-pointer-arithmetic-option-2">32-bit Reversal Using Pointer Arithmetic (Option 2)</h3>
+<p>This approach manipulates pointers to the bytes of the input and output integers, relying on memory ordering. This was noted to be slower in benchmarks compared to direct shifting and indexing.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">reverse_lookup_ptr</span>(<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> v) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> c; <span style="color:#75715e">// Result
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>p <span style="color:#f92672">=</span> (<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>) <span style="color:#f92672">&amp;</span>v;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>q <span style="color:#f92672">=</span> (<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>) <span style="color:#f92672">&amp;</span>c;
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    q[<span style="color:#ae81ff">3</span>] <span style="color:#f92672">=</span> BitReverseTable256[p[<span style="color:#ae81ff">0</span>]]; <span style="color:#75715e">// LSB of input becomes MSB of output
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    q[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> BitReverseTable256[p[<span style="color:#ae81ff">1</span>]];
+</span></span><span style="display:flex;"><span>    q[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> BitReverseTable256[p[<span style="color:#ae81ff">2</span>]];
+</span></span><span style="display:flex;"><span>    q[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> BitReverseTable256[p[<span style="color:#ae81ff">3</span>]]; <span style="color:#75715e">// MSB of input becomes LSB of output
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> c;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="method-4-hardware-intrinsics-peak-performance">Method 4: Hardware Intrinsics (Peak Performance)</h2>
+<p>For maximum throughput on specific architectures, utilizing native instructions is key.</p>
+<h3 id="arm-architecture-rbit">ARM Architecture (<code>rbit</code>)</h3>
+<p>ARM CPUs often feature a dedicated instruction for this task, offering a single-cycle operation.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">// ARM specific implementation
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">uint32_t</span> <span style="color:#a6e22e">reverse_arm</span>(<span style="color:#66d9ef">uint32_t</span> x)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#if defined(__arm__) || defined(__aarch64__)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">__asm__</span>(<span style="color:#e6db74">&#34;rbit %0, %1&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;=r&#34;</span> (x) <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;r&#34;</span> (x));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> x;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#else
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// Fallback to binary partitioning or other fast method
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">reverse_bitwise</span>(x); 
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#endif
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><h3 id="x86-avx2-vectorized-solution">x86 AVX2 Vectorized Solution</h3>
+<p>For modern Intel/AMD processors supporting AVX2, parallel processing of 32 bytes simultaneously can achieve extreme throughput. One specialized implementation clocked 400 million bytes in about 50 milliseconds, significantly faster than portable methods. This typically involves complex assembly or compiler intrinsics manipulating 256-bit YMM registers for lookup table access.</p>
+<h3 id="byte-swapping-integration">Byte Swapping Integration</h3>
+<p>Several solutions leverage built-in compiler functions for fast byte swapping (<code>_byteswap_ulong</code> in MSVC, <code>__builtin_bswap32</code> in GCC/Clang) after performing bit-swaps within each byte.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">uint32_t</span> <span style="color:#a6e22e">reverse_with_bswap_internal</span>(<span style="color:#66d9ef">uint32_t</span> x)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 1. Swap bits within each byte (using binary partitioning on 8-bit values)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    x <span style="color:#f92672">=</span> ((x <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0x55555555</span>) <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">|</span> ((x <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xAAAAAAAA</span>) <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>    x <span style="color:#f92672">=</span> ((x <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0x33333333</span>) <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">2</span>) <span style="color:#f92672">|</span> ((x <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xCCCCCCCC</span>) <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">2</span>);
+</span></span><span style="display:flex;"><span>    x <span style="color:#f92672">=</span> ((x <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0x0F0F0F0F</span>) <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">4</span>) <span style="color:#f92672">|</span> ((x <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xF0F0F0F0</span>) <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">4</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 2. Swap byte order for the whole word
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#ifdef __GNUC__
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">__builtin_bswap32</span>(x);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#elif defined(_MSC_VER)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">_byteswap_ulong</span>(x);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#else
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// Fallback for byte reversal if instruction is unavailable
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> (x <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">24</span>) <span style="color:#f92672">|</span> ((x <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xFF00</span>) <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">8</span>) <span style="color:#f92672">|</span> ((x <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xFF0000</span>) <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">8</span>) <span style="color:#f92672">|</span> (x <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">24</span>);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#endif
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><h2 id="performance-observations-from-benchmarks">Performance Observations from Benchmarks</h2>
+<p>Benchmarking 100 million unsigned integers on a Core 2 Duo T7500 revealed clear hierarchies:</p>
+<ol>
+<li><strong>AVX2 (Vectorized):</strong> Offers the absolute peak performance (e.g., ~0.05 seconds for 400M bytes processed).</li>
+<li><strong>Lookup Table (8-bit):</strong> Very fast, typically around 0.63 to 0.9 seconds for the 100M integer test set using the best option (Option 1 assembly layout).</li>
+<li><strong>Binary Partitioning (Bitwise):</strong> Competitive, often slightly slower than the lookup table (~0.89 seconds), but consumes zero auxiliary memory.</li>
+<li><strong>Iterative Methods:</strong> Significantly slower, taking around 1.9 to 2.0 seconds for the same workload without compiler optimizations.</li>
+</ol>
+<p>When memory usage is extremely restricted, the binary partitioning approach (Method 2) becomes the preferred high-speed alternative to the lookup table.</p>
+<h2 id="solutions">Solutions</h2>
+<h3 id="faqs-on-bit-reversal-techniques">FAQs on Bit Reversal Techniques</h3>
+<p><div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Which bit reversal method is generally the fastest for 32-bit integers</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The fastest portable method typically involves using a precomputed 256-entry lookup table for 8-bit chunks combined with bit shifting and OR operations to assemble the final 32-bit result. For specific hardware, AVX2 vectorization or native ARM <code>rbit</code> instruction will yield superior speed.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is the lookup table approach portable across different systems</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: The lookup table approach itself is portable C code, but its performance advantage depends on efficient memory access on the host CPU. The table must be initialized correctly for 8-bit chunks.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How does using 64-bit types affect bit reversal speed</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: On 64-bit processors, using <code>uint64_t</code> and leveraging 64-bit instructions (like <code>BSWAP</code> if available) can be faster than processing two 32-bit integers separately. Benchmarks suggest a roughly 10% speed improvement when using 64-bit types directly versus reversing bits in two 32-bit halves packed into a 64-bit value.</div>
+    </div>
+</div></p>
+<p>We welcome discussion on benchmarking nuances, compiler optimization effects (like <code>-O3</code> or <code>-march=native</code>), or other architecture-specific tricks for bit manipulation. Share your insights or performance results below!</p>
+<p>Check out more C/C++ optimization discussions:
+<a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">Solved How to Fix SSL Certificate Verify Failed Error in Python</a>
+
+<a href="https://sqlpey.com/python/top-9-ways-to-solve-typeerror-is-not-json-serializable/" target="_blank" rel="noopener">Top 4 Methods to Solve TypeError: is not JSON serializable</a>
+
+<a href="https://sqlpey.com/python/how-to-properly-configure-pythonpath/" target="_blank" rel="noopener">How to Properly Configure PYTHONPATH</a>
+</p>
+<pre tabindex="0"><code>unsigned int
+reverse(register unsigned int x)
+{
+    x = (((x &amp;amp; 0xaaaaaaaa) &amp;gt;&amp;gt; 1) | ((x &amp;amp; 0x55555555) &amp;lt;&amp;lt; 1));
+    x = (((x &amp;amp; 0xcccccccc) &amp;gt;&amp;gt; 2) | ((x &amp;amp; 0x33333333) &amp;lt;&amp;lt; 2));
+    x = (((x &amp;amp; 0xf0f0f0f0) &amp;gt;&amp;gt; 4) | ((x &amp;amp; 0x0f0f0f0f) &amp;lt;&amp;lt; 4));
+    x = (((x &amp;amp; 0xff00ff00) &amp;gt;&amp;gt; 8) | ((x &amp;amp; 0x00ff00ff) &amp;lt;&amp;lt; 8));
+    return((x &amp;gt;&amp;gt; 16) | (x &amp;lt;&amp;lt; 16));
+
+}
+static const unsigned char BitReverseTable256[] = 
+{
+  0x00, 0x80, 0x40, 0xC0, 0x20, 0xA0, 0x60, 0xE0, 0x10, 0x90, 0x50, 0xD0, 0x30, 0xB0, 0x70, 0xF0, 
+  0x08, 0x88, 0x48, 0xC8, 0x28, 0xA8, 0x68, 0xE8, 0x18, 0x98, 0x58, 0xD8, 0x38, 0xB8, 0x78, 0xF8, 
+  0x04, 0x84, 0x44, 0xC4, 0x24, 0xA4, 0x64, 0xE4, 0x14, 0x94, 0x54, 0xD4, 0x34, 0xB4, 0x74, 0xF4, 
+  0x0C, 0x8C, 0x4C, 0xCC, 0x2C, 0xAC, 0x6C, 0xEC, 0x1C, 0x9C, 0x5C, 0xDC, 0x3C, 0xBC, 0x7C, 0xFC, 
+  0x02, 0x82, 0x42, 0xC2, 0x22, 0xA2, 0x62, 0xE2, 0x12, 0x92, 0x52, 0xD2, 0x32, 0xB2, 0x72, 0xF2, 
+  0x0A, 0x8A, 0x4A, 0xCA, 0x2A, 0xAA, 0x6A, 0xEA, 0x1A, 0x9A, 0x5A, 0xDA, 0x3A, 0xBA, 0x7A, 0xFA,
+  0x06, 0x86, 0x46, 0xC6, 0x26, 0xA6, 0x66, 0xE6, 0x16, 0x96, 0x56, 0xD6, 0x36, 0xB6, 0x76, 0xF6, 
+  0x0E, 0x8E, 0x4E, 0xCE, 0x2E, 0xAE, 0x6E, 0xEE, 0x1E, 0x9E, 0x5E, 0xDE, 0x3E, 0xBE, 0x7E, 0xFE,
+  0x01, 0x81, 0x41, 0xC1, 0x21, 0xA1, 0x61, 0xE1, 0x11, 0x91, 0x51, 0xD1, 0x31, 0xB1, 0x71, 0xF1,
+  0x09, 0x89, 0x49, 0xC9, 0x29, 0xA9, 0x69, 0xE9, 0x19, 0x99, 0x59, 0xD9, 0x39, 0xB9, 0x79, 0xF9, 
+  0x05, 0x85, 0x45, 0xC5, 0x25, 0xA5, 0x65, 0xE5, 0x15, 0x95, 0x55, 0xD5, 0x35, 0xB5, 0x75, 0xF5,
+  0x0D, 0x8D, 0x4D, 0xCD, 0x2D, 0xAD, 0x6D, 0xED, 0x1D, 0x9D, 0x5D, 0xDD, 0x3D, 0xBD, 0x7D, 0xFD,
+  0x03, 0x83, 0x43, 0xC3, 0x23, 0xA3, 0x63, 0xE3, 0x13, 0x93, 0x53, 0xD3, 0x33, 0xB3, 0x73, 0xF3, 
+  0x0B, 0x8B, 0x4B, 0xCB, 0x2B, 0xAB, 0x6B, 0xEB, 0x1B, 0x9B, 0x5B, 0xDB, 0x3B, 0xBB, 0x7B, 0xFB,
+  0x07, 0x87, 0x47, 0xC7, 0x27, 0xA7, 0x67, 0xE7, 0x17, 0x97, 0x57, 0xD7, 0x37, 0xB7, 0x77, 0xF7, 
+  0x0F, 0x8F, 0x4F, 0xCF, 0x2F, 0xAF, 0x6F, 0xEF, 0x1F, 0x9F, 0x5F, 0xDF, 0x3F, 0xBF, 0x7F, 0xFF
+};
+
+unsigned int v; // reverse 32-bit value, 8 bits at time
+unsigned int c; // c will get v reversed
+
+// Option 1:
+c = (BitReverseTable256[v &amp;amp; 0xff] &amp;lt;&amp;lt; 24) | 
+    (BitReverseTable256[(v &amp;gt;&amp;gt; 8) &amp;amp; 0xff] &amp;lt;&amp;lt; 16) | 
+    (BitReverseTable256[(v &amp;gt;&amp;gt; 16) &amp;amp; 0xff] &amp;lt;&amp;lt; 8) |
+    (BitReverseTable256[(v &amp;gt;&amp;gt; 24) &amp;amp; 0xff]);
+
+// Option 2:
+unsigned char * p = (unsigned char *) &amp;amp;v;
+unsigned char * q = (unsigned char *) &amp;amp;c;
+q[3] = BitReverseTable256[p[0]]; 
+q[2] = BitReverseTable256[p[1]]; 
+q[1] = BitReverseTable256[p[2]]; 
+q[0] = BitReverseTable256[p[3]];
+unsigned int v;     // input bits to be reversed
+unsigned int r = v &amp;amp; 1; // r will be reversed bits of v; first get LSB of v
+int s = sizeof(v) * CHAR_BIT - 1; // extra shift needed at end
+
+for (v &amp;gt;&amp;gt;= 1; v; v &amp;gt;&amp;gt;= 1)
+{   
+  r &amp;lt;&amp;lt;= 1;
+  r |= v &amp;amp; 1;
+  s--;
+}
+r &amp;lt;&amp;lt;= s; // shift when v&#39;s highest bits are zero
+unsigned char b = x;
+b = ((b * 0x0802LU &amp;amp; 0x22110LU) | (b * 0x8020LU &amp;amp; 0x88440LU)) * 0x10101LU &amp;gt;&amp;gt; 16;
+unsigned char b; // reverse this (8-bit) byte
+b = (b * 0x0202020202ULL &amp;amp; 0x010884422010ULL) % 1023;
+unsigned int toReverse;
+unsigned int reversed;
+unsigned char inByte0 = (toReverse &amp;amp; 0xFF);
+unsigned char inByte1 = (toReverse &amp;amp; 0xFF00) &amp;gt;&amp;gt; 8;
+unsigned char inByte2 = (toReverse &amp;amp; 0xFF0000) &amp;gt;&amp;gt; 16;
+unsigned char inByte3 = (toReverse &amp;amp; 0xFF000000) &amp;gt;&amp;gt; 24;
+reversed = (reverseBits(inByte0) &amp;lt;&amp;lt; 24) | (reverseBits(inByte1) &amp;lt;&amp;lt; 16) | (reverseBits(inByte2) &amp;lt;&amp;lt; 8) | (reverseBits(inByte3);
+#include &amp;lt;stdlib.h&amp;gt;
+#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;omp.h&amp;gt;
+
+unsigned int
+reverse(register unsigned int x)
+{
+    x = (((x &amp;amp; 0xaaaaaaaa) &amp;gt;&amp;gt; 1) | ((x &amp;amp; 0x55555555) &amp;lt;&amp;lt; 1));
+    x = (((x &amp;amp; 0xcccccccc) &amp;gt;&amp;gt; 2) | ((x &amp;amp; 0x33333333) &amp;lt;&amp;lt; 2));
+    x = (((x &amp;amp; 0xf0f0f0f0) &amp;gt;&amp;gt; 4) | ((x &amp;amp; 0x0f0f0f0f) &amp;lt;&amp;lt; 4));
+    x = (((x &amp;amp; 0xff00ff00) &amp;gt;&amp;gt; 8) | ((x &amp;amp; 0x00ff00ff) &amp;lt;&amp;lt; 8));
+    return((x &amp;gt;&amp;gt; 16) | (x &amp;lt;&amp;lt; 16));
+
+}
+
+int main()
+{
+    unsigned int *ints = malloc(100000000*sizeof(unsigned int));
+    unsigned int *ints2 = malloc(100000000*sizeof(unsigned int));
+    for(unsigned int i = 0; i &amp;lt; 100000000; i++)
+      ints[i] = rand();
+
+    unsigned int *inptr = ints;
+    unsigned int *outptr = ints2;
+    unsigned int *endptr = ints + 100000000;
+    // Starting the time measurement
+    double start = omp_get_wtime();
+    // Computations to be measured
+    while(inptr != endptr)
+    {
+      (*outptr) = reverse(*inptr);
+      inptr++;
+      outptr++;
+    }
+    // Measuring the elapsed time
+    double end = omp_get_wtime();
+    // Time calculation (in seconds)
+    printf(&#34;Time: %f seconds\n&#34;, end-start);
+
+    free(ints);
+    free(ints2);
+
+    return 0;
+}
+#include &amp;lt;stdlib.h&amp;gt;
+#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;omp.h&amp;gt;
+
+static const unsigned char BitReverseTable256[] = 
+{
+  0x00, 0x80, 0x40, 0xC0, 0x20, 0xA0, 0x60, 0xE0, 0x10, 0x90, 0x50, 0xD0, 0x30, 0xB0, 0x70, 0xF0, 
+  0x08, 0x88, 0x48, 0xC8, 0x28, 0xA8, 0x68, 0xE8, 0x18, 0x98, 0x58, 0xD8, 0x38, 0xB8, 0x78, 0xF8, 
+  0x04, 0x84, 0x44, 0xC4, 0x24, 0xA4, 0x64, 0xE4, 0x14, 0x94, 0x54, 0xD4, 0x34, 0xB4, 0x74, 0xF4, 
+  0x0C, 0x8C, 0x4C, 0xCC, 0x2C, 0xAC, 0x6C, 0xEC, 0x1C, 0x9C, 0x5C, 0xDC, 0x3C, 0xBC, 0x7C, 0xFC, 
+  0x02, 0x82, 0x42, 0xC2, 0x22, 0xA2, 0x62, 0xE2, 0x12, 0x92, 0x52, 0xD2, 0x32, 0xB2, 0x72, 0xF2, 
+  0x0A, 0x8A, 0x4A, 0xCA, 0x2A, 0xAA, 0x6A, 0xEA, 0x1A, 0x9A, 0x5A, 0xDA, 0x3A, 0xBA, 0x7A, 0xFA,
+  0x06, 0x86, 0x46, 0xC6, 0x26, 0xA6, 0x66, 0xE6, 0x16, 0x96, 0x56, 0xD6, 0x36, 0xB6, 0x76, 0xF6, 
+  0x0E, 0x8E, 0x4E, 0xCE, 0x2E, 0xAE, 0x6E, 0xEE, 0x1E, 0x9E, 0x5E, 0xDE, 0x3E, 0xBE, 0x7E, 0xFE,
+  0x01, 0x81, 0x41, 0xC1, 0x21, 0xA1, 0x61, 0xE1, 0x11, 0x91, 0x51, 0xD1, 0x31, 0xB1, 0x71, 0xF1,
+  0x09, 0x89, 0x49, 0xC9, 0x29, 0xA9, 0x69, 0xE9, 0x19, 0x99, 0x59, 0xD9, 0x39, 0xB9, 0x79, 0xF9, 
+  0x05, 0x85, 0x45, 0xC5, 0x25, 0xA5, 0x65, 0xE5, 0x15, 0x95, 0x55, 0xD5, 0x35, 0xB5, 0x75, 0xF5,
+  0x0D, 0x8D, 0x4D, 0xCD, 0x2D, 0xAD, 0x6D, 0xED, 0x1D, 0x9D, 0x5D, 0xDD, 0x3D, 0xBD, 0x7D, 0xFD,
+  0x03, 0x83, 0x43, 0xC3, 0x23, 0xA3, 0x63, 0xE3, 0x13, 0x93, 0x53, 0xD3, 0x33, 0xB3, 0x73, 0xF3, 
+  0x0B, 0x8B, 0x4B, 0xCB, 0x2B, 0xAB, 0x6B, 0xEB, 0x1B, 0x9B, 0x5B, 0xDB, 0x3B, 0xBB, 0x7B, 0xFB,
+  0x07, 0x87, 0x47, 0xC7, 0x27, 0xA7, 0x67, 0xE7, 0x17, 0x97, 0x57, 0xD7, 0x37, 0xB7, 0x77, 0xF7, 
+  0x0F, 0x8F, 0x4F, 0xCF, 0x2F, 0xAF, 0x6F, 0xEF, 0x1F, 0x9F, 0x5F, 0xDF, 0x3F, 0xBF, 0x7F, 0xFF
+};
+
+int main()
+{
+    unsigned int *ints = malloc(100000000*sizeof(unsigned int));
+    unsigned int *ints2 = malloc(100000000*sizeof(unsigned int));
+    for(unsigned int i = 0; i &amp;lt; 100000000; i++)
+      ints[i] = rand();
+
+    unsigned int *inptr = ints;
+    unsigned int *outptr = ints2;
+    unsigned int *endptr = ints + 100000000;
+    // Starting the time measurement
+    double start = omp_get_wtime();
+    // Computations to be measured
+    while(inptr != endptr)
+    {
+    unsigned int in = *inptr;  
+
+    // Option 1:
+    //*outptr = (BitReverseTable256[in &amp;amp; 0xff] &amp;lt;&amp;lt; 24) | 
+    //    (BitReverseTable256[(in &amp;gt;&amp;gt; 8) &amp;amp; 0xff] &amp;lt;&amp;lt; 16) | 
+    //    (BitReverseTable256[(in &amp;gt;&amp;gt; 16) &amp;amp; 0xff] &amp;lt;&amp;lt; 8) |
+    //    (BitReverseTable256[(in &amp;gt;&amp;gt; 24) &amp;amp; 0xff]);
+
+    // Option 2:
+    unsigned char * p = (unsigned char *) &amp;amp;(*inptr);
+    unsigned char * q = (unsigned char *) &amp;amp;(*outptr);
+    q[3] = BitReverseTable256[p[0]]; 
+    q[2] = BitReverseTable256[p[1]]; 
+    q[1] = BitReverseTable256[p[2]]; 
+    q[0] = BitReverseTable256[p[3]];
+
+      inptr++;
+      outptr++;
+    }
+    // Measuring the elapsed time
+    double end = omp_get_wtime();
+    // Time calculation (in seconds)
+    printf(&#34;Time: %f seconds\n&#34;, end-start);
+
+    free(ints);
+    free(ints2);
+
+    return 0;
+}
+mrj10@mjlap:~/code$ gcc -fopenmp -std=c99 -o reverse reverse.c
+mrj10@mjlap:~/code$ ./reverse
+Time: 2.000593 seconds
+mrj10@mjlap:~/code$ ./reverse
+Time: 1.938893 seconds
+mrj10@mjlap:~/code$ ./reverse
+Time: 1.936365 seconds
+mrj10@mjlap:~/code$ gcc -fopenmp -std=c99 -O2 -o reverse reverse.c
+mrj10@mjlap:~/code$ ./reverse
+Time: 0.942709 seconds
+mrj10@mjlap:~/code$ ./reverse
+Time: 0.991104 seconds
+mrj10@mjlap:~/code$ ./reverse
+Time: 0.947203 seconds
+mrj10@mjlap:~/code$ gcc -fopenmp -std=c99 -O3 -o reverse reverse.c
+mrj10@mjlap:~/code$ ./reverse
+Time: 0.922639 seconds
+mrj10@mjlap:~/code$ ./reverse
+Time: 0.892372 seconds
+mrj10@mjlap:~/code$ ./reverse
+Time: 0.891688 seconds
+mrj10@mjlap:~/code$ gcc -fopenmp -std=c99 -o reverse_lookup reverse_lookup.c
+mrj10@mjlap:~/code$ ./reverse_lookup
+Time: 1.201127 seconds              
+mrj10@mjlap:~/code$ ./reverse_lookup
+Time: 1.196129 seconds              
+mrj10@mjlap:~/code$ ./reverse_lookup
+Time: 1.235972 seconds              
+mrj10@mjlap:~/code$ gcc -fopenmp -std=c99 -O2 -o reverse_lookup reverse_lookup.c
+mrj10@mjlap:~/code$ ./reverse_lookup
+Time: 0.633042 seconds              
+mrj10@mjlap:~/code$ ./reverse_lookup
+Time: 0.655880 seconds              
+mrj10@mjlap:~/code$ ./reverse_lookup
+Time: 0.633390 seconds              
+mrj10@mjlap:~/code$ gcc -fopenmp -std=c99 -O3 -o reverse_lookup reverse_lookup.c
+mrj10@mjlap:~/code$ ./reverse_lookup
+Time: 0.652322 seconds              
+mrj10@mjlap:~/code$ ./reverse_lookup
+Time: 0.631739 seconds              
+mrj10@mjlap:~/code$ ./reverse_lookup
+Time: 0.652431 seconds
+mrj10@mjlap:~/code$ gcc -fopenmp -std=c99 -o reverse_lookup reverse_lookup.c
+mrj10@mjlap:~/code$ ./reverse_lookup
+Time: 1.671537 seconds
+mrj10@mjlap:~/code$ ./reverse_lookup
+Time: 1.688173 seconds
+mrj10@mjlap:~/code$ ./reverse_lookup
+Time: 1.664662 seconds
+mrj10@mjlap:~/code$ gcc -fopenmp -std=c99 -O2 -o reverse_lookup reverse_lookup.c
+mrj10@mjlap:~/code$ ./reverse_lookup
+Time: 1.049851 seconds
+mrj10@mjlap:~/code$ ./reverse_lookup
+Time: 1.048403 seconds
+mrj10@mjlap:~/code$ ./reverse_lookup
+Time: 1.085086 seconds
+mrj10@mjlap:~/code$ gcc -fopenmp -std=c99 -O3 -o reverse_lookup reverse_lookup.c
+mrj10@mjlap:~/code$ ./reverse_lookup
+Time: 1.082223 seconds
+mrj10@mjlap:~/code$ ./reverse_lookup
+Time: 1.053431 seconds
+mrj10@mjlap:~/code$ ./reverse_lookup
+Time: 1.081224 seconds
+.L3:
+movl    (%r12,%rsi), %ecx
+movzbl  %cl, %eax
+movzbl  BitReverseTable256(%rax), %edx
+movl    %ecx, %eax
+shrl    $24, %eax
+mov     %eax, %eax
+movzbl  BitReverseTable256(%rax), %eax
+sall    $24, %edx
+orl     %eax, %edx
+movzbl  %ch, %eax
+shrl    $16, %ecx
+movzbl  BitReverseTable256(%rax), %eax
+movzbl  %cl, %ecx
+sall    $16, %eax
+orl     %eax, %edx
+movzbl  BitReverseTable256(%rcx), %eax
+sall    $8, %eax
+orl     %eax, %edx
+movl    %edx, (%r13,%rsi)
+addq    $4, %rsi
+cmpq    $400000000, %rsi
+jne     .L3
+.L3:
+movq    (%r12,%rsi), %rdx
+movq    %rdx, %rax
+shrq    $24, %rax
+andl    $255, %eax
+movzbl  BitReverseTable256(%rax), %ecx
+movzbq  %dl,%rax
+movzbl  BitReverseTable256(%rax), %eax
+salq    $24, %rax
+orq     %rax, %rcx
+movq    %rdx, %rax
+shrq    $56, %rax
+movzbl  BitReverseTable256(%rax), %eax
+salq    $32, %rax
+orq     %rax, %rcx
+movzbl  %dh, %eax
+shrq    $16, %rdx
+movzbl  BitReverseTable256(%rax), %eax
+salq    $16, %rax
+orq     %rax, %rcx
+movzbq  %dl,%rax
+shrq    $16, %rdx
+movzbl  BitReverseTable256(%rax), %eax
+salq    $8, %rax
+orq     %rax, %rcx
+movzbq  %dl,%rax
+shrq    $8, %rdx
+movzbl  BitReverseTable256(%rax), %eax
+salq    $56, %rax
+orq     %rax, %rcx
+movzbq  %dl,%rax
+shrq    $8, %rdx
+movzbl  BitReverseTable256(%rax), %eax
+andl    $255, %edx
+salq    $48, %rax
+orq     %rax, %rcx
+movzbl  BitReverseTable256(%rdx), %eax
+salq    $40, %rax
+orq     %rax, %rcx
+movq    %rcx, (%r13,%rsi)
+addq    $8, %rsi
+cmpq    $400000000, %rsi
+jne     .L3
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

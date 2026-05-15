@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Bash Script Argument Parsing: getopts vs getopt and Custom Solutions - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore effective methods for parsing command-line arguments in Bash scripts, comparing built-in tools like getopts and getopt with alternative custom parsing …">
+
+
+
+<meta name="keywords" content="bash getopts, bash getopt, command line arguments, argument parsing">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Bash Script Argument Parsing: getopts vs getopt and Custom Solutions - sqlpey">
+<meta name="DC.description" content="Explore effective methods for parsing command-line arguments in Bash scripts, comparing built-in tools like getopts and getopt with alternative custom parsing techniques.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-11-04">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Bash Script Argument Parsing: getopts vs getopt and Custom Solutions - sqlpey">
+<meta property="og:description" content="Explore effective methods for parsing command-line arguments in Bash scripts, comparing built-in tools like getopts and getopt with alternative custom parsing …">
+<meta property="og:url" content="https://sqlpey.com/bash/bash-script-argument-parsing-getopts-vs-getopt/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-11-04T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-11-04T00:00:00Z">
+<meta property="article:modified_time" content="2025-11-04T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="Bash Scripting">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Bash Script Argument Parsing: getopts vs getopt and Custom Solutions">
+<meta name="twitter:description" content="Explore effective methods for parsing command-line arguments in Bash scripts, comparing built-in tools like getopts and getopt with alternative custom parsing …">
+
+
+<link rel="canonical" href="https://sqlpey.com/bash/bash-script-argument-parsing-getopts-vs-getopt/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Bash Script Argument Parsing: getopts vs getopt and Custom Solutions\"",
+  "description": "\"Explore effective methods for parsing command-line arguments in Bash scripts, comparing built-in tools like getopts and getopt with alternative custom parsing techniques.\"",
+  "url": "\"https://sqlpey.com/bash/bash-script-argument-parsing-getopts-vs-getopt/\"",
+  "datePublished": "\"2025-11-04T00:00:00Z\"",
+  "dateModified": "\"2025-11-04T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/bash/bash-script-argument-parsing-getopts-vs-getopt/\""
+  },
+  "articleSection": "\"Bash Scripting\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Bash Script Argument Parsing: getopts vs getopt and Custom Solutions</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">Bash Scripting</span>
+              
+              <span class="tag">Shell Programming</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              15 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Nov 4, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#bash-script-argument-parsing-getopts-vs-getopt-and-custom-solutions">&ldquo;Bash Script Argument Parsing: getopts vs getopt and Custom Solutions&rdquo;</a></li>
+    <li><a href="#solution-1-standard-getopts-implementation-with-strict-validation">Solution 1: Standard <code>getopts</code> Implementation with Strict Validation</a>
+      <ul>
+        <li><a href="#the-script-structure-using-getopts">The Script Structure using <code>getopts</code></a></li>
+        <li><a href="#example-interactions">Example Interactions:</a></li>
+      </ul>
+    </li>
+    <li><a href="#solution-2-enhancing-getopts-error-handling-and-structure">Solution 2: Enhancing <code>getopts</code> Error Handling and Structure</a>
+      <ul>
+        <li><a href="#key-getopts-syntax-details">Key <code>getopts</code> Syntax Details:</a></li>
+      </ul>
+    </li>
+    <li><a href="#solution-3-employing-getopt-for-long-options">Solution 3: Employing <code>getopt</code> for Long Options</a>
+      <ul>
+        <li><a href="#getopt-syntax-forms-and-argument-types"><code>getopt</code> Syntax Forms and Argument Types:</a></li>
+        <li><a href="#elaborate-script-example-using-getopt">Elaborate Script Example using <code>getopt</code></a></li>
+      </ul>
+    </li>
+    <li><a href="#solution-4-getopt-with-complex-optional-arguments">Solution 4: <code>getopt</code> with Complex Optional Arguments</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#solution-5-posix-getopts-compliance-check">Solution 5: POSIX <code>getopts</code> Compliance Check</a></li>
+    <li><a href="#solution-6-creating-a-generic-comment-driven-option-parser-advanced">Solution 6: Creating a Generic, Comment-Driven Option Parser (Advanced)</a></li>
+    <li><a href="#solution-7-custom-non-getoptsgetopt-parsing-for-long-options">Solution 7: Custom Non-<code>getopts</code>/<code>getopt</code> Parsing for Long Options</a>
+      <ul>
+        <li><a href="#custom-argument-formatting-and-parsing">Custom Argument Formatting and Parsing:</a></li>
+      </ul>
+    </li>
+    <li><a href="#solution-8-posix-compliant-manual-argument-handling">Solution 8: POSIX-Compliant Manual Argument Handling</a>
+      <ul>
+        <li><a href="#faqs-on-bash-script-argument-parsing">FAQs on Bash Script Argument Parsing</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="bash-script-argument-parsing-getopts-vs-getopt-and-custom-solutions">&ldquo;Bash Script Argument Parsing: getopts vs getopt and Custom Solutions&rdquo;</h2>
+<p>When developing robust shell scripts, correctly processing command-line options and arguments is crucial for user experience and script reliability. The standard tools, <code>getopts</code> and <code>getopt</code>, offer different capabilities but also present limitations, especially regarding long options (e.g., <code>--help</code>). This exploration details several established solutions, focusing on how each approach manages option definition, argument requirements, and error handling.</p>
+<h2 id="solution-1-standard-getopts-implementation-with-strict-validation">Solution 1: Standard <code>getopts</code> Implementation with Strict Validation</h2>
+<p>The <code>getopts</code> built-in is often the preferred method for handling single-character options due to its simplicity and native availability in most shells. However, it strictly enforces that options requiring arguments must have them immediately following the option letter, separated by whitespace or nothing at all.</p>
+<h3 id="the-script-structure-using-getopts">The Script Structure using <code>getopts</code></h3>
+<p>This implementation rigidly checks for required options (<code>-s</code> and <code>-p</code>) and validates the value for <code>-s</code> to be either 45 or 90.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Function to display usage information and exit</span>
+</span></span><span style="display:flex;"><span>usage<span style="color:#f92672">()</span> <span style="color:#f92672">{</span> 
+</span></span><span style="display:flex;"><span>    echo <span style="color:#e6db74">&#34;Usage: </span>$0<span style="color:#e6db74"> [-s &lt;45|90&gt;] [-p &lt;string&gt;]&#34;</span> 1&gt;&amp;<span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>    exit <span style="color:#ae81ff">1</span> 
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Initialize variables</span>
+</span></span><span style="display:flex;"><span>s<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>p<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># The OPTSTRING &#34;:s:p:&#34; dictates:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># : at the start: Enables silent error reporting (OPTERR is suppressed)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># s: : option -s requires an argument</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># p: : option -p requires an argument</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">while</span> getopts <span style="color:#e6db74">&#34;:s:p:&#34;</span> o; <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>o<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> in
+</span></span><span style="display:flex;"><span>        s<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>            s<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>OPTARG<span style="color:#e6db74">}</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># Validate &#39;s&#39; value is exactly 45 or 90</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">((</span>s <span style="color:#f92672">==</span> <span style="color:#ae81ff">45</span> <span style="color:#f92672">||</span> s <span style="color:#f92672">==</span> 90<span style="color:#f92672">))</span> <span style="color:#f92672">||</span> usage
+</span></span><span style="display:flex;"><span>            ;;
+</span></span><span style="display:flex;"><span>        p<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>            p<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>OPTARG<span style="color:#e6db74">}</span>
+</span></span><span style="display:flex;"><span>            ;;
+</span></span><span style="display:flex;"><span>        :<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># This case catches missing arguments for options marked with &#39;:&#39; (like -s or -p)</span>
+</span></span><span style="display:flex;"><span>            echo <span style="color:#e6db74">&#34;Error: Option -</span>$OPTARG<span style="color:#e6db74"> requires an argument.&#34;</span> &gt;&amp;<span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>            usage
+</span></span><span style="display:flex;"><span>            ;;
+</span></span><span style="display:flex;"><span>        <span style="color:#ae81ff">\?</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># This case catches unknown options</span>
+</span></span><span style="display:flex;"><span>            echo <span style="color:#e6db74">&#34;Error: Invalid option -</span>$OPTARG<span style="color:#e6db74">&#34;</span> &gt;&amp;<span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>            usage
+</span></span><span style="display:flex;"><span>            ;;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">esac</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">done</span>
+</span></span><span style="display:flex;"><span>shift <span style="color:#66d9ef">$((</span>OPTIND-1<span style="color:#66d9ef">))</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Final check to ensure both required arguments were provided</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> -z <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>s<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">]</span> <span style="color:#f92672">||</span> <span style="color:#f92672">[</span> -z <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>p<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>    usage
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;s = </span><span style="color:#e6db74">${</span>s<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;p = </span><span style="color:#e6db74">${</span>p<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span></code></pre></div><h3 id="example-interactions">Example Interactions:</h3>
+<p>Running <code>./myscript.sh -s 45 -p foo</code> yields the expected output:</p>
+<pre tabindex="0"><code>s = 45
+p = foo
+</code></pre><h2 id="solution-2-enhancing-getopts-error-handling-and-structure">Solution 2: Enhancing <code>getopts</code> Error Handling and Structure</h2>
+<p>This approach refines the <code>getopts</code> usage by explicitly handling errors silently (<code>:</code> in the OPTSTRING) and restructuring the case statement to offer more informative feedback when validation fails, particularly for numerical constraints.</p>
+<h3 id="key-getopts-syntax-details">Key <code>getopts</code> Syntax Details:</h3>
+<ul>
+<li><strong><code>OPTSTRING</code></strong>: The string defines expected options. A colon after a letter (e.g., <code>s:</code>) signifies that the option requires an argument.</li>
+<li><strong>Silent Errors (<code>:s:p:</code>)</strong>: Starting the string with a colon suppresses default error messages from <code>getopts</code>, allowing custom error reporting within the <code>case</code> block (e.g., catching <code>?</code> for unknown options or <code>:</code> for missing arguments).</li>
+<li><strong><code>OPTARG</code></strong>: Holds the argument value for the current option.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/usr/bin/env bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Function to display help by grepping comments in the script itself</span>
+</span></span><span style="display:flex;"><span>usage<span style="color:#f92672">()</span> <span style="color:#f92672">{</span> 
+</span></span><span style="display:flex;"><span>    echo <span style="color:#e6db74">&#34;</span>$0<span style="color:#e6db74"> usage:&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Extract usage details from comments starting with &#34;. ) #&#34;</span>
+</span></span><span style="display:flex;"><span>    grep -E <span style="color:#e6db74">&#34;^\s*\w+\)\s*#.*&#34;</span> $0 | sed -E <span style="color:#e6db74">&#39;s/^\s*\w+\)\s*#\s*(.*)/\1/&#39;</span>
+</span></span><span style="display:flex;"><span>    exit <span style="color:#ae81ff">0</span> 
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Check if any arguments were provided</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span> $# -eq <span style="color:#ae81ff">0</span> <span style="color:#f92672">]</span> <span style="color:#f92672">&amp;&amp;</span> usage
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Use &#34;:hs:p:&#34; to enable silent error handling</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">while</span> getopts <span style="color:#e6db74">&#34;:hs:p:&#34;</span> arg; <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">case</span> $arg in
+</span></span><span style="display:flex;"><span>    p<span style="color:#f92672">)</span> <span style="color:#75715e"># Option -p requires an argument</span>
+</span></span><span style="display:flex;"><span>      echo <span style="color:#e6db74">&#34;p is </span><span style="color:#e6db74">${</span>OPTARG<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>      ;;
+</span></span><span style="display:flex;"><span>    s<span style="color:#f92672">)</span> <span style="color:#75715e"># Option -s requires an argument (strength)</span>
+</span></span><span style="display:flex;"><span>      strength<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>OPTARG<span style="color:#e6db74">}</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># Numeric validation for strength</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">[</span> $strength -eq <span style="color:#ae81ff">45</span> -o $strength -eq <span style="color:#ae81ff">90</span> <span style="color:#f92672">]</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        <span style="color:#f92672">&amp;&amp;</span> echo <span style="color:#e6db74">&#34;Strength set to </span>$strength<span style="color:#e6db74">.&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>        <span style="color:#f92672">||</span> <span style="color:#f92672">{</span> echo <span style="color:#e6db74">&#34;Validation Error: Strength must be 45 or 90. Found &#39;</span>$strength<span style="color:#e6db74">&#39;.&#34;</span>; usage; exit 1; <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>      ;;
+</span></span><span style="display:flex;"><span>    h<span style="color:#f92672">)</span> <span style="color:#75715e"># Display help on -h</span>
+</span></span><span style="display:flex;"><span>      usage
+</span></span><span style="display:flex;"><span>      exit <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>      ;;
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">\?</span> | :<span style="color:#f92672">)</span> <span style="color:#75715e"># Handle unknown options or missing arguments silently</span>
+</span></span><span style="display:flex;"><span>      echo <span style="color:#e6db74">&#34;Error: Invalid option or missing argument for -</span>$OPTARG<span style="color:#e6db74">&#34;</span> &gt;&amp;<span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>      usage
+</span></span><span style="display:flex;"><span>      exit <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>      ;;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">esac</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">done</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Shift past processed options</span>
+</span></span><span style="display:flex;"><span>shift <span style="color:#66d9ef">$((</span>OPTIND-1<span style="color:#66d9ef">))</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># If any remaining positional arguments exist, we might need to handle them here,</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># or ensure all required arguments were consumed/handled.</span>
+</span></span></code></pre></div><h2 id="solution-3-employing-getopt-for-long-options">Solution 3: Employing <code>getopt</code> for Long Options</h2>
+<p>When scripts require options spanning multiple characters (e.g., <code>--version</code>), the external utility <code>getopt</code> is often necessary. <code>getopt</code> processes arguments and outputs a standardized list of options ready for processing by <code>eval set -- &quot;$options&quot;</code>.</p>
+<h3 id="getopt-syntax-forms-and-argument-types"><code>getopt</code> Syntax Forms and Argument Types:</h3>
+<p><code>getopt</code> defines options using an <code>optstring</code> where:</p>
+<ul>
+<li><code>h</code>: A flag option requiring no value.</li>
+<li><code>v:</code>: A key-value option where the value is mandatory.</li>
+<li><code>t::</code>: A key-value option where the value is optional (indicated by double colons).</li>
+</ul>
+<p>Crucially, <code>getopt</code> separates the list of valid options from the actual parameters passed to the script using <code>--</code>.</p>
+<h3 id="elaborate-script-example-using-getopt">Elaborate Script Example using <code>getopt</code></h3>
+<p>This example demonstrates defining both short (<code>-v</code>, <code>-r</code>, <code>-V</code>, <code>-d</code>) and long options (<code>--help</code>, <code>--espo-version</code>, etc.) simultaneously.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># filename: commandLineParser.sh</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># author: ExpertTechnicalWriter</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>showHelp<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Use &#39;cat &lt;&lt; EOF&#39; for clean multi-line output</span>
+</span></span><span style="display:flex;"><span>cat <span style="color:#e6db74">&lt;&lt; EOF  
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Usage: ./commandLineParser.sh -v &lt;version&gt; [-hrV]
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Installs pre-requisites for an application in Development mode.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">-h, --help                Display help information.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">-v, --espo-version &lt;ver&gt;  Specify target application version.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">-r, --rebuild             Trigger build process steps.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">-V, --verbose             Enable detailed execution logging.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">EOF</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Default variable states</span>
+</span></span><span style="display:flex;"><span>version<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;latest&#34;</span>
+</span></span><span style="display:flex;"><span>verbose<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>rebuilt<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Define short and long options for getopt</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Short options: hv:Vrd (h and r take no arg, v and d take arg)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Long options: help,version:,verbose,rebuild,dryrun</span>
+</span></span><span style="display:flex;"><span>OPTIONS_SPEC<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>getopt -l <span style="color:#e6db74">&#34;help,version:,verbose,rebuild,dryrun&#34;</span> -o <span style="color:#e6db74">&#34;hv:Vrd&#34;</span> -a -- <span style="color:#e6db74">&#34;</span>$@<span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> $? !<span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span> 
+</span></span><span style="display:flex;"><span>    echo <span style="color:#e6db74">&#34;Error processing options.&#34;</span> &gt;&amp;<span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>    showHelp
+</span></span><span style="display:flex;"><span>    exit <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Reset positional parameters based on getopt&#39;s parsed output</span>
+</span></span><span style="display:flex;"><span>eval set -- <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>OPTIONS_SPEC<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">while</span> true; <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span> in
+</span></span><span style="display:flex;"><span>        -h|--help<span style="color:#f92672">)</span> 
+</span></span><span style="display:flex;"><span>            showHelp
+</span></span><span style="display:flex;"><span>            exit <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>            ;;
+</span></span><span style="display:flex;"><span>        -v|--version<span style="color:#f92672">)</span> 
+</span></span><span style="display:flex;"><span>            shift
+</span></span><span style="display:flex;"><span>            version<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>            ;;
+</span></span><span style="display:flex;"><span>        -V|--verbose<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>            verbose<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            set -xv  <span style="color:#75715e"># Activate script tracing</span>
+</span></span><span style="display:flex;"><span>            ;;
+</span></span><span style="display:flex;"><span>        -r|--rebuild<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>            rebuilt<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            ;;
+</span></span><span style="display:flex;"><span>        --<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>            shift
+</span></span><span style="display:flex;"><span>            break;; <span style="color:#75715e"># End of options</span>
+</span></span><span style="display:flex;"><span>        *<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>            echo <span style="color:#e6db74">&#34;Internal error: Unhandled option </span>$1<span style="color:#e6db74">&#34;</span> &gt;&amp;<span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>            showHelp
+</span></span><span style="display:flex;"><span>            exit <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            ;;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">esac</span>
+</span></span><span style="display:flex;"><span>    shift
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">done</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">## Solutions
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Parsed Results
+</span></span></span></code></pre></div><p>#!/bin/bash</p>
+<p>usage() { echo &ldquo;Usage: $0 [-s &lt;45|90&gt;] [-p &lt;string&gt;]&rdquo; 1&gt;&amp;2; exit 1; }</p>
+<p>while getopts &ldquo;:s:p:&rdquo; o; do
+case &ldquo;${o}&rdquo; in
+s)
+s=${OPTARG}
+((s == 45 || s == 90)) || usage
+;;
+p)
+p=${OPTARG}
+;;
+*)
+usage
+;;
+esac
+done
+shift $((OPTIND-1))</p>
+<p>if [ -z &ldquo;${s}&rdquo; ] || [ -z &ldquo;${p}&rdquo; ]; then
+usage
+fi</p>
+<p>echo &ldquo;s = ${s}&rdquo;
+echo &ldquo;p = ${p}&rdquo;
+$ ./myscript.sh
+Usage: ./myscript.sh [-s &lt;45|90&gt;] [-p &lt;string&gt;]</p>
+<p>$ ./myscript.sh -h
+Usage: ./myscript.sh [-s &lt;45|90&gt;] [-p &lt;string&gt;]</p>
+<p>$ ./myscript.sh -s &quot;&quot; -p &quot;&quot;
+Usage: ./myscript.sh [-s &lt;45|90&gt;] [-p &lt;string&gt;]</p>
+<p>$ ./myscript.sh -s 10 -p foo
+Usage: ./myscript.sh [-s &lt;45|90&gt;] [-p &lt;string&gt;]</p>
+<p>$ ./myscript.sh -s 45 -p foo
+s = 45
+p = foo</p>
+<p>$ ./myscript.sh -s 90 -p bar
+s = 90
+p = bar</p>
+<pre tabindex="0"><code>
+&#34;
+echo &#34;Version: $version&#34;
+echo &#34;Verbose Mode: $verbose&#34;
+echo &#34;Rebuild Triggered: $rebuilt&#34;
+echo &#34;Remaining positional arguments: $*&#34;
+</code></pre><h2 id="solution-4-getopt-with-complex-optional-arguments">Solution 4: <code>getopt</code> with Complex Optional Arguments</h2>
+<p>When dealing with options that are optional <em>and</em> can take an optional argument (like <code>-c</code> or <code>--c-long</code> below), the logic within the <code>case</code> statement needs refinement to check if the argument slot <code>$2</code> is empty.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Example demonstrating optional argument handling with getopt</span>
+</span></span><span style="display:flex;"><span>TEMP<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>getopt -o ab:c:: --long a-long,b-long:,c-long:: <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>              -n <span style="color:#e6db74">&#39;arg_parser_example.sh&#39;</span> -- <span style="color:#e6db74">&#34;</span>$@<span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> $? !<span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span> 
+</span></span><span style="display:flex;"><span>    echo <span style="color:#e6db74">&#34;Terminating due to argument parsing error...&#34;</span> &gt;&amp;<span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>    exit <span style="color:#ae81ff">1</span> 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Essential step: re-evaluate arguments based on getopt&#39;s output</span>
+</span></span><span style="display:flex;"><span>eval set -- <span style="color:#e6db74">&#34;</span>$TEMP<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">while</span> true; <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span> in
+</span></span><span style="display:flex;"><span>        -a|--a-long<span style="color:#f92672">)</span> 
+</span></span><span style="display:flex;"><span>            echo <span style="color:#e6db74">&#34;Flag -a or --a-long set (no value required).&#34;</span>
+</span></span><span style="display:flex;"><span>            shift ;;
+</span></span><span style="display:flex;"><span>        -b|--b-long<span style="color:#f92672">)</span> 
+</span></span><span style="display:flex;"><span>            echo <span style="color:#e6db74">&#34;Option -b or --b-long set with argument &#39;</span>$2<span style="color:#e6db74">&#39;.&#34;</span>
+</span></span><span style="display:flex;"><span>            shift <span style="color:#ae81ff">2</span> ;; <span style="color:#75715e"># Shift twice: once for option, once for argument</span>
+</span></span><span style="display:flex;"><span>        -c|--c-long<span style="color:#f92672">)</span> 
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># Handle optional argument for -c</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;</span>$2<span style="color:#e6db74">&#34;</span> in
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;&#34;</span><span style="color:#f92672">)</span> 
+</span></span><span style="display:flex;"><span>                    echo <span style="color:#e6db74">&#34;Option -c or --c-long set (no value provided).&#34;</span>
+</span></span><span style="display:flex;"><span>                    shift <span style="color:#ae81ff">2</span> ;;
+</span></span><span style="display:flex;"><span>                *<span style="color:#f92672">)</span>  
+</span></span><span style="display:flex;"><span>                    echo <span style="color:#e6db74">&#34;Option -c or --c-long set with argument &#39;</span>$2<span style="color:#e6db74">&#39;.&#34;</span>
+</span></span><span style="display:flex;"><span>                    shift <span style="color:#ae81ff">2</span> ;;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">esac</span> ;;
+</span></span><span style="display:flex;"><span>        --<span style="color:#f92672">)</span> 
+</span></span><span style="display:flex;"><span>            shift ; 
+</span></span><span style="display:flex;"><span>            break ;;
+</span></span><span style="display:flex;"><span>        *<span style="color:#f92672">)</span> 
+</span></span><span style="display:flex;"><span>            echo <span style="color:#e6db74">&#34;Fatal: Internal parsing error.&#34;</span> ; 
+</span></span><span style="display:flex;"><span>            exit <span style="color:#ae81ff">1</span> ;;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">esac</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">done</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;
+</span></span></span></code></pre></div><p>getopts OPTSTRING VARNAME [ARGS&hellip;]
+#!/usr/bin/env bash
+usage() { echo &quot;$0 usage:&quot; &amp;&amp; grep &quot; .)\ #&quot; $0; exit 0; }
+[ $# -eq 0 ] &amp;&amp; usage
+while getopts &quot;:hs:p:&quot; arg; do
+case $arg in
+p) # Specify p value.
+echo &quot;p is ${OPTARG}&quot;
+;;
+s) # Specify strength, either 45 or 90.
+strength=${OPTARG}
+[ $strength -eq 45 -o $strength -eq 90 ] <br>
+&amp;&amp; echo &quot;Strength is $strength.&quot; <br>
+|| echo &quot;Strength needs to be either 45 or 90, $strength found instead.&quot;
+;;
+h | *) # Display help.
+usage
+exit 0
+;;
+esac
+done
+$ ./foo.sh
+./foo.sh usage:
+p) # Specify p value.
+s) # Specify strength, either 45 or 90.
+h | *) # Display help.
+$ ./foo.sh -s 123 -p any_string
+Strength needs to be either 45 or 90, 123 found instead.
+p is any_string
+$ ./foo.sh -s 90 -p any_string
+Strength is 90.
+p is any_string</p>
+<pre tabindex="0"><code>
+Remaining Arguments
+</code></pre><p>getopt optstring parameters</p>
+<h1 id="this-is-correct">This is correct</h1>
+<p>getopt &quot;hv:t::&quot; -v 123 -t123<br>
+getopt &quot;hv:t::&quot; -v123 -t123  # -v and 123 doesn&rsquo;t have whitespace</p>
+<h1 id="-h-takes-no-value">-h takes no value.</h1>
+<p>getopt &quot;hv:t::&quot; -h -v123</p>
+<h1 id="this-is-wrong-after--t-cant-have-whitespace">This is wrong. after -t can&rsquo;t have whitespace.</h1>
+<h1 id="only-optional-params-cannot-have-whitespace-between-key-and-value">Only optional params cannot have whitespace between key and value</h1>
+<p>getopt &quot;hv:t::&quot; -v 123 -t 123</p>
+<h1 id="multiple-arguments-that-takes-value">Multiple arguments that takes value.</h1>
+<p>getopt &quot;h:v:t::g::&quot; -h abc -v 123 -t21</p>
+<h1 id="multiple-arguments-without-value">Multiple arguments without value</h1>
+<h1 id="all-of-these-are-correct">All of these are correct</h1>
+<p>getopt &quot;hvt&quot; -htv
+getopt &quot;hvt&quot; -h -t -v
+getopt &quot;hvt&quot; -tv -h
+getopt [getopt_options] [&ndash;] optstring parameters
+getopt -l &quot;name:,version::,verbose&quot; &ndash; &quot;n:v::V&quot; &ndash;name=Karthik -version=5.2 -verbose
+getopt [getopt_options] -o|&ndash;options optstring [getopt_options] [&ndash;] [parameters]
+getopt -l &quot;name:,version::,verbose&quot; -a -o &quot;n:v::V&quot; &ndash; -name=Karthik -version=5.2 -verbose
+getopt -l &quot;name:,version&quot; &ndash; &quot;&quot; &ndash;name=Karthik
+getopt -a -l &quot;name:,version&quot; &ndash; &quot;&quot; -name=Karthik
+#!/bin/bash</p>
+<h1 id="filename-commandlinesh">filename: commandLine.sh</h1>
+<h1 id="author-thebuzzycoder">author: @theBuzzyCoder</h1>
+<p>showHelp() {</p>
+<h1 id="cat--eof-this-means-that-cat-should-stop-reading-when-eof-is-detected"><code>cat &amp;lt;&amp;lt; EOF</code> This means that cat should stop reading when EOF is detected</h1>
+<p>cat &lt;&lt; EOF<br>
+Usage: ./installer -v &lt;espo-version&gt; [-hrV]
+Install Pre-requisites for EspoCRM with docker in Development mode</p>
+<p>-h, -help,          &ndash;help                  Display help</p>
+<p>-v, -espo-version,  &ndash;espo-version          Set and Download specific version of EspoCRM</p>
+<p>-r, -rebuild,       &ndash;rebuild               Rebuild php vendor directory using composer and compiled css using grunt</p>
+<p>-V, -verbose,       &ndash;verbose               Run script in verbose mode. Will print out each step of execution.</p>
+<p>EOF</p>
+<h1 id="eof-is-found-above-and-hence-cat-command-stops-reading-this-is-equivalent-to-echo-but-much-neater-when-printing-out">EOF is found above and hence cat command stops reading. This is equivalent to echo but much neater when printing out.</h1>
+<p>}</p>
+<p>export version=0
+export verbose=0
+export rebuilt=0</p>
+<h1 id="-is-all-command-line-parameters-passed-to-the-script">$@ is all command line parameters passed to the script.</h1>
+<h1 id="-o-is-for-short-options-like--v">-o is for short options like -v</h1>
+<h1 id="-l-is-for-long-options-with-double-dash-like-version">-l is for long options with double dash like &ndash;version</h1>
+<h1 id="the-comma-separates-different-long-options">the comma separates different long options</h1>
+<h1 id="-a-is-for-long-options-with-single-dash-like--version">-a is for long options with single dash like -version</h1>
+<p>options=$(getopt -l &quot;help,version:,verbose,rebuild,dryrun&quot; -o &quot;hv:Vrd&quot; -a &ndash; &quot;$@&quot;)</p>
+<h1 id="set-">set &ndash;:</h1>
+<h1 id="if-no-arguments-follow-this-option-then-the-positional-parameters-are-unset-otherwise-the-positional-parameters">If no arguments follow this option, then the positional parameters are unset. Otherwise, the positional parameters</h1>
+<h1 id="are-set-to-the-arguments-even-if-some-of-them-begin-with-a--">are set to the arguments, even if some of them begin with a ‘-’.</h1>
+<p>eval set &ndash; &quot;$options&quot;</p>
+<p>while true
+do
+case &quot;$1&quot; in
+-h|&ndash;help)
+showHelp
+exit 0
+;;
+-v|&ndash;version)
+shift
+export version=&quot;$1&quot;
+;;
+-V|&ndash;verbose)
+export verbose=1
+set -xv  # Set xtrace and verbose mode.
+;;
+-r|&ndash;rebuild)
+export rebuild=1
+;;
+&ndash;)
+shift
+break;;
+esac
+shift
+done</p>
+<h1 id="with-short-options-grouped-together-and-long-option">With short options grouped together and long option</h1>
+<h1 id="with-double-dash-version">With double dash &lsquo;&ndash;version&rsquo;</h1>
+<p>bash commandLine.sh &ndash;version=1.0 -rV</p>
+<h1 id="with-short-options-grouped-together-and-long-option-1">With short options grouped together and long option</h1>
+<h1 id="with-single-dash--version">With single dash &lsquo;-version&rsquo;</h1>
+<p>bash commandLine.sh -version=1.0 -rV</p>
+<h1 id="or-with-short-option-that-takes-value-value-separated-by-whitespace">OR with short option that takes value, value separated by whitespace</h1>
+<h1 id="by-key">by key</h1>
+<p>bash commandLine.sh -v 1.0 -rV</p>
+<h1 id="or-with-short-option-that-takes-value-value-without-whitespace">OR with short option that takes value, value without whitespace</h1>
+<h1 id="separation-from-key">separation from key.</h1>
+<p>bash commandLine.sh -v1.0 -rV</p>
+<h1 id="or-separating-individual-short-options">OR Separating individual short options</h1>
+<p>bash commandLine.sh -v1.0 -r -V</p>
+<pre tabindex="0"><code>
+&#34;
+for arg; do 
+    echo &#34;--&gt; &#39;$arg&#39;&#34; ; 
+done
+</code></pre><h2 id="solution-5-posix-getopts-compliance-check">Solution 5: POSIX <code>getopts</code> Compliance Check</h2>
+<p>For maximum portability across Unix-like systems, adhering closely to the POSIX specification for <code>getopts</code> is recommended. This standard approach clearly separates option handling from remaining arguments via <code>shift $(($OPTIND - 1))</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/sh
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e"># POSIX compliant example using getopts</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>aflag<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>bflag<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>bval<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Process options: &#39;a&#39; takes no argument, &#39;b:&#39; requires one argument</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">while</span> getopts <span style="color:#e6db74">&#34;ab:&#34;</span> name; <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">case</span> $name in
+</span></span><span style="display:flex;"><span>    a<span style="color:#f92672">)</span>    aflag<span style="color:#f92672">=</span>1;;
+</span></span><span style="display:flex;"><span>    b<span style="color:#f92672">)</span>    bflag<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>          bval<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span>$OPTARG<span style="color:#e6db74">&#34;</span>;;
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">\?</span><span style="color:#f92672">)</span>   printf <span style="color:#e6db74">&#34;Usage: %s: [-a] [-b value] args\n&#34;</span> <span style="color:#e6db74">&#34;</span>$0<span style="color:#e6db74">&#34;</span> &gt;&amp;<span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>          exit 2;;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">esac</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">done</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$aflag<span style="color:#e6db74">&#34;</span> -eq <span style="color:#ae81ff">1</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>    printf <span style="color:#e6db74">&#34;Flag -a activated.\n&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$bflag<span style="color:#e6db74">&#34;</span> -eq <span style="color:#ae81ff">1</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>    printf <span style="color:#e6db74">&#39;Flag -b specified with value &#34;%s&#34;.\n&#39;</span> <span style="color:#e6db74">&#34;</span>$bval<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Remove processed options and shift to remaining positional arguments</span>
+</span></span><span style="display:flex;"><span>shift <span style="color:#66d9ef">$((</span>$OPTIND <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span><span style="color:#66d9ef">))</span>
+</span></span><span style="display:flex;"><span>printf <span style="color:#e6db74">&#34;Positional arguments left: %s\n&#34;</span> <span style="color:#e6db74">&#34;</span>$*<span style="color:#e6db74">&#34;</span>
+</span></span></code></pre></div><h2 id="solution-6-creating-a-generic-comment-driven-option-parser-advanced">Solution 6: Creating a Generic, Comment-Driven Option Parser (Advanced)</h2>
+<p>For scripts where the option definitions change frequently, creating a reusable parser function that derives the <code>getopts</code> string from a descriptive input string offers high flexibility. This requires heavy use of <code>sed</code> to transform the description format into a valid <code>getopts</code> format and map flags to variable names.</p>
+<p>The complexity here lies in reliably mapping descriptive strings like <code>[-s START_DATE_TIME]</code> to environment variables (e.g., <code>START_DATE_TIME</code>).</p>
+<h2 id="solution-7-custom-non-getoptsgetopt-parsing-for-long-options">Solution 7: Custom Non-<code>getopts</code>/<code>getopt</code> Parsing for Long Options</h2>
+<p>When the limitations of <code>getopt</code> (especially its handling of spaces within arguments or its output format) become restrictive, a manual loop over arguments (<code>$@</code>) combined with prefix checks (<code>--</code> or <code>-</code>) can yield a highly customized solution. This method allows for very flexible argument formats, including arguments without spaces (e.g., <code>--package=value</code>) or arguments that are flags (set to 1).</p>
+<h3 id="custom-argument-formatting-and-parsing">Custom Argument Formatting and Parsing:</h3>
+<p>This function formats arguments for variable assignment (e.g., <code>--package-name</code> becomes <code>ARG_PACKAGE_NAME</code>).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> formatArgument<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Capitalize, remove leading --, replace - with _</span>
+</span></span><span style="display:flex;"><span>  local ARGUMENT<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>1^^<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>  ARGUMENT<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>ARGUMENT/--/<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>  ARGUMENT<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>ARGUMENT//-/_<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>  echo <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>ARGUMENT<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> parseArguments<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>  local PREVIOUS_ITEM<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>  local COUNT<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">for</span> CURRENT_ITEM in <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>@<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">[[</span> <span style="color:#e6db74">${</span>CURRENT_ITEM<span style="color:#e6db74">}</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;--&#34;</span>* <span style="color:#f92672">]]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># Argument starting with -- is treated as a flag (set to 1) unless the next item is an argument.</span>
+</span></span><span style="display:flex;"><span>      printf -v <span style="color:#e6db74">&#34;ARG_</span><span style="color:#66d9ef">$(</span>formatArgument <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>CURRENT_ITEM<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span> <span style="color:#e6db74">&#34;%s&#34;</span> <span style="color:#e6db74">&#34;1&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> <span style="color:#f92672">[[</span> <span style="color:#e6db74">${</span>PREVIOUS_ITEM<span style="color:#e6db74">}</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;--&#34;</span>* <span style="color:#f92672">]]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Previous item was a flag-like option, so CURRENT_ITEM is its value</span>
+</span></span><span style="display:flex;"><span>        printf -v <span style="color:#e6db74">&#34;ARG_</span><span style="color:#66d9ef">$(</span>formatArgument <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>PREVIOUS_ITEM<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span> <span style="color:#e6db74">&#34;%s&#34;</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>CURRENT_ITEM<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Positional argument</span>
+</span></span><span style="display:flex;"><span>        printf -v <span style="color:#e6db74">&#34;ARG_</span><span style="color:#e6db74">${</span>COUNT<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#e6db74">&#34;%s&#34;</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>CURRENT_ITEM<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    PREVIOUS_ITEM<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>CURRENT_ITEM<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">((</span> COUNT++ <span style="color:#f92672">))</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">done</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><h2 id="solution-8-posix-compliant-manual-argument-handling">Solution 8: POSIX-Compliant Manual Argument Handling</h2>
+<p>An alternative to <code>getopts</code> that supports long options without relying on the external <code>getopt</code> utility involves manually checking prefixes (<code>-s</code> vs <code>--sopt</code>). This tends to be more POSIX-compliant than custom looping based on <code>$@</code> but requires more <code>case</code> logic to manage argument consumption (using <code>shift</code>).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>usage<span style="color:#f92672">()</span> <span style="color:#f92672">{</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Note: This usage function requires arguments to be space-separated from options</span>
+</span></span><span style="display:flex;"><span>    printf <span style="color:#e6db74">&#34;Usage: %s &lt;req&gt; [-s|--sopt &lt;45|90&gt;] [-p|--popt &lt;string&gt;]\n&#34;</span> <span style="color:#e6db74">&#34;</span>$0<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span> 
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span> 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>main<span style="color:#f92672">()</span> <span style="color:#f92672">{</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Check for the first required argument ($1)</span>
+</span></span><span style="display:flex;"><span>    req<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>1:?<span style="color:#66d9ef">$(</span>usage<span style="color:#66d9ef">)</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>    shift; 
+</span></span><span style="display:flex;"><span>    s<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;&#34;</span>;
+</span></span><span style="display:flex;"><span>    p<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;&#34;</span>;
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$#<span style="color:#e6db74">&#34;</span> -ge <span style="color:#ae81ff">1</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;</span>$1<span style="color:#e6db74">&#34;</span> in 
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># Handling short option -s or long option --sopt</span>
+</span></span><span style="display:flex;"><span>            -s|--sopt<span style="color:#f92672">)</span> 
+</span></span><span style="display:flex;"><span>                shift;
+</span></span><span style="display:flex;"><span>                s<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>1:?<span style="color:#66d9ef">$(</span>usage<span style="color:#66d9ef">)</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># Validation</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$s<span style="color:#e6db74">&#34;</span> -eq <span style="color:#ae81ff">45</span> <span style="color:#f92672">]</span> <span style="color:#f92672">||</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$s<span style="color:#e6db74">&#34;</span> -eq <span style="color:#ae81ff">90</span> <span style="color:#f92672">]</span> <span style="color:#f92672">||</span> <span style="color:#f92672">{</span> usage; <span style="color:#66d9ef">return</span> 1; <span style="color:#f92672">}</span> 
+</span></span><span style="display:flex;"><span>                ;; 
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># Handling option -p or --popt, requires argument</span>
+</span></span><span style="display:flex;"><span>            -p|--popt<span style="color:#f92672">)</span> 
+</span></span><span style="display:flex;"><span>                shift; 
+</span></span><span style="display:flex;"><span>                p<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>1:?<span style="color:#66d9ef">$(</span>usage<span style="color:#66d9ef">)</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>                ;; 
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># Any other input is an error</span>
+</span></span><span style="display:flex;"><span>            *<span style="color:#f92672">)</span> 
+</span></span><span style="display:flex;"><span>                usage;
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> 1; 
+</span></span><span style="display:flex;"><span>                ;;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">esac</span>; 
+</span></span><span style="display:flex;"><span>        shift; <span style="color:#75715e"># Move to the next argument after consuming the option and its value</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">done</span>; 
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    printf <span style="color:#e6db74">&#34;req = %s\ns = %s\np = %s\n&#34;</span> <span style="color:#e6db74">&#34;</span>$req<span style="color:#e6db74">&#34;</span> <span style="color:#e6db74">&#34;</span>$s<span style="color:#e6db74">&#34;</span> <span style="color:#e6db74">&#34;</span>$p<span style="color:#e6db74">&#34;</span>; 
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>main <span style="color:#e6db74">&#34;</span>$@<span style="color:#e6db74">&#34;</span>
+</span></span></code></pre></div><p>If you encounter specific issues with SSL verification in Python requests, refer to this resource: <a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">Fixing Python SSL Certificate Verify Failed Error</a>
+.</p>
+<p>What are your biggest pain points when writing shell scripts that need complex argument validation? Share your experiences below!</p>
+<p>For more details on Python environment issues, check <a href="https://sqlpey.com/python/solved-how-to-fix-pip-install-access-denied-on-windows/" target="_blank" rel="noopener">Fixing pip installation errors</a>
+.
+If you are integrating components in Blazor, look into <a href="https://sqlpey.com/dotnet/mudblazor-layouts-perfecting/" target="_blank" rel="noopener">MudBlazor Layouts</a>
+.
+For troubleshooting general Python dependency errors, see <a href="https://sqlpey.com/python/solved-how-to-fix-could-not-find-a-version-that-satisfies-the-requirement-error-in-python/" target="_blank" rel="noopener">Satisfying Requirements Error</a>
+.</p>
+<h3 id="faqs-on-bash-script-argument-parsing">FAQs on Bash Script Argument Parsing</h3>
+<p><div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: What is the main difference between getopts and getopt in Bash</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: <code>getopts</code> is a shell built-in that only handles single-character options (like <code>-a</code>, <code>-b:</code>). <code>getopt</code> is an external utility that supports long options (like <code>--all</code>, <code>--backup=value</code>) but requires specific command structuring and use of <code>eval</code>.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How do I make an option optional in getopts</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: <code>getopts</code> itself does not natively support optional arguments for a single flag definition; if an argument is required (e.g., <code>s:</code>), <code>getopts</code> will raise an error if it&rsquo;s missing. Optional arguments are best handled by <code>getopt</code> (using <code>::</code>) or manual parsing.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why use eval set -- after running getopt</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: <code>getopt</code> reformats the arguments into a space-separated string that follows standard positional parameter conventions. <code>eval set -- &quot;$TEMP&quot;</code> resets the script&rsquo;s positional parameters (<code>$1</code>, <code>$2</code>, etc.) to this standardized, parsable output.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: How can I handle long options without using the external getopt utility</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: You must implement manual parsing by looping through <code>$@</code> and using <code>case</code> statements with prefix matching (e.g., checking if <code>$1</code> starts with <code>--</code> or <code>-</code>) and then explicitly shifting options and arguments as demonstrated in Solution 8.</div>
+    </div>
+</div></p>
+<pre tabindex="0"><code>#!/bin/bash
+
+# A small example program for using the new getopt(1) program.
+# This program will only work with bash(1)
+# An similar program using the tcsh(1) script language can be found
+# as parse.tcsh
+
+# Example input and output (from the bash prompt):
+# ./parse.bash -a par1 &#39;another arg&#39; --c-long &#39;wow!*\?&#39; -cmore -b &amp;quot; very long &amp;quot;
+# Option a
+# Option c, no argument
+# Option c, argument &#39;more&#39;
+# Option b, argument &#39; very long &#39;
+# Remaining arguments:
+# --&amp;gt; &#39;par1&#39;
+# --&amp;gt; &#39;another arg&#39;
+# --&amp;gt; &#39;wow!*\?&#39;
+
+# Note that we use `&amp;quot;$@&amp;quot;&#39; to let each command-line parameter expand to a 
+# separate word. The quotes around &#39;$@&#39; are essential!
+# We need TEMP as the `eval set --&#39; would nuke the return value of getopt.
+TEMP=$(getopt -o ab:c:: --long a-long,b-long:,c-long:: \
+              -n &#39;example.bash&#39; -- &amp;quot;$@&amp;quot;)
+
+if [ $? != 0 ] ; then echo &amp;quot;Terminating...&amp;quot; &amp;gt;&amp;amp;2 ; exit 1 ; fi
+
+# Note the quotes around &#39;$TEMP&#39;: they are essential!
+eval set -- &amp;quot;$TEMP&amp;quot;
+
+while true ; do
+    case &amp;quot;$1&amp;quot; in
+        -a|--a-long) echo &amp;quot;Option a&amp;quot; ; shift ;;
+        -b|--b-long) echo &amp;quot;Option b, argument &#39;$2&#39;&amp;quot; ; shift 2 ;;
+        -c|--c-long) 
+            # c has an optional argument. As we are in quoted mode,
+            # an empty parameter will be generated if its optional
+            # argument is not found.
+            case &amp;quot;$2&amp;quot; in
+                &amp;quot;&amp;quot;) echo &amp;quot;Option c, no argument&amp;quot;; shift 2 ;;
+                *)  echo &amp;quot;Option c, argument &#39;$2&#39;&amp;quot; ; shift 2 ;;
+            esac ;;
+        --) shift ; break ;;
+        *) echo &amp;quot;Internal error!&amp;quot; ; exit 1 ;;
+    esac
+done
+echo &amp;quot;Remaining arguments:&amp;quot;
+for arg do echo &#39;--&amp;gt; &#39;&amp;quot;&#39;$arg&#39;&amp;quot; ; done
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

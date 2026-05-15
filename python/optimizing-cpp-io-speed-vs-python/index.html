@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Optimizing C&#43;&#43; File I/O Speed Versus Python for Large Input Processing - sqlpey - Learn programming with expert tutorials on SQL, JavaScript, Python, C#, Java, and more. Free guides for developers.</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta name="description" content="Explore effective techniques to dramatically accelerate C&#43;&#43; input/output operations, especially when reading large files, by addressing synchronization and …">
+
+
+
+<meta name="keywords" content="C&#43;&#43; input speed, cin vs scanf performance, std::ios_base::sync_with_stdio, file I/O benchmarking">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="author" content="abkhan">
+<meta name="generator" content="Hugo">
+
+<meta name="googlebot" content="index, follow">
+<meta name="googlebot-news" content="index, follow">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/index.xml">
+
+<link rel="alternate" type="application/rss+xml" title="sqlpey" href="/sitemap.xml"><meta name="DC.title" content="Optimizing C&#43;&#43; File I/O Speed Versus Python for Large Input Processing - sqlpey">
+<meta name="DC.description" content="Explore effective techniques to dramatically accelerate C&#43;&#43; input/output operations, especially when reading large files, by addressing synchronization and buffering against Python&#39;s inherent speed in file processing.">
+
+<meta name="DC.creator" content="abkhan">
+<meta name="DC.date" content="2025-07-29">
+
+
+<meta property="og:site_name" content="sqlpey">
+<meta property="og:title" content="Optimizing C&#43;&#43; File I/O Speed Versus Python for Large Input Processing - sqlpey">
+<meta property="og:description" content="Explore effective techniques to dramatically accelerate C&#43;&#43; input/output operations, especially when reading large files, by addressing synchronization and …">
+<meta property="og:url" content="https://sqlpey.com/python/optimizing-cpp-io-speed-vs-python/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:updated_time" content="2025-07-29T00:00:00Z">
+
+
+<meta property="article:published_time" content="2025-07-29T00:00:00Z">
+<meta property="article:modified_time" content="2025-07-29T00:00:00Z">
+<meta property="article:author" content="abkhan">
+
+<meta property="article:section" content="C&#43;&#43; Performance">
+
+
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sqlpey">
+<meta name="twitter:creator" content="@sqlpey">
+<meta name="twitter:title" content="Optimizing C&#43;&#43; File I/O Speed Versus Python for Large Input Processing">
+<meta name="twitter:description" content="Explore effective techniques to dramatically accelerate C&#43;&#43; input/output operations, especially when reading large files, by addressing synchronization and …">
+
+
+<link rel="canonical" href="https://sqlpey.com/python/optimizing-cpp-io-speed-vs-python/" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "\"Optimizing C++ File I/O Speed Versus Python for Large Input Processing\"",
+  "description": "\"Explore effective techniques to dramatically accelerate C++ input/output operations, especially when reading large files, by addressing synchronization and buffering against Python's inherent speed in file processing.\"",
+  "url": "\"https://sqlpey.com/python/optimizing-cpp-io-speed-vs-python/\"",
+  "datePublished": "\"2025-07-29T00:00:00Z\"",
+  "dateModified": "\"2025-07-29T00:00:00Z\"",
+  "author": {
+    "@type": "Person",
+    "name": "\"abkhan\""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "\"sqlpey\"",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "\"/header.webp\""
+    }
+  },
+  "image": [],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "\"https://sqlpey.com/python/optimizing-cpp-io-speed-vs-python/\""
+  },
+  "articleSection": "\"C++ Performance\"",
+  "keywords": ["programming", "tutorials"]
+}
+</script>
+
+
+
+
+  
+
+<link rel="stylesheet" href="/css/main.min.607a76875cd076092719dc05b1f76f66ee6aa7ba0bea0a59fb9a6da06db193e3.css">
+
+<style>
+   
+  :root {
+    --bg-primary: #FAF9F7;
+    --bg-secondary: #F3F1ED;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5C5C5C;
+    --text-muted: #8A8A8A;
+    --accent: #E85D3B;
+    --accent-hover: #D14D2B;
+    --border: #E8E6E2;
+    --border-light: #F0EEEA;
+    
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1E1E1E;
+    --bg-card-dark: #252525;
+    --text-primary-dark: #F5F5F5;
+    --text-secondary-dark: #B0B0B0;
+    --text-muted-dark: #707070;
+    --accent-dark: #FF7A5C;
+    --border-dark: #333333;
+  }
+  
+   
+  body {
+    background-color: var(--bg-primary);
+    transition: background-color 0.4s ease;
+  }
+  
+  html.dark body,
+  body.dark {
+    background-color: var(--bg-primary-dark);
+  }
+</style>
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ksbxuzi2ur");
+</script><script>
+  (function() {
+    var saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (saved === 'dark') document.documentElement.classList.add('dark');
+  })();
+</script>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-[var(--bg-primary)] dark:bg-[var(--bg-primary-dark)] border-b border-[var(--border-light)] dark:border-[var(--border-dark)]">
+    <div class="container">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="text-[var(--accent)]">SQL</span>pey
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="/">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">Tutorials</a>
+        <div class="dropdown-content">
+          <a href="/mysql/">MySQL</a>
+          <a href="/sql/">SQL</a>
+          <a href="/database/">Database Blog</a>
+        </div>
+      </li>
+      <li><a href="/python/">Python</a></li>
+      <li><a href="/about/">About</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      
+
+      <button id="darkmode-toggle-header" class="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<style>
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .dark .theme-toggle {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-dark);
+  }
+  
+  .sun-icon { display: block; }
+  .moon-icon { display: none; }
+  
+  .dark .sun-icon { display: none; }
+  .dark .moon-icon { display: block; }
+  
+  .mobile-menu-toggle {
+    display: none;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+var toggle = document.getElementById('darkmode-toggle-header');
+if (toggle) {
+  toggle.addEventListener('click', function() {
+    var html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+  var mobileToggle = document.querySelector('.mobile-menu-toggle');
+  var navbarMenu = document.querySelector('.navbar-menu');
+  
+  if (mobileToggle && navbarMenu) {
+    mobileToggle.addEventListener('click', function() {
+      navbarMenu.classList.toggle('show');
+    });
+  }
+
+  
+  var dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(function(dropdown) {
+    var toggleBtn = dropdown.querySelector('.dropdown-toggle, .theme-toggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768 && !toggleBtn.id) { 
+          e.preventDefault();
+          dropdown.classList.toggle('active');
+        }
+      });
+    }
+  });
+});
+</script>
+
+<style>
+  @media (max-width: 768px) {
+    .navbar-menu.show {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      padding: var(--space-md) var(--space-xl);
+      box-shadow: var(--shadow-soft);
+      z-index: 50;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .dark .navbar-menu.show {
+      background: var(--bg-card-dark);
+      border-color: var(--border-dark);
+    }
+
+    .dropdown.active .dropdown-content {
+      display: block;
+      position: static;
+      box-shadow: none;
+      padding-left: var(--space-md);
+      border: none;
+      min-width: 100%;
+    }
+  }
+</style>
+  </header>
+  
+  <main class="flex-1">
+    
+<article class="container single-article">
+  <div class="article-layout">
+    <div class="article-content animate-fade-in-up">
+      
+      
+      <header class="article-header">
+        <h1 class="article-title">Optimizing C++ File I/O Speed Versus Python for Large Input Processing</h1>
+        
+        <div class="article-meta">
+          <div class="article-meta-left">
+            
+            <div class="article-tags">
+              
+              <span class="tag">C&#43;&#43; Performance</span>
+              
+              <span class="tag">I/O Optimization</span>
+              
+            </div>
+            
+          </div>
+          
+          <div class="article-meta-right">
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              7 min read
+            </span>
+            <span class="meta-divider">·</span>
+            <span class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Jul 29, 2025
+            </span>
+          </div>
+        </div>
+      </header>
+
+      
+      <div class="toc">
+        <h2 class="toc-title">Table of Contents</h2>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#optimizing-c-file-io-speed-versus-python-for-large-input-processing">&ldquo;Optimizing C++ File I/O Speed Versus Python for Large Input Processing&rdquo;</a>
+      <ul>
+        <li><a href="#the-synchronization-overhead-c-streams-and-c-standard-io">The Synchronization Overhead: C++ Streams and C Standard I/O</a></li>
+        <li><a href="#deep-dive-system-call-differences-revealed-through-tracing">Deep Dive: System Call Differences Revealed Through Tracing</a></li>
+        <li><a href="#advanced-buffering-techniques-in-c">Advanced Buffering Techniques in C++</a></li>
+        <li><a href="#alternative-input-strategies-for-maximum-c-speed">Alternative Input Strategies for Maximum C++ Speed</a></li>
+        <li><a href="#caveats-in-benchmarking-methodology">Caveats in Benchmarking Methodology</a></li>
+        <li><a href="#edge-cases-in-line-counting">Edge Cases in Line Counting</a></li>
+      </ul>
+    </li>
+    <li><a href="#solutions">Solutions</a>
+      <ul>
+        <li><a href="#faqs-on-optimizing-c-io-speed-vs-python">FAQs on Optimizing C++ IO Speed Vs Python</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+      
+
+      <div class="prose">
+        <h2 id="optimizing-c-file-io-speed-versus-python-for-large-input-processing">&ldquo;Optimizing C++ File I/O Speed Versus Python for Large Input Processing&rdquo;</h2>
+<p>When benchmarking C++ programs against Python for heavy file input tasks, C++ often lags significantly due to default I/O stream configurations. Why does standard C++ stream input (like <code>std::cin</code>) incur such a substantial performance penalty compared to Python&rsquo;s simple file iteration, and what precise methods exist to close this performance gap?</p>
+<h3 id="the-synchronization-overhead-c-streams-and-c-standard-io">The Synchronization Overhead: C++ Streams and C Standard I/O</h3>
+<p>A primary culprit for slow C++ input with <code>std::cin</code> is the default synchronization mechanism.</p>
+<p><strong>Q: What causes the performance reduction in default C++ iostreams operations</strong></p>
+<p>ANS: By default, <code>std::cin</code> is synchronized with the C standard I/O functions (like <code>scanf</code>, <code>printf</code>) via <code>FILE*</code> streams. This linkage forces <code>std::cin</code> to operate without its own buffering to prevent inconsistent state if both C and C++ I/O methods are intermixed. This avoidance of buffering translates directly into more frequent, expensive system calls for input, crippling performance when processing massive datasets.</p>
+<p><strong>Q: How can C++ I/O synchronization be disabled for speed gains</strong></p>
+<p>ANS: You can decouple the C++ streams from the C standard streams by calling:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>std<span style="color:#f92672">::</span>ios_base<span style="color:#f92672">::</span>sync_with_stdio(false);
+</span></span></code></pre></div><p>Placing this command at the program&rsquo;s start allows C++ streams to buffer their I/O independently, potentially yielding significant speed improvements by reducing system call frequency.</p>
+<p><strong>Q: What risks arise if I disable synchronization while mixing C and C++ I/O</strong></p>
+<p>ANS: If synchronization is disabled (<code>std::ios_base::sync_with_stdio(false);</code>), C++ streams and C streams maintain separate buffers. Mixing them can lead to unpredictable input behavior. For instance, if <code>cin &gt;&gt; myvalue1;</code> reads past the required data, subsequent calls like <code>scanf(&quot;%d&quot;, &amp;myvalue2);</code> might read from an already consumed buffer, resulting in incorrect values being processed.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// Example demonstrating potential hazard after disabling sync
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>std<span style="color:#f92672">::</span>ios_base<span style="color:#f92672">::</span>sync_with_stdio(false);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> myvalue1;
+</span></span><span style="display:flex;"><span>std<span style="color:#f92672">::</span>cin <span style="color:#f92672">&gt;&gt;</span> myvalue1; <span style="color:#75715e">// Might read more than necessary from the input source
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> myvalue2;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// scanf might read incorrect data if cin over-read the buffer
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>scanf(<span style="color:#e6db74">&#34;%d&#34;</span>,<span style="color:#f92672">&amp;</span>amp;myvalue2); 
+</span></span></code></pre></div><p>If you disable synchronization, ensure you commit entirely to using only C++ streams or only C-style I/O functions within that critical section of code.</p>
+<h3 id="deep-dive-system-call-differences-revealed-through-tracing">Deep Dive: System Call Differences Revealed Through Tracing</h3>
+<p>System call tracing (using tools like <code>dtruss</code> or <code>strace</code>) illustrates the I/O divergence between optimized Python iteration and standard C++ streams.</p>
+<p><strong>Q: What do system call traces show when comparing C++ and Python file reading</strong></p>
+<p>ANS: Tracing a C++ execution using default settings versus a Python equivalent reveals that the Python version often performs significantly fewer raw <code>read_nocancel</code> system calls over the same duration, despite achieving higher line throughput. For example, a C++ run might log thousands of <code>read_nocancel</code> calls, whereas Python can process substantially more data with fewer explicit read operations, suggesting internal efficiencies or different underlying library behaviors (like OS-level buffering leveraged by Python).</p>
+<h3 id="advanced-buffering-techniques-in-c">Advanced Buffering Techniques in C++</h3>
+<p>Disabling synchronization is often necessary but not always sufficient. Explicitly managing buffer sizes can provide further optimization.</p>
+<p><strong>Q: Beyond <code>sync_with_stdio</code>, what other C++ stream tuning can boost input rates</strong></p>
+<p>ANS: You can manually set a larger buffer for <code>std::cin</code> to encourage reading larger chunks from the operating system less frequently. This involves setting a custom buffer size before the main processing loop:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// Highly optimized input configuration
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>std<span style="color:#f92672">::</span>ios_base<span style="color:#f92672">::</span>sync_with_stdio(false);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Define a large buffer (e.g., 1MB)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">char</span> custom_buffer[<span style="color:#ae81ff">1048576</span>]; 
+</span></span><span style="display:flex;"><span>std<span style="color:#f92672">::</span>cin.rdbuf()<span style="color:#f92672">-&gt;</span>pubsetbuf(custom_buffer, <span style="color:#66d9ef">sizeof</span>(custom_buffer));
+</span></span></code></pre></div><p>Implementing both <code>sync_with_stdio(false)</code> and setting a custom <code>pubsetbuf</code> can often bring the C++ performance in line with highly optimized Python file reading methods.</p>
+<h3 id="alternative-input-strategies-for-maximum-c-speed">Alternative Input Strategies for Maximum C++ Speed</h3>
+<p>When raw speed is paramount, moving away from high-level streaming operators (<code>&gt;&gt;</code> or <code>getline</code>) toward lower-level C functions or direct memory mapping proves beneficial.</p>
+<p><strong>Q: What C-style functions or memory methods are faster than <code>std::cin</code> even with synchronization off</strong></p>
+<p>ANS:</p>
+<ol>
+<li>
+<p><strong>Using <code>fread</code> with a large vector buffer:</strong> Employing C-style <code>fread</code> directly on <code>stdin</code> with a substantial buffer size (e.g., 500KB) and then manually counting delimiters (like <code>\n</code>) can dramatically outperform stream operations. This approach minimizes overhead by reading large blocks into memory and processing the delimiter count directly.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> CHUNK_SIZE <span style="color:#f92672">=</span> <span style="color:#ae81ff">500</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span>;
+</span></span><span style="display:flex;"><span>std<span style="color:#f92672">::</span>vector<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">char</span><span style="color:#f92672">&gt;</span> chunk(CHUNK_SIZE);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">long</span> <span style="color:#66d9ef">long</span> line_count <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> bytes_read;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Reading from stdin using C function fread
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">while</span> ((bytes_read <span style="color:#f92672">=</span> fread(chunk.data(), <span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">char</span>), CHUNK_SIZE, stdin)) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>    line_count <span style="color:#f92672">+=</span> std<span style="color:#f92672">::</span>count(chunk.begin(), chunk.begin() <span style="color:#f92672">+</span> bytes_read, <span style="color:#e6db74">&#39;\n&#39;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div></li>
+<li>
+<p><strong>Memory Mapping (<code>mmap</code>):</strong> If you control the file reading environment entirely, mapping the entire file into memory can be the fastest approach, as it delegates the read operation entirely to the OS kernel. This avoids repeated buffering layers if the file fits comfortably in available RAM.</p>
+</li>
+<li>
+<p><strong>Binary Data Format:</strong> If file content parsing complexity is an issue, switching from text-based input to a flat, pre-parsed binary data format removes all ambiguity and parsing overhead associated with whitespace and text representation, leading to much quicker loading times.</p>
+</li>
+<li>
+<p><strong>Reading the Entire File at Once:</strong> For smaller files that fit in memory, reading the whole file content into a character array first, then wrapping a stream object around that buffer, avoids external I/O system calls during the actual processing phase.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// Reading entire file content into memory buffer
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>std<span style="color:#f92672">::</span>fstream file(filename, std<span style="color:#f92672">::</span>ios<span style="color:#f92672">::</span>in <span style="color:#f92672">|</span> std<span style="color:#f92672">::</span>ios<span style="color:#f92672">::</span>binary);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>file) <span style="color:#66d9ef">return</span> NULL;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>file.seekg(<span style="color:#ae81ff">0</span>, std<span style="color:#f92672">::</span>ios<span style="color:#f92672">::</span>end);
+</span></span><span style="display:flex;"><span>size_t length <span style="color:#f92672">=</span> file.tellg();
+</span></span><span style="display:flex;"><span>file.seekg(<span style="color:#ae81ff">0</span>, std<span style="color:#f92672">::</span>ios<span style="color:#f92672">::</span>beg);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>file_content <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">char</span>[length <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>];
+</span></span><span style="display:flex;"><span>file.read(file_content, length);
+</span></span><span style="display:flex;"><span>file_content[length] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;\0&#39;</span>;
+</span></span><span style="display:flex;"><span>file.close();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Use an in-memory stream for convenience
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>std<span style="color:#f92672">::</span>istrstream processing_stream(file_content, length);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Process using processing_stream
+</span></span></span></code></pre></div></li>
+</ol>
+<h3 id="caveats-in-benchmarking-methodology">Caveats in Benchmarking Methodology</h3>
+<p>The structure of the benchmarking command itself can profoundly influence perceived performance differences.</p>
+<p><strong>Q: How does using <code>cat file | program</code> versus <code>program &lt; file</code> affect I/O timing measurements</strong></p>
+<p>ANS: Executing benchmarks as <code>$ /usr/bin/time cat big_file | program_to_benchmark</code> involves timing the <code>cat</code> process, which reads from the disk and writes to a pipe, and the subsequent reading by your program from that pipe. This adds overhead from <code>cat</code> and the pipe operations themselves.</p>
+<p>The superior method is direct redirection: <code>$ /usr/bin/time program_to_benchmark &lt; big_file</code>. Here, the shell opens the file descriptor, and the timing tool measures only your program. Your program receives a direct file descriptor, potentially allowing I/O libraries to use advanced techniques like memory mapping (<code>mmap(2)</code>), which might not be triggered when reading from a pipe. The difference between these two styles can show dramatic CPU time disparities.</p>
+<p>If your program performs differently when reading from a pipe versus a direct file descriptor, it indicates the library (or program logic) is actively optimizing based on the source type (e.g., using <code>mmap</code> for direct file access).</p>
+<h3 id="edge-cases-in-line-counting">Edge Cases in Line Counting</h3>
+<p>When counting lines, the loop structure needs careful attention to accurately reflect EOF conditions versus waiting for data.</p>
+<p><strong>Q: Why might a C++ line counting loop overcount lines compared to Python&rsquo;s simple iteration</strong></p>
+<p>ANS: Standard Python iteration over <code>sys.stdin</code> usually terminates cleanly when the End-Of-File (EOF) is reached. In contrast, a simple C++ <code>while (cin)</code> loop combined with <code>getline</code> might execute one final time <em>after</em> the EOF flag is set if the last operation was successful but incomplete, or if the condition check is placed incorrectly relative to the EOF flag set. A more robust C++ structure explicitly checks the <code>eof()</code> flag after reading:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">// Safer C++ line counting loop structure
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">while</span> (std<span style="color:#f92672">::</span>cin) {
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>getline(std<span style="color:#f92672">::</span>cin, input_line);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>std<span style="color:#f92672">::</span>cin.eof())
+</span></span><span style="display:flex;"><span>        line_count<span style="color:#f92672">++</span>;
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><h2 id="solutions">Solutions</h2>
+<h3 id="faqs-on-optimizing-c-io-speed-vs-python">FAQs on Optimizing C++ IO Speed Vs Python</h3>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Why is std cin slower than python for reading files</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: std::cin is slow primarily because it synchronizes with C standard I/O (<code>stdio</code>) by default, preventing independent buffering and forcing more system calls. Disabling this with <code>std::ios_base::sync_with_stdio(false);</code> resolves most of the performance hit.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Is scanf faster than std cin</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, <code>scanf</code> generally outperforms default <code>std::cin</code> because it bypasses the C++ stream synchronization overhead, often reading data more efficiently, though still slower than highly optimized buffering techniques or C-style <code>fread</code>.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Should I use cat file | program or program &lt; file for benchmarking</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Use <code>program &lt; file</code> with <code>/usr/bin/time</code> wrapped around it. Using <code>cat</code> introduces the overhead of the <code>cat</code> process and pipe communication, which pollutes the measurement of your target program&rsquo;s I/O performance.</div>
+    </div>
+</div>
+<div itemscope itemtype="https://schema.org/Question" itemprop="mainEntity">
+    <h2 itemprop="name">Q: Can buffer size fix slow cin performance</h2>
+    <div itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+    <div itemprop="text">ANS: Yes, combining <code>std::ios_base::sync_with_stdio(false);</code> with setting a custom buffer size using <code>std::cin.rdbuf()-&gt;pubsetbuf(...)</code> provides significant improvements by allowing larger I/O chunks.</div>
+    </div>
+</div>
+<pre tabindex="0"><code>std::ios_base::sync_with_stdio(false);
+int myvalue1;
+cin &amp;gt;&amp;gt; myvalue1;
+int myvalue2;
+scanf(&amp;quot;%d&amp;quot;,&amp;amp;myvalue2);
+</code></pre><p>What optimizations have you found most effective when dealing with extremely high-volume data processing in C++? Share your experiences or further questions below!</p>
+<p>For more detailed performance tuning in related areas, check out these resources:</p>
+<ul>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-ssl-certificate-verify-failed-error-in-python/" target="_blank" rel="noopener">Fixing SSL Certificate Verify Failed Errors in Python Requests</a>
+</li>
+<li><a href="https://sqlpey.com/python/solved-how-to-fix-could-not-find-a-version-that-satisfies-the-requirement-error-in-python/" target="_blank" rel="noopener">Resolving Pip Install Version Satisfaction Issues in Python</a>
+</li>
+<li><a href="https://sqlpey.com/python/top-5-methods-to-ping-servers-in-python/" target="_blank" rel="noopener">Methods to Ping Servers Efficiently in Python</a>
+</li>
+</ul>
+<pre tabindex="0"><code>./a.out &amp;lt; in
+Saw 6512403 lines in 8 seconds.  Crunch speed: 814050
+CALL                                        COUNT
+__mac_syscall                                   1
+&amp;lt;snip&amp;gt;
+open                                            6
+pread                                           8
+mprotect                                       17
+mmap                                           22
+stat64                                         30
+read_nocancel                               25958
+./a.py &amp;lt; in
+Read 6512402 lines in 1 seconds. LPS: 6512402
+CALL                                        COUNT
+__mac_syscall                                   1
+&amp;lt;snip&amp;gt;
+open                                            5
+pread                                           8
+mprotect                                       17
+mmap                                           21
+stat64                                         29
+</code></pre>
+      </div>
+
+      
+
+      
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      const light = 'light';
+      const dark = 'dark';
+      let theme = localStorage.theme === dark || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) ? dark : light;
+
+      const s = document.createElement('script');
+      s.type = 'text/javascript';
+      const dataset = {
+          repo: 'CodeWithAbkhan\/discussions-repo',
+          repoId: 'R_kgDONP5ABA',
+          category: 'Announcements',
+          categoryId: 'DIC_kwDONP5ABM4CkTVe',
+          mapping: 'pathname',
+          reactionsEnabled: '1',
+          emitMetadata: '0',
+          theme: theme,
+          lang: 'en',
+      };
+      s.src = 'https://giscus.app/client.js';
+      s.crossorigin = 'anonymous';
+      s.async = true;
+      Object.entries(dataset).forEach(function(a) {
+          return s.dataset[a[0]] = a[1];
+      });
+
+      const curScriptElement = document.currentScript;
+      curScriptElement.parentNode.insertBefore(s, curScriptElement);
+
+      function sendMessage(message) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+
+      function loadGiscusScript() {
+        if (!s.parentElement) {
+          curScriptElement.parentNode.insertBefore(s, curScriptElement);
+        }
+      }
+
+      document.addEventListener('mousemove', loadGiscusScript);
+      window.addEventListener('scroll', loadGiscusScript);
+
+      var toggle = document.getElementById('darkmode-toggle-header');
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          theme = document.documentElement.classList.contains('dark') ? dark : light;
+          sendMessage({
+            setConfig: {
+              theme: theme,
+            }
+          });
+        });
+      }
+    })();
+  </script>
+  
+  
+
+
+    </div>
+
+    <aside class="article-sidebar">
+      <div class="sidebar-section sidebar-intro">
+  <div class="intro-card">
+    <div class="intro-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+    </div>
+    <h3 class="intro-title">Welcome to SQLpey</h3>
+    <p class="intro-text">Expert tutorials and guides for developers. Learn programming concepts the right way.</p>
+    <a href="/about/" class="intro-button">Learn More</a>
+  </div>
+</div>
+
+<ins class="adsbygoogle sidebar-ad"
+     style="display:block"
+     data-ad-client="ca-pub-9018422630165731"
+     data-ad-slot="4612108591"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+
+<script>
+  (function() {
+    setTimeout(function() {
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";
+      s.setAttribute("crossorigin", "anonymous");
+      document.head.appendChild(s);
+      s.onload = function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      };
+    }, 1500);
+  })();
+</script>
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Categories</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/categories/python/" class="sidebar-link">
+        Python
+        <span class="count">4063</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/javascript/" class="sidebar-link">
+        Javascript
+        <span class="count">1316</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/programming/" class="sidebar-link">
+        Programming
+        <span class="count">754</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/sql/" class="sidebar-link">
+        SQL
+        <span class="count">602</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/database/" class="sidebar-link">
+        Database
+        <span class="count">492</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/java/" class="sidebar-link">
+        Java
+        <span class="count">453</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/web-development/" class="sidebar-link">
+        Web Development
+        <span class="count">402</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c%23/" class="sidebar-link">
+        C#
+        <span class="count">283</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/c&#43;&#43;/" class="sidebar-link">
+        C&#43;&#43;
+        <span class="count">277</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/categories/php/" class="sidebar-link">
+        PHP
+        <span class="count">266</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/categories/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+
+<div class="sidebar-section">
+  <h3 class="sidebar-title">Tags</h3>
+  <ul class="sidebar-list">
+    
+    <li>
+      <a href="/tags/sql/" class="sidebar-link">
+        Sql
+        <span class="count">413</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/database/" class="sidebar-link">
+        Database
+        <span class="count">405</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/.net-8/" class="sidebar-link">
+        .NET 8
+        <span class="count">26</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/dotnet/" class="sidebar-link">
+        Dotnet
+        <span class="count">25</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/mysql/" class="sidebar-link">
+        MySQL
+        <span class="count">18</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor-8/" class="sidebar-link">
+        Blazor 8
+        <span class="count">15</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/blazor/" class="sidebar-link">
+        Blazor
+        <span class="count">12</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/oracle/" class="sidebar-link">
+        Oracle
+        <span class="count">11</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/azure-sql-database-2/" class="sidebar-link">
+        Azure-Sql-Database-2
+        <span class="count">9</span>
+      </a>
+    </li>
+    
+    <li>
+      <a href="/tags/postgresql/" class="sidebar-link">
+        Postgresql
+        <span class="count">6</span>
+      </a>
+    </li>
+    
+  </ul>
+  <a href="/tags/" class="view-all">View all →</a>
+</div>
+
+<style>
+  .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-list li {
+    margin-bottom: var(--space-sm);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-link:hover {
+    color: var(--accent);
+    padding-left: var(--space-sm);
+  }
+  
+  .sidebar-link .count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+  
+  .dark .sidebar-link {
+    border-color: var(--border-dark);
+    color: var(--text-secondary-dark);
+  }
+  
+  .dark .sidebar-link:hover {
+    color: var(--accent-dark);
+  }
+  
+  .dark .sidebar-link .count {
+    background: var(--bg-secondary-dark);
+  }
+  
+  .view-all {
+    display: inline-block;
+    margin-top: var(--space-md);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+
+
+    </aside>
+  </div>
+</article>
+
+<style>
+  .single-article { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  
+  .article-header { margin-bottom: var(--space-xl); padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-light); }
+  .dark .article-header { border-color: var(--border-dark); }
+  
+  .article-header .article-title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin-bottom: var(--space-lg); line-height: 1.2; }
+  
+  .article-header .article-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-md); }
+  
+  .meta-item { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); }
+  .meta-divider { color: var(--border); }
+  
+  .article-footer-tags { display: flex; align-items: center; gap: var(--space-md); padding-top: var(--space-lg); margin-top: var(--space-xl); border-top: 1px solid var(--border-light); font-size: 0.9rem; color: var(--text-muted); }
+  .dark .article-footer-tags { border-color: var(--border-dark); }
+  
+  .toc-title { font-size: 1.25rem; font-family: var(--font-display); margin-bottom: var(--space-md); }
+</style>
+
+  </main>
+  
+  <footer class="site-footer">
+    <div class="container">
+  <div class="footer-content">
+    <div class="social-links">
+      <a href="https://www.facebook.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="https://twitter.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+      </a>
+      <a href="https://www.instagram.com/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/sqlpey" class="social-link" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      </a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/terms/">Terms</a>
+      <a href="/contact/">Contact</a>
+    </div>
+
+    <div class="footer-copyright"><span>&copy; 2024-2026 abkhan</span>
+      
+      <span class="ml-4">
+        Powered by <a href="https://codewithabkhan.github.io" target="_blank" rel="noopener" class="text-[var(--accent)]">Ab Khan</a>
+      </span>
+      
+    </div>
+  </div>
+</div>
+  </footer><script src="/main.min.384b175219d26d457111499aa2038f293b9bfd782070f214dc80e59af6797017.js"></script>
+  <div style="display:none" id="code-copy">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+  </div>
+  <div style="display:none" id="code-copy-done">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  </div><script src="/code-copy.min.4be95a7068ec721962fd0df64ce1c8673df8035fde465874f1e6e67e2aac7f71.js"></script>
+  
+
+  
+  
+  <script>
+    !function(){const e=document.createElement("script");e.async=!0,e.setAttribute("crossorigin","anonymous"),e.src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9018422630165731";let t=0;document.addEventListener("mousemove",function(){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)}),window.onscroll=function(n){1==++t&&document.getElementsByTagName("HEAD").item(0).appendChild(e)},setTimeout(function(){0===t&&(t++,document.getElementsByTagName("HEAD").item(0).appendChild(e))},3e3)}();
+  </script>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  <button id="scroll-top" class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>
